@@ -1,0 +1,52 @@
+@import url('./modules//hairline.scss');
+
+html,
+body,
+#app {
+    height: 100%;
+    overflow: hidden;
+}
+
+/**通知提示二次封装**/
+.n-notification-wrapper.custom-notify-service {
+    .n-notification__avatar {
+        position: static;
+        padding: 16px 10px 16px 0;
+    }
+    .n-notification-main,
+    .n-notification-main__content {
+        width: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex;
+        flex: 1;
+    }
+}
+
+/**tabs组件二次封装**/
+.common-element-tabser.n-tabs.n-tabs--line-type {
+    position: relative;
+    > .n-tabs-nav--line-type {
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        background-color: var(--card-color);
+        transition:
+            border-color 0.3s var(--n-bezier),
+            background-color 0.3s var(--n-bezier);
+    }
+    > .n-tabs-pane-wrapper,
+    > .n-tabs-pane-wrapper > .n-tab-pane {
+        position: relative;
+        flex-direction: column;
+        display: flex;
+        flex: 1;
+        padding: 0;
+    }
+    &.inset-bar > .n-tabs-nav {
+        display: none;
+    }
+    &.inset-absolute > .n-tabs-pane-wrapper > .n-tab-pane {
+        position: absolute;
+        inset: 0;
+        padding: 0;
+    }
+}

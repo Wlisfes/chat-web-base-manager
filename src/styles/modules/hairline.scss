@@ -1,0 +1,108 @@
+@mixin skyline-common() {
+    --border-width: 1px;
+    position: absolute;
+    box-sizing: border-box;
+    content: ' ';
+    pointer-events: none;
+    transition:
+        color 0.3s var(--n-bezier),
+        border-color 0.3s var(--n-bezier);
+}
+
+@mixin skyline($color: var(--divider-color), $solid: solid) {
+    @include skyline-common();
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 0 $solid $color;
+}
+
+@mixin skyline-top($color: var(--divider-color), $left: 0, $right: 0) {
+    @include skyline-common();
+    top: 0;
+    right: $right;
+    left: $left;
+    border-top: 1px solid $color;
+}
+
+@mixin skyline-bottom($color: var(--divider-color), $left: 0, $right: 0) {
+    @include skyline-common();
+    right: $right;
+    bottom: 0;
+    left: $left;
+    border-bottom: 1px solid $color;
+}
+
+.common-skyline {
+    &,
+    &--top,
+    &--left,
+    &--right,
+    &--bottom,
+    &--full,
+    &--top-bottom {
+        position: relative;
+    }
+    &--top::after {
+        @include skyline();
+        border-top-width: var(--border-width);
+    }
+    &--left::after {
+        @include skyline();
+        border-left-width: var(--border-width);
+    }
+    &--right::after {
+        @include skyline();
+        border-right-width: var(--border-width);
+    }
+    &--bottom::after {
+        @include skyline();
+        border-bottom-width: var(--border-width);
+    }
+    &,
+    &-unset {
+        &--top-bottom::after {
+            @include skyline();
+            border-width: var(--border-width) 0;
+        }
+    }
+    &--full::after {
+        @include skyline();
+        border-width: var(--border-width);
+    }
+    &-dashed {
+        &--top,
+        &--left,
+        &--right,
+        &--bottom,
+        &--full,
+        &--top-bottom {
+            position: relative;
+        }
+        &--top::after {
+            @include skyline($solid: dashed);
+            border-top-width: var(--border-width);
+        }
+        &--left::after {
+            @include skyline($solid: dashed);
+            border-left-width: var(--border-width);
+        }
+        &--right::after {
+            @include skyline($solid: dashed);
+            border-right-width: var(--border-width);
+        }
+        &--bottom::after {
+            @include skyline($solid: dashed);
+            border-bottom-width: var(--border-width);
+        }
+        &--top-bottom::after {
+            @include skyline($solid: dashed);
+            border-width: var(--border-width) 0;
+        }
+        &--full::after {
+            @include skyline($solid: dashed);
+            border-width: var(--border-width);
+        }
+    }
+}

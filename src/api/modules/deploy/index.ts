@@ -1,0 +1,6 @@
+export * from '@/api/modules/deploy/modules/sheet.service'
+export * from '@/api/modules/deploy/modules/dept.service'
+export * from '@/api/modules/deploy/modules/role.service'
+export * from '@/api/modules/deploy/modules/account.service'
+export * from '@/api/modules/deploy/modules/position.service'
+export * from '@/api/modules/deploy/modules/datetask.service'
