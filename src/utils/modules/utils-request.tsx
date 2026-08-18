@@ -3,6 +3,7 @@ import { APP_COOKIE, getToken, getCookie, fetchDestroy, fetchCompose } from '@/u
 
 export const request: AxiosRequest = axios.create({
     timeout: 120000,
+    withCredentials: true,
     headers: {
         platform: 'manager'
     }
@@ -42,6 +43,7 @@ function fetchAuthAccountTokenContinue(): Promise<string> {
                 isRefreshing = true
                 try {
                     const { data } = await axios.post('/api/account/auth/refresh', null, {
+                        withCredentials: true,
                         headers: { Authorization: `Bearer ${token}`, platform: 'manager' }
                     })
                     if (data.code === 200) {

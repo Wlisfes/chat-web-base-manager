@@ -9,7 +9,7 @@ export default defineComponent({
     name: 'BaseAuthorize',
     setup(props) {
         const { fetchAuthAccountToken } = useStore(useGlobal)
-        const { link, loading, fetchRefresh, fetchComplete } = useCodeService()
+        const { link, loading, error, fetchRefresh, fetchComplete, fetchError } = useCodeService()
         const { router, formRef, formState, state, setState, fetchValidater } = useFormService({
             formState: {
                 number: '',
@@ -101,9 +101,11 @@ export default defineComponent({
                                 <common-element-codex
                                     link={link.value}
                                     loading={loading.value}
+                                    error={error.value}
                                     disabled={state.loading}
                                     onClick={fetchRefresh}
                                     onComplete={fetchComplete}
+                                    onError={fetchError}
                                 ></common-element-codex>
                             </n-flex>
                         </n-form-item>
