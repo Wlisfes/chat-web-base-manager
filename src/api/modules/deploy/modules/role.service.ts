@@ -2,6 +2,7 @@ import { request } from '@/utils'
 
 const ROLE_API = '/api/account/roles'
 const USER_API = '/api/account/users'
+const ORGANIZATION_API = '/api/account/organizations'
 
 function dataScopePayload(data: Omix): Omix {
     if (!data.model) return { rules: [] }
@@ -42,6 +43,36 @@ function mapRole(role: Omix): Omix {
     }
 }
 
+function getSingleOrganizationKeyId(role: Omix): number | undefined {
+    const organizationKeyIds = [
+        ...new Set<number>(
+            (role.dataScopes ?? [])
+                .flatMap((scope: Omix) =>
+                    (scope.organizations ?? []).map((organization: Omix) => Number(organization.organizationKeyId))
+                )
+                .filter((keyId: number) => Number.isSafeInteger(keyId))
+        )
+    ]
+    return organizationKeyIds.length === 1 ? organizationKeyIds[0] : undefined
+}
+
+function mapDepartmentRoleTree(nodes: Array<Omix>, rolesByOrganization: Map<number, Omix>): Array<Omix> {
+    return nodes.flatMap(organization => {
+        const children = mapDepartmentRoleTree(organization.children ?? [], rolesByOrganization)
+        const role = rolesByOrganization.get(Number(organization.keyId))
+        if (!role && children.length === 0) return []
+        return [
+            {
+                ...organization,
+                nodeId: role?.keyId ?? -Number(organization.keyId),
+                node: role,
+                disabled: !role,
+                children
+            }
+        ]
+    })
+}
+
 async function replaceUserRole(uid: string, roleId: number, add: boolean) {
     const detail = await request({ url: `${USER_API}/${uid}`, method: 'GET' })
     const current = detail.data?.roleKeyIds ?? []
@@ -75,8 +106,27 @@ export async function httpBaseSystemRoleResolver(data: Omix): Promise<any> {
 
 /**角色列表查询**/
 export async function httpBaseSystemColumnRole(): Promise<any> {
-    const response = await request({ url: ROLE_API, method: 'GET' })
-    return { ...response, data: { list: (response.data ?? []).map(mapRole), total: response.data?.length ?? 0 } }
+    const [roleResponse, organizationResponse] = await Promise.all([
+        request({ url: ROLE_API, method: 'GET' }),
+        request({ url: `${ORGANIZATION_API}/tree`, method: 'GET' })
+    ])
+    const roles = (roleResponse.data ?? []).map(mapRole)
+    const rolesByOrganization = new Map<number, Omix>()
+    const departmentRoleKeyIds = new Set<number>()
+    for (const role of roles) {
+        const organizationKeyId = getSingleOrganizationKeyId(role)
+        if (organizationKeyId === undefined || rolesByOrganization.has(organizationKeyId)) continue
+        rolesByOrganization.set(organizationKeyId, role)
+        departmentRoleKeyIds.add(role.keyId)
+    }
+    return {
+        ...roleResponse,
+        data: {
+            list: roles.filter((role: Omix) => !departmentRoleKeyIds.has(role.keyId)),
+            dept: mapDepartmentRoleTree(organizationResponse.data ?? [], rolesByOrganization),
+            total: roles.length
+        }
+    }
 }
 
 /**角色关联账号列表**/
