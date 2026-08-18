@@ -5,6 +5,7 @@
 - 影响机器：Company、Home；与 Gateway 同版本窗口联动发布。
 - 关联版本：本次 Manager 与 Gateway 联动发布的完整 Git SHA。
 - 变更内容：Account 请求由 `/api/account/**` 改为 `/api/**`，Finance 请求由 `/api/windows/finance/**` 改为 `/api/finance/**`；刷新 Token、登录态判断、验证码及全部账号和财务管理接口同步迁移。
+- 部署可靠性：两台 Runner 访问 GHCR 多次出现 EOF，镜像拉取默认重试由 3 次提高到 8 次，仍保持递增退避且失败后自动保留旧容器。
 - 机器侧操作：先发布支持 `/api` 根前缀的 Gateway 并切换 Nacos 路由，再发布 Manager；两台机器继续使用相同域名、TLS、Compose 项目和 Docker 网络。
 
 ### 验证
