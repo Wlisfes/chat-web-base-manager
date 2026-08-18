@@ -1,5 +1,33 @@
 # 部署变更记录
 
+## 2026-08-18 Company/Home 双机部署
+
+- 影响机器：Company 与 Home 两台独立 Docker 主机，以及各自的 Manager 仓库 Self-hosted Runner。
+- 关联版本：本次变更合并后的完整 Git SHA 镜像；两台机器部署相同版本。
+- 变更内容：将原先只绑定 `chat-server-company` 的单机部署改为 Company/Home 双机矩阵。镜像仍只构建和发布一次，Company 使用 `production-company` 与 `deploy-company`，Home 使用 `production-home` 与 `deploy-home`；矩阵关闭 fail-fast，使在线机器不受另一台离线或失败影响。补充双机 Runner、本地 TLS、部署验证与故障恢复基线。
+- 机器侧操作：在 Home 机器为本仓库安装并启动带 `chat-server-home` 标签的 Self-hosted Runner，确保 Runner 用户可访问 Docker 并可写 `/opt/chat-web-base-manager`；在 Company 和 Home 各执行一次 `deploy/bootstrap-local-https.ps1`，分别生成和信任机器本地证书。GitHub 仓库中保留 `production-company` 和 `production-home` 两个 Environment；如使用默认部署目录，无需设置 `DEPLOY_PATH`。
+
+### 验证
+
+```bash
+actionlint
+docker compose -f deploy/compose.yml config --quiet
+sh -n deploy/deploy.sh
+```
+
+合并到 `main` 后，在 Actions 中确认同一次构建产生 `Deploy to company host` 与 `Deploy to home host` 两个任务，二者的 `IMAGE` 均为 `ghcr.io/wlisfes/chat-web-base-manager:<同一提交SHA>`。在两台机器分别执行：
+
+```bash
+docker inspect chat-web-base-manager --format '{{.Config.Image}} {{.State.Status}} {{.State.Health.Status}}'
+curl --silent --show-error --fail --insecure --resolve chat.lisfes.com:443:127.0.0.1 https://chat.lisfes.com/health
+```
+
+预期容器镜像 SHA 一致、状态为 `running healthy`，健康接口输出 `healthy`。
+
+### 回滚
+
+工作流变更回滚为上一版单机配置不会删除 Home 上已经运行的容器。应用版本回滚时，在 Company 和 Home 各自的 `/opt/chat-web-base-manager` 将 `IMAGE` 指向同一个上一提交 SHA，然后执行 `docker compose -f compose.yml up -d --no-deps base-manager` 并重新检查健康状态。若只需暂停某台部署，停止该机器的本仓库 Runner 服务；不得删除另一台机器的运行实例。
+
 ## 2026-08-18 本地 HTTPS 与自动部署
 
 - 影响机器：Company 自托管 Runner 所在的本机；Windows 浏览器和对应 WSL Docker 主机。

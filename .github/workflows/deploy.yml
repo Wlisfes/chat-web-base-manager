@@ -60,16 +60,26 @@ jobs:
                   cache-to: type=gha,mode=max
 
     deploy:
-        name: Deploy to local company host
+        name: Deploy to ${{ matrix.server }} host
         needs: build
         if: github.event_name != 'pull_request'
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - server: company
+                      runner: chat-server-company
+                      environment: production-company
+                    - server: home
+                      runner: chat-server-home
+                      environment: production-home
         runs-on:
             - self-hosted
             - linux
-            - chat-server-company
-        environment: production-company
+            - ${{ matrix.runner }}
+        environment: ${{ matrix.environment }}
         concurrency:
-            group: deploy-company
+            group: deploy-${{ matrix.server }}
             cancel-in-progress: true
         permissions:
             contents: read

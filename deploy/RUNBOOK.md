@@ -14,13 +14,16 @@
 | Docker 网络 | `chat-web-infrastructure` |
 | API 上游 | `chat-web-gateway-service:3999` |
 | TLS Docker Volume | `chat-web-base-manager-tls` |
-| Runner 标签 | `chat-server-company` |
+| Runner 标签 | Company：`chat-server-company`；Home：`chat-server-home` |
+| GitHub Environments | Company：`production-company`；Home：`production-home` |
 
-该域名仅供本机访问，不依赖公共 DNS，也不对外网监听。浏览器通过 Windows hosts 解析到回环地址；本地证书只加入 Windows 当前用户信任库。证书私钥固定保存在 `/opt/chat-web-base-manager/certs/chat.lisfes.com.key`，权限必须为 `0600`。部署脚本验证证书后通过标准输入同步到专用 Docker Volume，解决 Docker Desktop 无法直接绑定 WSL `/opt` 路径的问题；站点容器对该卷只读挂载。
+该服务同时部署到 Company 和 Home。流水线只构建一次镜像，并把同一个完整 Git SHA 部署到两台机器；两个部署任务使用独立并发组，任一机器离线时不会阻塞另一台，离线机器的任务会等待对应 Runner 恢复。
+
+该域名仅供每台机器本机访问，不依赖公共 DNS，也不对外网监听。每台机器的浏览器分别通过 Windows hosts 解析到自己的回环地址；本地证书只加入对应机器的 Windows 当前用户信任库。证书私钥固定保存在各机器 `/opt/chat-web-base-manager/certs/chat.lisfes.com.key`，权限必须为 `0600`。部署脚本验证证书后通过标准输入同步到该机器的专用 Docker Volume，解决 Docker Desktop 无法直接绑定 WSL `/opt` 路径的问题；站点容器对该卷只读挂载。
 
 ## 首次机器初始化
 
-从管理员 PowerShell 执行：
+Company 和 Home 两台机器都要从管理员 PowerShell 各执行一次：
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
@@ -34,6 +37,8 @@ Select-String -Path "$env:SystemRoot\System32\drivers\etc\hosts" -Pattern 'chat\
 Get-ChildItem Cert:\CurrentUser\Root | Where-Object Subject -EQ 'CN=chat.lisfes.com'
 wsl -d Ubuntu-22.04 -u root -- sh -lc "stat -c '%a %n' /opt/chat-web-base-manager/certs/chat.lisfes.com.*"
 ```
+
+每个机器还必须为 Manager 仓库安装一个独立 Self-hosted Runner，并分别添加 `chat-server-company` 或 `chat-server-home` 标签。Runner 服务账户需要能写入 `/opt/chat-web-base-manager`，并能访问该机器的 Docker daemon。仓库的 `production-company` 与 `production-home` Environment 可分别覆盖 `DEPLOY_PATH`；不设置时都使用 `/opt/chat-web-base-manager`。
 
 ## 部署验证
 
@@ -58,7 +63,9 @@ $response.StatusCode
 | 443 端口冲突 | 其他进程监听本机 HTTPS | `Get-NetTCPConnection -State Listen -LocalPort 443` 定位并处理冲突 |
 | 页面正常、API 502 | Gateway 不健康或不在共享网络 | 检查 `chat-web-gateway-service` 健康状态和 `chat-web-infrastructure` |
 | 刷新页面返回 404 | Nginx SPA 回退配置未生效 | 检查运行镜像及 `/etc/nginx/conf.d/default.conf` |
-| 流水线一直等待 Runner | Manager 仓库 Runner 未在线 | 检查 Manager 仓库 `chat-server-company` Runner 服务 |
+| Company 部署一直等待 | Company Runner 未在线 | 检查 Manager 仓库 `chat-server-company` Runner 服务 |
+| Home 部署一直等待 | Home Runner 未在线 | 检查 Manager 仓库 `chat-server-home` Runner 服务 |
+| 一台成功、另一台等待 | 等待机器离线 | 已在线机器的部署有效；恢复另一台对应 Runner 后等待任务会继续 |
 
 ## 回滚
 

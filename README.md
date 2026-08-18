@@ -8,4 +8,4 @@ yarn dev
 yarn build
 ```
 
-本机部署地址为 `https://chat.lisfes.com`。首次初始化、证书信任、健康检查和回滚说明见 `deploy/RUNBOOK.md`。
+Company 和 Home 两台机器都通过各自本机的 `https://chat.lisfes.com` 访问。流水线构建一次镜像并将同一 Git SHA 部署到两台机器；首次初始化、Runner 标签、证书信任、健康检查和回滚说明见 `deploy/RUNBOOK.md`。
