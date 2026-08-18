@@ -1,5 +1,30 @@
 # 部署变更记录
 
+## 2026-08-18 Home 共享 HTTPS 入口部署
+
+- 影响机器：Home 当前 Docker Desktop 主机；Company 已有部署不变。
+- 关联版本：`5b3c30a6cbf67fbc7702a64519a675195f9074ee`，GHCR 镜像摘要 `sha256:a733f222dcb6aad998e5332ac69b0a9198d9193f1cf82831278c74cc3481f937`。
+- 变更内容：将 `chat-web-base-manager` 部署到 Compose 项目 `chat-web-service` 和共享网络 `chat-web-infrastructure`。由于 Home 的 `80/443` 已由 `chat-web-nginx` 占用，Manager 仅额外绑定 `127.0.0.1:8443`，共享入口使用 `deploy/shared-ingress.conf` 在 Docker 网络内反向代理到 Manager 的 `8443`；Windows hosts 继续使用 `127.0.0.1 chat.lisfes.com`，HTTPS 继续使用该机器现有且受信任的本地证书。
+- 机器侧操作：创建 `chat-web-base-manager-tls` Volume，并在机器内部从共享入口的证书 Volume 同步证书和私钥；以 `HTTPS_PORT=8443` 启动 Manager；将共享入口的 `default.conf` 更新为本次配置并重载 Nginx。私钥没有写入仓库或命令输出。
+
+### 验证
+
+```powershell
+docker inspect chat-web-base-manager --format "{{.Config.Image}} {{.State.Status}} {{.State.Health.Status}}"
+docker inspect chat-web-base-manager --format "{{index .Config.Labels `"com.docker.compose.project`"}}"
+docker exec chat-web-nginx nginx -t
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/health
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/account/health
+```
+
+预期镜像为上述完整 SHA，Compose 项目为 `chat-web-service`，容器为 `running healthy`，Nginx 配置检查成功，两个 HTTPS 健康检查均返回 HTTP 200。
+
+### 回滚
+
+- 恢复共享 Nginx 原 `default.conf` 后执行 `docker exec chat-web-nginx nginx -s reload`，流量即回到原上游。
+- 在 Manager 部署目录执行 `docker compose -p chat-web-service -f compose.yml down`；如 Compose 项目中还有其他业务服务，只执行 `docker rm -f chat-web-base-manager`，不要对整个项目执行 `down`。
+- 保留 `chat-web-base-manager-tls` Volume 便于再次部署；确认不再使用后才可删除。Company 容器和配置无需操作。
+
 ## 2026-08-18 Company/Home 双机部署
 
 - 影响机器：Company 与 Home 两台独立 Docker 主机，以及各自的 Manager 仓库 Self-hosted Runner。

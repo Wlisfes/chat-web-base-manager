@@ -17,6 +17,12 @@
 | Runner 标签 | Company：`chat-server-company`；Home：`chat-server-home` |
 | GitHub Environments | Company：`production-company`；Home：`production-home` |
 
+Home 当前机器的 `443` 已由共享 `chat-web-nginx` 占用，因此 Manager 使用
+`127.0.0.1:8443 -> 8443`，共享入口加载 `deploy/shared-ingress.conf` 后通过
+`chat-web-infrastructure` 转发到 `chat-web-base-manager:8443`。该兼容模式不改变
+Compose 项目名、容器内端口、域名或 API 上游；Company 若没有共享入口，继续使用
+默认的 `127.0.0.1:443 -> 8443`。
+
 该服务同时部署到 Company 和 Home。流水线只构建一次镜像，并把同一个完整 Git SHA 部署到两台机器；两个部署任务使用独立并发组，任一机器离线时不会阻塞另一台，离线机器的任务会等待对应 Runner 恢复。
 
 该域名仅供每台机器本机访问，不依赖公共 DNS，也不对外网监听。每台机器的浏览器分别通过 Windows hosts 解析到自己的回环地址；本地证书只加入对应机器的 Windows 当前用户信任库。证书私钥固定保存在各机器 `/opt/chat-web-base-manager/certs/chat.lisfes.com.key`，权限必须为 `0600`。部署脚本验证证书后通过标准输入同步到该机器的专用 Docker Volume，解决 Docker Desktop 无法直接绑定 WSL `/opt` 路径的问题；站点容器对该卷只读挂载。
@@ -61,6 +67,7 @@ $response.StatusCode
 | 域名无法打开 | Windows hosts 未配置 | 重新运行初始化脚本并执行 `ipconfig /flushdns` |
 | 浏览器提示证书不可信 | 当前用户证书库缺少本地证书 | 重新运行初始化脚本，完全退出并重启浏览器 |
 | 443 端口冲突 | 其他进程监听本机 HTTPS | `Get-NetTCPConnection -State Listen -LocalPort 443` 定位并处理冲突 |
+| 共享入口返回 502 | Manager 未加入共享网络或入口配置未加载 | 检查两个容器的 `chat-web-infrastructure` 网络，并执行 `docker exec chat-web-nginx nginx -t` |
 | 页面正常、API 502 | Gateway 不健康或不在共享网络 | 检查 `chat-web-gateway-service` 健康状态和 `chat-web-infrastructure` |
 | 刷新页面返回 404 | Nginx SPA 回退配置未生效 | 检查运行镜像及 `/etc/nginx/conf.d/default.conf` |
 | Company 部署一直等待 | Company Runner 未在线 | 检查 Manager 仓库 `chat-server-company` Runner 服务 |
