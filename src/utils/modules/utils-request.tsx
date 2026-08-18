@@ -11,7 +11,8 @@ export const request: AxiosRequest = axios.create({
 /**自定义错误处理**/
 async function fetchInizeNotice(response: AxiosResponse) {
     const data = response.data
-    if (data.code === 401) {
+    const isLoginRequest = response.config.url?.includes('/api/account/auth/login')
+    if (data.code === 401 && !isLoginRequest) {
         await fetchDestroy()
         window.location.replace('/login')
     }
@@ -23,7 +24,7 @@ async function fetchInizeNotice(response: AxiosResponse) {
 
 /**token续时状态**/
 let isRefreshing = false
-let refreshQueue: Array<any> = []
+let refreshQueue: Array<{ resolve: (token: string) => void; reject: (error: unknown) => void }> = []
 
 /**检查token是否需要续时**/
 function fetchAuthAccountTokenContinue(): Promise<string> {
@@ -40,19 +41,21 @@ function fetchAuthAccountTokenContinue(): Promise<string> {
                 /**需要续时且当前无续时任务**/
                 isRefreshing = true
                 try {
-                    const { data } = await axios.post('/api/windows/auth/token/continue', null, {
-                        headers: { Authorization: token, platform: 'manager' }
+                    const { data } = await axios.post('/api/account/auth/refresh', null, {
+                        headers: { Authorization: `Bearer ${token}`, platform: 'manager' }
                     })
                     if (data.code === 200) {
                         await fetchCompose(data.data)
                         /**执行队列中等待的请求**/
-                        refreshQueue.forEach(cb => cb(data.data.token))
+                        refreshQueue.forEach(waiter => waiter.resolve(data.data.accessToken))
                         refreshQueue = []
-                        return resolve(data.data.token)
+                        return resolve(data.data.accessToken)
                     } else {
                         throw data
                     }
                 } catch (err) {
+                    refreshQueue.forEach(waiter => waiter.reject(err))
+                    refreshQueue = []
                     await fetchDestroy()
                     window.location.replace('/login')
                     return reject(err)
@@ -62,8 +65,8 @@ function fetchAuthAccountTokenContinue(): Promise<string> {
             } else {
                 /**续时进行中、当前请求排队等待新token**/
                 return resolve(
-                    await new Promise<string>(queueResolve => {
-                        refreshQueue.push((newToken: string) => queueResolve(newToken))
+                    await new Promise<string>((queueResolve, queueReject) => {
+                        refreshQueue.push({ resolve: queueResolve, reject: queueReject })
                     })
                 )
             }
@@ -77,7 +80,7 @@ request.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         const token = getToken()
         if (token) {
-            config.headers.Authorization = await fetchAuthAccountTokenContinue()
+            config.headers.Authorization = `Bearer ${await fetchAuthAccountTokenContinue()}`
         }
         return config
     },

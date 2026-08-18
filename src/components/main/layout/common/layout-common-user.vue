@@ -10,7 +10,7 @@ export default defineComponent({
     name: 'LayoutCommonUser',
     setup(props, ctx) {
         const router = useRouter()
-        const { faseUser, fetchReset } = useStore(useGlobal)
+        const { faseUser, fetchAuthAccountTokenLogout } = useStore(useGlobal)
         const { theme, fetchThemeUpdate } = useProvider()
         const { state, setState } = useState({ visible: false, delay: false })
 
@@ -38,7 +38,7 @@ export default defineComponent({
                     type: 'warning',
                     content: `确定要退出当前账号吗？`,
                     async onSubmit(done: Function) {
-                        return await fetchReset().then(async () => {
+                        return await fetchAuthAccountTokenLogout().then(async () => {
                             await done({ visible: false })
                             return router.push({ path: '/login', replace: true })
                         })
@@ -112,7 +112,7 @@ export default defineComponent({
                     </n-list>
                     <div class="p-inline-10 p-block-10 flex flex-col p-bs-0">
                         <common-element-button size="large" icon="nest-quit" secondary onClick={fetchCompose}>
-                            立即登录
+                            退出登录
                         </common-element-button>
                     </div>
                 </n-element>

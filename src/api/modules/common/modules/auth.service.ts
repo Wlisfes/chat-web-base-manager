@@ -3,7 +3,7 @@ import { request } from '@/utils'
 /**账号登录**/
 export function httpAuthAccountToken(data: Omix) {
     return request({
-        url: `/api/windows/auth/token/login`,
+        url: `/api/account/auth/login`,
         method: 'POST',
         data
     })
@@ -12,7 +12,7 @@ export function httpAuthAccountToken(data: Omix) {
 /**登录续时**/
 export function httpAuthAccountTokenContinue() {
     return request({
-        url: `/api/windows/auth/token/continue`,
+        url: `/api/account/auth/refresh`,
         method: 'POST'
     })
 }
@@ -20,23 +20,23 @@ export function httpAuthAccountTokenContinue() {
 /**登录账户信息**/
 export function httpAuthAccountTokenResolver() {
     return request({
-        url: `/api/windows/auth/token/resolver`,
+        url: `/api/account/auth/me`,
         method: 'GET'
     })
 }
 
-/**登录账户权限**/
-export function httpAuthAccountTokenResource() {
+/**登录账户菜单和按钮权限**/
+export function httpAuthAccountPermissions() {
     return request({
-        url: `/api/windows/auth/token/resource`,
+        url: `/api/account/permissions/me`,
         method: 'GET'
     })
 }
 
-/**登录账户按钮权限**/
-export function httpAuthAccountTokenSheet() {
+/**退出登录并撤销服务端会话**/
+export function httpAuthAccountTokenLogout() {
     return request({
-        url: `/api/windows/auth/token/sheet`,
-        method: 'GET'
+        url: `/api/account/auth/logout`,
+        method: 'POST'
     })
 }

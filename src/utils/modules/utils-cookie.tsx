@@ -13,12 +13,17 @@ export enum APP_COOKIE {
 }
 
 export async function setCookie(key: keyof typeof APP_COOKIE, data: any, expires: number = 0) {
+    const options = {
+        sameSite: 'strict' as const,
+        secure: window.location.protocol === 'https:'
+    }
     if (expires && expires > 0) {
         return JsCookie.set(key, JSON.stringify(data), {
+            ...options,
             expires: new Date(Date.now() + expires * 1000)
         })
     }
-    return JsCookie.set(key, JSON.stringify(data))
+    return JsCookie.set(key, JSON.stringify(data), options)
 }
 
 export function getCookie<T>(key: keyof typeof APP_COOKIE, defaultValue?: T): T {
@@ -36,6 +41,8 @@ export async function delCookie(key: keyof typeof APP_COOKIE) {
 
 export async function setToken(token: string, expires: number) {
     return JsCookie.set(APP_COOKIE.APP_TOKEN, token, {
+        sameSite: 'strict',
+        secure: window.location.protocol === 'https:',
         expires: new Date(Date.now() + expires * 1000)
     })
 }
@@ -48,10 +55,10 @@ export function delToken() {
     return JsCookie.remove(APP_COOKIE.APP_TOKEN)
 }
 
-export async function fetchCompose(data: Omix<{ token: string; expires: number }>) {
-    await setCookie(APP_COOKIE.APP_TOKEN_EXPIRES, data.expires, data.expires)
-    await setCookie(APP_COOKIE.APP_TOKEN_CREATED_EXPIRES, Date.now(), data.expires)
-    return await setToken(data.token, data.expires)
+export async function fetchCompose(data: Omix<{ accessToken: string; expiresIn: number }>) {
+    await setCookie(APP_COOKIE.APP_TOKEN_EXPIRES, data.expiresIn, data.expiresIn)
+    await setCookie(APP_COOKIE.APP_TOKEN_CREATED_EXPIRES, Date.now(), data.expiresIn)
+    return await setToken(data.accessToken, data.expiresIn)
 }
 
 export async function fetchDestroy() {

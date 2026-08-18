@@ -21,7 +21,7 @@ interface BaseServiceOptions<T> extends Partial<BaseServiceState> {
 export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = {}) {
     const { inverted } = useProvider()
     const { state, setState } = useState({
-        url: options.url ?? '/api/windows/auth/codex/write',
+        url: options.url ?? '/api/account/auth/captcha',
         link: options.link ?? '',
         loading: options.loading ?? true,
         initialize: options.initialize ?? true,

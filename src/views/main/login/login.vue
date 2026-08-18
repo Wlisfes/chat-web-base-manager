@@ -18,8 +18,8 @@ export default defineComponent({
             },
             rules: {
                 number: { required: true, trigger: 'blur', message: '请输入登录账号' },
-                password: { required: true, trigger: 'blur', min: 6, max: 18, message: '请输入6~18位登录密码' },
-                code: { required: true, trigger: 'blur', message: '请输入验证码' }
+                password: { required: true, trigger: 'blur', max: 128, message: '请输入登录密码' },
+                code: { required: true, trigger: 'blur', len: 4, message: '请输入4位验证码' }
             }
         })
 
@@ -34,8 +34,9 @@ export default defineComponent({
                             return router.push({ path: '/', replace: true })
                         })
                     })
-                } catch (err) {
-                    return await await setState({ loading: false, disabled: false }).then(async () => {
+                } catch (err: any) {
+                    formState.value.code = ''
+                    return await setState({ loading: false, disabled: false }).then(async () => {
                         return await Promise.all([fetchRefresh(), fetchNotifyService({ type: 'error', title: err.message })])
                     })
                 }
@@ -64,7 +65,7 @@ export default defineComponent({
                         </n-h2>
                         <n-form-item path="number">
                             <form-common-column-input
-                                maxlength={32}
+                                maxlength={128}
                                 type="text"
                                 placeholder="请输入登录账号"
                                 v-model:value={formState.value.number}
@@ -75,7 +76,7 @@ export default defineComponent({
                         </n-form-item>
                         <n-form-item path="password">
                             <form-common-column-input
-                                maxlength={32}
+                                maxlength={128}
                                 placeholder="请输入登录密码"
                                 type="password"
                                 show-password-on="click"
