@@ -11,9 +11,13 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
     const faseMeta = ref<Omix>(fetchMetaDefault())
     const { state, setState } = useState({
         /**登录权限菜单**/
-        menuOptions: [],
+        menuOptions: [] as Array<Omix>,
         /**登录权限按钮**/
-        sheetOptions: [],
+        sheetOptions: [] as Array<string>,
+        /**是否超级管理员**/
+        superAdmin: false,
+        /**登录账户角色编码**/
+        roleCodes: [] as Array<string>,
         /**标签页缓存**/
         tabOptions: [faseMeta.value]
     })
@@ -28,7 +32,13 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
     async function fetchReset() {
         return await fetchDestroy().then(async () => {
             await useStore(useConfiger).fetchReset()
-            return await setState({ tabOptions: [faseMeta.value] }).then(() => {
+            return await setState({
+                menuOptions: [],
+                sheetOptions: [],
+                superAdmin: false,
+                roleCodes: [],
+                tabOptions: [faseMeta.value]
+            }).then(() => {
                 return (faseUser.value = {})
             })
         })
@@ -36,15 +46,15 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
 
     /**初始化**/
     async function fetchBaseInitialize() {
-        return await Promise.all([fetchAuthAccountTokenResolver(), fetchAuthAccountTokenResource(), fetchAuthAccountTokenSheet()])
+        return await Promise.all([fetchAuthAccountTokenResolver(), fetchAuthAccountPermissions()])
     }
 
     /**登录账户**/
     async function fetchAuthAccountToken(formState: Omix) {
         return await Service.httpAuthAccountToken({
             code: formState.code,
-            number: formState.number,
-            password: window.btoa(encodeURIComponent(formState.password))
+            account: formState.number,
+            password: formState.password
         })
     }
 
@@ -55,18 +65,51 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
         })
     }
 
-    /**登录账户权限**/
-    async function fetchAuthAccountTokenResource() {
-        return await Service.httpAuthAccountTokenResource().then(async ({ data }) => {
-            return await setState({ menuOptions: data.list ?? [] })
+    /**登录账户菜单、按钮和角色权限**/
+    async function fetchAuthAccountPermissions() {
+        return await Service.httpAuthAccountPermissions().then(async ({ data }) => {
+            const menuOptions = fetchMenuOptions(data.menuTree ?? [])
+            if (!fetchHasMenu(menuOptions, '/manager')) {
+                menuOptions.unshift({ name: '工作台', router: '/manager', iconName: 'nest-compass' })
+            }
+            return await setState({
+                menuOptions,
+                sheetOptions: data.permissionCodes ?? [],
+                superAdmin: data.superAdmin === true,
+                roleCodes: data.roleCodes ?? []
+            })
         })
     }
 
-    /**登录账户按钮权限**/
-    async function fetchAuthAccountTokenSheet() {
-        return await Service.httpAuthAccountTokenSheet().then(async ({ data }) => {
-            return await setState({ sheetOptions: data.list ?? [] })
-        })
+    /**退出登录；即使服务端暂不可用也清理本地身份。**/
+    async function fetchAuthAccountTokenLogout() {
+        try {
+            await Service.httpAuthAccountTokenLogout()
+        } catch {
+            // 本地退出不应被网络异常阻断。
+        } finally {
+            await fetchReset()
+        }
+    }
+
+    function fetchMenuOptions(nodes: Array<Omix>): Array<Omix> {
+        return nodes.reduce<Array<Omix>>((items, node) => {
+            if (node.visible === false || node.type === 'button') return items
+            const children = fetchMenuOptions(node.children ?? [])
+            const router = String(node.path ?? '').trim()
+            if (node.type === 'directory' && !router && children.length === 0) return items
+            items.push({
+                name: node.name,
+                router: router || `account-directory:${node.keyId}`,
+                iconName: node.icon,
+                children: children.length > 0 ? children : undefined
+            })
+            return items
+        }, [])
+    }
+
+    function fetchHasMenu(nodes: Array<Omix>, router: string): boolean {
+        return nodes.some(node => node.router === router || fetchHasMenu(node.children ?? [], router))
     }
 
     /**缓存标签页**/
@@ -103,8 +146,8 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
         fetchBaseInitialize,
         fetchAuthAccountToken,
         fetchAuthAccountTokenResolver,
-        fetchAuthAccountTokenResource,
-        fetchAuthAccountTokenSheet,
+        fetchAuthAccountPermissions,
+        fetchAuthAccountTokenLogout,
         fetchUpdateRouter,
         fetchRemoveRouter,
         keepTabNemas

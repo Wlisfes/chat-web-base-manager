@@ -3,12 +3,14 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
     name: 'CommonElementCodex',
-    emits: ['click', 'complete'],
+    emits: ['click', 'complete', 'error'],
     props: {
         /**加载状态**/
         loading: { type: Boolean, default: true },
         /**禁用状态**/
         disabled: { type: Boolean, default: false },
+        /**加载失败状态**/
+        error: { type: Boolean, default: false },
         /**图形验证码地址**/
         link: { type: String, required: true }
     },
@@ -20,21 +22,30 @@ export default defineComponent({
                     size="large"
                     secondary
                     disabled={props.loading || props.disabled}
+                    aria-label={props.error ? '验证码加载失败，点击重试' : '点击刷新验证码'}
                     onClick={() => emit('click', 0)}
                 >
-                    <n-image
-                        class="flex flex-col"
-                        preview-disabled
-                        src={props.link}
-                        on-load={() => emit('complete', 100)}
-                        on-error={() => emit('complete', 100)}
-                    >
-                        {{
-                            placeholder: () => (
-                                <n-skeleton width={120} height={40} style={{ borderRadius: 'var(--n-border-radius)' }}></n-skeleton>
-                            )
-                        }}
-                    </n-image>
+                    {props.error ? (
+                        <n-text class="w-120 h-40 flex justify-center items-center text-12" depth={3}>
+                            加载失败，点击重试
+                        </n-text>
+                    ) : (
+                        <n-image
+                            class="w-120 h-40 flex flex-col"
+                            width={120}
+                            height={40}
+                            preview-disabled
+                            src={props.link}
+                            on-load={() => emit('complete', 100)}
+                            on-error={() => emit('error', 100)}
+                        >
+                            {{
+                                placeholder: () => (
+                                    <n-skeleton width={120} height={40} style={{ borderRadius: 'var(--n-border-radius)' }}></n-skeleton>
+                                )
+                            }}
+                        </n-image>
+                    )}
                 </common-element-button>
             </n-spin>
         )

@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+.vscode
+deploy
+dist
+node_modules
+*.log
+*.local
+*.tsbuildinfo

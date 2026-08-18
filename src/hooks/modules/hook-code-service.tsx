@@ -10,6 +10,8 @@ interface BaseServiceState {
     initialize: boolean
     /**加载状态**/
     loading: boolean
+    /**加载失败状态**/
+    error: boolean
 }
 /**hooks基本配置**/
 interface BaseServiceOptions<T> extends Partial<BaseServiceState> {
@@ -21,9 +23,10 @@ interface BaseServiceOptions<T> extends Partial<BaseServiceState> {
 export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = {}) {
     const { inverted } = useProvider()
     const { state, setState } = useState({
-        url: options.url ?? '/api/windows/auth/codex/write',
+        url: options.url ?? '/api/account/auth/captcha',
         link: options.link ?? '',
         loading: options.loading ?? true,
+        error: options.error ?? false,
         initialize: options.initialize ?? true,
         ...(options.options ?? {})
     } as BaseServiceState & typeof options.options)
@@ -37,7 +40,14 @@ export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = 
     /**验证码加载回调**/
     async function fetchComplete(delay: number = 100) {
         return await fetchDelay(delay).then(async () => {
-            return await setState({ initialize: false, loading: false } as never)
+            return await setState({ initialize: false, loading: false, error: false } as never)
+        })
+    }
+
+    /**验证码加载失败回调**/
+    async function fetchError(delay: number = 100) {
+        return await fetchDelay(delay).then(async () => {
+            return await setState({ initialize: false, loading: false, error: true } as never)
         })
     }
 
@@ -46,6 +56,7 @@ export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = 
         return await fetchDelay(delay).then(async () => {
             return await setState({
                 loading: true,
+                error: false,
                 link: `${state.url}?inverse=${Number(inverted.value)}&t=${Math.random()}`
             } as never)
         })
@@ -56,6 +67,7 @@ export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = 
         ...toRefs(state),
         setState,
         fetchRefresh,
-        fetchComplete
+        fetchComplete,
+        fetchError
     }
 }
