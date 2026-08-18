@@ -2,7 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { faker, fetchCloneByte } from '@/utils'
+import { faker } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -19,18 +19,12 @@ export default defineComponent({
     setup(props, { emit }) {
         /**部门树结构**/
         const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure())
-        /**职位下拉列表**/
-        const postOptions = useSelectService(e => Service.httpBaseSystemSelectPosition())
-        /**职级下拉列表**/
-        const rankOptions = useSelectService(e => Service.httpBaseSystemSelectRank())
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
             chunkNames: { CHUNK_ACCOUNT_STATUS: true },
             formState: {
                 depts: (props.node.depts ?? []).map((item: Omix) => item.keyId), //归属部门
-                positions: (props.node.positions ?? []).map((item: Omix) => item.keyId), //关联职位
-                ranks: (props.node.ranks ?? []).map((item: Omix) => item.keyId), //关联职级
                 name: props.node.name, //姓名
                 number: props.node.number, //工号
                 phone: props.node.phone, //手机号
@@ -58,14 +52,14 @@ export default defineComponent({
                 number: faker.string.numeric(4),
                 phone: `1${faker.helpers.arrayElement([3, 5, 7, 8, 9])}${faker.string.numeric(9)}`,
                 email: faker.internet.email({ provider: 'nqmo.com' }),
-                password: window.btoa('123456'),
-                status: 'online',
+                password: '123456',
+                status: 'enabled',
                 avatar: await fetch(`https://picsum.photos/500`).then(e => e.url)
             })
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [deptOptions.fetchRequest(), postOptions.fetchRequest(), rankOptions.fetchRequest()]
+            const taskNames = [deptOptions.fetchRequest()]
             return await Promise.all(taskNames).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await fetchInstState().then(async formData => {
@@ -78,9 +72,7 @@ export default defineComponent({
                     return await Service.httpBaseSystemAccountResolver({ uid: props.node.uid }).then(async ({ data }) => {
                         const formOptions: Omix = fetchReste({
                             ...data,
-                            depts: data.depts.map((item: Omix) => item.keyId),
-                            positions: (data.positions ?? []).map((item: Omix) => item.keyId),
-                            ranks: (data.ranks ?? []).map((item: Omix) => item.keyId)
+                            depts: data.depts.map((item: Omix) => item.keyId)
                         })
                         return await setForm(formOptions).then(async () => {
                             return await setState({ initialize: false })
@@ -101,13 +93,10 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const formOptions = fetchCloneByte(formState.value, {
-                        password: window.btoa(encodeURIComponent(formState.value.password))
-                    })
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateAccount(formOptions)
+                        await Service.httpBaseSystemCreateAccount(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdateAccount({ ...formOptions, uid: props.node.uid })
+                        await Service.httpBaseSystemUpdateAccount({ ...formState.value, uid: props.node.uid })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -150,26 +139,6 @@ export default defineComponent({
                             v-model:value={formState.value.depts}
                             options={deptOptions.dataSource.value}
                         ></form-common-column-cascader>
-                    </form-common-column>
-                    <form-common-column label="职位" path="positions">
-                        <form-common-column-select
-                            multiple
-                            clearable
-                            filterable
-                            placeholder="请选择职位"
-                            options={postOptions.dataSource.value}
-                            v-model:value={formState.value.positions}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="职级" path="ranks">
-                        <form-common-column-select
-                            multiple
-                            clearable
-                            filterable
-                            placeholder="请选择职级"
-                            options={rankOptions.dataSource.value}
-                            v-model:value={formState.value.ranks}
-                        ></form-common-column-select>
                     </form-common-column>
                     <form-common-column label="姓名" path="name">
                         <form-common-column-input

@@ -29,22 +29,21 @@ export default defineComponent({
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemSheetResolver,
             formState: {
+                type: props.node.type, //后端菜单类型
                 chunk: props.node.chunk ?? 'resource', //类型
                 keyName: props.node.keyName, //权限标识
                 name: props.node.name, //名称
                 router: props.node.router, //菜单地址
-                version: props.node.version, //版本号
+                version: props.node.version ?? '1.0', //版本号
                 sort: props.node.sort ?? 10, //排序号
-                status: props.node.status, //状态
-                check: props.node.check, //菜单显示状态
+                status: props.node.status ?? 'enabled', //状态
+                check: props.node.check ?? true, //菜单显示状态
                 iconName: props.node.iconName, //菜单图标
                 pid: props.node.pid //父级菜单
             },
             rules: {
                 chunk: { required: true, trigger: 'blur', message: '请选择类型' },
-                keyName: { required: true, trigger: 'blur', message: '请输入权限标识' },
                 name: { required: true, trigger: 'blur', message: '请输入菜单/按钮名称' },
-                router: { required: true, trigger: 'blur', message: '请输入菜单地址' },
                 status: { required: true, trigger: 'blur', message: '请选择菜单/按钮状态' },
                 check: { required: true, trigger: 'blur', message: '请选择菜单显示状态' },
                 version: { required: true, trigger: 'blur', message: '请输入版本号' },
@@ -78,7 +77,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    if (['resource'].includes(formState.value.chunk)) {
+                    if (['resource', 'directory'].includes(formState.value.chunk)) {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
                             await Service.httpBaseSystemCreateSheetResource(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
@@ -130,7 +129,11 @@ export default defineComponent({
                             v-model:value={formState.value.chunk}
                         ></form-common-column-select>
                     </form-common-column>
-                    <form-common-column label="权限标识" path="keyName">
+                    <form-common-column
+                        label="权限标识"
+                        path="keyName"
+                        rule={{ required: formState.value.chunk !== 'directory', trigger: 'blur', message: '请输入权限标识' }}
+                    >
                         <form-common-column-input
                             maxlength={255}
                             placeholder="请输入权限标识"
@@ -165,7 +168,11 @@ export default defineComponent({
                     </form-common-column>
                     {['resource'].includes(formState.value.chunk) && (
                         <Fragment>
-                            <form-common-column label="菜单地址" path="router">
+                            <form-common-column
+                                label="菜单地址"
+                                path="router"
+                                rule={{ required: true, trigger: 'blur', message: '请输入菜单地址' }}
+                            >
                                 <form-common-column-input
                                     maxlength={255}
                                     placeholder="请输入菜单地址"

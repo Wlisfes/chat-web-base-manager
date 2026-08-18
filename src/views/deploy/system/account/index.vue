@@ -59,13 +59,13 @@ export default defineComponent({
                 }
             })
         }
-        /**删除账号**/
+        /**禁用账号**/
         async function fetchDeployAccountDelete() {
             const node = state.select[0]
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认删除账号【${node.name}】吗？删除后无法恢复！`,
+                content: `确认禁用账号【${node.name}】吗？禁用后该账号将无法登录。`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -126,7 +126,7 @@ export default defineComponent({
                             编辑
                         </common-element-button>
                         <common-element-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
-                            删除
+                            禁用
                         </common-element-button>
                         <common-element-button
                             dashed

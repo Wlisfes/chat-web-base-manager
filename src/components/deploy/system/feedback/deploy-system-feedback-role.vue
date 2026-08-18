@@ -20,7 +20,7 @@ export default defineComponent({
         /**通用字典枚举**/
         const chunkOptions = useChunkService({
             immediate: false,
-            type: ['CHUNK_ROLE_MODEL', 'CHUNK_ROLE_CHUNK']
+            type: ['CHUNK_ROLE_MODEL', 'CHUNK_ROLE_CHUNK', 'CHUNK_ACCOUNT_STATUS']
         })
         /**部门树结构（仅部门角色需要）**/
         const deptOptions = useSelectService(() => httpBaseSystemDepartmentTreeStructure(), {
@@ -31,13 +31,18 @@ export default defineComponent({
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemRoleResolver,
             formState: {
+                code: props.node.code, //角色编码
                 name: props.node.name, //角色名称
                 comment: props.node.comment, //角色描述
                 sort: props.node.sort ?? 10, //排序号
-                model: props.node.model //数据权限
+                status: props.node.status ?? 'enabled', //角色状态
+                model: props.node.model ?? 'self', //数据权限
+                organizationKeyIds: props.node.organizationKeyIds ?? [] //指定组织
             },
             rules: {
+                code: { required: true, message: '请输入角色编码', trigger: 'blur' },
                 name: { required: true, message: '请输入角色名称', trigger: 'blur' },
+                status: { required: true, message: '请选择角色状态', trigger: 'blur' },
                 model: { required: true, message: '请选择数据权限', trigger: 'blur' },
                 sort: { required: true, type: 'number', message: '请输入排序号', trigger: 'blur' }
             }
@@ -104,6 +109,14 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
+                    <form-common-column label="角色编码" path="code">
+                        <form-common-column-input
+                            maxlength={64}
+                            placeholder="例如 department_manager"
+                            disabled={props.node.builtin === true}
+                            v-model:value={formState.value.code}
+                        ></form-common-column-input>
+                    </form-common-column>
                     <form-common-column label="角色名称" path="name">
                         <form-common-column-input
                             maxlength={32}
@@ -116,6 +129,29 @@ export default defineComponent({
                             placeholder="请选择数据权限"
                             options={chunkOptions.CHUNK_ROLE_MODEL.value}
                             v-model:value={formState.value.model}
+                        ></form-common-column-select>
+                    </form-common-column>
+                    {formState.value.model === 'custom' && (
+                        <form-common-column
+                            label="指定组织"
+                            path="organizationKeyIds"
+                            rule={{ required: true, type: 'array', min: 1, message: '请选择至少一个组织', trigger: 'change' }}
+                        >
+                            <form-common-column-cascader
+                                multiple
+                                clearable
+                                cascade={false}
+                                placeholder="请选择可访问的组织"
+                                options={deptOptions.dataSource.value}
+                                v-model:value={formState.value.organizationKeyIds}
+                            ></form-common-column-cascader>
+                        </form-common-column>
+                    )}
+                    <form-common-column label="角色状态" path="status">
+                        <form-common-column-select
+                            placeholder="请选择角色状态"
+                            options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            v-model:value={formState.value.status}
                         ></form-common-column-select>
                     </form-common-column>
                     <form-common-column label="排序号" path="sort">
