@@ -113,7 +113,7 @@ export default defineComponent({
                             <n-element class="flex flex-col gap-10 overflow-hidden">
                                 <div class="flex flex-col p-inline-14 overflow-hidden">
                                     <div class="flex items-center justify-between p-block-12 overflow-hidden">
-                                        <n-h4 class="line-height-21 m-0">岗位角色</n-h4>
+                                        <n-h4 class="line-height-21 m-0">通用角色</n-h4>
                                         <common-element-button
                                             text
                                             type="primary"
@@ -169,7 +169,7 @@ export default defineComponent({
                                     )}
                                 </div>
                                 <div class="flex flex-col p-inline-14 overflow-hidden">
-                                    <n-h4 class="line-height-21 m-0 p-block-14">部门角色</n-h4>
+                                    <n-h4 class="line-height-21 m-0 p-block-14">岗位角色</n-h4>
                                     <n-tree
                                         block-line
                                         cancelable={false}
