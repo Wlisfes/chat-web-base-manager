@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-const MENU_API = '/api/account/menus'
+const MENU_API = '/api/menus'
 
 function mapMenu(node: Omix): Omix {
     return {

@@ -46,8 +46,9 @@ wsl -d Ubuntu-22.04 -u root -- sh -lc "stat -c '%a %n' /opt/chat-web-base-manage
 docker inspect chat-web-base-manager --format "{{.Config.Image}} {{.State.Status}} {{.State.Health.Status}}"
 docker inspect chat-web-gateway-service --format "{{.State.Health.Status}}"
 Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/health
-Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/account/health
-$response = Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/api/account/auth/me
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/health
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/finance/health
+$response = Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/api/auth/me
 $response.StatusCode
 ($response.Content | ConvertFrom-Json).code
 ```

@@ -1,5 +1,28 @@
 # 部署变更记录
 
+## 2026-08-18 公网 API 路径精简
+
+- 影响机器：Company、Home；与 Gateway 同版本窗口联动发布。
+- 关联版本：本次 Manager 与 Gateway 联动发布的完整 Git SHA。
+- 变更内容：Account 请求由 `/api/account/**` 改为 `/api/**`，Finance 请求由 `/api/windows/finance/**` 改为 `/api/finance/**`；刷新 Token、登录态判断、验证码及全部账号和财务管理接口同步迁移。
+- 机器侧操作：先发布支持 `/api` 根前缀的 Gateway 并切换 Nacos 路由，再发布 Manager；两台机器继续使用相同域名、TLS、Compose 项目和 Docker 网络。
+
+### 验证
+
+```powershell
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/health
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/finance/health
+$response = Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/api/auth/me
+($response.Content | ConvertFrom-Json).code
+```
+
+预期两个健康检查业务 `code=200`，未登录 Account 接口业务 `code=401`，页面不再请求 `/api/account/**` 或 `/api/windows/finance/**`。
+
+### 回滚
+
+- 先将 Nacos 路由恢复为旧前缀，再回滚 Manager 和 Gateway 到上一组已验证镜像。
+- 域名、证书、数据库和后端容器均不变化，无需回滚数据。
+
 ## 2026-08-18 Company/Home 双机部署
 
 - 影响机器：Company 与 Home 两台独立 Docker 主机，以及各自的 Manager 仓库 Self-hosted Runner。

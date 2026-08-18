@@ -3,7 +3,7 @@ import { request } from '@/utils'
 /**币种分页列表**/
 export function httpBaseFinanceColumnCurrency(data: Omix) {
     return request({
-        url: `/api/windows/finance/currency/column`,
+        url: `/api/finance/currency/column`,
         method: 'POST',
         data
     })
@@ -12,7 +12,7 @@ export function httpBaseFinanceColumnCurrency(data: Omix) {
 /**币种状态修改**/
 export function httpBaseFinanceUpdateCurrencyStatus(data: Omix) {
     return request({
-        url: `/api/windows/finance/currency/update/status`,
+        url: `/api/finance/currency/update/status`,
         method: 'POST',
         data
     })
@@ -21,7 +21,7 @@ export function httpBaseFinanceUpdateCurrencyStatus(data: Omix) {
 /**币种下拉列表**/
 export function httpBaseFinanceSelectCurrency() {
     return request({
-        url: `/api/windows/finance/currency/select`,
+        url: `/api/finance/currency/select`,
         method: 'POST'
     })
 }
@@ -29,7 +29,7 @@ export function httpBaseFinanceSelectCurrency() {
 /**汇率分页列表**/
 export function httpBaseFinanceColumnCurrencyExchange(data: Omix) {
     return request({
-        url: `/api/windows/finance/currency/exchange/column`,
+        url: `/api/finance/currency/exchange/column`,
         method: 'POST',
         data
     })

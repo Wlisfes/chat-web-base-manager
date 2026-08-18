@@ -3,7 +3,7 @@ import { request } from '@/utils'
 /**账号登录**/
 export function httpAuthAccountToken(data: Omix) {
     return request({
-        url: `/api/account/auth/login`,
+        url: `/api/auth/login`,
         method: 'POST',
         data
     })
@@ -12,7 +12,7 @@ export function httpAuthAccountToken(data: Omix) {
 /**登录续时**/
 export function httpAuthAccountTokenContinue() {
     return request({
-        url: `/api/account/auth/refresh`,
+        url: `/api/auth/refresh`,
         method: 'POST'
     })
 }
@@ -20,7 +20,7 @@ export function httpAuthAccountTokenContinue() {
 /**登录账户信息**/
 export function httpAuthAccountTokenResolver() {
     return request({
-        url: `/api/account/auth/me`,
+        url: `/api/auth/me`,
         method: 'GET'
     })
 }
@@ -28,7 +28,7 @@ export function httpAuthAccountTokenResolver() {
 /**登录账户菜单和按钮权限**/
 export function httpAuthAccountPermissions() {
     return request({
-        url: `/api/account/permissions/me`,
+        url: `/api/permissions/me`,
         method: 'GET'
     })
 }
@@ -36,7 +36,7 @@ export function httpAuthAccountPermissions() {
 /**退出登录并撤销服务端会话**/
 export function httpAuthAccountTokenLogout() {
     return request({
-        url: `/api/account/auth/logout`,
+        url: `/api/auth/logout`,
         method: 'POST'
     })
 }

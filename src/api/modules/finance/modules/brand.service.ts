@@ -3,7 +3,7 @@ import { request } from '@/utils'
 /**新增品牌**/
 export function httpBaseFinanceCreateBrand(data: Omix) {
     return request({
-        url: `/api/windows/finance/brand/create`,
+        url: `/api/finance/brand/create`,
         method: 'POST',
         data
     })
@@ -12,7 +12,7 @@ export function httpBaseFinanceCreateBrand(data: Omix) {
 /**编辑品牌**/
 export function httpBaseFinanceUpdateBrand(data: Omix) {
     return request({
-        url: `/api/windows/finance/brand/update`,
+        url: `/api/finance/brand/update`,
         method: 'POST',
         data
     })
@@ -21,7 +21,7 @@ export function httpBaseFinanceUpdateBrand(data: Omix) {
 /**品牌分页列表**/
 export function httpBaseFinanceColumnBrand(data: Omix) {
     return request({
-        url: `/api/windows/finance/brand/column`,
+        url: `/api/finance/brand/column`,
         method: 'POST',
         data
     })
@@ -30,7 +30,7 @@ export function httpBaseFinanceColumnBrand(data: Omix) {
 /**品牌状态修改**/
 export function httpBaseFinanceUpdateBrandStatus(data: Omix) {
     return request({
-        url: `/api/windows/finance/brand/update/status`,
+        url: `/api/finance/brand/update/status`,
         method: 'POST',
         data
     })
@@ -39,7 +39,7 @@ export function httpBaseFinanceUpdateBrandStatus(data: Omix) {
 /**品牌下拉列表**/
 export function httpBaseFinanceSelectBrand() {
     return request({
-        url: `/api/windows/finance/brand/select`,
+        url: `/api/finance/brand/select`,
         method: 'POST'
     })
 }

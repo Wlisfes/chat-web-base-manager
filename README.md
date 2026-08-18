@@ -1,6 +1,6 @@
 # Chat Web Base Manager
 
-Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api/account` 转发到本地 Gateway；生产镜像通过同一 Docker 网络把 `/api/*` 转发到 `chat-web-gateway-service:3999`。
+Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产镜像通过同一 Docker 网络把 `/api/*` 转发到 `chat-web-gateway-service:3999`。Account 使用 `/api/**`，Finance 使用优先级更高的 `/api/finance/**`。
 
 ```bash
 yarn install

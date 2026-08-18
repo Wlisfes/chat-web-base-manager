@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-const ORGANIZATION_API = '/api/account/organizations'
+const ORGANIZATION_API = '/api/organizations'
 
 function mapOrganization(node: Omix): Omix {
     return {
@@ -57,7 +57,7 @@ export async function httpBaseSystemDeptMemberOptions(data: Omix): Promise<any> 
     const [organization, users] = await Promise.all([
         request({ url: `${ORGANIZATION_API}/${data.keyId}`, method: 'GET' }),
         request({
-            url: '/api/account/users',
+            url: '/api/users',
             method: 'GET',
             params: { page: 1, pageSize: 100, organizationKeyIds: String(data.keyId) }
         })

@@ -54,16 +54,16 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
             port: 4680,
             host: '0.0.0.0',
             proxy: {
-                [`/api/account`]: {
-                    target: accountProxyTarget,
-                    ws: true,
-                    changeOrigin: true,
-                    rewrite: accountProxyDirect ? path => path.replace(/^\/api\/account/, '') : undefined
-                },
                 [`/api/windows`]: {
                     target: `http://localhost:5100`,
                     ws: true,
                     changeOrigin: true
+                },
+                [`/api`]: {
+                    target: accountProxyTarget,
+                    ws: true,
+                    changeOrigin: true,
+                    rewrite: accountProxyDirect ? path => path.replace(/^\/api/, '') : undefined
                 }
             }
         }
