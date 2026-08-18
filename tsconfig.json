@@ -22,7 +22,6 @@
         "noFallthroughCasesInSwitch": true /**switch中必须要有break、return语句**/,
         "useUnknownInCatchVariables": false /**catch变量设定未any类型**/,
 
-        "baseUrl": "." /**配置根路径**/,
         "paths": {
             "@/*": ["./src/*"] /**别名路径**/
         }
