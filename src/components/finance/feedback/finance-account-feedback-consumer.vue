@@ -26,7 +26,7 @@ export default defineComponent({
         })
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
-            callback: fetchBaseFinanceClientResolver,
+            callback: fetchBaseAccountConsumerResolver,
             chunkNames: {
                 CHUNK_CLIENT_PAY_MODE: true,
                 CHUNK_CLIENT_AUTH_STATUS: true,
@@ -55,7 +55,7 @@ export default defineComponent({
         })
 
         /**详情初始化**/
-        async function fetchBaseFinanceClientResolver() {
+        async function fetchBaseAccountConsumerResolver() {
             return await Promise.all([brandOptions.fetchRequest(), currencyOptions.fetchRequest()]).then(async () => {
                 try {
                     if (['CREATE'].includes(props.command)) {
@@ -80,9 +80,9 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceCreateClient(formState.value)
+                        await Service.httpBaseAccountCreateConsumer(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceUpdateClient({ ...formState.value, keyId: props.node.keyId })
+                        await Service.httpBaseAccountUpdateConsumer({ ...formState.value, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

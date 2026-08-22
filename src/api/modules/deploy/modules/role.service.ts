@@ -1,8 +1,8 @@
 import { request } from '@/utils'
 
-const ROLE_API = '/api/roles'
-const USER_API = '/api/users'
-const ORGANIZATION_API = '/api/organizations'
+const ROLE_API = '/api/account/roles'
+const USER_API = '/api/account/users'
+const ORGANIZATION_API = '/api/account/organizations'
 
 function dataScopePayload(data: Omix): Omix {
     if (!data.model) return { rules: [] }

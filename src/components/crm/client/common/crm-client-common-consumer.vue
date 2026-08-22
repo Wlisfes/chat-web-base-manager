@@ -22,7 +22,7 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseCrmClientCommonConsumer(payload),
+            request: (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
             keyName: 'chatbok:crm:client:common:consumer',
             chunkNames: {
                 CHUNK_CLIENT_PAY_MODE: true,

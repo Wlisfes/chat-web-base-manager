@@ -11,7 +11,7 @@ export default defineComponent({
         const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnClient(payload),
+            request: (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
             keyName: 'chatbok:finance:account:consumer',
             chunkNames: {
                 CHUNK_CLIENT_PAY_MODE: true,
@@ -96,7 +96,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateClientStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseAccountUpdateConsumerStatus({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {

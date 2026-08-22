@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-const USER_API = '/api/users'
+const USER_API = '/api/account/users'
 
 function mapUser(user: Omix): Omix {
     const organizations = user.organizations ?? []

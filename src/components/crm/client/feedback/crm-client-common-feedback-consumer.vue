@@ -81,7 +81,7 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseCrmClientCommonCreate(formState.value)
+                        await Service.httpBaseAccountCreateConsumer(formState.value)
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

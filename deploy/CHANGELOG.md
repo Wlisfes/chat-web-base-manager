@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 Account 服务前缀与 Consumer 归属修正
+
+- 影响机器：Company、Home；需与 Gateway、Account 同一发布窗口部署。
+- 关联版本：本次 Manager、Gateway、Account 联动发布的完整 Git SHA。
+- 变更内容：全部 Account 请求恢复 `/api/account/**` 服务名称前缀；外部客户请求统一为 `/api/account/consumer/**`。新增 Account Consumer API 文件并使用单数 `consumer` 命名，删除 Finance 下错误的 `client.service.ts` Consumer 实现；CRM 自有 `/api/windows/crm/client/**` 接口保持不变。
+- 机器侧操作：无需修改域名、TLS、`.env`、端口、Runner、部署目录或 Docker 网络；先部署 Gateway 和 Account，再发布 Manager。
+- 验证命令：执行 `yarn build`；部署后验证登录、续期、权限、账号管理和 `/api/account/consumer/column`，并确认浏览器不再请求 `/api/consumers/**` 或 Account 根前缀 `/api/auth/**`。
+- 回滚方法：同时回滚 Manager 和 Gateway 到上一组健康镜像；不回滚数据库、证书或其他业务数据。
+
 ## 2026-08-22 GitHub Actions Node.js 24 运行时升级
 
 - 影响范围：GitHub 托管构建任务，以及 Company、Home 两台自托管部署 Runner。
@@ -12,7 +21,7 @@
 
 - 影响机器：Company、Home；与 Account、Finance 同版本窗口联动发布。
 - 关联版本：本次 Manager、Account、Finance 联动发布的完整 Git SHA。
-- 变更内容：财务账户和 CRM 客户列表的新增、编辑、分页及状态请求统一改为 Account `/api/consumers/**`；品牌和币种选项仍从 `/api/finance/**` 获取，列表按 `brandId` 在前端补全品牌名称。
+- 变更内容：财务账户和 CRM 客户列表的新增、编辑、分页及状态请求统一改为 Account `/api/account/consumer/**`；品牌和币种选项仍从 `/api/finance/**` 获取，列表按 `brandId` 在前端补全品牌名称。
 - 机器侧操作：无需修改域名、TLS、`.env`、端口、Runner、部署目录或 Docker 网络；必须先部署 Account Consumer 表与接口，再发布本 Manager 镜像。
 - 验证命令：执行 `yarn build`；部署后登录管理端，验证财务账户客户列表及 CRM 客户列表不再请求 `/api/finance/client/**`，新增、查询和状态切换均成功。
 - 回滚方法：将 Manager 恢复到上一条健康 SHA；若后端已经停止旧 Finance Client 接口，回滚 Manager 前必须先恢复兼容接口，否则旧页面客户功能不可用。
