@@ -73,7 +73,7 @@ export default defineComponent({
                                                 </common-element-columns-wrapper>
                                                 <common-element-columns-wrapper label-class="w-5.2em m-ie-10" label="应用状态">
                                                     <common-database-table-chunk
-                                                        element="text"
+                                                        element="chunk"
                                                         value={item.status}
                                                         options={props.chunkState.CHUNK_CLIENT_SMS_STATUS}
                                                     ></common-database-table-chunk>
