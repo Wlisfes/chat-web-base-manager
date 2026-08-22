@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 客户枚举行使用 Naive UI 虚拟滚动
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：客户页保留 6 个中文枚举 `n-tag`，通过 `common-database-table` 透传 Naive UI `n-data-table` 原生 `virtual-scroll`；复用表格现有 `flex-height` 约束，不增加自定义颜色、动画、固定高度或过渡样式。
+- 性能依据：客户页每页 50 行时包含 300 个 Tag、约 3989 个 DOM 节点，而基准项目同页仅 2 个 Tag/行；虚拟滚动仅渲染可视行，降低主题切换时参与更新的组件数量。
+- 验证命令：执行 `yarn build`、`docker compose -f deploy/compose.yml config --quiet` 和 `git diff --check`；部署后检查客户页实际渲染行数、Tag 数量、连续主题切换和浏览器控制台。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 恢复 nest-platform-manager 主题渲染基线
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
