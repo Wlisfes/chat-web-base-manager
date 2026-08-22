@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 使用 Naive UI 官方主题与 Tag API
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：按照 Naive UI 官方主题文档移除 `n-config-provider` 的 `inline-theme-disabled`，避免在频繁切换 `theme-overrides` 的场景生成和切换大量主题样式；删除 HTML 主题类、手写 Tag CSS 和自定义 CSS 变量。枚举标签统一使用 `n-tag` 官方 `color`、`round`、`strong` 属性，亮暗主题仍由 `n-config-provider` 的 `theme` 与 `theme-overrides` 管理，Body 样式由 `n-global-style` 同步。
+- 机器侧操作：保留两台机器现有域名、TLS、`.env`、端口、Runner、部署目录和网络；Company Runner 离线时只保留最新部署任务排队。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后在 `/finance/account/consumer` 多次双向切换亮色/暗黑模式，确认 Tag 使用官方 `color` 属性、没有自定义 Tag 类和 HTML 主题类，页面无明显卡顿且控制台无错误。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 恢复 Naive UI 统一主题过渡
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。

@@ -12,7 +12,7 @@ const option = (
     name,
     value,
     label: name,
-    json: { type, color, style: {} }
+    json: { type, color }
 }) as unknown as Omix<ChunkColumnOptions>
 
 const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {

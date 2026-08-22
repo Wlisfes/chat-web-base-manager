@@ -7,20 +7,6 @@ body,
     overflow: hidden;
 }
 
-/**列表枚举标签只维护静态色板变量，主题切换时无需逐个重算内联样式**/
-.common-database-tag.n-tag {
-    --n-color: rgba(var(--common-database-tag-rgb), 0.1);
-    --n-text-color: var(--common-database-tag-light-text);
-    --n-border: 1px solid rgba(var(--common-database-tag-rgb), 0.34);
-    font-weight: 400;
-}
-
-html.app-theme-dark .common-database-tag.n-tag {
-    --n-color: rgba(var(--common-database-tag-rgb), 0.2);
-    --n-text-color: var(--common-database-tag-dark-text);
-    --n-border: 1px solid rgba(var(--common-database-tag-rgb), 0.52);
-}
-
 /**通知提示二次封装**/
 .n-notification-wrapper.custom-notify-service {
     .n-notification__avatar {
