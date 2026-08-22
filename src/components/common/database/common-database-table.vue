@@ -139,6 +139,7 @@ export default defineComponent({
                     fixed: 'right',
                     width: 40,
                     check: true,
+                    render: () => null,
                     title: () => (
                         <common-database-table-settings
                             columns={props.columns}
@@ -147,6 +148,7 @@ export default defineComponent({
                         ></common-database-table-settings>
                     )
                 })
+                if (props.virtualScrollX) return columns
                 return columns.map((item, index) => {
                     if (index === columns.length - 2) {
                         item.colSpan = () => 2
