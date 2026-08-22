@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-const ORGANIZATION_API = '/api/account/organizations'
+const ORGANIZATION_API = '/api/account/organization'
 
 function mapOrganization(node: Omix): Omix {
     return {
@@ -32,34 +32,38 @@ function organizationPayload(data: Omix): Omix {
 
 /**新增部门**/
 export function httpBaseSystemCreateDepartment(data: Omix) {
-    return request({ url: ORGANIZATION_API, method: 'POST', data: organizationPayload(data) })
+    return request({ url: `${ORGANIZATION_API}/create`, method: 'POST', data: organizationPayload(data) })
 }
 
 /**编辑部门**/
 export function httpBaseSystemUpdateDepartment(data: Omix) {
-    return request({ url: `${ORGANIZATION_API}/${data.keyId}`, method: 'PATCH', data: organizationPayload(data) })
+    return request({
+        url: `${ORGANIZATION_API}/update`,
+        method: 'POST',
+        data: { keyId: data.keyId, ...organizationPayload(data) }
+    })
 }
 
 /**部门详情**/
 export async function httpBaseSystemDepartmentResolver(data: Omix): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/${data.keyId}`, method: 'GET' })
+    const response = await request({ url: `${ORGANIZATION_API}/resolver`, method: 'GET', params: { keyId: data.keyId } })
     return { ...response, data: mapOrganization(response.data) }
 }
 
 /**部门树结构**/
 export async function httpBaseSystemDepartmentTreeStructure(): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/tree`, method: 'GET' })
+    const response = await request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
     return { ...response, data: { list: (response.data ?? []).map(mapOrganization) } }
 }
 
 /**部门成员列表**/
 export async function httpBaseSystemDeptMemberOptions(data: Omix): Promise<any> {
     const [organization, users] = await Promise.all([
-        request({ url: `${ORGANIZATION_API}/${data.keyId}`, method: 'GET' }),
+        request({ url: `${ORGANIZATION_API}/resolver`, method: 'GET', params: { keyId: data.keyId } }),
         request({
-            url: '/api/account/users',
-            method: 'GET',
-            params: { page: 1, pageSize: 100, organizationKeyIds: String(data.keyId) }
+            url: '/api/account/user/column',
+            method: 'POST',
+            data: { page: 1, pageSize: 100, organizationKeyIds: [Number(data.keyId)] }
         })
     ])
     const list = (users.data?.items ?? []).map((user: Omix) => ({
@@ -71,7 +75,7 @@ export async function httpBaseSystemDeptMemberOptions(data: Omix): Promise<any> 
 
 /**部门分页列表查询**/
 export async function httpBaseSystemColumnDepartment(data: Omix): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/tree`, method: 'GET' })
+    const response = await request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
     const mapped = flattenOrganizations((response.data ?? []).map(mapOrganization)).filter(item => {
         if (data.pid !== undefined && data.pid !== null && item.pid !== data.pid) return false
         if (data.name && !item.name?.includes(data.name)) return false
@@ -85,5 +89,5 @@ export async function httpBaseSystemColumnDepartment(data: Omix): Promise<any> {
 
 /**删除部门**/
 export function httpBaseSystemDeleteDepartment(data: Omix) {
-    return request({ url: `${ORGANIZATION_API}/${data.keyId}`, method: 'DELETE' })
+    return request({ url: `${ORGANIZATION_API}/delete`, method: 'POST', data: { keyId: data.keyId } })
 }

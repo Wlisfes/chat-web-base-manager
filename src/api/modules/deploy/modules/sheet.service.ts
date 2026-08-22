@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-const MENU_API = '/api/account/menus'
+const MENU_API = '/api/account/menu'
 
 function mapMenu(node: Omix): Omix {
     return {
@@ -41,17 +41,17 @@ function menuPayload(data: Omix, type?: 'directory' | 'menu' | 'button'): Omix {
 
 /**新增菜单**/
 export function httpBaseSystemCreateSheetResource(data: Omix) {
-    return request({ url: MENU_API, method: 'POST', data: menuPayload(data, data.chunk === 'directory' ? 'directory' : 'menu') })
+    return request({ url: `${MENU_API}/create`, method: 'POST', data: menuPayload(data, data.chunk === 'directory' ? 'directory' : 'menu') })
 }
 
 /**编辑菜单**/
 export function httpBaseSystemUpdateSheetResource(data: Omix) {
-    return request({ url: `${MENU_API}/${data.keyId}`, method: 'PATCH', data: menuPayload(data) })
+    return request({ url: `${MENU_API}/update`, method: 'POST', data: { keyId: data.keyId, ...menuPayload(data) } })
 }
 
 /**分页列表查询**/
 export async function httpBaseSystemColumnSheet(data: Omix): Promise<any> {
-    const response = await request({ url: `${MENU_API}/tree`, method: 'GET' })
+    const response = await request({ url: `${MENU_API}/tree/structure`, method: 'GET' })
     const mapped = flattenMenus((response.data ?? []).map(mapMenu)).filter(item => {
         if (data.pid !== undefined && data.pid !== null && item.pid !== data.pid) return false
         if (data.name && !item.name?.includes(data.name)) return false
@@ -66,27 +66,31 @@ export async function httpBaseSystemColumnSheet(data: Omix): Promise<any> {
 
 /**菜单树结构**/
 export async function httpBaseSystemSheetTreeStructure(): Promise<any> {
-    const response = await request({ url: `${MENU_API}/tree`, method: 'GET' })
+    const response = await request({ url: `${MENU_API}/tree/structure`, method: 'GET' })
     return { ...response, data: { list: (response.data ?? []).map(mapMenu) } }
 }
 
 /**菜单、按钮详情**/
 export async function httpBaseSystemSheetResolver(data: Omix): Promise<any> {
-    const response = await request({ url: `${MENU_API}/${data.keyId}`, method: 'GET' })
+    const response = await request({ url: `${MENU_API}/resolver`, method: 'GET', params: { keyId: data.keyId } })
     return { ...response, data: mapMenu(response.data) }
 }
 
 /**新增权限按钮**/
 export function httpBaseSystemCreateSheetAuthorize(data: Omix) {
-    return request({ url: MENU_API, method: 'POST', data: menuPayload(data, 'button') })
+    return request({ url: `${MENU_API}/create`, method: 'POST', data: menuPayload(data, 'button') })
 }
 
 /**编辑权限按钮**/
 export function httpBaseSystemUpdateSheetAuthorize(data: Omix) {
-    return request({ url: `${MENU_API}/${data.keyId}`, method: 'PATCH', data: menuPayload(data, 'button') })
+    return request({
+        url: `${MENU_API}/update`,
+        method: 'POST',
+        data: { keyId: data.keyId, ...menuPayload(data, 'button') }
+    })
 }
 
 /**删除菜单/按钮**/
 export function httpBaseSystemDeleteSheet(data: Omix) {
-    return request({ url: `${MENU_API}/${data.keyId}`, method: 'DELETE' })
+    return request({ url: `${MENU_API}/delete`, method: 'POST', data: { keyId: data.keyId } })
 }

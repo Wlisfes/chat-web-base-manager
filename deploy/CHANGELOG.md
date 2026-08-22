@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 Account 动作式接口联动与日志轮转
+
+- 影响机器：Company、Home；需在 Account、Finance、Gateway 部署后发布。
+- 关联版本：本次 Manager 与三个后端服务的完整 Git SHA。
+- 变更内容：全部 Account 调用改为单数模块和动作式路径，只发送 GET query 或 POST body；用户组织筛选改为数字数组，移除逗号字符串及 PUT/PATCH/DELETE 调用。Auth 改为 `/api/account/auth/codex/write` 与 `/api/account/auth/token/**`；Docker `json-file` 轮转调整为单文件 20m、保留 30 个文件。
+- 机器侧操作：保留两台机器现有 `/opt/chat-web-base-manager/.env`、本地 TLS、域名、端口、Runner 和网络配置；后端联动版本健康后再部署 Manager。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后验证验证码、登录、续期、退出、权限、用户、组织、角色、菜单与 Consumer 页面，并检查浏览器请求方法/入参及 `docker inspect chat-web-base-manager --format '{{json .HostConfig.LogConfig}}'`。
+- 回滚方法：同时回滚 Manager、Account、Finance、Gateway 到上一组兼容镜像；保留机器侧 `.env`、TLS 和数据库。
+
 ## 2026-08-22 Account 服务前缀与 Consumer 归属修正
 
 - 影响机器：Company、Home；需与 Gateway、Account 同一发布窗口部署。
