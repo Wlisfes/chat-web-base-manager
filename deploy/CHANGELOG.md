@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 恢复 Naive UI 统一主题过渡
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：删除主题切换期间的全局 `transition: none`、View Transition 和根节点透明度动画，不再切换 `theme-switching` 全局类；Tag 仅提供 `--n-color`、`--n-text-color`、`--n-border` 色板变量和 400 字重，颜色、背景及边框过渡完全使用 Naive UI 内置的 `.3s var(--n-bezier)`。
+- 机器侧操作：保留两台机器现有域名、TLS、`.env`、端口、Runner、部署目录和网络；Company Runner 离线时只保留最新部署任务排队。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后在 `/finance/account/consumer` 多次双向切换亮色/暗黑模式，确认根节点无自定义透明度动画、HTML 不出现 `theme-switching`、Tag 使用 Naive UI 的 `var(--n-bezier)` 过渡且控制台无错误。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 客户列表标签与主题切换性能优化
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。

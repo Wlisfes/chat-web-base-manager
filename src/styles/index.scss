@@ -7,31 +7,12 @@ body,
     overflow: hidden;
 }
 
-/**主题切换由根页面合成层统一过渡，避免大量组件同时执行颜色动画**/
-html.theme-switching *,
-html.theme-switching *::before,
-html.theme-switching *::after {
-    transition: none !important;
-    animation: none !important;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation-duration: 180ms;
-        animation-timing-function: ease-out;
-    }
-}
-
 /**列表枚举标签只维护静态色板变量，主题切换时无需逐个重算内联样式**/
 .common-database-tag.n-tag {
     --n-color: rgba(var(--common-database-tag-rgb), 0.1);
     --n-text-color: var(--common-database-tag-light-text);
     --n-border: 1px solid rgba(var(--common-database-tag-rgb), 0.34);
-    background-color: var(--n-color);
-    color: var(--n-text-color);
     font-weight: 400;
-    transition: none;
 }
 
 html.app-theme-dark .common-database-tag.n-tag {
