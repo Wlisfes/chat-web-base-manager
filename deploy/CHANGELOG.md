@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 恢复 nest-platform-manager 主题渲染基线
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：以 `F:/GitHub/nest-platform-manager` 为基准恢复主题渲染：`n-config-provider` 重新启用基准项目的 `inline-theme-disabled`，亮色使用 `lightTheme`；布局内容区恢复基准背景过渡。枚举标签恢复为无边框 `n-tag` 原生 `type`，删除逐 Tag 的 `useProvider`、主题计算、官方 `color` 动态对象及自定义 20 色文件；同时撤销非基准的客户表格虚拟滚动补丁。
+- 机器侧操作：保留两台机器现有域名、TLS、`.env`、端口、Runner、部署目录和网络；Company Runner 离线时只保留最新部署任务排队。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；逐文件对比基准 Provider、主题 Hook、布局、Tag 和 DataTable；部署后在 `/finance/account/consumer` 连续切换亮暗主题，确认 Tag 不再订阅主题且控制台无错误。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 客户表格启用 Naive UI 虚拟滚动
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。

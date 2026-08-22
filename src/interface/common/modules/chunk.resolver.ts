@@ -1,4 +1,3 @@
-import type { CommonDatabaseTagColor } from '@/components/common/database/common-database-table-chunk.constants'
 /**枚举类型**/
 export type ChunkName = keyof typeof COMMON_CHUNK_OPTIONS
 /**通用下拉字典类型**/
@@ -8,7 +7,7 @@ export interface ChunkColumnOptions extends Omix {
     keyId: number
     name: string
     value: string
-    json: Omix<{ type: string; color?: CommonDatabaseTagColor }>
+    json: Omix<{ type: string }>
 }
 /**通用下拉字典**/
 export const COMMON_CHUNK_OPTIONS = {
