@@ -48,7 +48,7 @@ export const useConfiger = defineStore(
             const startViewTransition = (document as ViewTransitionDocument).startViewTransition?.bind(document)
 
             root.classList.add('theme-switching')
-            if (!startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 try {
                     return await updateTheme()
                 } finally {
@@ -56,12 +56,39 @@ export const useConfiger = defineStore(
                 }
             }
 
+            if (startViewTransition) {
+                try {
+                    const transition = startViewTransition(updateTheme)
+                    await transition.finished
+                    return state
+                } finally {
+                    root.classList.remove('theme-switching')
+                }
+            }
+
+            const app = document.getElementById('app')
+            if (app && typeof app.animate === 'function') {
+                let fadeOut: Animation | undefined
+                let fadeIn: Animation | undefined
+                try {
+                    fadeOut = app.animate([{ opacity: 1 }, { opacity: 0.6 }], { duration: 70, easing: 'ease-out', fill: 'forwards' })
+                    await fadeOut.finished.catch(() => undefined)
+                    const result = await updateTheme()
+                    fadeOut.cancel()
+                    fadeIn = app.animate([{ opacity: 0.6 }, { opacity: 1 }], { duration: 110, easing: 'ease-out' })
+                    await fadeIn.finished.catch(() => undefined)
+                    return result
+                } finally {
+                    fadeOut?.cancel()
+                    fadeIn?.cancel()
+                    root.classList.remove('theme-switching')
+                }
+            }
+
             try {
-                const transition = startViewTransition(updateTheme)
-                await transition.finished
-                return state
+                return await updateTheme()
             } finally {
-                root.classList.remove('theme-switching')
+                releaseThemeSwitching(root)
             }
         }
 
