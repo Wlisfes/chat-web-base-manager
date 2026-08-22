@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'vue'
+import type { TagProps } from 'naive-ui'
 
 export const COMMON_DATABASE_TAG_COLOR_NAMES = [
     'slate',
@@ -54,11 +54,11 @@ export const COMMON_DATABASE_TAG_PALETTES: Record<CommonDatabaseTagColor, Common
     brown: { rgb: '180, 83, 9', lightText: '#92400e', darkText: '#fed7aa' }
 }
 
-export function createCommonDatabaseTagStyle(color: CommonDatabaseTagColor): CSSProperties {
+export function createCommonDatabaseTagColor(color: CommonDatabaseTagColor, dark: boolean): NonNullable<TagProps['color']> {
     const palette = COMMON_DATABASE_TAG_PALETTES[color]
     return {
-        '--common-database-tag-rgb': palette.rgb,
-        '--common-database-tag-light-text': palette.lightText,
-        '--common-database-tag-dark-text': palette.darkText
-    } as CSSProperties
+        color: `rgba(${palette.rgb}, ${dark ? 0.2 : 0.1})`,
+        borderColor: `rgba(${palette.rgb}, ${dark ? 0.52 : 0.34})`,
+        textColor: dark ? palette.darkText : palette.lightText
+    }
 }

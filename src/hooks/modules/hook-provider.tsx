@@ -1,5 +1,5 @@
 import { computed, ComputedRef } from 'vue'
-import { useThemeVars, darkTheme, lightTheme, GlobalThemeOverrides, ThemeCommonVars } from 'naive-ui'
+import { useThemeVars, darkTheme, GlobalThemeOverrides, ThemeCommonVars } from 'naive-ui'
 import { useConfiger, useStore } from '@/store'
 /**全局样式变量**/
 export interface CustomThemeCommonVars extends Omix<ThemeCommonVars> {
@@ -11,7 +11,7 @@ export function useProvider() {
 
     /**主题反转**/
     const inverted = computed(() => theme.value === 'dark')
-    const themeStyle = computed(() => (inverted.value ? darkTheme : lightTheme))
+    const themeStyle = computed(() => (inverted.value ? darkTheme : null))
 
     const themeOverrides = computed(() => {
         return inverted.value ? darkThemeOverrides.value : lightThemeOverrides.value

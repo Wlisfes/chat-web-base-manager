@@ -1,9 +1,10 @@
 <script lang="tsx">
 import { defineComponent, computed, PropType, Fragment } from 'vue'
+import { useProvider } from '@/hooks'
 import { isEmpty, isNotEmpty, fetchCurrent } from '@/utils'
 import {
     COMMON_DATABASE_TAG_PALETTES,
-    createCommonDatabaseTagStyle
+    createCommonDatabaseTagColor
 } from '@/components/common/database/common-database-table-chunk.constants'
 import type { CommonDatabaseTagColor } from '@/components/common/database/common-database-table-chunk.constants'
 
@@ -18,13 +19,13 @@ export default defineComponent({
         value: { type: [String, Number] }
     },
     setup(props, { slots }) {
+        const { inverted } = useProvider()
         /**标签枚举数据**/
         const itemNode = computed(() => fetchCurrent(props.options, e => e.value == props.value))
-        const tagStyle = computed(() => {
+        const tagColor = computed(() => {
             const color = itemNode.value?.json?.color as CommonDatabaseTagColor | undefined
-            const customStyle = itemNode.value?.json?.style ?? {}
-            if (!color || !COMMON_DATABASE_TAG_PALETTES[color]) return customStyle
-            return { ...createCommonDatabaseTagStyle(color), ...customStyle }
+            if (!color || !COMMON_DATABASE_TAG_PALETTES[color]) return undefined
+            return createCommonDatabaseTagColor(color, inverted.value)
         })
 
         return () => {
@@ -36,10 +37,11 @@ export default defineComponent({
                 ) : (
                     <n-tag
                         bordered
-                        class="common-database-tag"
+                        round={false}
                         size="small"
-                        type={itemNode.value.json?.type ?? 'default'}
-                        style={tagStyle.value}
+                        strong={false}
+                        color={tagColor.value}
+                        type={tagColor.value ? undefined : (itemNode.value.json?.type ?? 'default')}
                     >
                         {itemNode.value.name}
                     </n-tag>
