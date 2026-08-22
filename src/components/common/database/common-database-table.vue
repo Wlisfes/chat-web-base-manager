@@ -43,6 +43,8 @@ export default defineComponent({
         paginationClass: { type: String, default: '' },
         /**开启边框**/
         bordered: { type: Boolean, default: true },
+        /**开启纵向虚拟滚动**/
+        virtualScroll: { type: Boolean, default: false },
         /**被选中的行的对象列表**/
         select: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**表头配置自定义排版规则**/
@@ -225,6 +227,7 @@ export default defineComponent({
                                 loading={loading.value}
                                 scroll-x={width.value}
                                 single-line={false}
+                                virtual-scroll={props.virtualScroll}
                                 data={data.value}
                                 columns={faseColumns.value}
                                 checked-row-keys={faseSelect.value}
