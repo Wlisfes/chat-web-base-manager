@@ -1,5 +1,13 @@
 # 部署变更记录
 
+## 2026-08-22 GitHub Actions Node.js 24 运行时升级
+
+- 影响范围：GitHub 托管构建任务，以及 Company、Home 两台自托管部署 Runner。
+- 变更内容：将 `actions/checkout` 升级到 v7，将 Docker Buildx、GHCR 登录和镜像构建 Action 分别升级到支持 Node.js 24 的 v4、v4、v7，消除 Node.js 20 弃用告警。
+- Runner 要求：Company、Home 自托管 Runner 必须保持自动更新，并至少支持 Node.js 24 Action 运行时；Runner 离线时部署任务仍会排队，不影响镜像构建结果。
+- 验证命令：执行 `yarn build`、`docker buildx build --check .`、`docker compose -f deploy/compose.yml config --quiet` 和 `sh -n deploy/deploy.sh`；合并后确认构建任务不再产生 Node.js 20 弃用告警。
+- 回滚方法：将四个 Action 恢复为 `actions/checkout@v4`、`docker/setup-buildx-action@v3`、`docker/login-action@v3` 和 `docker/build-push-action@v6`；应用镜像和运行容器无需回滚。
+
 ## 2026-08-22 客户接口迁入 Account
 
 - 影响机器：Company、Home；与 Account、Finance 同版本窗口联动发布。
