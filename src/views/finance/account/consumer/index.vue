@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
@@ -8,6 +8,7 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'FinanceAccountConsumer',
     setup(props, ctx) {
+        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseFinanceColumnClient(payload),
@@ -202,6 +203,13 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
+                        col_accountOptions: (data: Omix) => (
+                            <common-database-table-user element="text" data={data.accountOptions}></common-database-table-user>
+                        ),
+                        col_brandOptions: (data: Omix) => {
+                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
+                            return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
+                        },
                         col_status: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"

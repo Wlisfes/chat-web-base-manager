@@ -189,7 +189,10 @@ export default defineComponent({
                             return <common-database-table-user element="text" data={data.accountOptions}></common-database-table-user>
                         },
                         col_brandOptions: (data: Omix) => {
-                            return <common-database-table-content value={data.brandOptions.name}></common-database-table-content>
+                            const brand = data.brandOptions?.name
+                                ? data.brandOptions
+                                : brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
+                            return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
                         },
                         col_deptOptions: (data: Omix) => (
                             <common-database-table-content

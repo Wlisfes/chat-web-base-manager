@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 客户接口迁入 Account
+
+- 影响机器：Company、Home；与 Account、Finance 同版本窗口联动发布。
+- 关联版本：本次 Manager、Account、Finance 联动发布的完整 Git SHA。
+- 变更内容：财务账户和 CRM 客户列表的新增、编辑、分页及状态请求统一改为 Account `/api/consumers/**`；品牌和币种选项仍从 `/api/finance/**` 获取，列表按 `brandId` 在前端补全品牌名称。
+- 机器侧操作：无需修改域名、TLS、`.env`、端口、Runner、部署目录或 Docker 网络；必须先部署 Account Consumer 表与接口，再发布本 Manager 镜像。
+- 验证命令：执行 `yarn build`；部署后登录管理端，验证财务账户客户列表及 CRM 客户列表不再请求 `/api/finance/client/**`，新增、查询和状态切换均成功。
+- 回滚方法：将 Manager 恢复到上一条健康 SHA；若后端已经停止旧 Finance Client 接口，回滚 Manager 前必须先恢复兼容接口，否则旧页面客户功能不可用。
+
 ## 2026-08-18 公网 API 路径精简
 
 - 影响机器：Company、Home；与 Gateway 同版本窗口联动发布。
