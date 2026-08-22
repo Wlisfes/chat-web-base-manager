@@ -7,7 +7,7 @@ import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmPartner',
+    name: 'CrmConsumer',
     setup(props, ctx) {
         const { state, setState } = useState({ tabName: 'common', observer: Observer<Record<string, Omix>>() })
 
@@ -17,7 +17,6 @@ export default defineComponent({
                     animated
                     type="line"
                     default-value="account"
-                    tab-class="p-block-12!"
                     tabs-padding={14}
                     class="common-element-tabser inset-absolute flex-1 overflow-hidden "
                     v-model:value={state.tabName}

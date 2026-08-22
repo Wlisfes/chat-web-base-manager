@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-23 独立 CRM 服务接入与命名重构
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA，并与 Account、Finance、Gateway、CRM 处于同一发布窗口。
+- 关联版本：`chat-web-crm-service` 首个正式版本；Account、Finance 和 Gateway 本次完整 Git SHA。
+- 变更内容：CRM 请求统一切换到 `/api/crm/sms/**`，客户详情和下拉直接使用 `/api/account/consumer/**`；文件、组件、变量和页面路由从旧 `client/formosan/saturation` 迁移为 `consumer/sms-quote`，彻底移除 path 参数。报价编辑使用 Naive UI 数字输入框展示 USD 小数并按百万倍整数提交，枚举使用中文 `n-tag`，发布确认不再误导为邮件发送。
+- 机器侧操作：无需修改 Manager 端口、证书、Runner、部署目录和 Docker 网络；须先完成四个后端服务部署及 Account CRM 菜单修复。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后验证客户详情、短信应用、报价初始化、编辑、预览、发布和正式报价列表。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；新 CRM 数据保留，后端和数据库不自动回滚。
+
 ## 2026-08-23 表格横纵虚拟化与按需 Cell 渲染
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。

@@ -47,36 +47,36 @@ export const COMMON_CHUNK_OPTIONS = {
         value: 'CHUNK_COUNTRY_STATUS',
         name: '国家/地区状态'
     },
-    CHUNK_CLIENT_STATUS: {
-        value: 'CHUNK_CLIENT_STATUS',
+    CHUNK_CONSUMER_STATUS: {
+        value: 'CHUNK_CONSUMER_STATUS',
         name: '客户状态'
     },
-    CHUNK_CLIENT_PAY_MODE: {
-        value: 'CHUNK_CLIENT_PAY_MODE',
+    CHUNK_CONSUMER_PAY_MODE: {
+        value: 'CHUNK_CONSUMER_PAY_MODE',
         name: '付款模式'
     },
-    CHUNK_CLIENT_AUTH_STATUS: {
-        value: 'CHUNK_CLIENT_AUTH_STATUS',
+    CHUNK_CONSUMER_AUTH_STATUS: {
+        value: 'CHUNK_CONSUMER_AUTH_STATUS',
         name: '认证状态'
     },
-    CHUNK_CLIENT_SOURCE: {
-        value: 'CHUNK_CLIENT_SOURCE',
+    CHUNK_CONSUMER_SOURCE: {
+        value: 'CHUNK_CONSUMER_SOURCE',
         name: '注册来源'
     },
-    CHUNK_CLIENT_CLASS: {
-        value: 'CHUNK_CLIENT_CLASS',
+    CHUNK_CONSUMER_CLASS: {
+        value: 'CHUNK_CONSUMER_CLASS',
         name: '客户类型'
     },
-    CHUNK_CLIENT_STAGE: {
-        value: 'CHUNK_CLIENT_STAGE',
+    CHUNK_CONSUMER_STAGE: {
+        value: 'CHUNK_CONSUMER_STAGE',
         name: '客户阶段'
     },
-    CHUNK_CLIENT_SMS_STATUS: {
-        value: 'CHUNK_CLIENT_SMS_STATUS',
+    CHUNK_CONSUMER_SMS_STATUS: {
+        value: 'CHUNK_CONSUMER_SMS_STATUS',
         name: '短信应用状态'
     },
-    CHUNK_CLIENT_SMS_TYPE: {
-        value: 'CHUNK_CLIENT_SMS_TYPE',
+    CHUNK_CONSUMER_SMS_TYPE: {
+        value: 'CHUNK_CONSUMER_SMS_TYPE',
         name: '短信应用类型'
     },
     CHUNK_DATETASK_TYPE: {
@@ -91,8 +91,8 @@ export const COMMON_CHUNK_OPTIONS = {
         value: 'CHUNK_DATETASK_LOG_STATUS',
         name: '执行状态'
     },
-    CHUNK_SMS_FORMOSAN_STATUS: {
-        value: 'CHUNK_SMS_FORMOSAN_STATUS',
+    CHUNK_SMS_QUOTE_STATUS: {
+        value: 'CHUNK_SMS_QUOTE_STATUS',
         name: '报价状态'
     }
 }
