@@ -2,6 +2,14 @@ import { toRefs, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useState } from '@/hooks'
 
+type ViewTransitionDocument = Document & {
+    startViewTransition?: (updateCallback: () => Promise<unknown>) => { finished: Promise<void> }
+}
+
+function releaseThemeSwitching(root: HTMLElement) {
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')))
+}
+
 /**基础缓存配置实例**/
 export const useConfiger = defineStore(
     'APP_STORE_CONFIGER',
@@ -32,7 +40,29 @@ export const useConfiger = defineStore(
 
         /**主题切换**/
         async function fetchThemeUpdate(theme?: 'light' | 'dark') {
-            return await setState({ theme: theme ?? (state.theme === 'light' ? 'dark' : 'light') })
+            const nextTheme = theme ?? (state.theme === 'light' ? 'dark' : 'light')
+            if (nextTheme === state.theme) return state
+
+            const root = document.documentElement
+            const updateTheme = () => setState({ theme: nextTheme })
+            const startViewTransition = (document as ViewTransitionDocument).startViewTransition?.bind(document)
+
+            root.classList.add('theme-switching')
+            if (!startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                try {
+                    return await updateTheme()
+                } finally {
+                    releaseThemeSwitching(root)
+                }
+            }
+
+            try {
+                const transition = startViewTransition(updateTheme)
+                await transition.finished
+                return state
+            } finally {
+                root.classList.remove('theme-switching')
+            }
         }
 
         return {

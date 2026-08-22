@@ -1,6 +1,5 @@
 <script lang="tsx">
 import { defineComponent, computed, PropType, Fragment } from 'vue'
-import { useProvider } from '@/hooks'
 import { isEmpty, isNotEmpty, fetchCurrent } from '@/utils'
 import {
     COMMON_DATABASE_TAG_PALETTES,
@@ -19,14 +18,13 @@ export default defineComponent({
         value: { type: [String, Number] }
     },
     setup(props, { slots }) {
-        const { inverted } = useProvider()
         /**标签枚举数据**/
         const itemNode = computed(() => fetchCurrent(props.options, e => e.value == props.value))
         const tagStyle = computed(() => {
             const color = itemNode.value?.json?.color as CommonDatabaseTagColor | undefined
             const customStyle = itemNode.value?.json?.style ?? {}
             if (!color || !COMMON_DATABASE_TAG_PALETTES[color]) return customStyle
-            return { ...createCommonDatabaseTagStyle(color, inverted.value), ...customStyle }
+            return { ...createCommonDatabaseTagStyle(color), ...customStyle }
         })
 
         return () => {
@@ -36,7 +34,13 @@ export default defineComponent({
                 return slots.default ? (
                     slots.default(itemNode.value)
                 ) : (
-                    <n-tag bordered round size="small" type={itemNode.value.json?.type ?? 'default'} style={tagStyle.value}>
+                    <n-tag
+                        bordered
+                        class="common-database-tag"
+                        size="small"
+                        type={itemNode.value.json?.type ?? 'default'}
+                        style={tagStyle.value}
+                    >
                         {itemNode.value.name}
                     </n-tag>
                 )
