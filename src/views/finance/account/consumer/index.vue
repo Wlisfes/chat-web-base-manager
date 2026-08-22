@@ -17,7 +17,9 @@ export default defineComponent({
                 CHUNK_CLIENT_PAY_MODE: true,
                 CHUNK_CLIENT_AUTH_STATUS: true,
                 CHUNK_CLIENT_SOURCE: true,
-                CHUNK_CLIENT_STATUS: true
+                CHUNK_CLIENT_STATUS: true,
+                CHUNK_CLIENT_CLASS: true,
+                CHUNK_CLIENT_STAGE: true
             },
             formState: {
                 name: undefined,
@@ -210,6 +212,18 @@ export default defineComponent({
                             const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
                             return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
                         },
+                        col_classType: (data: Omix) => (
+                            <common-database-table-chunk
+                                value={data.classType}
+                                options={chunkState.CHUNK_CLIENT_CLASS}
+                            ></common-database-table-chunk>
+                        ),
+                        col_stage: (data: Omix) => (
+                            <common-database-table-chunk
+                                value={data.stage}
+                                options={chunkState.CHUNK_CLIENT_STAGE}
+                            ></common-database-table-chunk>
+                        ),
                         col_status: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
@@ -219,7 +233,7 @@ export default defineComponent({
                         ),
                         col_payMode: (data: Omix) => (
                             <common-database-table-chunk
-                                element="text"
+                                element="chunk"
                                 value={data.payMode}
                                 options={chunkState.CHUNK_CLIENT_PAY_MODE}
                             ></common-database-table-chunk>
@@ -233,7 +247,7 @@ export default defineComponent({
                         ),
                         col_source: (data: Omix) => (
                             <common-database-table-chunk
-                                element="text"
+                                element="chunk"
                                 value={data.source}
                                 options={chunkState.CHUNK_CLIENT_SOURCE}
                             ></common-database-table-chunk>
