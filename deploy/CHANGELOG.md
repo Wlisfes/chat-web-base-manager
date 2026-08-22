@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 客户表格启用 Naive UI 虚拟滚动
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：财务客户列表启用 `n-data-table` 官方 `virtual-scroll`，结合现有 `flex-height` 设置 `max-height: 100%` 和 40px 最小行高，仅挂载可视区域及缓冲区内的行。客户页不再同时保留 50 行、约 300 个 `n-tag` 实例参与主题切换。
+- 机器侧操作：保留两台机器现有域名、TLS、`.env`、端口、Runner、部署目录和网络；Company Runner 离线时只保留最新部署任务排队。
+- 验证命令：执行 `yarn build` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后检查 `/finance/account/consumer` 表格纵向/横向滚动、复选框及分页，确认 DOM 中只渲染可视行，并连续切换亮暗主题检查响应耗时和控制台。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 使用 Naive UI 官方主题与 Tag API
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
