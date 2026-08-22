@@ -14,6 +14,7 @@ export default defineComponent({
         return () => (
             <n-config-provider
                 abstract
+                inline-theme-disabled
                 locale={zhCN}
                 date-locale={dateZhCN}
                 theme={themeStyle.value}

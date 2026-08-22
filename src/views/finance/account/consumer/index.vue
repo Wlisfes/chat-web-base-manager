@@ -190,7 +190,6 @@ export default defineComponent({
                 <common-database-table
                     show-select
                     show-settings
-                    virtual-scroll
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
