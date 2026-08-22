@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-22 表格单元格使用 Naive UI 高性能 Ellipsis
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：通用表格普通单元格和 `common-database-table-content` 默认改用 Naive UI 原生 `n-performant-ellipsis`；组件仅在鼠标移入时升级为完整 `n-ellipsis` 并测量溢出，仍保留显式 `ellipsis` 配置。
+- 性能依据：客户页启用虚拟滚动后仍同时存在约 379 个完整 `n-ellipsis`；这些组件包含主题和 Tooltip 响应逻辑，并非等价于同数量的静态 DOM 节点。
+- 验证命令：执行 `yarn build`、`docker compose -f deploy/compose.yml config --quiet` 和 `git diff --check`；部署后检查客户页主题切换、文本溢出 Tooltip、Tag 样式和浏览器控制台。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 客户枚举行使用 Naive UI 虚拟滚动
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。

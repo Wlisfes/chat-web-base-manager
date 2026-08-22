@@ -174,7 +174,7 @@ export default defineComponent({
                 return <span>-</span>
             }
             try {
-                if (['performant-ellipsis'].includes(base.ellipsisComponent ?? 'ellipsis')) {
+                if (base.ellipsisComponent !== 'ellipsis') {
                     return (
                         <n-performant-ellipsis tooltip={{ scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } }}>
                             {isObject(value) || isArray(value) ? JSON.stringify(value) : value}
