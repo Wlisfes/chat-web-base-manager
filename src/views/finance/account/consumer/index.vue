@@ -191,6 +191,7 @@ export default defineComponent({
                     show-select
                     show-settings
                     virtual-scroll
+                    virtual-scroll-x
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
