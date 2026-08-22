@@ -37,7 +37,7 @@ export default defineComponent({
                             native-scrollbar={false}
                             scrollbar-props={{ size: 100, trigger: 'none' }}
                         >
-                            <n-element class="flex flex-col flex-1 relative transition-background-color transition-duration-300 bg-[var(--common-body-bg-color)]">
+                            <n-element class="flex flex-col flex-1 relative bg-[var(--common-body-bg-color)]">
                                 <RouterView>
                                     {{
                                         default: ({ Component }: Omix) => {

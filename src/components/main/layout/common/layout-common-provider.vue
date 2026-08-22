@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { defineComponent, watchEffect } from 'vue'
 import { dateZhCN, zhCN } from 'naive-ui'
 import { useProvider } from '@/hooks'
 
@@ -9,7 +9,13 @@ export default defineComponent({
         globalStyle: { type: Boolean, default: false }
     },
     setup(props, { slots }) {
-        const { themeStyle, themeOverrides } = useProvider()
+        const { themeStyle, themeOverrides, inverted } = useProvider()
+
+        watchEffect(() => {
+            document.documentElement.classList.toggle('app-theme-dark', inverted.value)
+            document.documentElement.classList.toggle('app-theme-light', !inverted.value)
+            document.documentElement.style.colorScheme = inverted.value ? 'dark' : 'light'
+        })
 
         return () => (
             <n-config-provider

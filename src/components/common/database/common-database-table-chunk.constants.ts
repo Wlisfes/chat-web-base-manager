@@ -54,18 +54,11 @@ export const COMMON_DATABASE_TAG_PALETTES: Record<CommonDatabaseTagColor, Common
     brown: { rgb: '180, 83, 9', lightText: '#92400e', darkText: '#fed7aa' }
 }
 
-export function createCommonDatabaseTagStyle(color: CommonDatabaseTagColor, dark: boolean): CSSProperties {
+export function createCommonDatabaseTagStyle(color: CommonDatabaseTagColor): CSSProperties {
     const palette = COMMON_DATABASE_TAG_PALETTES[color]
-    const background = `rgba(${palette.rgb}, ${dark ? 0.2 : 0.1})`
-    const border = `rgba(${palette.rgb}, ${dark ? 0.52 : 0.34})`
-    const text = dark ? palette.darkText : palette.lightText
     return {
-        '--n-color': background,
-        '--n-text-color': text,
-        '--n-border': `1px solid ${border}`,
-        backgroundColor: background,
-        borderColor: border,
-        color: text,
-        fontWeight: 600
+        '--common-database-tag-rgb': palette.rgb,
+        '--common-database-tag-light-text': palette.lightText,
+        '--common-database-tag-dark-text': palette.darkText
     } as CSSProperties
 }
