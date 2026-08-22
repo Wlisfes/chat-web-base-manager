@@ -6,6 +6,8 @@ import { useVModels } from '@vueuse/core'
 import { useState } from '@/hooks'
 import { cloneDeep } from 'lodash-es'
 
+const TABLE_ELLIPSIS = { tooltip: { scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } } }
+
 export default defineComponent({
     name: 'CommonDatabaseTable',
     emits: [
@@ -45,6 +47,10 @@ export default defineComponent({
         bordered: { type: Boolean, default: true },
         /**开启纵向虚拟滚动**/
         virtualScroll: { type: Boolean, default: false },
+        /**开启横向虚拟滚动**/
+        virtualScrollX: { type: Boolean, default: false },
+        /**虚拟滚动最小行高**/
+        minRowHeight: { type: Number, default: 44 },
         /**被选中的行的对象列表**/
         select: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**表头配置自定义排版规则**/
@@ -79,8 +85,34 @@ export default defineComponent({
         })
         /**表头配置**/
         const faseColumns = computed(() => {
-            return fetchBaseColumns(fetchColumnsCustomize(props.columns)).filter(item => item.disabled || (item.check ?? true))
+            return fetchBaseColumns(fetchColumnsCustomize(props.columns))
+                .filter(item => item.disabled || (item.check ?? true))
+                .map(fetchColumnRender)
         })
+        /**绑定自定义列并配置原生轻量省略渲染**/
+        function fetchColumnRender(base: Omix<DataTableColumn>) {
+            const key = String(base.key ?? '')
+            if (props.virtualScrollX && isEmpty(base.width)) {
+                base.width = base.minWidth ?? 120
+            }
+            if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
+                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
+                return base
+            }
+            if (!['selection', 'expand'].includes(String(base.type ?? '')) && !['settings', 'command'].includes(key)) {
+                if (base.ellipsis === undefined) {
+                    if (base.minWidth !== undefined) {
+                        base.ellipsis = TABLE_ELLIPSIS
+                        base.ellipsisComponent = 'performant-ellipsis'
+                    } else {
+                        base.ellipsis = true
+                    }
+                } else if (isObject(base.ellipsis) && isEmpty(base.ellipsisComponent)) {
+                    base.ellipsisComponent = 'performant-ellipsis'
+                }
+            }
+            return base
+        }
         /**按自定义排版规则排序列**/
         function fetchColumnsCustomize(data: Array<Omix<DataTableColumn>>) {
             if (customize.value.length === 0) return data
@@ -167,27 +199,12 @@ export default defineComponent({
             })
         }
         /**节点渲染**/
-        function fetchCellRender(value: any, data: Omix, base: Omix<DataTableColumn>) {
-            if (isNotEmpty(base.key) && isNotEmpty(slots[`col_${base.key}`])) {
-                return slots[`col_${base.key}`]?.(data, base) ?? <span>-</span>
-            } else if (isEmpty(value)) {
-                return <span>-</span>
-            }
+        function fetchCellRender(value: any) {
+            if (isEmpty(value)) return '-'
             try {
-                if (base.ellipsisComponent !== 'ellipsis') {
-                    return (
-                        <n-performant-ellipsis tooltip={{ scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } }}>
-                            {isObject(value) || isArray(value) ? JSON.stringify(value) : value}
-                        </n-performant-ellipsis>
-                    )
-                }
-                return (
-                    <n-ellipsis tooltip={{ scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } }}>
-                        {isObject(value) || isArray(value) ? JSON.stringify(value) : value}
-                    </n-ellipsis>
-                )
+                return isObject(value) || isArray(value) ? JSON.stringify(value) : value
             } catch (err) {
-                return <span>-</span>
+                return '-'
             }
         }
 
@@ -225,9 +242,12 @@ export default defineComponent({
                                 style={{ flex: 1, '--n-opacity-loading': initialize.value ? 0 : 0.5 }}
                                 row-key={(e: Omix) => e.keyId}
                                 loading={loading.value}
+                                min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}
                                 single-line={false}
                                 virtual-scroll={props.virtualScroll}
+                                virtual-scroll-x={props.virtualScroll && props.virtualScrollX}
+                                virtual-scroll-header={props.virtualScroll && props.virtualScrollX}
                                 data={data.value}
                                 columns={faseColumns.value}
                                 checked-row-keys={faseSelect.value}

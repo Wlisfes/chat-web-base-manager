@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-23 表格横纵虚拟化与按需 Cell 渲染
+
+- 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
+- 关联版本：本次 Manager 合并后的完整 Git SHA。
+- 变更内容：客户表格同时启用 Naive UI 原生 `virtual-scroll`、`virtual-scroll-x` 和 `virtual-scroll-header`，使用 44px 实际最小行高；命名插槽在列配置阶段绑定为 `column.render`，普通 `render-cell` 仅返回原始值。固定宽度列使用原生 CSS Ellipsis，弹性列才按需使用 `n-performant-ellipsis`。
+- 性能依据：优化前客户页 567 个 Cell 实际展开为 2032 个表格 DOM；主题切换会把 `mergedTheme` 传给全部 Cell，并同时触发每个单元格的背景、边框和文字颜色过渡。横纵虚拟化会同时限制参与更新的行和列。
+- 验证命令：执行 `yarn build`、`docker compose -f deploy/compose.yml config --quiet` 和 `git diff --check`；部署后检查横纵滚动、固定列、列设置、溢出 Tooltip、亮暗主题切换和浏览器控制台。
+- 回滚方法：将 Company、Home 的 Manager 同时恢复到上一条健康 SHA；无需回滚后端或数据库。
+
 ## 2026-08-22 表格单元格使用 Naive UI 高性能 Ellipsis
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA。
