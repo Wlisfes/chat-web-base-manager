@@ -28,17 +28,17 @@ const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
     CHUNK_BRAND_STATUS: [option(1, '启用', 'enable', 'success'), option(2, '禁用', 'disable', 'error')],
     CHUNK_CURRENCY_STATUS: [option(1, '启用', 'enable', 'success'), option(2, '禁用', 'disable', 'error')],
     CHUNK_COUNTRY_STATUS: [option(1, '启用', 'enable', 'success'), option(2, '禁用', 'disable', 'error')],
-    CHUNK_CLIENT_STATUS: [option(1, '启用', 'enable', 'success'), option(2, '禁用', 'disable', 'error')],
-    CHUNK_CLIENT_PAY_MODE: [option(1, '预付', 'prepaid', 'info'), option(2, '后付', 'postpaid', 'warning')],
-    CHUNK_CLIENT_AUTH_STATUS: [
+    CHUNK_CONSUMER_STATUS: [option(1, '启用', 'enable', 'success'), option(2, '禁用', 'disable', 'error')],
+    CHUNK_CONSUMER_PAY_MODE: [option(1, '预付', 'prepaid', 'info'), option(2, '后付', 'postpaid', 'warning')],
+    CHUNK_CONSUMER_AUTH_STATUS: [
         option(1, '未认证', 'unverified'),
         option(2, '认证中', 'pending', 'warning'),
         option(3, '已认证', 'verified', 'success'),
         option(4, '认证失败', 'rejected', 'error')
     ],
-    CHUNK_CLIENT_SOURCE: [option(1, '平台注册', 'platform', 'info'), option(2, '手动创建', 'manual', 'success')],
-    CHUNK_CLIENT_CLASS: [option(1, '普通客户', 'common', 'info'), option(2, '推广客户', 'cooperate', 'info')],
-    CHUNK_CLIENT_STAGE: [
+    CHUNK_CONSUMER_SOURCE: [option(1, '平台注册', 'platform', 'info'), option(2, '手动创建', 'manual', 'success')],
+    CHUNK_CONSUMER_CLASS: [option(1, '普通客户', 'common', 'info'), option(2, '推广客户', 'cooperate', 'info')],
+    CHUNK_CONSUMER_STAGE: [
         option(1, '线索阶段', 'cluetrail', 'info'),
         option(2, '意向阶段', 'intention', 'info'),
         option(3, '认证阶段', 'authenticate', 'info'),
@@ -47,12 +47,12 @@ const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
         option(6, '生产阶段', 'production', 'success'),
         option(7, '价值阶段', 'cooperate', 'success')
     ],
-    CHUNK_CLIENT_SMS_STATUS: [
+    CHUNK_CONSUMER_SMS_STATUS: [
         option(1, '未激活', 'inactive'),
         option(2, '已激活', 'active', 'success'),
         option(3, '禁用', 'disable', 'error')
     ],
-    CHUNK_CLIENT_SMS_TYPE: [
+    CHUNK_CONSUMER_SMS_TYPE: [
         option(1, '验证码', 'otp', 'success'),
         option(2, '营销短信', 'market', 'warning'),
         option(3, '通知短信', 'notify', 'info')
@@ -73,7 +73,7 @@ const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
         option(2, '成功', 'success', 'success'),
         option(3, '失败', 'failed', 'error')
     ],
-    CHUNK_SMS_FORMOSAN_STATUS: [
+    CHUNK_SMS_QUOTE_STATUS: [
         option(1, '待生效', 'pending', 'warning'),
         option(2, '已生效', 'effective', 'success'),
         option(3, '已删除', 'deleted', 'error')

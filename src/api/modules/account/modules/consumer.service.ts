@@ -21,3 +21,13 @@ export function httpBaseAccountColumnConsumer(data: Omix) {
 export function httpBaseAccountUpdateConsumerStatus(data: Omix) {
     return request({ url: `${CONSUMER_API}/update/status`, method: 'POST', data })
 }
+
+/** 查询外部客户详情。 */
+export function httpBaseAccountResolverConsumer(params: Omix) {
+    return request({ url: `${CONSUMER_API}/resolver`, method: 'GET', params })
+}
+
+/** 查询可用外部客户下拉列表。 */
+export function httpBaseAccountSelectConsumer(params: Omix = {}) {
+    return request({ url: `${CONSUMER_API}/select`, method: 'GET', params })
+}
