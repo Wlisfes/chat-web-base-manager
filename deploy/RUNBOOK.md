@@ -10,7 +10,7 @@ Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/o
 docker exec chat-web-base-manager nginx -t
 ```
 
-若返回 502，先检查 `chat-web-grafana` 是否运行且加入 `chat-web-infrastructure`；不要把 Grafana 3000 或其他观测组件端口直接暴露到公网。
+若返回 502，先检查 `chat-web-grafana` 是否运行且加入 `chat-web-infrastructure`，再使用 `docker exec chat-web-base-manager getent hosts chat-web-grafana` 检查容器 DNS。Manager 通过 `127.0.0.11` 每10秒动态刷新 Grafana 和 Gateway 地址，正常情况下上游容器重建后不需要重启 Manager；不要把 Grafana 3000 或其他观测组件端口直接暴露到公网。
 
 
 ## 当前基线

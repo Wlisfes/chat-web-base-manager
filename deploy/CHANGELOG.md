@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-24 Docker 上游地址动态重解析
+
+- 影响机器：Home；Company 当前离线，本次不等待其部署结果。
+- 关联版本：Manager 本次完整 Git SHA 镜像。
+- 变更内容：Nginx 通过 Docker 内置 DNS 动态解析 Gateway 与 Grafana 容器名，缓存有效期10秒；修复 Grafana 或 Gateway 容器重建并更换 IP 后，Manager 仍访问旧 IP 导致 `/observability/**` 或 `/api/**` 返回 502 的问题。
+- 机器侧操作：无需修改证书、`.env`、端口、Runner、部署目录和 Docker 网络；Home 已通过重启 Manager 临时刷新旧 DNS，合并后由新镜像提供持续动态解析。
+- 验证命令：执行 `yarn build`、`nginx -t` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后重建 Grafana，等待最多10秒，再验证 `/observability/api/health` 和 `/api/account/health` 均返回 HTTP 200。
+- 回滚方法：恢复上一条健康 Manager 完整 SHA 镜像；若观测组件已经重建，回滚后需重启 Manager 刷新一次上游地址，业务数据和观测数据均不回滚。
+
 ## 2026-08-23 Grafana 统一 HTTPS 入口
 
 - 影响机器：Home；Company 当前离线，本次不等待其部署结果。
