@@ -73,6 +73,10 @@ function mapDepartmentRoleTree(nodes: Array<Omix>, rolesByOrganization: Map<numb
     })
 }
 
+function getDepartmentRoleTreeRoots(nodes: Array<Omix>): Array<Omix> {
+    return nodes.flatMap(organization => (organization.type === 'company' ? (organization.children ?? []) : [organization]))
+}
+
 async function replaceUserRole(uid: string, roleId: number, add: boolean) {
     const detail = await request({ url: `${USER_API}/resolver`, method: 'GET', params: { uid } })
     const current = detail.data?.roleKeyIds ?? []
@@ -135,7 +139,7 @@ export async function httpBaseSystemColumnRole(): Promise<any> {
         ...roleResponse,
         data: {
             list: roles.filter((role: Omix) => !departmentRoleKeyIds.has(role.keyId)),
-            dept: mapDepartmentRoleTree(organizationResponse.data ?? [], rolesByOrganization),
+            dept: mapDepartmentRoleTree(getDepartmentRoleTreeRoots(organizationResponse.data ?? []), rolesByOrganization),
             total: roles.length
         }
     }
