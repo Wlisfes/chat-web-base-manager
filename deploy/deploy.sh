@@ -10,7 +10,7 @@ CERT_FILE=certs/chat.lisfes.com.crt
 KEY_FILE=certs/chat.lisfes.com.key
 TLS_VOLUME=chat-web-base-manager-tls
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-120}
-PULL_ATTEMPTS=${PULL_ATTEMPTS:-3}
+PULL_ATTEMPTS=${PULL_ATTEMPTS:-8}
 deployment_started=0
 
 if [ ! -f "$COMPOSE_FILE" ]; then

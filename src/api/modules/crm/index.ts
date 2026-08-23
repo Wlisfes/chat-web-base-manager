@@ -1,4 +1,3 @@
-export * from '@/api/modules/crm/modules/client.service'
-export * from '@/api/modules/crm/modules/formosan.service'
-export * from '@/api/modules/crm/modules/saturation.service'
+export * from '@/api/modules/crm/modules/sms-application.service'
+export * from '@/api/modules/crm/modules/sms-quote.service'
 

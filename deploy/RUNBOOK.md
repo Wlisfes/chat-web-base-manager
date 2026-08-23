@@ -50,13 +50,18 @@ wsl -d Ubuntu-22.04 -u root -- sh -lc "stat -c '%a %n' /opt/chat-web-base-manage
 
 ```powershell
 docker inspect chat-web-base-manager --format "{{.Config.Image}} {{.State.Status}} {{.State.Health.Status}}"
+docker inspect chat-web-base-manager --format "{{json .HostConfig.LogConfig}}"
+docker logs --tail 200 chat-web-base-manager
 docker inspect chat-web-gateway-service --format "{{.State.Health.Status}}"
 Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/health
 Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/account/health
-$response = Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/api/account/auth/me
+Invoke-WebRequest -UseBasicParsing https://chat.lisfes.com/api/finance/health
+$response = Invoke-WebRequest -UseBasicParsing -SkipHttpErrorCheck https://chat.lisfes.com/api/account/auth/token/resolver
 $response.StatusCode
 ($response.Content | ConvertFrom-Json).code
 ```
+
+Manager 的 Nginx access/error 日志写入标准输出和标准错误；Docker 日志配置预期为 `json-file`、`max-size=20m`、`max-file=30`。
 
 最后一组预期分别为 HTTP `200` 和业务 `401`。前端所有 `/api/*` 请求保持原路径转发到 Gateway，并固定传递 `X-Forwarded-Proto: https`，确保登录刷新 Cookie 使用安全属性。
 

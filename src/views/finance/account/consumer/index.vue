@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
@@ -8,15 +8,18 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'FinanceAccountConsumer',
     setup(props, ctx) {
+        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnClient(payload),
+            request: (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
             keyName: 'chatbok:finance:account:consumer',
             chunkNames: {
-                CHUNK_CLIENT_PAY_MODE: true,
-                CHUNK_CLIENT_AUTH_STATUS: true,
-                CHUNK_CLIENT_SOURCE: true,
-                CHUNK_CLIENT_STATUS: true
+                CHUNK_CONSUMER_PAY_MODE: true,
+                CHUNK_CONSUMER_AUTH_STATUS: true,
+                CHUNK_CONSUMER_SOURCE: true,
+                CHUNK_CONSUMER_STATUS: true,
+                CHUNK_CONSUMER_CLASS: true,
+                CHUNK_CONSUMER_STAGE: true
             },
             formState: {
                 name: undefined,
@@ -95,7 +98,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateClientStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseAccountUpdateConsumerStatus({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -155,7 +158,7 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             placeholder="请选择状态"
-                            options={chunkState.CHUNK_CLIENT_STATUS}
+                            options={chunkState.CHUNK_CONSUMER_STATUS}
                             v-model:value={formState.value.status}
                         ></form-common-column-select>
                     </common-database-search-column>
@@ -163,7 +166,7 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             placeholder="请选择付款模式"
-                            options={chunkState.CHUNK_CLIENT_PAY_MODE}
+                            options={chunkState.CHUNK_CONSUMER_PAY_MODE}
                             v-model:value={formState.value.payMode}
                         ></form-common-column-select>
                     </common-database-search-column>
@@ -171,7 +174,7 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             placeholder="请选择认证状态"
-                            options={chunkState.CHUNK_CLIENT_AUTH_STATUS}
+                            options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
                             v-model:value={formState.value.authStatus}
                         ></form-common-column-select>
                     </common-database-search-column>
@@ -179,7 +182,7 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             placeholder="请选择注册来源"
-                            options={chunkState.CHUNK_CLIENT_SOURCE}
+                            options={chunkState.CHUNK_CONSUMER_SOURCE}
                             v-model:value={formState.value.source}
                         ></form-common-column-select>
                     </common-database-search-column>
@@ -187,6 +190,8 @@ export default defineComponent({
                 <common-database-table
                     show-select
                     show-settings
+                    virtual-scroll
+                    virtual-scroll-x
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
@@ -202,32 +207,56 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
+                        col_accountOptions: (data: Omix) => (
+                            <common-database-table-user element="text" data={data.accountOptions}></common-database-table-user>
+                        ),
+                        col_deptOptions: (data: Omix) => (
+                            <common-database-table-content
+                                value={(data.deptOptions ?? []).map((item: Omix) => item.deptName)}
+                            ></common-database-table-content>
+                        ),
+                        col_brandOptions: (data: Omix) => {
+                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
+                            return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
+                        },
+                        col_classType: (data: Omix) => (
+                            <common-database-table-chunk
+                                value={data.classType}
+                                options={chunkState.CHUNK_CONSUMER_CLASS}
+                            ></common-database-table-chunk>
+                        ),
+                        col_stage: (data: Omix) => (
+                            <common-database-table-chunk
+                                value={data.stage}
+                                options={chunkState.CHUNK_CONSUMER_STAGE}
+                            ></common-database-table-chunk>
+                        ),
                         col_status: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkState.CHUNK_CLIENT_STATUS}
+                                options={chunkState.CHUNK_CONSUMER_STATUS}
                             ></common-database-table-chunk>
                         ),
                         col_payMode: (data: Omix) => (
                             <common-database-table-chunk
-                                element="text"
+                                element="chunk"
                                 value={data.payMode}
-                                options={chunkState.CHUNK_CLIENT_PAY_MODE}
+                                options={chunkState.CHUNK_CONSUMER_PAY_MODE}
                             ></common-database-table-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.authStatus}
-                                options={chunkState.CHUNK_CLIENT_AUTH_STATUS}
+                                options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
                             ></common-database-table-chunk>
                         ),
                         col_source: (data: Omix) => (
                             <common-database-table-chunk
-                                element="text"
+                                element="chunk"
                                 value={data.source}
-                                options={chunkState.CHUNK_CLIENT_SOURCE}
+                                options={chunkState.CHUNK_CONSUMER_SOURCE}
                             ></common-database-table-chunk>
                         )
                     }}

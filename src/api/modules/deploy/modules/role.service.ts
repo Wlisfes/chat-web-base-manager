@@ -1,8 +1,8 @@
 import { request } from '@/utils'
 
-const ROLE_API = '/api/account/roles'
-const USER_API = '/api/account/users'
-const ORGANIZATION_API = '/api/account/organizations'
+const ROLE_API = '/api/account/role'
+const USER_API = '/api/account/user'
+const ORGANIZATION_API = '/api/account/organization'
 
 function dataScopePayload(data: Omix): Omix {
     if (!data.model) return { rules: [] }
@@ -74,41 +74,53 @@ function mapDepartmentRoleTree(nodes: Array<Omix>, rolesByOrganization: Map<numb
 }
 
 async function replaceUserRole(uid: string, roleId: number, add: boolean) {
-    const detail = await request({ url: `${USER_API}/${uid}`, method: 'GET' })
+    const detail = await request({ url: `${USER_API}/resolver`, method: 'GET', params: { uid } })
     const current = detail.data?.roleKeyIds ?? []
     const roleKeyIds = add ? [...new Set([...current, roleId])] : current.filter((item: number) => item !== roleId)
-    return request({ url: `${USER_API}/${uid}/roles`, method: 'PUT', data: { roleKeyIds } })
+    return request({ url: `${USER_API}/update/role`, method: 'POST', data: { uid, roleKeyIds } })
 }
 
 /**新增岗位角色**/
 export async function httpBaseSystemCreateRole(data: Omix): Promise<any> {
-    const response = await request({ url: ROLE_API, method: 'POST', data: rolePayload(data) })
+    const response = await request({ url: `${ROLE_API}/create`, method: 'POST', data: rolePayload(data) })
     if (data.model) {
-        await request({ url: `${ROLE_API}/${response.data.keyId}/data-scopes`, method: 'PUT', data: dataScopePayload(data) })
+        await request({
+            url: `${ROLE_API}/update/data/scope`,
+            method: 'POST',
+            data: { keyId: response.data.keyId, ...dataScopePayload(data) }
+        })
     }
     return response
 }
 
 /**编辑岗位角色**/
 export async function httpBaseSystemUpdateRole(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/${data.keyId}`, method: 'PATCH', data: rolePayload(data) })
+    const response = await request({
+        url: `${ROLE_API}/update`,
+        method: 'POST',
+        data: { keyId: data.keyId, ...rolePayload(data) }
+    })
     if (data.model) {
-        await request({ url: `${ROLE_API}/${data.keyId}/data-scopes`, method: 'PUT', data: dataScopePayload(data) })
+        await request({
+            url: `${ROLE_API}/update/data/scope`,
+            method: 'POST',
+            data: { keyId: data.keyId, ...dataScopePayload(data) }
+        })
     }
     return response
 }
 
 /**角色详情**/
 export async function httpBaseSystemRoleResolver(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/${data.keyId}`, method: 'GET' })
+    const response = await request({ url: `${ROLE_API}/resolver`, method: 'GET', params: { keyId: data.keyId } })
     return { ...response, data: mapRole(response.data) }
 }
 
 /**角色列表查询**/
 export async function httpBaseSystemColumnRole(): Promise<any> {
     const [roleResponse, organizationResponse] = await Promise.all([
-        request({ url: ROLE_API, method: 'GET' }),
-        request({ url: `${ORGANIZATION_API}/tree`, method: 'GET' })
+        request({ url: `${ROLE_API}/select`, method: 'GET' }),
+        request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
     ])
     const roles = (roleResponse.data ?? []).map(mapRole)
     const rolesByOrganization = new Map<number, Omix>()
@@ -133,9 +145,9 @@ export async function httpBaseSystemColumnRole(): Promise<any> {
 export async function httpBaseSystemColumnAccountRole(data: Omix): Promise<any> {
     const keyword = [data.vague, data.phone, data.email].find(value => Boolean(value))
     const response = await request({
-        url: USER_API,
-        method: 'GET',
-        params: {
+        url: `${USER_API}/column`,
+        method: 'POST',
+        data: {
             page: Number(data.page ?? 1),
             pageSize: Math.min(Number(data.size ?? 50), 100),
             keyword,
@@ -167,29 +179,39 @@ export async function httpBaseSystemDeleteAccountRole(data: Omix): Promise<any> 
 
 /**角色菜单权限列表**/
 export async function httpBaseSystemColumnRoleSheet(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/${data.roleId}`, method: 'GET' })
+    const response = await request({ url: `${ROLE_API}/resolver`, method: 'GET', params: { keyId: data.roleId } })
     return { ...response, data: { list: response.data?.menuKeyIds ?? [] } }
 }
 
 /**更新角色菜单权限**/
 export function httpBaseSystemUpdateRoleSheet(data: Omix) {
-    return request({ url: `${ROLE_API}/${data.roleId}/menus`, method: 'PUT', data: { menuKeyIds: data.sheetIds ?? [] } })
+    return request({
+        url: `${ROLE_API}/update/menu`,
+        method: 'POST',
+        data: { keyId: data.roleId, menuKeyIds: data.sheetIds ?? [] }
+    })
 }
 
 /**更新角色数据权限**/
 export function httpBaseSystemUpdateRoleModel(data: Omix) {
-    return request({ url: `${ROLE_API}/${data.roleId}/data-scopes`, method: 'PUT', data: dataScopePayload(data) })
+    return request({
+        url: `${ROLE_API}/update/data/scope`,
+        method: 'POST',
+        data: { keyId: data.roleId, ...dataScopePayload(data) }
+    })
 }
 
 /**删除岗位角色**/
 export function httpBaseSystemDeleteRole(data: Omix) {
-    return request({ url: `${ROLE_API}/${data.keyId}`, method: 'DELETE' })
+    return request({ url: `${ROLE_API}/delete`, method: 'POST', data: { keyId: data.keyId } })
 }
 
 /**批量更新角色排序**/
 export async function httpBaseSystemUpdateRoleSort(data: Omix): Promise<any> {
     const responses = await Promise.all(
-        (data.list ?? []).map((item: Omix) => request({ url: `${ROLE_API}/${item.keyId}`, method: 'PATCH', data: { sort: item.sort } }))
+        (data.list ?? []).map((item: Omix) =>
+            request({ url: `${ROLE_API}/update`, method: 'POST', data: { keyId: item.keyId, sort: item.sort } })
+        )
     )
     return responses[0] ?? ({ code: 200, message: 'success', data: { success: true } } as any)
 }

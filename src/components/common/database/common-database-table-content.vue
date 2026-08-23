@@ -6,7 +6,7 @@ export default defineComponent({
     name: 'CommonDatabaseTableContent',
     props: {
         /**渲染类型**/
-        element: { type: String as PropType<'ellipsis' | 'performant-ellipsis'>, default: 'ellipsis' },
+        element: { type: String as PropType<'ellipsis' | 'performant-ellipsis'>, default: 'performant-ellipsis' },
         /**内容**/
         value: { type: [String, Number, Array] },
         /**分割符合**/
