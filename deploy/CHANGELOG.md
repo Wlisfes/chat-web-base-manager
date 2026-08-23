@@ -1,5 +1,15 @@
 # 部署变更记录
 
+## 2026-08-23 Grafana 统一 HTTPS 入口
+
+- 影响机器：Home；Company 当前离线，本次不等待其部署结果。
+- 关联版本：`chat-web-observability` 首个正式版本；Manager 本次完整 Git SHA 镜像。
+- 变更内容：新增 `/observability` 到 `/observability/` 的固定跳转，并把 `/observability/**` 原路径代理到 `chat-web-grafana:3000`；保留 WebSocket 升级头并关闭代理缓冲，业务 `/api/**` 和 SPA 路由不变。
+- 机器侧操作：先把 Grafana 接入现有 `chat-web-infrastructure` 网络并配置 `GF_SERVER_ROOT_URL=https://chat.lisfes.com/observability/`；无需修改 Manager 证书、端口、`.env` 或 Gateway 路由。
+- 验证命令：执行 `yarn build`、`nginx -t` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后访问 `https://chat.lisfes.com/observability/`，检查登录、数据源、Dashboard 和实时查询。
+- 回滚方法：恢复上一条健康 Manager 完整 SHA 镜像；观测平台容器、凭据和持久化数据不回滚。
+
+
 ## 2026-08-23 独立 CRM 服务接入与命名重构
 
 - 影响机器：Company、Home；两台机器部署同一 Manager Git SHA，并与 Account、Finance、Gateway、CRM 处于同一发布窗口。

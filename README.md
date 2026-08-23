@@ -2,6 +2,8 @@
 
 Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产镜像通过同一 Docker 网络把 `/api/*` 转发到 `chat-web-gateway-service:3999`。Account 使用 `/api/account/**`，Finance 使用 `/api/finance/**`，CRM 使用 `/api/crm/**`。
 
+统一可观测平台通过 `https://chat.lisfes.com/observability/` 访问，Manager 仅负责把该子路径反向代理到同一 Docker 网络中的 Grafana；Loki、Tempo、Prometheus 和 Alloy 不对外暴露。
+
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；Consumer 不是独立网关服务。品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。
 
 CRM 页面使用 `/crm/consumer`、`/crm/partner`、`/crm/sms/quote/create` 和 `/crm/sms/quote` 规范路由；短信应用及报价数据调用独立 CRM 服务，客户选择与详情直接调用 Account 服务。
