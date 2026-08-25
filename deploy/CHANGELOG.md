@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-25 移除统一观测入口
+
+- 影响机器：Home；Company 当前离线，本次不等待其部署结果。
+- 关联版本：Manager 本次完整 Git SHA 镜像。
+- 变更内容：删除 `/observability` 与 `/observability/` 的 Grafana 专用反向代理，保留 SPA、健康检查和 `/api/**` 网关代理。
+- 机器侧操作：先发布本镜像，再下线 Home 的 Grafana、Loki、Tempo、Prometheus 和 Alloy 容器及数据卷。
+- 验证命令：执行 `yarn build`、`nginx -t` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后确认 Manager 和业务 API 正常，运行配置不再引用 `chat-web-grafana`。
+- 回滚方法：恢复上一条健康 Manager 完整 SHA 镜像，并按需重新部署观测组件；业务数据库不回滚。
+
 ## 2026-08-24 Docker 上游地址动态重解析
 
 - 影响机器：Home；Company 当前离线，本次不等待其部署结果。
