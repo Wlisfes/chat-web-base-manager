@@ -14,22 +14,22 @@
 | Docker 网络 | `chat-web-infrastructure` |
 | API 上游 | `chat-web-gateway-service:3999` |
 | TLS Docker Volume | `chat-web-base-manager-tls` |
-| Runner 标签 | Company：`chat-server-company`；Home：`chat-server-home` |
-| GitHub Environments | Company：`production-company`；Home：`production-home` |
+| 部署主机 | `chat-home-server` |
+| Runner 标签 | `chat-home-server` |
+| GitHub Environment | `production-home` |
 
-Home 当前机器的 `443` 已由共享 `chat-web-nginx` 占用，因此 Manager 使用
+`chat-home-server` 的 `443` 已由共享 `chat-web-nginx` 占用，因此 Manager 使用
 `127.0.0.1:8443 -> 8443`，共享入口加载 `deploy/shared-ingress.conf` 后通过
 `chat-web-infrastructure` 转发到 `chat-web-base-manager:8443`。该兼容模式不改变
-Compose 项目名、容器内端口、域名或 API 上游；Company 若没有共享入口，继续使用
-默认的 `127.0.0.1:443 -> 8443`。
+Compose 项目名、容器内端口、域名或 API 上游。
 
-该服务同时部署到 Company 和 Home。流水线只构建一次镜像，并把同一个完整 Git SHA 部署到两台机器；两个部署任务使用独立并发组，任一机器离线时不会阻塞另一台，离线机器的任务会等待对应 Runner 恢复。
+该服务只部署到 `chat-home-server`。流水线只构建一次镜像，并把完整 Git SHA 部署到该主机；原另一台部署机器已废弃，不再创建部署任务或等待其 Runner。
 
-该域名仅供每台机器本机访问，不依赖公共 DNS，也不对外网监听。每台机器的浏览器分别通过 Windows hosts 解析到自己的回环地址；本地证书只加入对应机器的 Windows 当前用户信任库。证书私钥固定保存在各机器 `/opt/chat-web-base-manager/certs/chat.lisfes.com.key`，权限必须为 `0600`。部署脚本验证证书后通过标准输入同步到该机器的专用 Docker Volume，解决 Docker Desktop 无法直接绑定 WSL `/opt` 路径的问题；站点容器对该卷只读挂载。
+该域名仅供本机访问，不依赖公共 DNS，也不对外网监听。浏览器通过 Windows hosts 解析到回环地址；本地证书只加入 `chat-home-server` 的 Windows 当前用户信任库。证书私钥固定保存在 `/opt/chat-web-base-manager/certs/chat.lisfes.com.key`，权限必须为 `0600`。部署脚本验证证书后通过标准输入同步到专用 Docker Volume，解决 Docker Desktop 无法直接绑定 WSL `/opt` 路径的问题；站点容器对该卷只读挂载。
 
 ## 首次机器初始化
 
-Company 和 Home 两台机器都要从管理员 PowerShell 各执行一次：
+在 `chat-home-server` 的管理员 PowerShell 执行一次：
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
@@ -41,10 +41,10 @@ Set-ExecutionPolicy -Scope Process Bypass
 ```powershell
 Select-String -Path "$env:SystemRoot\System32\drivers\etc\hosts" -Pattern 'chat\.lisfes\.com'
 Get-ChildItem Cert:\CurrentUser\Root | Where-Object Subject -EQ 'CN=chat.lisfes.com'
-wsl -d Ubuntu-22.04 -u root -- sh -lc "stat -c '%a %n' /opt/chat-web-base-manager/certs/chat.lisfes.com.*"
+wsl -d Ubuntu-24.04 -u root -- sh -lc "stat -c '%a %n' /opt/chat-web-base-manager/certs/chat.lisfes.com.*"
 ```
 
-每个机器还必须为 Manager 仓库安装一个独立 Self-hosted Runner，并分别添加 `chat-server-company` 或 `chat-server-home` 标签。Runner 服务账户需要能写入 `/opt/chat-web-base-manager`，并能访问该机器的 Docker daemon。仓库的 `production-company` 与 `production-home` Environment 可分别覆盖 `DEPLOY_PATH`；不设置时都使用 `/opt/chat-web-base-manager`。
+必须为 Manager 仓库安装独立 Self-hosted Runner，并添加 `chat-home-server` 标签。Runner 服务账户需要能写入 `/opt/chat-web-base-manager`，并能访问本机 Docker daemon。仓库的 `production-home` Environment 可覆盖 `DEPLOY_PATH`；不设置时使用 `/opt/chat-web-base-manager`。
 
 ## 部署验证
 
@@ -75,9 +75,7 @@ Manager 的 Nginx access/error 日志写入标准输出和标准错误；Docker 
 | 共享入口返回 502 | Manager 未加入共享网络或入口配置未加载 | 检查两个容器的 `chat-web-infrastructure` 网络，并执行 `docker exec chat-web-nginx nginx -t` |
 | 页面正常、API 502 | Gateway 不健康或不在共享网络 | 检查 `chat-web-gateway-service` 健康状态和 `chat-web-infrastructure` |
 | 刷新页面返回 404 | Nginx SPA 回退配置未生效 | 检查运行镜像及 `/etc/nginx/conf.d/default.conf` |
-| Company 部署一直等待 | Company Runner 未在线 | 检查 Manager 仓库 `chat-server-company` Runner 服务 |
-| Home 部署一直等待 | Home Runner 未在线 | 检查 Manager 仓库 `chat-server-home` Runner 服务 |
-| 一台成功、另一台等待 | 等待机器离线 | 已在线机器的部署有效；恢复另一台对应 Runner 后等待任务会继续 |
+| 部署一直等待 | `chat-home-server` Runner 未在线 | 检查 Manager 仓库 `chat-home-server` Runner 服务 |
 
 ## 回滚
 

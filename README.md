@@ -12,4 +12,4 @@ yarn dev
 yarn build
 ```
 
-Company 和 Home 两台机器都通过各自本机的 `https://chat.lisfes.com` 访问。流水线构建一次镜像并将同一 Git SHA 部署到两台机器；首次初始化、Runner 标签、证书信任、健康检查和回滚说明见 `deploy/RUNBOOK.md`。
+当前只在 `chat-home-server` 部署，并通过本机 `https://chat.lisfes.com` 访问。流水线构建一次镜像并将完整 Git SHA 部署到该主机；原另一台部署机器已废弃。首次初始化、Runner 标签、证书信任、健康检查和回滚说明见 `deploy/RUNBOOK.md`。
