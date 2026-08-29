@@ -6,6 +6,7 @@ COMPOSE_FILE=${2:-compose.yml}
 SERVICE=web
 CONTAINER=chat-web-cloud-nginx
 DOMAIN=chat.lisfes.cn
+API_DOMAIN=chat-web.lisfes.cn
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-120}
 PULL_ATTEMPTS=${PULL_ATTEMPTS:-8}
 COMPOSE_PROJECT=${COMPOSE_PROJECT:-chat-web-cloud}
@@ -147,8 +148,8 @@ if ! curl --silent --show-error --fail --insecure \
 fi
 
 if ! curl --silent --show-error --fail --insecure \
-    --resolve "$DOMAIN:443:127.0.0.1" \
-    "https://$DOMAIN/api/health" >/dev/null; then
+    --resolve "$API_DOMAIN:443:127.0.0.1" \
+    "https://$API_DOMAIN/health" >/dev/null; then
     echo '云端 Gateway API 健康检查失败。' >&2
     rollback
     exit 1

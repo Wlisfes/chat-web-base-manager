@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-29 页面与 API 域名拆分
+
+- 影响机器：云服务器 `47.119.21.228`；开发机上的 Manager 生产容器已废弃。
+- 关联版本：本次 `developer` 配置提交，合并 `main` 后由流水线生成对应完整 Git SHA 镜像。
+- 变更内容：页面入口继续使用 `https://chat.lisfes.cn`，浏览器 API 请求改为直接访问 `https://chat-web.lisfes.cn`；Manager 请求封装在生产环境自动切换到绝对 API 域名，部署脚本外部校验同步改为 API 域名健康检查。
+- 机器侧操作：Gateway 运行时需把 `https://chat.lisfes.cn` 加入 `gateway.cors.allowedOrigins` 并保持 `credentials: true`；保留 `/opt/chat-web-cloud/nginx.conf`、`/etc/letsencrypt/live/chat.lisfes.cn`、WireGuard 和 `chat-web-cloud-nacos`。GitHub Environment 配置保持不变。
+- 验证命令：执行 `yarn build`、`docker compose -f deploy/compose.yml config --quiet`、`sh -n deploy/deploy.sh`；云端分别验证 `https://chat.lisfes.cn/health` 与 `https://chat-web.lisfes.cn/health`。
+- 回滚方法：恢复上一完整 Git SHA 镜像，并把 Manager 请求封装和部署脚本回滚到同域 `/api` 校验；Gateway CORS 保持兼容 Origin 不变。
+
 ## 2026-08-29 迁移管理端到云服务器
 
 - 影响机器：云服务器 `47.119.21.228`；开发机上的 Manager 生产容器已废弃。
@@ -45,7 +54,6 @@
 - 机器侧操作：先把 Grafana 接入现有 `chat-web-infrastructure` 网络并配置 `GF_SERVER_ROOT_URL=https://chat.lisfes.com/observability/`；无需修改 Manager 证书、端口、`.env` 或 Gateway 路由。
 - 验证命令：执行 `yarn build`、`nginx -t` 和 `docker compose -f deploy/compose.yml config --quiet`；部署后访问 `https://chat.lisfes.com/observability/`，检查登录、数据源、Dashboard 和实时查询。
 - 回滚方法：恢复上一条健康 Manager 完整 SHA 镜像；观测平台容器、凭据和持久化数据不回滚。
-
 
 ## 2026-08-23 独立 CRM 服务接入与命名重构
 

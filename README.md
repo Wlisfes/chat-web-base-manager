@@ -1,6 +1,6 @@
 # Chat Web Base Manager
 
-Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产环境只部署到云服务器，由云端 Nginx 使用 `https://chat.lisfes.cn` 提供静态资源，并把 `/api/*` 通过 WireGuard 转发到开发机 Gateway。
+Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产环境页面固定使用 `https://chat.lisfes.cn`，API 请求固定使用 `https://chat-web.lisfes.cn`，页面静态资源由云端 Nginx 提供，跨域与接口由 Gateway 处理。
 
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。CRM 页面使用 `/crm/consumer`、`/crm/partner`、`/crm/sms/quote/create` 和 `/crm/sms/quote` 路由。
 
@@ -21,6 +21,6 @@ yarn build
 
 可选 Environment Variables：`CLOUD_HOST`（默认 `47.119.21.228`）、`CLOUD_USER`（默认 `root`，建议改为受限部署用户）和 `CLOUD_DEPLOY_PATH`（默认 `/opt/chat-web-cloud`）。证书私钥、WireGuard 配置和云端 Nginx 配置均只保存在云服务器，不提交到仓库。
 
-部署脚本会校验证书、拉取完整 Git SHA 镜像、保留基础设施端口映射、检查 `https://chat.lisfes.cn/health` 与 `/api/health`，失败时自动回滚上一版本。
+部署脚本会校验证书、拉取完整 Git SHA 镜像、保留基础设施端口映射、检查 `https://chat.lisfes.cn/health` 与 `https://chat-web.lisfes.cn/health`，失败时自动回滚上一版本。
 
 首次初始化、云端 Nginx、证书、SSH Secret、验证和回滚命令见 [`deploy/RUNBOOK.md`](deploy/RUNBOOK.md)。
