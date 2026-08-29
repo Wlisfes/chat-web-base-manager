@@ -2,20 +2,21 @@
 
 ## 当前基线
 
-| 项目 | 值 |
-| --- | --- |
-| 生产地址 | `https://chat.lisfes.cn` |
-| 云服务器 | `47.119.21.228` |
-| 容器 | `chat-web-cloud-nginx` |
-| Compose 项目 | `chat-web-cloud` |
-| 部署目录 | `/opt/chat-web-cloud` |
+| 项目                 | 值                                        |
+| -------------------- | ----------------------------------------- |
+| 页面地址             | `https://chat.lisfes.cn`                  |
+| API 地址             | `https://chat-web.lisfes.cn`              |
+| 云服务器             | `47.119.21.228`                           |
+| 容器                 | `chat-web-cloud-nginx`                    |
+| Compose 项目         | `chat-web-cloud`                          |
+| 部署目录             | `/opt/chat-web-cloud`                     |
 | Manager Compose 文件 | `/opt/chat-web-cloud/manager-compose.yml` |
-| 云端 Nginx 配置 | `/opt/chat-web-cloud/nginx.conf` |
-| TLS 目录 | `/etc/letsencrypt/live/chat.lisfes.cn` |
-| API 上游 | WireGuard 本机 Gateway `10.66.0.2:80` |
-| 基础设施网络 | `chat-web-cloud` |
+| 云端 Nginx 配置      | `/opt/chat-web-cloud/nginx.conf`          |
+| TLS 目录             | `/etc/letsencrypt/live/chat.lisfes.cn`    |
+| 网关上游             | WireGuard 本机 Gateway `10.66.0.2:80`     |
+| 基础设施网络         | `chat-web-cloud`                          |
 
-开发机上的 `chat-web-base-manager` 容器、`chat-web-base-manager-tls` Volume、`chat.lisfes.com` 本地域名和旧的本机 HTTPS 入口均已废弃。云端 Nginx 同时承载 Manager 静态资源、`/api/*` Gateway 代理和 MySQL、Redis、RabbitMQ、Kafka、Nacos 的 TCP 入口；发布 Manager 时必须保留这些端口映射。
+开发机上的 `chat-web-base-manager` 容器、`chat-web-base-manager-tls` Volume、`chat.lisfes.com` 本地域名和旧的本机 HTTPS 入口均已废弃。云端 Nginx 仅承载 Manager 静态资源和 MySQL、Redis、RabbitMQ、Kafka、Nacos 的 TCP 入口；浏览器 API 请求直接访问 `chat-web.lisfes.cn` 对应的 Gateway 入口。发布 Manager 时必须保留这些端口映射。
 
 ## 云端初始化
 
@@ -42,13 +43,13 @@ docker exec chat-web-cloud-nginx nginx -s reload
 
 `.github/workflows/deploy.yml` 在 `main` 分支构建一次完整 Git SHA 镜像，并通过 SSH 部署云端。GitHub 仓库的 `production-cloud` Environment 需要配置：
 
-| 类型 | 名称 | 说明 |
-| --- | --- | --- |
-| Secret | `CLOUD_SSH_PRIVATE_KEY` | 云端部署专用 SSH 私钥 |
-| Secret | `CLOUD_KNOWN_HOSTS` | `47.119.21.228` 的完整主机指纹行 |
-| Variable | `CLOUD_HOST` | 默认 `47.119.21.228` |
-| Variable | `CLOUD_USER` | 默认 `root`，建议使用仅可管理 Docker 的部署用户 |
-| Variable | `CLOUD_DEPLOY_PATH` | 默认 `/opt/chat-web-cloud` |
+| 类型     | 名称                    | 说明                                            |
+| -------- | ----------------------- | ----------------------------------------------- |
+| Secret   | `CLOUD_SSH_PRIVATE_KEY` | 云端部署专用 SSH 私钥                           |
+| Secret   | `CLOUD_KNOWN_HOSTS`     | `47.119.21.228` 的完整主机指纹行                |
+| Variable | `CLOUD_HOST`            | 默认 `47.119.21.228`                            |
+| Variable | `CLOUD_USER`            | 默认 `root`，建议使用仅可管理 Docker 的部署用户 |
+| Variable | `CLOUD_DEPLOY_PATH`     | 默认 `/opt/chat-web-cloud`                      |
 
 部署用户必须能访问 Docker daemon、写入部署目录，并能读取云端证书目录。流水线不会在开发机创建或启动 Manager 容器。
 
@@ -70,20 +71,20 @@ docker inspect chat-web-cloud-nginx --format '{{.Config.Image}} {{.State.Status}
 docker inspect chat-web-cloud-nginx --format '{{json .HostConfig.LogConfig}}'
 docker logs --tail 200 chat-web-cloud-nginx
 curl --silent --show-error --fail --insecure --resolve chat.lisfes.cn:443:127.0.0.1 https://chat.lisfes.cn/health
-curl --silent --show-error --fail --insecure --resolve chat.lisfes.cn:443:127.0.0.1 https://chat.lisfes.cn/api/health
+curl --silent --show-error --fail --insecure --resolve chat-web.lisfes.cn:443:127.0.0.1 https://chat-web.lisfes.cn/health
 ```
 
-预期 `/health` 返回 `healthy`，`/api/health` 返回 Gateway 的正常响应。Manager 容器日志使用 `json-file`，单文件最大 `20m`、保留 `30` 个文件。
+预期两个域名的 `/health` 都返回 `healthy`。Manager 容器日志使用 `json-file`，单文件最大 `20m`、保留 `30` 个文件。
 
 ## 常见故障
 
-| 现象 | 排查 |
-| --- | --- |
-| `chat.lisfes.cn` 无法访问 | 检查 DNS、云安全组 80/443、证书路径和 `docker ps` |
-| 页面正常、API 502 | 检查 WireGuard `10.66.0.2` 连通性、本机 Gateway 和云端 Nginx `/api/` 配置 |
-| Nginx 启动失败 | 执行 `docker exec chat-web-cloud-nginx nginx -t`，确认云端配置中的证书与上游地址有效 |
-| 基础设施域名异常 | 确认 Manager Compose 仍保留 3306、6379、5672、9092、15672、8848、9848 端口映射 |
-| 部署一直等待 | 检查 `production-cloud` 的 SSH Secret、主机指纹和 Docker 权限 |
+| 现象                      | 排查                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| `chat.lisfes.cn` 无法访问 | 检查 DNS、云安全组 80/443、证书路径和 `docker ps`                                    |
+| 页面正常、API 502         | 检查 `chat-web.lisfes.cn` 解析、Gateway 证书、CORS 白名单和服务连通性                |
+| Nginx 启动失败            | 执行 `docker exec chat-web-cloud-nginx nginx -t`，确认云端配置中的证书与上游地址有效 |
+| 基础设施域名异常          | 确认 Manager Compose 仍保留 3306、6379、5672、9092、15672、8848、9848 端口映射       |
+| 部署一直等待              | 检查 `production-cloud` 的 SSH Secret、主机指纹和 Docker 权限                        |
 
 ## 回滚
 
