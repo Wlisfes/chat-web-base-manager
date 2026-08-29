@@ -1,6 +1,6 @@
 # Chat Web Base Manager
 
-Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产镜像通过同一 Docker 网络把 `/api/*` 转发到 `chat-web-gateway-service:3999`。Account 使用 `/api/account/**`，Finance 使用 `/api/finance/**`，CRM 使用 `/api/crm/**`。
+Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产镜像通过同一 Docker 网络把 `/api/*` 转发到 `chat-web-gateway-service:5000`。Account 使用 `/api/account/**`，Finance 使用 `/api/finance/**`，CRM 使用 `/api/crm/**`。
 
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；Consumer 不是独立网关服务。品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。
 
