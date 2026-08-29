@@ -11,15 +11,15 @@
 ## 自动发布与部署
 
 - 用户已经要求完成发布或部署时，Agent 必须自行完成验证、提交、推送、创建 PR、合并和流水线跟踪，不得把这些步骤转交给用户。
-- 机器侧的本地域名、证书和 Runner 配置由 Agent 按 `deploy/RUNBOOK.md` 完成；证书私钥只能保存在部署机器，不得提交到仓库或输出到日志。
+- 机器侧的云端证书、WireGuard 和 SSH 配置由 Agent 按 `deploy/RUNBOOK.md` 完成；证书私钥和 SSH 私钥只能保存在部署机器或 GitHub Secret，不得提交到仓库或输出到日志。
 - 只有权限、认证、分支保护、目标机器不可达或持续失败的 CI 确实阻止自动完成时，才请求用户介入。
 
-## 单机部署
+## 云端部署
 
-- Docker 服务只部署到当前主机 `chat-home-server`，原另一台部署机器已废弃并下线，不得再为废弃机器创建部署任务或多机矩阵。
-- 流水线使用 `chat-home-server` Runner 标签和 `production-home` Environment，只构建一次完整 Git SHA 镜像并部署到 `/opt/chat-web-base-manager`。
-- 当前主机维护本仓库专用的 Self-hosted Runner、本地 TLS 文件和 `.env`；不得在仓库或工作流中输出机器侧敏感文件。
-- 部署必须执行健康检查并支持失败自动回滚；运行基线、初始化、验证和回滚操作维护在 `deploy/RUNBOOK.md`。
+- `chat-web-base-manager` 只部署到云服务器 `47.119.21.228`，开发机上的同名 Docker 容器和本地域名入口均视为废弃，不得恢复。
+- 生产访问地址固定为 `https://chat.lisfes.cn`。云端 Nginx 负责 TLS、静态资源和 `/api/*` 到 WireGuard 本机 Gateway 的转发。
+- 流水线只构建一次完整 Git SHA 镜像并部署到云端 `/opt/chat-web-cloud` 的 `chat-web-cloud-nginx` 容器；Nacos 等基础设施由云端基础设施 Compose 独立维护。
+- 云端部署必须执行健康检查并支持失败自动回滚；运行基线、初始化、验证和回滚操作维护在 `deploy/RUNBOOK.md`。
 
 ## Git 提交规范
 

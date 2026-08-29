@@ -1,7 +1,17 @@
 # 部署变更记录
 
+## 2026-08-29 迁移管理端到云服务器
+
+- 影响机器：云服务器 `47.119.21.228`；开发机上的 Manager 生产容器已废弃。
+- 关联版本：本次 `developer` 配置提交，合并 `main` 后由流水线生成对应完整 Git SHA 镜像。
+- 变更内容：生产入口固定为 `https://chat.lisfes.cn`；新增云端 Manager Compose 和回滚脚本，容器统一使用 `chat-web-cloud-nginx`，通过云端 Nginx 将 `/api/*` 经 WireGuard 转发到开发机 Gateway，同时保留基础设施 TCP 端口映射。流水线改为通过 `production-cloud` Environment 的 SSH 凭据部署云端，不再在开发机启动 Manager。
+- 机器侧操作：保留 `/opt/chat-web-cloud/nginx.conf`、`/etc/letsencrypt/live/chat.lisfes.cn`、WireGuard 和 `chat-web-cloud-nacos`；删除开发机 Manager 容器和 `chat-web-base-manager-tls` Volume。GitHub Environment 配置 `CLOUD_SSH_PRIVATE_KEY`、`CLOUD_KNOWN_HOSTS`，可选配置 `CLOUD_HOST`、`CLOUD_USER`、`CLOUD_DEPLOY_PATH`。
+- 验证命令：执行 `yarn build`、`docker compose -f deploy/compose.yml config --quiet`、`sh -n deploy/deploy.sh`；云端验证 `https://chat.lisfes.cn/health`、`/api/health`、Nginx 配置和容器健康状态。
+- 回滚方法：将云端 Manager 镜像回滚到上一完整 Git SHA，执行 `docker compose -p chat-web-cloud -f manager-compose.yml up -d --no-deps web`；不停止 Nacos、WireGuard 和基础设施数据卷。
+
 ## 2026-08-29 部署拓扑收敛到 chat-home-server
 
+- 状态：该本机部署方案已由上方云端迁移方案替代，以下内容仅保留作历史审计。
 - 影响机器：仅 `chat-home-server`；原另一台部署机器已废弃并下线，不再创建部署任务。
 - 关联版本：Manager 本次 `developer` 配置提交；未合并 `main`，不触发镜像构建或线上部署。
 - 变更内容：删除 Company/Home 双机矩阵，Runner 选择标签统一为 `chat-home-server`，继续使用 `production-home` Environment、`/opt/chat-web-base-manager` 部署目录和本机 TLS 文件。

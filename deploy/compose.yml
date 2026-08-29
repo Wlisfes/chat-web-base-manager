@@ -1,4 +1,4 @@
-name: chat-web-service
+name: chat-web-cloud
 
 x-logging: &default-logging
     driver: json-file
@@ -7,28 +7,41 @@ x-logging: &default-logging
         max-file: '30'
 
 services:
-    base-manager:
+    web:
         image: ${IMAGE:?IMAGE is required}
-        container_name: chat-web-base-manager
+        container_name: chat-web-cloud-nginx
         restart: unless-stopped
         logging: *default-logging
         init: true
-        environment:
-            TZ: ${TZ:-Asia/Shanghai}
         ports:
-            - '${HTTPS_BIND_ADDRESS:-127.0.0.1}:${HTTPS_PORT:-443}:8443'
+            - '80:80'
+            - '443:443'
+            # 基础设施 TCP 端口继续由云端 Nginx stream 转发到开发机。
+            - '3306:3306'
+            - '6379:6379'
+            - '5672:5672'
+            - '9092:9092'
+            - '15672:15672'
+            - '172.18.100.12:8848:8848'
+            - '172.18.100.12:9848:9848'
         volumes:
-            - tls:/etc/nginx/tls:ro
+            # 云端 Nginx 配置由基础设施部署维护，避免 Manager 发布覆盖其他域名入口。
+            - ${NGINX_CONFIG_PATH:-./nginx.conf}:/etc/nginx/nginx.conf:ro
+            - ${LETSENCRYPT_PATH:-/etc/letsencrypt}:/etc/letsencrypt:ro
         networks:
-            - infrastructure
-        stop_grace_period: 10s
+            - cloud
+        healthcheck:
+            test: ['CMD-SHELL', "wget --no-check-certificate --header='Host: chat.lisfes.cn' -qO- https://127.0.0.1/health | grep -qx healthy"]
+            interval: 15s
+            timeout: 5s
+            retries: 6
+            start_period: 10s
+        mem_limit: 128m
+        mem_reservation: 32m
+        cpus: 0.5
+        pids_limit: 128
 
 networks:
-    infrastructure:
+    cloud:
         external: true
-        name: ${DOCKER_NETWORK:-chat-web-infrastructure}
-
-volumes:
-    tls:
-        external: true
-        name: chat-web-base-manager-tls
+        name: chat-web-cloud
