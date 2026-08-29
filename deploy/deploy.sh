@@ -1,103 +1,85 @@
 #!/bin/sh
 set -eu
 
-IMAGE=${1:?Usage: deploy.sh IMAGE [COMPOSE_FILE]}
+IMAGE=${1:?用法：deploy.sh IMAGE [COMPOSE_FILE]}
 COMPOSE_FILE=${2:-compose.yml}
-SERVICE=base-manager
-CONTAINER=chat-web-base-manager
-DOMAIN=chat.lisfes.com
-CERT_FILE=certs/chat.lisfes.com.crt
-KEY_FILE=certs/chat.lisfes.com.key
-TLS_VOLUME=chat-web-base-manager-tls
+SERVICE=web
+CONTAINER=chat-web-cloud-nginx
+DOMAIN=chat.lisfes.cn
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-120}
 PULL_ATTEMPTS=${PULL_ATTEMPTS:-8}
+COMPOSE_PROJECT=${COMPOSE_PROJECT:-chat-web-cloud}
 deployment_started=0
 
 if [ ! -f "$COMPOSE_FILE" ]; then
-    echo "Compose file not found: $COMPOSE_FILE" >&2
+    echo "找不到 Compose 文件：$COMPOSE_FILE" >&2
     exit 1
 fi
 
-if [ ! -f .env ]; then
-    echo "Missing $(pwd)/.env; create it from deploy/.env.example before the first deployment." >&2
+command -v docker >/dev/null || { echo '未找到 Docker。' >&2; exit 1; }
+command -v curl >/dev/null || { echo '未找到 curl。' >&2; exit 1; }
+command -v openssl >/dev/null || { echo '未找到 openssl。' >&2; exit 1; }
+
+read_env_value() {
+    key=$1
+    if [ -f .env ]; then
+        sed -n "s/^${key}=//p" .env | tail -n 1 | tr -d '\r'
+    fi
+}
+
+env_letsencrypt_path=$(read_env_value LETSENCRYPT_PATH)
+env_nginx_config_path=$(read_env_value NGINX_CONFIG_PATH)
+certificate_directory=${LETSENCRYPT_PATH:-${env_letsencrypt_path:-/etc/letsencrypt}}
+certificate_file="$certificate_directory/live/$DOMAIN/fullchain.pem"
+private_key_file="$certificate_directory/live/$DOMAIN/privkey.pem"
+nginx_config=${NGINX_CONFIG_PATH:-${env_nginx_config_path:-$(dirname "$COMPOSE_FILE")/nginx.conf}}
+unset env_letsencrypt_path env_nginx_config_path
+
+if [ ! -s "$nginx_config" ]; then
+    echo "找不到云端 Nginx 配置：$nginx_config" >&2
     exit 1
 fi
 
-if [ ! -s "$CERT_FILE" ] || [ ! -s "$KEY_FILE" ]; then
-    echo "Missing the machine-local HTTPS certificate or private key under $(pwd)/certs." >&2
+if [ ! -s "$certificate_file" ] || [ ! -s "$private_key_file" ]; then
+    echo "找不到云端 HTTPS 证书或私钥：$certificate_directory/live/$DOMAIN/" >&2
     exit 1
 fi
 
-if ! openssl x509 -checkend 86400 -noout -in "$CERT_FILE" >/dev/null 2>&1; then
-    echo "The local HTTPS certificate is invalid or expires within 24 hours." >&2
+if ! openssl x509 -checkend 86400 -noout -in "$certificate_file" >/dev/null 2>&1; then
+    echo '云端 HTTPS 证书无效或将在 24 小时内过期。' >&2
     exit 1
 fi
 
-if ! openssl x509 -in "$CERT_FILE" -noout -text | grep -F "DNS:$DOMAIN" >/dev/null 2>&1; then
-    echo "The local HTTPS certificate does not contain the required DNS SAN." >&2
+if ! openssl x509 -in "$certificate_file" -noout -text | grep -F "DNS:$DOMAIN" >/dev/null 2>&1; then
+    echo "云端 HTTPS 证书不包含 DNS SAN：$DOMAIN" >&2
     exit 1
 fi
 
-certificate_public_key=$(openssl x509 -pubkey -noout -in "$CERT_FILE" | openssl pkey -pubin -outform DER 2>/dev/null | sha256sum | awk '{print $1}')
-private_public_key=$(openssl pkey -in "$KEY_FILE" -pubout -outform DER 2>/dev/null | sha256sum | awk '{print $1}')
-if [ -z "$certificate_public_key" ] || [ "$certificate_public_key" != "$private_public_key" ]; then
-    echo "The local HTTPS certificate and private key do not match." >&2
-    exit 1
-fi
-unset certificate_public_key private_public_key
+compose() {
+    IMAGE="$IMAGE" docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE" "$@"
+}
 
-network=$(sed -n 's/^DOCKER_NETWORK=//p' .env | tail -n 1 | tr -d '\r')
-network=${network:-chat-web-infrastructure}
-https_port=$(sed -n 's/^HTTPS_PORT=//p' .env | tail -n 1 | tr -d '\r')
-https_port=${https_port:-443}
-
-case "$network" in
-    *[!A-Za-z0-9_.-]*|'')
-        echo "Invalid DOCKER_NETWORK in .env" >&2
-        exit 1
-        ;;
-esac
-
-case "$https_port" in
-    *[!0-9]*|'')
-        echo "Invalid HTTPS_PORT in .env" >&2
-        exit 1
-        ;;
-esac
-
-if ! docker network inspect "$network" >/dev/null 2>&1; then
-    echo "Required Docker network is unavailable." >&2
-    exit 1
-fi
-
-gateway_state=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' chat-web-gateway-service 2>/dev/null || true)
-if [ "$gateway_state" != "healthy" ]; then
-    echo "Gateway must be healthy before deploying the manager site." >&2
+if ! compose config --quiet; then
+    echo '云端 Compose 配置校验失败。' >&2
     exit 1
 fi
 
 old_image=$(docker inspect --format '{{.Config.Image}}' "$CONTAINER" 2>/dev/null || true)
 
-compose() {
-    IMAGE="$IMAGE" docker compose -f "$COMPOSE_FILE" "$@"
-}
-
 rollback() {
-    echo "Deployment failed; showing the latest container logs." >&2
+    echo '云端部署失败，输出最新容器日志。' >&2
     docker logs --tail 100 "$CONTAINER" 2>&1 || true
 
     if [ -n "$old_image" ] && [ "$old_image" != "$IMAGE" ]; then
-        echo "Rolling back to $old_image" >&2
-        IMAGE="$old_image" docker compose -f "$COMPOSE_FILE" up -d --no-deps "$SERVICE"
+        echo "回滚到 $old_image" >&2
+        IMAGE="$old_image" docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE" up -d --no-deps "$SERVICE" || true
     else
-        echo "No previous image is available for rollback." >&2
+        echo '没有可用的上一版本镜像，跳过回滚。' >&2
     fi
 }
 
-# shellcheck disable=SC2329 # Invoked indirectly by trap.
 handle_interrupt() {
     trap - HUP INT TERM
-    echo "Deployment interrupted by a newer version." >&2
     if [ "$deployment_started" -eq 1 ]; then
         rollback
     fi
@@ -110,37 +92,21 @@ pull_image() {
     attempt=1
     while ! docker pull "$IMAGE"; do
         if [ "$attempt" -ge "$PULL_ATTEMPTS" ]; then
-            echo "Failed to pull $IMAGE after $PULL_ATTEMPTS attempts." >&2
+            echo "镜像拉取失败：$IMAGE（已重试 $PULL_ATTEMPTS 次）" >&2
             return 1
         fi
 
         delay=$((attempt * 5))
-        echo "Image pull attempt $attempt failed; retrying in ${delay}s." >&2
+        echo "镜像拉取第 $attempt 次失败，${delay} 秒后重试。" >&2
         sleep "$delay"
         attempt=$((attempt + 1))
     done
 }
 
-echo "Pulling $IMAGE (up to $PULL_ATTEMPTS attempts)"
+echo "拉取云端镜像：$IMAGE"
 pull_image
 
-docker volume create "$TLS_VOLUME" >/dev/null
-if ! tar -C certs -cf - "$(basename "$CERT_FILE")" "$(basename "$KEY_FILE")" |
-    docker run --rm -i \
-        -v "$TLS_VOLUME:/tls" \
-        --entrypoint sh \
-        "$IMAGE" \
-        -c 'set -eu
-            tar -xf - -C /tls
-            mv -f /tls/chat.lisfes.com.crt /tls/tls.crt
-            mv -f /tls/chat.lisfes.com.key /tls/tls.key
-            chmod 0644 /tls/tls.crt
-            chmod 0600 /tls/tls.key'; then
-    echo "Failed to synchronize the machine-local HTTPS certificate into its Docker volume." >&2
-    exit 1
-fi
-
-echo "Starting $SERVICE"
+echo "启动云端 $SERVICE"
 deployment_started=1
 if ! compose up -d --no-deps "$SERVICE"; then
     rollback
@@ -148,6 +114,7 @@ if ! compose up -d --no-deps "$SERVICE"; then
 fi
 
 elapsed=0
+state='starting'
 while [ "$elapsed" -lt "$HEALTH_TIMEOUT" ]; do
     state=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$CONTAINER" 2>/dev/null || true)
     case "$state" in
@@ -155,7 +122,7 @@ while [ "$elapsed" -lt "$HEALTH_TIMEOUT" ]; do
             break
             ;;
         exited|dead|unhealthy)
-            echo "Container state: $state" >&2
+            echo "容器状态：$state" >&2
             rollback
             exit 1
             ;;
@@ -165,39 +132,28 @@ while [ "$elapsed" -lt "$HEALTH_TIMEOUT" ]; do
     elapsed=$((elapsed + 5))
 done
 
-if [ "${state:-}" != "healthy" ]; then
-    echo "Health check timed out after ${HEALTH_TIMEOUT}s." >&2
+if [ "$state" != 'healthy' ]; then
+    echo "云端健康检查在 ${HEALTH_TIMEOUT} 秒内未通过。" >&2
     rollback
     exit 1
 fi
-
-served_certificate=$(mktemp)
-trap 'rm -f "$served_certificate"' EXIT
-if ! openssl s_client -connect "127.0.0.1:$https_port" -servername "$DOMAIN" -showcerts </dev/null 2>/dev/null |
-    openssl x509 -outform PEM > "$served_certificate"; then
-    echo "Unable to read the HTTPS certificate served by the manager site." >&2
-    rollback
-    exit 1
-fi
-
-expected_fingerprint=$(openssl x509 -in "$CERT_FILE" -noout -fingerprint -sha256)
-served_fingerprint=$(openssl x509 -in "$served_certificate" -noout -fingerprint -sha256)
-if [ "$served_fingerprint" != "$expected_fingerprint" ]; then
-    echo "The manager site is not serving the configured local certificate." >&2
-    rollback
-    exit 1
-fi
-unset expected_fingerprint served_fingerprint
 
 if ! curl --silent --show-error --fail --insecure \
-    --resolve "$DOMAIN:$https_port:127.0.0.1" \
-    "https://$DOMAIN:$https_port/health" | grep -qx healthy; then
-    echo "The manager HTTPS endpoint did not pass its health check." >&2
+    --resolve "$DOMAIN:443:127.0.0.1" \
+    "https://$DOMAIN/health" | grep -qx healthy; then
+    echo '云端 HTTPS 健康检查失败。' >&2
     rollback
     exit 1
 fi
 
-rm -f "$served_certificate"
-trap - EXIT HUP INT TERM
-echo "Deployment succeeded: $IMAGE"
+if ! curl --silent --show-error --fail --insecure \
+    --resolve "$DOMAIN:443:127.0.0.1" \
+    "https://$DOMAIN/api/health" >/dev/null; then
+    echo '云端 Gateway API 健康检查失败。' >&2
+    rollback
+    exit 1
+fi
+
+trap - HUP INT TERM
+echo "云端部署成功：$IMAGE"
 docker image prune -f >/dev/null 2>&1 || true

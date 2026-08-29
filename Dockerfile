@@ -27,4 +27,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 8443
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
-    CMD wget --no-check-certificate --header='Host: chat.lisfes.com' -qO- https://127.0.0.1:8443/health | grep -qx healthy
+    CMD wget --no-check-certificate --header='Host: chat.lisfes.cn' -qO- https://127.0.0.1:8443/health | grep -qx healthy
