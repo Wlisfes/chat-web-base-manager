@@ -12,7 +12,7 @@ import UnoCSS from 'unocss/vite'
 import path from 'path'
 
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-    const accountProxyTarget = process.env.VITE_ACCOUNT_PROXY_TARGET || 'http://localhost:3999'
+    const accountProxyTarget = process.env.VITE_ACCOUNT_PROXY_TARGET || 'http://localhost:5000'
     const accountProxyDirect = process.env.VITE_ACCOUNT_PROXY_DIRECT === 'true'
     return {
         build: {

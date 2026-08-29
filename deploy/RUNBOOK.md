@@ -12,7 +12,7 @@
 | 容器端口 | `8443` |
 | 部署目录 | `/opt/chat-web-base-manager` |
 | Docker 网络 | `chat-web-infrastructure` |
-| API 上游 | `chat-web-gateway-service:3999` |
+| API 上游 | `chat-web-gateway-service:5000` |
 | TLS Docker Volume | `chat-web-base-manager-tls` |
 | 部署主机 | `chat-home-server` |
 | Runner 标签 | `chat-home-server` |
