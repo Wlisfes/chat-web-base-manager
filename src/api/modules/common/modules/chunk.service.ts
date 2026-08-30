@@ -13,8 +13,8 @@ const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
     CHUNK_SHEET_CHECK: [option(1, '显示', true, 'success'), option(2, '隐藏', false, 'warning')],
     CHUNK_SHEET_CHUNK: [
         option(1, '目录', 'directory'),
-        option(2, '菜单', 'resource', 'info'),
-        option(3, '按钮', 'authorize', 'warning')
+        option(2, '菜单', 'menu', 'info'),
+        option(3, '按钮', 'button', 'warning')
     ],
     CHUNK_SHEET_STATUS: [option(1, '启用', 'enabled', 'success'), option(2, '禁用', 'disabled', 'error')],
     CHUNK_ROLE_CHUNK: [option(1, '系统内置', 'builtin', 'warning'), option(2, '自定义', 'custom', 'info')],

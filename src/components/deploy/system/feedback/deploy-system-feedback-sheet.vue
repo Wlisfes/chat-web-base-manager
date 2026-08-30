@@ -29,24 +29,25 @@ export default defineComponent({
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemSheetResolver,
             formState: {
-                type: props.node.type, //后端菜单类型
-                chunk: props.node.chunk ?? 'resource', //类型
-                keyName: props.node.keyName, //权限标识
+                type: props.node.type ?? 'menu', //后端菜单类型
+                permissionCode: props.node.permissionCode, //权限标识
                 name: props.node.name, //名称
-                router: props.node.router, //菜单地址
-                version: props.node.version ?? '1.0', //版本号
+                path: props.node.path, //菜单地址
+                routeName: props.node.routeName, //前端路由名称
+                component: props.node.component, //前端组件标识
+                externalUrl: props.node.externalUrl, //外部链接地址
                 sort: props.node.sort ?? 10, //排序号
                 status: props.node.status ?? 'enabled', //状态
-                check: props.node.check ?? true, //菜单显示状态
-                iconName: props.node.iconName, //菜单图标
-                pid: props.node.pid //父级菜单
+                visible: props.node.visible ?? true, //菜单显示状态
+                keepAlive: props.node.keepAlive ?? false, //页面缓存
+                icon: props.node.icon, //菜单图标
+                parentKeyId: props.node.parentKeyId //父级菜单
             },
             rules: {
-                chunk: { required: true, trigger: 'blur', message: '请选择类型' },
+                type: { required: true, trigger: 'blur', message: '请选择类型' },
                 name: { required: true, trigger: 'blur', message: '请输入菜单/按钮名称' },
                 status: { required: true, trigger: 'blur', message: '请选择菜单/按钮状态' },
-                check: { required: true, trigger: 'blur', message: '请选择菜单显示状态' },
-                version: { required: true, trigger: 'blur', message: '请输入版本号' },
+                visible: { required: true, trigger: 'blur', message: '请选择菜单显示状态' },
                 sort: { required: true, type: 'number', trigger: 'blur', message: '请输入排序号' }
             }
         })
@@ -59,7 +60,7 @@ export default defineComponent({
                 }
                 try {
                     return await Service.httpBaseSystemSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
-                        return await setForm(fetchReste(data)).then(async () => {
+                        return await setForm({ ...fetchReste(data), parentKeyId: data.parentKeyId }).then(async () => {
                             return await setState({ initialize: false })
                         })
                     })
@@ -77,7 +78,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    if (['resource', 'directory'].includes(formState.value.chunk)) {
+                    if (['menu', 'directory'].includes(formState.value.type)) {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
                             await Service.httpBaseSystemCreateSheetResource(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
@@ -122,30 +123,30 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="类型" path="chunk">
+                    <form-common-column label="类型" path="type">
                         <form-common-column-select
                             placeholder="请选择类型"
                             options={chunkOptions.CHUNK_SHEET_CHUNK.value}
-                            v-model:value={formState.value.chunk}
+                            v-model:value={formState.value.type}
                         ></form-common-column-select>
                     </form-common-column>
                     <form-common-column
                         label="权限标识"
-                        path="keyName"
-                        rule={{ required: formState.value.chunk !== 'directory', trigger: 'blur', message: '请输入权限标识' }}
+                        path="permissionCode"
+                        rule={{ required: formState.value.type !== 'directory', trigger: 'blur', message: '请输入权限标识' }}
                     >
                         <form-common-column-input
                             maxlength={255}
                             placeholder="请输入权限标识"
-                            v-model:value={formState.value.keyName}
+                            v-model:value={formState.value.permissionCode}
                         ></form-common-column-input>
                     </form-common-column>
                     <form-common-column
                         label="父级菜单/按钮"
-                        path="pid"
-                        key={formState.value.chunk}
+                        path="parentKeyId"
+                        key={formState.value.type}
                         rule={{
-                            required: ['authorize'].includes(formState.value.chunk),
+                            required: ['button'].includes(formState.value.type),
                             type: 'number',
                             trigger: 'blur',
                             message: '请选择父级菜单/按钮'
@@ -155,7 +156,7 @@ export default defineComponent({
                             clearable
                             expand-trigger="click"
                             placeholder="请选择父级菜单/按钮"
-                            v-model:value={formState.value.pid}
+                            v-model:value={formState.value.parentKeyId}
                             options={sheetOptions.dataSource.value}
                         ></form-common-column-cascader>
                     </form-common-column>
@@ -166,31 +167,31 @@ export default defineComponent({
                             v-model:value={formState.value.name}
                         ></form-common-column-input>
                     </form-common-column>
-                    {['resource'].includes(formState.value.chunk) && (
+                    {['menu'].includes(formState.value.type) && (
                         <Fragment>
                             <form-common-column
                                 label="菜单地址"
-                                path="router"
+                                path="path"
                                 rule={{ required: true, trigger: 'blur', message: '请输入菜单地址' }}
                             >
                                 <form-common-column-input
                                     maxlength={255}
                                     placeholder="请输入菜单地址"
-                                    v-model:value={formState.value.router}
+                                    v-model:value={formState.value.path}
                                 ></form-common-column-input>
                             </form-common-column>
-                            <form-common-column label="菜单图标" path="iconName">
+                            <form-common-column label="菜单图标" path="icon">
                                 <form-common-column-input
                                     maxlength={255}
                                     placeholder="请输入菜单图标"
-                                    v-model:value={formState.value.iconName}
+                                    v-model:value={formState.value.icon}
                                 ></form-common-column-input>
                             </form-common-column>
-                            <form-common-column label="菜单显示状态" path="check">
+                            <form-common-column label="菜单显示状态" path="visible">
                                 <form-common-column-select
                                     placeholder="请选择菜单显示状态"
                                     options={chunkOptions.CHUNK_SHEET_CHECK.value}
-                                    v-model:value={formState.value.check}
+                                    v-model:value={formState.value.visible}
                                 ></form-common-column-select>
                             </form-common-column>
                         </Fragment>
@@ -201,13 +202,6 @@ export default defineComponent({
                             options={chunkOptions.CHUNK_SHEET_STATUS.value}
                             v-model:value={formState.value.status}
                         ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="版本号" path="version">
-                        <form-common-column-input
-                            maxlength={32}
-                            placeholder="请输入版本号"
-                            v-model:value={formState.value.version}
-                        ></form-common-column-input>
                     </form-common-column>
                     <form-common-column label="排序号" path="sort" v-model:value={formState.value.sort}>
                         <n-input-number

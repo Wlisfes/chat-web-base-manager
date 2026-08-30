@@ -22,11 +22,12 @@
 
 ## API 请求定义
 
-- `src/api/**/modules/*.service.ts` 以 `src/api/modules/deploy/modules/datetask.service.ts` 为基准；每个接口函数保持单一职责，使用清晰的请求对象定义接口，不新增专用的 `*.adapter.ts` 文件。
-- 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`；禁止通过模块级 URL 常量或字符串拼接隐藏实际接口地址。确需兼容页面字段时，只允许在同一 service 文件中使用私有转换函数，不能改变接口函数的请求职责。
+- `src/api/**/modules/*.service.ts` 以 `src/api/modules/deploy/modules/datetask.service.ts` 为基准；API 文件只负责 HTTP 传输，每个接口函数保持单一职责，使用与后端协议一致的明确请求和响应类型，不新增专用的 `*.adapter.ts` 文件。
+- 请求和响应类型必须直接描述后端接口协议；不得用 `Omix`、`any` 或其他宽泛类型掩盖页面字段与接口字段的差异。
+- 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`，将调用方传入的 `params`/`data` 原样发送；禁止在 API 层做参数转换或响应适配，包括字段改名、`Number`/`String`/`Boolean` 类型转换、默认值注入、分页裁剪、数组重组、`map` 映射、响应包装和私有转换函数。
 - GET 请求只通过 `params` 传递查询参数，POST 请求只通过 `data` 传递请求体；无入参时不添加空 `params` 或空 `data`。
 - API 函数按 `httpBase<Service><Action><Resource>` 风格命名并添加中文职责注释，例如 `httpBaseSystemColumnDatetask`、`httpBaseSystemCreateSheetResource`。
-- 页面字段兼容、请求体转换和响应适配不得通过额外 Adapter 文件分散；应在对应 service 文件内使用命名清晰的私有转换函数，并让每个导出的接口函数保持可读的单次请求结构。历史 API 文件在相关需求修改时按此规则逐步整理。
+- 页面字段兼容、请求体转换和响应适配必须放在页面/业务域层（如页面 composable、store 或业务 service）处理；接口字段应通过请求/响应 DTO 或类型定义明确表达，API service 不得承担业务规则和数据加工。历史 API 文件在相关需求修改时按此规则逐步整理。
 
 ## 自动发布与部署
 

@@ -63,6 +63,8 @@ export default defineComponent({
         showQuickJumper: { type: Boolean, default: false },
         /**分页条数列表**/
         showSizePicker: { type: Boolean, default: true },
+        /**分页条数选项**/
+        pageSizes: { type: Array as PropType<Array<number>>, default: () => [20, 30, 50, 100, 200, 300] },
         /**开启复选框**/
         showSelect: { type: Boolean, default: false },
         /**开启列设置**/
@@ -266,7 +268,7 @@ export default defineComponent({
                                 item-count={props.total}
                                 page-size={size.value}
                                 v-model:page={page.value}
-                                page-sizes={[20, 30, 50, 100, 200, 300]}
+                                page-sizes={props.pageSizes}
                                 show-size-picker={props.showSizePicker}
                                 show-quick-jumper={props.showQuickJumper}
                                 on-update:page={fetchUpdatePage}

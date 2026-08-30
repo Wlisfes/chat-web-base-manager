@@ -7,6 +7,8 @@ import { isEmpty } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
+type SheetTreeKey = number
+
 export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
@@ -15,13 +17,28 @@ export default defineComponent({
             callback: fetchReadyCallback,
             immediate: true,
             options: {
-                selectedKeys: [] as Array<string>,
-                expandedKeys: [] as Array<string>
+                selectedKeys: [] as Array<SheetTreeKey>,
+                expandedKeys: [] as Array<SheetTreeKey>
             }
         })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnSheet(payload),
+            request: async (base, payload) => {
+                const { size, ...filters } = payload
+                const response = await Service.httpBaseSystemColumnSheet({
+                    ...filters,
+                    page: base.page,
+                    pageSize: size
+                })
+                return {
+                    ...response,
+                    data: {
+                        ...response.data,
+                        size: response.data?.pageSize,
+                        list: response.data?.items ?? []
+                    }
+                }
+            },
             keyName: 'chatbok:deploy:system:sheet',
             immediate: false,
             chunkNames: {
@@ -29,24 +46,20 @@ export default defineComponent({
                 CHUNK_SHEET_CHUNK: true
             },
             formState: {
-                pid: undefined, //父级ID
+                parentKeyId: undefined as number | undefined, //父级ID
                 name: undefined, //菜单名称
-                keyName: undefined, //权限标识
-                router: undefined, //菜单地址
-                version: undefined //版本号
+                permissionCode: undefined, //权限标识
+                path: undefined //菜单地址
             },
             columns: [
                 { title: '菜单名称', key: 'name', width: 150, disabled: true },
-                { title: '图标', key: 'iconName', width: 100, align: 'center', className: 'p-block-0!', check: true },
-                { title: '类型', key: 'chunk', width: 100, check: true },
-                { title: '权限标识', key: 'keyName', minWidth: 200, check: true },
-                { title: '路由地址', key: 'router', minWidth: 200, check: true },
-                { title: '版本号', key: 'version', width: 100, align: 'center', check: true },
+                { title: '图标', key: 'icon', width: 100, align: 'center', className: 'p-block-0!', check: true },
+                { title: '类型', key: 'type', width: 100, check: true },
+                { title: '权限标识', key: 'permissionCode', minWidth: 200, check: true },
+                { title: '路由地址', key: 'path', minWidth: 200, check: true },
                 { title: '排序号', key: 'sort', width: 100, align: 'center', check: true },
                 { title: '状态', key: 'status', width: 100, align: 'center', check: true },
-                { title: '创建人', key: 'createBy', width: 120, check: true },
                 { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新人', key: 'modifyBy', width: 120, check: true },
                 { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
         })
@@ -59,21 +72,21 @@ export default defineComponent({
             const expandeds = data.dataSource.map((item: Omix) => item.keyId)
             const selecteds = expandeds.filter((e: Omix, index: number) => [0].includes(index))
             return await sheetOptions.setState({ selectedKeys: selecteds, expandedKeys: expandeds }).then(async (event: Omix) => {
-                return await setForm({ pid: selecteds[0] ?? undefined }).then(async () => {
+                return await setForm({ parentKeyId: selecteds[0] ?? undefined }).then(async () => {
                     return await instOptions.fetchRequest()
                 })
             })
         }
 
         /**左侧树展开变更回调**/
-        async function fetchUpdateExpanded(keys: Array<string>) {
-            return await sheetOptions.setState({ expandedKeys: keys as never })
+        async function fetchUpdateExpanded(keys: Array<SheetTreeKey>) {
+            return await sheetOptions.setState({ expandedKeys: keys })
         }
 
         /**左侧树选中变更回调**/
-        async function fetchUpdateSelected(keys: Array<string>) {
+        async function fetchUpdateSelected(keys: Array<SheetTreeKey>) {
             return await sheetOptions.setState({ selectedKeys: keys }).then(async () => {
-                return await setForm({ pid: keys[0] as never }).then(() => {
+                return await setForm({ parentKeyId: keys[0] }).then(() => {
                     return fetchRefresh({ page: 1, size: state.size })
                 })
             })
@@ -222,27 +235,19 @@ export default defineComponent({
                                     on-submit={fetchRefresh}
                                 ></form-common-column-input>
                             </common-database-search-column>
-                            <common-database-search-column prop="keyName" label="权限标识">
+                            <common-database-search-column prop="permissionCode" label="权限标识">
                                 <form-common-column-input
                                     clearable
                                     placeholder="请输入权限标识"
-                                    v-model:value={formState.value.keyName}
+                                    v-model:value={formState.value.permissionCode}
                                     on-submit={fetchRefresh}
                                 ></form-common-column-input>
                             </common-database-search-column>
-                            <common-database-search-column prop="router" label="菜单地址">
+                            <common-database-search-column prop="path" label="菜单地址">
                                 <form-common-column-input
                                     clearable
                                     placeholder="请输入菜单地址"
-                                    v-model:value={formState.value.router}
-                                    on-submit={fetchRefresh}
-                                ></form-common-column-input>
-                            </common-database-search-column>
-                            <common-database-search-column prop="version" label="版本号">
-                                <form-common-column-input
-                                    clearable
-                                    placeholder="请输入版本号"
-                                    v-model:value={formState.value.version}
+                                    v-model:value={formState.value.path}
                                     on-submit={fetchRefresh}
                                 ></form-common-column-input>
                             </common-database-search-column>
@@ -253,6 +258,7 @@ export default defineComponent({
                             class="p-0!"
                             show-select
                             show-settings
+                            page-sizes={[20, 30, 50, 100]}
                             limit={state.limit}
                             total={state.total}
                             columns={state.columns}
@@ -267,25 +273,19 @@ export default defineComponent({
                             on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                         >
                             {{
-                                col_iconName: (data: Omix) => (
+                                col_icon: (data: Omix) => (
                                     <div class="flex items-center justify-center">
-                                        {isEmpty(data.iconName) ? (
+                                        {isEmpty(data.icon) ? (
                                             <span>-</span>
                                         ) : (
-                                            <common-element-icon size={26} name={data.iconName}></common-element-icon>
+                                            <common-element-icon size={26} name={data.icon}></common-element-icon>
                                         )}
                                     </div>
                                 ),
-                                col_createBy: (data: Omix) => (
-                                    <common-database-table-user element="text" data={data.createByOptions}></common-database-table-user>
-                                ),
-                                col_modifyBy: (data: Omix) => (
-                                    <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
-                                ),
-                                col_chunk: (data: Omix) => (
+                                col_type: (data: Omix) => (
                                     <common-database-table-chunk
                                         element="chunk"
-                                        value={data.chunk}
+                                        value={data.type}
                                         options={chunkState.CHUNK_SHEET_CHUNK}
                                     ></common-database-table-chunk>
                                 ),
