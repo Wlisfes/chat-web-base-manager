@@ -20,6 +20,14 @@
 
 排障命令和当前运行基线维护在 `deploy/RUNBOOK.md`。
 
+## API 请求定义
+
+- `src/api/**/modules/*.service.ts` 以 `src/api/modules/deploy/modules/datetask.service.ts` 为基准；每个接口函数保持单一职责，使用清晰的请求对象定义接口，不新增专用的 `*.adapter.ts` 文件。
+- 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`；禁止通过模块级 URL 常量或字符串拼接隐藏实际接口地址。确需兼容页面字段时，只允许在同一 service 文件中使用私有转换函数，不能改变接口函数的请求职责。
+- GET 请求只通过 `params` 传递查询参数，POST 请求只通过 `data` 传递请求体；无入参时不添加空 `params` 或空 `data`。
+- API 函数按 `httpBase<Service><Action><Resource>` 风格命名并添加中文职责注释，例如 `httpBaseSystemColumnDatetask`、`httpBaseSystemCreateSheetResource`。
+- 页面字段兼容、请求体转换和响应适配不得通过额外 Adapter 文件分散；应在对应 service 文件内使用命名清晰的私有转换函数，并让每个导出的接口函数保持可读的单次请求结构。历史 API 文件在相关需求修改时按此规则逐步整理。
+
 ## 自动发布与部署
 
 - 用户已经要求完成发布或部署时，Agent 必须自行完成验证、提交、推送、创建 PR、合并和流水线跟踪，不得把这些步骤转交给用户。
