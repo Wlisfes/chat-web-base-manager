@@ -9,7 +9,7 @@ import {
 
 const API_BASE_URL = import.meta.env.PROD ? "https://chat-web.lisfes.cn" : "";
 
-function apiUrl(path: string) {
+export function apiUrl(path: string) {
   return `${API_BASE_URL}${path}`;
 }
 
@@ -17,9 +17,6 @@ export const request: AxiosRequest = axios.create({
   baseURL: API_BASE_URL,
   timeout: 120000,
   withCredentials: true,
-  headers: {
-    platform: "manager",
-  },
 });
 
 /**自定义错误处理**/
@@ -70,7 +67,6 @@ function fetchAuthAccountTokenContinue(): Promise<string> {
               withCredentials: true,
               headers: {
                 Authorization: `Bearer ${token}`,
-                platform: "manager",
               },
             },
           );

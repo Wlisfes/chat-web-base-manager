@@ -36,6 +36,7 @@ export default defineComponent({
                             height={40}
                             preview-disabled
                             src={props.link}
+                            imgProps={{ crossOrigin: 'use-credentials' }}
                             on-load={() => emit('complete', 100)}
                             on-error={() => emit('error', 100)}
                         >

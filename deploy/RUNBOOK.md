@@ -82,6 +82,7 @@ curl --silent --show-error --fail --insecure --resolve chat-web.lisfes.cn:443:12
 | ------------------------- | ------------------------------------------------------------------------------------ |
 | `chat.lisfes.cn` 无法访问 | 检查 DNS、云安全组 80/443、证书路径和 `docker ps`                                    |
 | 页面正常、API 502         | 检查 `chat-web.lisfes.cn` 解析、Gateway 证书、CORS 白名单和服务连通性                |
+| 登录提示验证码不存在      | 确认验证码请求使用 `chat-web.lisfes.cn` 且浏览器允许凭据；再检查登录请求是否携带 `chat-web-account-captcha` Cookie |
 | Nginx 启动失败            | 执行 `docker exec chat-web-cloud-nginx nginx -t`，确认云端配置中的证书与上游地址有效 |
 | 基础设施域名异常          | 确认 Manager Compose 仍保留 3306、6379、5672、9092、15672、8848、9848 端口映射       |
 | 部署一直等待              | 检查 `production-cloud` 的 SSH Secret、主机指纹和 Docker 权限                        |
