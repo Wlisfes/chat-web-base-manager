@@ -312,10 +312,6 @@ export default defineComponent({
         :deep(.n-data-table-loading-wrapper) {
             font-size: 48px;
         }
-        :deep(.n-data-table-td):has(.n-data-table-expand-trigger) {
-            display: flex;
-            align-items: center;
-        }
         :deep(.n-data-table-th.chunk-command) {
             padding: 0;
         }
