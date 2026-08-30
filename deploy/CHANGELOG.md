@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-30 修复验证码会话并废弃 Platform 请求头
+
+- 影响机器：云服务器 `47.119.21.228`；生产页面 `https://chat.lisfes.cn` 和 API `https://chat-web.lisfes.cn`。
+- 关联版本：Manager 本次完整 Git SHA 镜像；Gateway 保持 Nacos `gateway.cors.allowedOrigins` 为 `https://chat.lisfes.cn`、`credentials` 为 `true`。
+- 变更内容：验证码地址跟随 API 域名，图片请求显式使用跨域凭据，使 `chat-web-account-captcha` Cookie 能随登录请求发送；删除管理端 Axios 默认请求和 Token 续期请求中的已废弃 `Platform` 请求头。
+- 机器侧操作：部署新的 Manager 镜像；无需修改数据库、Redis、证书、Nacos 路由或云端 Nginx。
+- 验证命令：执行管理端类型检查与 Vite 生产构建、`docker compose -f deploy/compose.yml config --quiet`；发布后在浏览器确认验证码请求为 `https://chat-web.lisfes.cn/api/account/auth/codex/write`、图片请求带凭据，并由实际登录请求验证 `chat-web-account-captcha` Cookie 已随请求发送。
+- 回滚方法：恢复上一条健康 Manager 完整 Git SHA 镜像；Gateway CORS 和业务数据不回滚。
+
 ## 2026-08-29 页面与 API 域名拆分
 
 - 影响机器：云服务器 `47.119.21.228`；开发机上的 Manager 生产容器已废弃。
