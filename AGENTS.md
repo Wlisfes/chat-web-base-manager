@@ -1,5 +1,17 @@
 # Repository instructions
 
+本文件在本仓库内独立生效，不依赖 `F:/chat-web-service/AGENTS.md` 或其他工作区文件。
+
+## 通用工程规则
+
+- 使用 Node.js 22、Yarn 1.22.22、Vue 3、TypeScript 和本仓库锁定的 Naive UI 依赖；源码使用 UTF-8，Shell、YAML 和 Dockerfile 使用 LF。
+- 统一使用 4 空格、无分号、单引号、`printWidth: 140`、无尾随逗号；内部源码统一使用 `@/*` 路径别名。
+- 文件名使用小写 kebab-case；组件、类型和类使用 PascalCase，变量、函数和实例属性使用 camelCase，常量使用 UPPER_SNAKE_CASE。
+- 页面接口只使用 GET、POST；GET 使用 query，POST 使用 body；多选参数必须是数组，禁止使用 `/:uid` 等路径参数。
+- 面向用户的提示、校验、接口文档和维护错误信息使用中文，代码标识符使用英文。
+- `.env.example` 只列出启动所需参数和明确占位符；真实密钥、Token、私钥和生产 `.env` 不得提交。
+- 涉及接口、代理或部署的改动必须完成对应运行级验证；每次改动至少执行格式检查、TypeScript 类型检查和前端构建。
+
 ## 部署变更记录
 
 任何会影响 Docker 构建、站点启动、反向代理、端口、TLS、健康检查、Runner、部署目录或外部网络的修改，都必须在同一次改动中更新 `deploy/CHANGELOG.md`。
@@ -20,6 +32,10 @@
 - 生产访问地址固定为 `https://chat.lisfes.cn`。云端 Nginx 负责 TLS、静态资源和 `/api/*` 到 WireGuard 本机 Gateway 的转发。
 - 流水线只构建一次完整 Git SHA 镜像并部署到云端 `/opt/chat-web-cloud` 的 `chat-web-cloud-nginx` 容器；Nacos 等基础设施由云端基础设施 Compose 独立维护。
 - 云端部署必须执行健康检查并支持失败自动回滚；运行基线、初始化、验证和回滚操作维护在 `deploy/RUNBOOK.md`。
+
+## 分支生命周期
+
+- 远程仓库只保留 `main`、`developer` 两个长期分支；临时需求分支必须先合并到 `developer`，发布时同步合并到 `main`，合并并验证通过后立即删除远程和本地临时分支。
 
 ## Git 提交规范
 
