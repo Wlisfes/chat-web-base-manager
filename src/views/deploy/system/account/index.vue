@@ -19,23 +19,28 @@ export default defineComponent({
             request: (base, payload) => Service.httpBaseSystemColumnAccount(payload),
             keyName: 'chatbok:deploy:system:account',
             formState: {
-                name: undefined, //名称工号
-                phone: undefined, //手机号
-                email: undefined, //邮箱
-                status: undefined, //状态
-                depts: [] //归属部门
+                /**名称工号**/
+                name: undefined,
+                /**手机号**/
+                phone: undefined,
+                /**邮箱**/
+                email: undefined,
+                /**状态**/
+                status: undefined,
+                /**归属部门**/
+                depts: []
             },
             columns: [
-                { title: '头像', key: 'avatar', width: 60, align: 'center', disabled: true },
+                { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                 { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '状态', key: 'status', width: 100, align: 'center', check: true },
-                { title: '手机号', key: 'phone', width: 160, check: true },
-                { title: '邮箱', key: 'email', width: 220, check: true },
-                { title: '职级', key: 'ranks', width: 100, check: true },
-                { title: '职位', key: 'positions', width: 160, check: true },
-                { title: '归属部门', key: 'depts', minWidth: 200, check: true },
-                { title: '关联角色', key: 'roles', minWidth: 160, check: true },
-                { title: '入职时间', key: 'createTime', width: 160, check: true }
+                { title: '状态', key: 'status', width: 100 },
+                { title: '手机号', key: 'phone', width: 140 },
+                { title: '邮箱', key: 'email', width: 200 },
+                { title: '职级', key: 'ranks', width: 100 },
+                { title: '职位', key: 'positions', width: 160 },
+                { title: '归属部门', key: 'depts', minWidth: 200 },
+                { title: '关联角色', key: 'roles', minWidth: 160 },
+                { title: '入职时间', key: 'createTime', width: 160 }
             ]
         })
         /**新增账号**/
