@@ -1,6 +1,6 @@
 import { toRefs, onMounted } from 'vue'
 import { useState, useProvider } from '@/hooks'
-import { apiUrl, fetchDelay, fetchHandler } from '@/utils'
+import { API_BASE_URL, fetchDelay, fetchHandler } from '@/utils'
 interface BaseServiceState {
     /**验证码接口地址**/
     url: string
@@ -23,7 +23,7 @@ interface BaseServiceOptions<T> extends Partial<BaseServiceState> {
 export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = {}) {
     const { inverted } = useProvider()
     const { state, setState } = useState({
-        url: options.url ?? apiUrl('/api/account/auth/codex/write'),
+        url: options.url ?? `${API_BASE_URL}/api/account/auth/captcha`,
         link: options.link ?? '',
         loading: options.loading ?? true,
         error: options.error ?? false,
