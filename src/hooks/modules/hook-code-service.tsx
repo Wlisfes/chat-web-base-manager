@@ -23,7 +23,7 @@ interface BaseServiceOptions<T> extends Partial<BaseServiceState> {
 export function useCodeService<T extends Omix>(options: BaseServiceOptions<T> = {}) {
     const { inverted } = useProvider()
     const { state, setState } = useState({
-        url: options.url ?? `${API_BASE_URL}/api/account/auth/captcha`,
+        url: options.url ?? `${API_BASE_URL}/api/account/auth/codex/write`,
         link: options.link ?? '',
         loading: options.loading ?? true,
         error: options.error ?? false,

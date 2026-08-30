@@ -12,8 +12,6 @@ import UnoCSS from 'unocss/vite'
 import path from 'path'
 
 export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-    const accountProxyTarget = process.env.VITE_ACCOUNT_PROXY_TARGET || 'http://localhost:5000'
-    const accountProxyDirect = process.env.VITE_ACCOUNT_PROXY_DIRECT === 'true'
     return {
         build: {
             outDir: 'dist',
@@ -54,16 +52,10 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
             port: 4680,
             host: '0.0.0.0',
             proxy: {
-                [`/api/windows`]: {
-                    target: `http://localhost:5100`,
+                [`/api`]: {
+                    target: `https://chat-web.lisfes.cn`,
                     ws: true,
                     changeOrigin: true
-                },
-                [`/api`]: {
-                    target: accountProxyTarget,
-                    ws: true,
-                    changeOrigin: true,
-                    rewrite: accountProxyDirect ? path => path.replace(/^\/api/, '') : undefined
                 }
             }
         }
