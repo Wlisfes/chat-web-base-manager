@@ -37,11 +37,6 @@ function menuPayload(data: Omix, type?: SheetType): Omix {
     }
 }
 
-/**将菜单树展平成列表。*/
-function flattenMenus(nodes: Array<Omix>): Array<Omix> {
-    return nodes.flatMap(node => [node, ...flattenMenus(node.children ?? [])])
-}
-
 /**新增菜单资源。*/
 export function httpBaseSystemCreateSheetResource(data: Omix) {
     return request({
@@ -62,26 +57,28 @@ export function httpBaseSystemUpdateSheetResource(data: Omix) {
 
 /**菜单分页列表。*/
 export async function httpBaseSystemColumnSheet(data: Omix): Promise<any> {
+    const page = Math.max(1, Number(data.page ?? 1))
+    const pageSize = Math.min(Math.max(1, Number(data.size ?? 50)), 100)
+    const parentKeyId = data.pid === undefined || data.pid === null ? null : Number(data.pid)
     const response = await request({
-        url: `/api/account/menu/tree/structure`,
-        method: 'GET'
+        url: `/api/account/menu/column`,
+        method: 'POST',
+        data: {
+            page,
+            pageSize,
+            parentKeyId,
+            name: data.name || undefined,
+            permissionCode: data.keyName || undefined,
+            path: data.router || undefined
+        }
     })
-    const mapped = flattenMenus((response.data ?? []).map(mapMenu)).filter(item => {
-        if (data.pid !== undefined && data.pid !== null && item.pid !== data.pid) return false
-        if (data.name && !item.name?.includes(data.name)) return false
-        if (data.keyName && !item.keyName?.includes(data.keyName)) return false
-        if (data.router && !item.router?.includes(data.router)) return false
-        return true
-    })
-    const page = Number(data.page ?? 1)
-    const size = Number(data.size ?? 50)
     return {
         ...response,
         data: {
-            page,
-            size,
-            total: mapped.length,
-            list: mapped.slice((page - 1) * size, page * size)
+            page: response.data?.page ?? page,
+            size: response.data?.pageSize ?? pageSize,
+            total: response.data?.total ?? 0,
+            list: (response.data?.items ?? []).map(mapMenu)
         }
     }
 }
