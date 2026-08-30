@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-08-30 修复本地开发登录验证码 Cookie
+
+- 影响机器：开发机 `chat-home-server`；生产云端页面和 API 配置不变。
+- 关联版本：Manager `developer` 分支本地开发配置。
+- 变更内容：开发环境 API 请求改为 Vite 同源 `/api`，由本机 Nginx 使用 `chat-web.lisfes.cn` Host 转发到 Gateway；生产环境仍使用 `https://chat-web.lisfes.cn`。修复本地登录时验证码响应被浏览器按跨站 Cookie 拦截的问题。
+- 机器侧操作：本地启动 `chat-web-nginx`、`chat-web-gateway-service` 和相关下游服务后执行 `yarn dev`；无需修改云端 Nginx、Nacos、数据库或生产镜像。
+- 验证命令：执行 `yarn run vue-tsc --noEmit -p tsconfig.json`、`yarn run tsc --noEmit -p tsconfig.node.json`、`yarn run vite build --config vite.config.ts`；本地访问 `/api/account/auth/codex/write` 确认响应包含验证码 Cookie，浏览器登录请求携带该 Cookie。
+- 回滚方法：恢复 `src/utils/modules/utils-request.tsx` 和 `vite.config.ts` 上一版本；仅影响本地开发代理，不涉及生产数据。
+
 ## 2026-08-30 修复验证码会话并废弃 Platform 请求头
 
 - 影响机器：云服务器 `47.119.21.228`；生产页面 `https://chat.lisfes.cn` 和 API `https://chat-web.lisfes.cn`。

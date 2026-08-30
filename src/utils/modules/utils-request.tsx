@@ -1,7 +1,10 @@
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { APP_COOKIE, getToken, getCookie, fetchDestroy, fetchCompose } from '@/utils'
 
-export const API_BASE_URL = `https://chat-web.lisfes.cn`
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
+
+/**开发环境使用 Vite 同源代理，生产环境访问独立 API 域名。*/
+export const API_BASE_URL = configuredApiBaseUrl || (import.meta.env.DEV ? '' : 'https://chat-web.lisfes.cn')
 
 export const request: AxiosRequest = axios.create({
     baseURL: API_BASE_URL,

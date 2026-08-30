@@ -53,9 +53,12 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
             host: '0.0.0.0',
             proxy: {
                 [`/api`]: {
-                    target: `https://chat-web.lisfes.cn`,
+                    target: `http://127.0.0.1`,
                     ws: true,
-                    changeOrigin: true
+                    changeOrigin: false,
+                    headers: {
+                        Host: 'chat-web.lisfes.cn'
+                    }
                 }
             }
         }

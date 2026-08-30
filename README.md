@@ -1,6 +1,6 @@
 # Chat Web Base Manager
 
-Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本地 Gateway；生产环境页面固定使用 `https://chat.lisfes.cn`，API 请求固定使用 `https://chat-web.lisfes.cn`，页面静态资源由云端 Nginx 提供，跨域与接口由 Gateway 处理。
+Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到本机 Nginx 的 `chat-web.lisfes.cn` 虚拟主机，再由本地 Gateway 处理；生产环境页面固定使用 `https://chat.lisfes.cn`，API 请求固定使用 `https://chat-web.lisfes.cn`，页面静态资源由云端 Nginx 提供，跨域与接口由 Gateway 处理。
 
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。CRM 页面使用 `/crm/consumer`、`/crm/partner`、`/crm/sms/quote/create` 和 `/crm/sms/quote` 路由。
 
