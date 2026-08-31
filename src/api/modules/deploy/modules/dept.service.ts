@@ -2,37 +2,9 @@ import { request } from '@/utils'
 
 const ORGANIZATION_API = '/api/account/organization'
 
-function mapOrganization(node: Omix): Omix {
-    return {
-        ...node,
-        pid: node.parentKeyId,
-        alias: node.code,
-        accountCount: node.memberCount ?? 0,
-        admin: node.leader,
-        subAdmins: [],
-        children: (node.children ?? []).map(mapOrganization)
-    }
-}
-
-function flattenOrganizations(nodes: Array<Omix>): Array<Omix> {
-    return nodes.flatMap(node => [node, ...flattenOrganizations(node.children ?? [])])
-}
-
-function organizationPayload(data: Omix): Omix {
-    return {
-        parentKeyId: data.pid ?? data.parentKeyId ?? null,
-        code: data.code ?? data.alias,
-        name: data.name,
-        type: data.type ?? 'department',
-        leaderUserUid: data.leaderUserUid ?? data.adminUid ?? null,
-        sort: Number(data.sort ?? 10),
-        status: data.status ?? 'enabled'
-    }
-}
-
 /**新增部门**/
 export function httpBaseSystemCreateDepartment(data: Omix) {
-    return request({ url: `${ORGANIZATION_API}/create`, method: 'POST', data: organizationPayload(data) })
+    return request({ url: `${ORGANIZATION_API}/create`, method: 'POST', data })
 }
 
 /**编辑部门**/
@@ -40,54 +12,21 @@ export function httpBaseSystemUpdateDepartment(data: Omix) {
     return request({
         url: `${ORGANIZATION_API}/update`,
         method: 'POST',
-        data: { keyId: data.keyId, ...organizationPayload(data) }
+        data
     })
 }
 
 /**部门详情**/
-export async function httpBaseSystemDepartmentResolver(data: Omix): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/resolver`, method: 'GET', params: { keyId: data.keyId } })
-    return { ...response, data: mapOrganization(response.data) }
+export function httpBaseSystemDepartmentResolver(params: Omix) {
+    return request({ url: `${ORGANIZATION_API}/resolver`, method: 'GET', params })
 }
 
 /**部门树结构**/
-export async function httpBaseSystemDepartmentTreeStructure(): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
-    return { ...response, data: { list: (response.data ?? []).map(mapOrganization) } }
-}
-
-/**部门成员列表**/
-export async function httpBaseSystemDeptMemberOptions(data: Omix): Promise<any> {
-    const [organization, users] = await Promise.all([
-        request({ url: `${ORGANIZATION_API}/resolver`, method: 'GET', params: { keyId: data.keyId } }),
-        request({
-            url: '/api/account/user/column',
-            method: 'POST',
-            data: { page: 1, pageSize: 100, organizationKeyIds: [Number(data.keyId)] }
-        })
-    ])
-    const list = (users.data?.items ?? []).map((user: Omix) => ({
-        ...user,
-        chunk: user.uid === organization.data?.leaderUserUid ? 'admin' : 'member'
-    }))
-    return { ...users, data: { list, total: users.data?.total ?? list.length } }
-}
-
-/**部门分页列表查询**/
-export async function httpBaseSystemColumnDepartment(data: Omix): Promise<any> {
-    const response = await request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
-    const mapped = flattenOrganizations((response.data ?? []).map(mapOrganization)).filter(item => {
-        if (data.pid !== undefined && data.pid !== null && item.pid !== data.pid) return false
-        if (data.name && !item.name?.includes(data.name)) return false
-        if (data.alias && !item.alias?.includes(data.alias)) return false
-        return true
-    })
-    const page = Number(data.page ?? 1)
-    const size = Number(data.size ?? 50)
-    return { ...response, data: { page, size, total: mapped.length, list: mapped.slice((page - 1) * size, page * size) } }
+export function httpBaseSystemDepartmentTreeStructure() {
+    return request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
 }
 
 /**删除部门**/
 export function httpBaseSystemDeleteDepartment(data: Omix) {
-    return request({ url: `${ORGANIZATION_API}/delete`, method: 'POST', data: { keyId: data.keyId } })
+    return request({ url: `${ORGANIZATION_API}/delete`, method: 'POST', data })
 }

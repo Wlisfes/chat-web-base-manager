@@ -23,6 +23,7 @@
 ## API 请求定义
 
 - `src/api/**/modules/*.service.ts` 以 `src/api/modules/deploy/modules/datetask.service.ts` 为基准；API 文件只负责 HTTP 传输，每个接口函数保持单一职责，使用与后端协议一致的明确请求和响应类型，不新增专用的 `*.adapter.ts` 文件。
+- 所有分页页面统一使用 `page`、`size` 请求字段和 `page`、`size`、`total`、`list` 响应字段；禁止在 API 层兼容或转换 `pageSize`、`items`、`records`、`rows`。
 - 请求和响应类型必须直接描述后端接口协议；不得用 `Omix`、`any` 或其他宽泛类型掩盖页面字段与接口字段的差异。
 - 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`，将调用方传入的 `params`/`data` 原样发送；禁止在 API 层做参数转换或响应适配，包括字段改名、`Number`/`String`/`Boolean` 类型转换、默认值注入、分页裁剪、数组重组、`map` 映射、响应包装和私有转换函数。
 - GET 请求只通过 `params` 传递查询参数，POST 请求只通过 `data` 传递请求体；无入参时不添加空 `params` 或空 `data`。

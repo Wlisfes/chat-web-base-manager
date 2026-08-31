@@ -19,7 +19,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**角色关联菜单数据**/
         const { faseNode, faseState, setState, fetchInitialize, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseSystemColumnRoleSheet({ roleId: props.roleId }),
+            request: () => Service.httpBaseSystemColumnRoleSheet({ keyId: props.roleId }),
             callback: fetchSheetCallback,
             immediate: true,
             options: {
@@ -42,7 +42,7 @@ export default defineComponent({
         /**角色关联菜单回调：过滤非叶子节点，仅设置叶子节点为checked**/
         async function fetchSheetCallback(data: Omix) {
             const parentIds = fetchParentKeyIds(props.faseNode.list ?? [])
-            const checkedKeys = (data.list ?? []).filter((id: number) => !parentIds.has(id))
+            const checkedKeys = (data.menuKeyIds ?? []).filter((id: number) => !parentIds.has(id))
             return await setState({ checkedKeys })
         }
 
@@ -51,8 +51,8 @@ export default defineComponent({
             return await setState({ loading: true }).then(async () => {
                 try {
                     await Service.httpBaseSystemUpdateRoleSheet({
-                        roleId: props.roleId,
-                        sheetIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
+                        keyId: props.roleId,
+                        menuKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
                     return await setState({ loading: false }).then(async () => {
                         await fetchNotifyService({ title: '操作成功' })

@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
-import { stop, EventType } from '@/utils'
+import { createDeployAccountQuery, createDeployAccountRoleIds, stop, EventType } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -16,7 +16,10 @@ export default defineComponent({
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setState, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnAccountRole({ ...payload, roleId: props.roleId }),
+            request: (base, payload) =>
+                Service.httpBaseSystemColumnAccountRole(
+                    createDeployAccountQuery({ ...payload, page: base.page, size: base.size, roleKeyId: props.roleId })
+                ),
             keyName: 'chatbok:deploy:system:role:account',
             immediate: false,
             formState: { vague: undefined, phone: undefined, email: undefined },
@@ -56,7 +59,13 @@ export default defineComponent({
         /**移除关联用户**/
         async function fetchDeleteAccountRole(event: MouseEvent, uids: Array<string>) {
             return await stop(event).then(async () => {
-                return await Service.httpBaseSystemDeleteAccountRole({ roleId: props.roleId, uids }).then(() => {
+                return await Promise.all(
+                    uids.map(async uid => {
+                        const detail = await Service.httpBaseSystemAccountResolver({ uid })
+                        const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId!, false)
+                        return Service.httpBaseSystemUpdateAccountRole({ uid, roleKeyIds })
+                    })
+                ).then(() => {
                     return fetchRefresh({ page: 1 })
                 })
             })

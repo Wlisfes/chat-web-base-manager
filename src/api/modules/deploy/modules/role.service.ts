@@ -2,189 +2,48 @@ import { request } from '@/utils'
 
 const ROLE_API = '/api/account/role'
 const USER_API = '/api/account/user'
-const ORGANIZATION_API = '/api/account/organization'
-
-function dataScopePayload(data: Omix): Omix {
-    if (!data.model) return { rules: [] }
-    const organizations = (data.organizationKeyIds ?? []).map((organizationKeyId: number) => ({
-        organizationKeyId,
-        includeChildren: true
-    }))
-    return {
-        rules: [
-            {
-                resourceCode: 'account:user',
-                scopeType: data.model,
-                status: 'enabled',
-                ...(data.model === 'custom' ? { organizations } : {})
-            }
-        ]
-    }
-}
-
-function rolePayload(data: Omix): Omix {
-    return {
-        code: data.code ?? `role_${Date.now()}`,
-        name: data.name,
-        description: data.comment ?? data.description,
-        sort: Number(data.sort ?? 10),
-        status: data.status ?? 'enabled'
-    }
-}
-
-function mapRole(role: Omix): Omix {
-    const dataScope = (role.dataScopes ?? []).find((item: Omix) => item.resourceCode === 'account:user') ?? role.dataScopes?.[0]
-    return {
-        ...role,
-        comment: role.description,
-        chunk: role.builtin ? 'builtin' : 'custom',
-        model: dataScope?.scopeType,
-        organizationKeyIds: (dataScope?.organizations ?? []).map((item: Omix) => item.organizationKeyId)
-    }
-}
-
-function getSingleOrganizationKeyId(role: Omix): number | undefined {
-    const organizationKeyIds = [
-        ...new Set<number>(
-            (role.dataScopes ?? [])
-                .flatMap((scope: Omix) =>
-                    (scope.organizations ?? []).map((organization: Omix) => Number(organization.organizationKeyId))
-                )
-                .filter((keyId: number) => Number.isSafeInteger(keyId))
-        )
-    ]
-    return organizationKeyIds.length === 1 ? organizationKeyIds[0] : undefined
-}
-
-function mapDepartmentRoleTree(nodes: Array<Omix>, rolesByOrganization: Map<number, Omix>): Array<Omix> {
-    return nodes.flatMap(organization => {
-        const children = mapDepartmentRoleTree(organization.children ?? [], rolesByOrganization)
-        const role = rolesByOrganization.get(Number(organization.keyId))
-        if (!role && children.length === 0) return []
-        return [
-            {
-                ...organization,
-                nodeId: role?.keyId ?? -Number(organization.keyId),
-                node: role,
-                disabled: !role,
-                children
-            }
-        ]
-    })
-}
-
-function getDepartmentRoleTreeRoots(nodes: Array<Omix>): Array<Omix> {
-    return nodes.flatMap(organization => (organization.type === 'company' ? (organization.children ?? []) : [organization]))
-}
-
-async function replaceUserRole(uid: string, roleId: number, add: boolean) {
-    const detail = await request({ url: `${USER_API}/resolver`, method: 'GET', params: { uid } })
-    const current = detail.data?.roleKeyIds ?? []
-    const roleKeyIds = add ? [...new Set([...current, roleId])] : current.filter((item: number) => item !== roleId)
-    return request({ url: `${USER_API}/update/role`, method: 'POST', data: { uid, roleKeyIds } })
-}
 
 /**新增岗位角色**/
-export async function httpBaseSystemCreateRole(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/create`, method: 'POST', data: rolePayload(data) })
-    if (data.model) {
-        await request({
-            url: `${ROLE_API}/update/data/scope`,
-            method: 'POST',
-            data: { keyId: response.data.keyId, ...dataScopePayload(data) }
-        })
-    }
-    return response
+export function httpBaseSystemCreateRole(data: Omix) {
+    return request({ url: `${ROLE_API}/create`, method: 'POST', data })
 }
 
 /**编辑岗位角色**/
-export async function httpBaseSystemUpdateRole(data: Omix): Promise<any> {
-    const response = await request({
+export function httpBaseSystemUpdateRole(data: Omix) {
+    return request({
         url: `${ROLE_API}/update`,
         method: 'POST',
-        data: { keyId: data.keyId, ...rolePayload(data) }
+        data
     })
-    if (data.model) {
-        await request({
-            url: `${ROLE_API}/update/data/scope`,
-            method: 'POST',
-            data: { keyId: data.keyId, ...dataScopePayload(data) }
-        })
-    }
-    return response
 }
 
 /**角色详情**/
-export async function httpBaseSystemRoleResolver(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/resolver`, method: 'GET', params: { keyId: data.keyId } })
-    return { ...response, data: mapRole(response.data) }
+export function httpBaseSystemRoleResolver(params: Omix) {
+    return request({ url: `${ROLE_API}/resolver`, method: 'GET', params })
 }
 
 /**角色列表查询**/
-export async function httpBaseSystemColumnRole(): Promise<any> {
-    const [roleResponse, organizationResponse] = await Promise.all([
-        request({ url: `${ROLE_API}/select`, method: 'GET' }),
-        request({ url: `${ORGANIZATION_API}/tree/structure`, method: 'GET' })
-    ])
-    const roles = (roleResponse.data ?? []).map(mapRole)
-    const rolesByOrganization = new Map<number, Omix>()
-    const departmentRoleKeyIds = new Set<number>()
-    for (const role of roles) {
-        const organizationKeyId = getSingleOrganizationKeyId(role)
-        if (organizationKeyId === undefined || rolesByOrganization.has(organizationKeyId)) continue
-        rolesByOrganization.set(organizationKeyId, role)
-        departmentRoleKeyIds.add(role.keyId)
-    }
-    return {
-        ...roleResponse,
-        data: {
-            list: roles.filter((role: Omix) => !departmentRoleKeyIds.has(role.keyId)),
-            dept: mapDepartmentRoleTree(getDepartmentRoleTreeRoots(organizationResponse.data ?? []), rolesByOrganization),
-            total: roles.length
-        }
-    }
+export function httpBaseSystemSelectRole() {
+    return request({ url: `${ROLE_API}/select`, method: 'GET' })
 }
 
 /**角色关联账号列表**/
-export async function httpBaseSystemColumnAccountRole(data: Omix): Promise<any> {
-    const keyword = [data.vague, data.phone, data.email].find(value => Boolean(value))
-    const response = await request({
+export function httpBaseSystemColumnAccountRole(data: Omix) {
+    return request({
         url: `${USER_API}/column`,
         method: 'POST',
-        data: {
-            page: Number(data.page ?? 1),
-            pageSize: Math.min(Number(data.size ?? 50), 100),
-            keyword,
-            roleKeyId: data.roleId
-        }
+        data
     })
-    return {
-        ...response,
-        data: {
-            page: response.data?.page ?? 1,
-            size: response.data?.pageSize ?? 50,
-            total: response.data?.total ?? 0,
-            list: response.data?.items ?? []
-        }
-    }
 }
 
-/**角色关联用户**/
-export async function httpBaseSystemCreateAccountRole(data: Omix): Promise<any> {
-    await Promise.all((data.uids ?? []).map((uid: string) => replaceUserRole(uid, data.keyId, true)))
-    return { code: 200, message: 'success', data: { success: true } } as any
-}
-
-/**删除角色关联用户**/
-export async function httpBaseSystemDeleteAccountRole(data: Omix): Promise<any> {
-    await Promise.all((data.uids ?? []).map((uid: string) => replaceUserRole(uid, data.roleId, false)))
-    return { code: 200, message: 'success', data: { success: true } } as any
+/**更新账号角色关系。*/
+export function httpBaseSystemUpdateAccountRole(data: Omix) {
+    return request({ url: `${USER_API}/update/role`, method: 'POST', data })
 }
 
 /**角色菜单权限列表**/
-export async function httpBaseSystemColumnRoleSheet(data: Omix): Promise<any> {
-    const response = await request({ url: `${ROLE_API}/resolver`, method: 'GET', params: { keyId: data.roleId } })
-    return { ...response, data: { list: response.data?.menuKeyIds ?? [] } }
+export function httpBaseSystemColumnRoleSheet(params: Omix) {
+    return request({ url: `${ROLE_API}/resolver`, method: 'GET', params })
 }
 
 /**更新角色菜单权限**/
@@ -192,7 +51,7 @@ export function httpBaseSystemUpdateRoleSheet(data: Omix) {
     return request({
         url: `${ROLE_API}/update/menu`,
         method: 'POST',
-        data: { keyId: data.roleId, menuKeyIds: data.sheetIds ?? [] }
+        data
     })
 }
 
@@ -201,21 +60,16 @@ export function httpBaseSystemUpdateRoleModel(data: Omix) {
     return request({
         url: `${ROLE_API}/update/data/scope`,
         method: 'POST',
-        data: { keyId: data.roleId, ...dataScopePayload(data) }
+        data
     })
 }
 
 /**删除岗位角色**/
 export function httpBaseSystemDeleteRole(data: Omix) {
-    return request({ url: `${ROLE_API}/delete`, method: 'POST', data: { keyId: data.keyId } })
+    return request({ url: `${ROLE_API}/delete`, method: 'POST', data })
 }
 
-/**批量更新角色排序**/
-export async function httpBaseSystemUpdateRoleSort(data: Omix): Promise<any> {
-    const responses = await Promise.all(
-        (data.list ?? []).map((item: Omix) =>
-            request({ url: `${ROLE_API}/update`, method: 'POST', data: { keyId: item.keyId, sort: item.sort } })
-        )
-    )
-    return responses[0] ?? ({ code: 200, message: 'success', data: { success: true } } as any)
+/**更新单个角色排序。*/
+export function httpBaseSystemUpdateRoleSort(data: Omix) {
+    return request({ url: `${ROLE_API}/update`, method: 'POST', data })
 }

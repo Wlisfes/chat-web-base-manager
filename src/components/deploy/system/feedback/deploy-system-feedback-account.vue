@@ -3,6 +3,7 @@ import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { faker } from '@/utils'
+import { createDeployAccountMemberships, createDeployAccountPayload, mapDeployAccountUser, mapDeployOrganizations } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -18,7 +19,9 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure())
+        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
+            transform: mapDeployOrganizations
+        })
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
@@ -70,9 +73,10 @@ export default defineComponent({
                 }
                 try {
                     return await Service.httpBaseSystemAccountResolver({ uid: props.node.uid }).then(async ({ data }) => {
+                        const account = mapDeployAccountUser(data)
                         const formOptions: Omix = fetchReste({
-                            ...data,
-                            depts: data.depts.map((item: Omix) => item.keyId)
+                            ...account,
+                            depts: (account.depts ?? []).map((item: Omix) => item.keyId)
                         })
                         return await setForm(formOptions).then(async () => {
                             return await setState({ initialize: false })
@@ -94,9 +98,22 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateAccount(formState.value)
+                        await Service.httpBaseSystemCreateAccount({
+                            ...createDeployAccountPayload(formState.value, true),
+                            password: formState.value.password,
+                            memberships: createDeployAccountMemberships(formState.value.depts),
+                            roleKeyIds: formState.value.roleKeyIds ?? []
+                        })
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdateAccount({ ...formState.value, uid: props.node.uid })
+                        const uid = props.node.uid
+                        await Service.httpBaseSystemUpdateAccount({
+                            uid,
+                            ...createDeployAccountPayload(formState.value)
+                        })
+                        await Service.httpBaseSystemUpdateAccountOrganization({
+                            uid,
+                            memberships: createDeployAccountMemberships(formState.value.depts)
+                        })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

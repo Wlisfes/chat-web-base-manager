@@ -2,6 +2,7 @@
 import { defineComponent } from 'vue'
 import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
+import { createDeployAccountQuery, mapDeployAccountUsers, mapDeployOrganizations } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -12,11 +13,13 @@ export default defineComponent({
         const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
         /**部门树结构**/
         const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
-            immediate: true
+            immediate: true,
+            transform: mapDeployOrganizations
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnAccount(payload),
+            request: (base, payload) => Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+            transform: data => mapDeployAccountUsers(data.list),
             keyName: 'chatbok:deploy:system:account',
             formState: {
                 /**名称工号**/
@@ -74,7 +77,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeleteAccount({ uid: node.uid })
+                            await Service.httpBaseSystemDeleteAccount({ uid: node.uid, status: 'disabled' })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -95,7 +98,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemResetPasswordAccount({ uid: node.uid })
+                            await Service.httpBaseSystemResetPasswordAccount({ uid: node.uid, password: '123456' })
                             return await done({ visible: false }).then(async () => {
                                 return await fetchNotifyService({ title: '密码重置成功' })
                             })

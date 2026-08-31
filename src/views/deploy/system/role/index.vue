@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { stop, isEmpty } from '@/utils'
+import { createDeployRoleView, isEmpty, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -17,7 +17,16 @@ export default defineComponent({
         })
         /**角色列表**/
         const { faseNode, faseState, observer, setState, fetchRefresh } = useBaseService({
-            request: Service.httpBaseSystemColumnRole,
+            request: async () => {
+                const [roleResponse, organizationResponse] = await Promise.all([
+                    Service.httpBaseSystemSelectRole(),
+                    Service.httpBaseSystemDepartmentTreeStructure()
+                ])
+                return {
+                    ...roleResponse,
+                    data: createDeployRoleView(roleResponse.data ?? [], organizationResponse.data ?? [])
+                } as any
+            },
             callback: fetchReadyCallback,
             immediate: true,
             options: {
@@ -52,7 +61,7 @@ export default defineComponent({
                     keyId: item.keyId,
                     sort: (index + 1) * 10
                 }))
-                await Service.httpBaseSystemUpdateRoleSort({ list })
+                await Promise.all(list.map((item: Omix) => Service.httpBaseSystemUpdateRoleSort(item)))
                 return await fetchNotifyService({ title: '操作成功' })
             } catch (err) {
                 return await fetchNotifyService({ type: 'error', title: err.message })

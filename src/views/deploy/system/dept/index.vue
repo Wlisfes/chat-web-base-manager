@@ -3,6 +3,7 @@ import { defineComponent, h } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
+import { createDeployOrganizationColumn, mapDeployOrganizations } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -13,11 +14,18 @@ export default defineComponent({
         const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
             immediate: true,
             options: { pattern: undefined, selectedKeys: [], expandedKeys: [] },
-            callback: fetchReadyCallback
+            callback: fetchReadyCallback,
+            transform: mapDeployOrganizations
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnDepartment(payload),
+            request: async (base, payload) => {
+                const response = await Service.httpBaseSystemDepartmentTreeStructure()
+                return {
+                    ...response,
+                    data: createDeployOrganizationColumn(response.data ?? [], { ...payload, page: base.page, size: base.size })
+                } as any
+            },
             keyName: 'chatbok:deploy:system:dept',
             immediate: false,
             formState: {
