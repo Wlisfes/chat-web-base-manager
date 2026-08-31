@@ -64,7 +64,7 @@ export default defineComponent({
         /**分页条数列表**/
         showSizePicker: { type: Boolean, default: true },
         /**分页条数选项**/
-        pageSizes: { type: Array as PropType<Array<number>>, default: () => [20, 30, 50, 100, 200, 300] },
+        pageSizes: { type: Array as PropType<Array<number>>, default: () => [20, 30, 50, 100] },
         /**开启复选框**/
         showSelect: { type: Boolean, default: false },
         /**开启列设置**/

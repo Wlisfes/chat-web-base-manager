@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { createDeployRoleDataScopePayload, createDeployRolePayload, mapDeployOrganizations, mapDeployRole } from '@/utils'
 import { httpBaseSystemDepartmentTreeStructure } from '@/api/modules/deploy/modules/dept.service'
 import * as Service from '@/api/modules/deploy/modules/role.service'
 
@@ -24,7 +25,8 @@ export default defineComponent({
         })
         /**部门树结构（仅部门角色需要）**/
         const deptOptions = useSelectService(() => httpBaseSystemDepartmentTreeStructure(), {
-            immediate: false
+            immediate: false,
+            transform: mapDeployOrganizations
         })
 
         /**表单实例**/
@@ -55,7 +57,7 @@ export default defineComponent({
                 }
                 try {
                     return await Service.httpBaseSystemRoleResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
-                        return await setForm(fetchReste(data)).then(async () => {
+                        return await setForm(fetchReste(mapDeployRole(data))).then(async () => {
                             return await setState({ initialize: false })
                         })
                     })
@@ -74,9 +76,24 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateRole(formState.value)
+                        const response = await Service.httpBaseSystemCreateRole(createDeployRolePayload(formState.value))
+                        if (formState.value.model) {
+                            await Service.httpBaseSystemUpdateRoleModel({
+                                keyId: response.data.keyId,
+                                ...createDeployRoleDataScopePayload(formState.value)
+                            })
+                        }
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdateRole({ ...formState.value, keyId: props.node.keyId })
+                        await Service.httpBaseSystemUpdateRole({
+                            keyId: props.node.keyId,
+                            ...createDeployRolePayload(formState.value)
+                        })
+                        if (formState.value.model) {
+                            await Service.httpBaseSystemUpdateRoleModel({
+                                keyId: props.node.keyId,
+                                ...createDeployRoleDataScopePayload(formState.value)
+                            })
+                        }
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

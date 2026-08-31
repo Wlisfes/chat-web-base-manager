@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
 import { isNotEmpty } from 'class-validator'
+import { createDeployAccountQuery, mapDeployAccountUsers } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -18,7 +19,8 @@ export default defineComponent({
         const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
         /**表格实例**/
         const { state, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnAccount(payload),
+            request: (base, payload) => Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+            transform: data => mapDeployAccountUsers(data.list),
             formState: { depts: [props.node.keyId].filter(isNotEmpty) },
             limit: 0,
             size: 100,

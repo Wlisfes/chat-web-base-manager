@@ -44,7 +44,7 @@ export default defineComponent({
                 Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
             formState: { draftBatchId: undefined },
             immediate: false,
-            size: 200,
+            size: 100,
             transform: data =>
                 data.list.map((item: Omix, index: number) => ({
                     ...item,

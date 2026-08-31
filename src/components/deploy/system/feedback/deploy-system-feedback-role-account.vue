@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { createDeployAccountRoleIds, mapDeployAccountOptions } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -15,8 +16,9 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**账号下拉列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount(), {
-            immediate: false
+        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount({ page: 1, size: 100, status: 'enabled' }), {
+            immediate: false,
+            transform: mapDeployAccountOptions
         })
         /**表单实例**/
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
@@ -41,10 +43,13 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Service.httpBaseSystemCreateAccountRole({
-                        keyId: props.roleId,
-                        uids: formState.value.uids
-                    })
+                    await Promise.all(
+                        formState.value.uids.map(async (uid: string) => {
+                            const detail = await Service.httpBaseSystemAccountResolver({ uid })
+                            const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId, true)
+                            return Service.httpBaseSystemUpdateAccountRole({ uid, roleKeyIds })
+                        })
+                    )
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })

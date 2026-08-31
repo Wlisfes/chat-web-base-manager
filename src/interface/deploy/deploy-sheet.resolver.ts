@@ -55,7 +55,7 @@ export interface SheetKeyRequest extends Omix {
 /**菜单分页查询请求体。*/
 export interface SheetColumnRequest extends Omix {
     page: number
-    pageSize: number
+    size: number
     parentKeyId?: number | null
     name?: string
     permissionCode?: string
@@ -64,10 +64,10 @@ export interface SheetColumnRequest extends Omix {
 
 /**菜单分页查询响应数据。*/
 export interface SheetColumnResponse extends Omix {
-    items: SheetNode[]
+    list: SheetNode[]
     total: number
     page: number
-    pageSize: number
+    size: number
 }
 
 /**菜单删除响应数据。*/

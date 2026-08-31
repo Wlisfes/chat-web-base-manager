@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { createDeployOrganizationPayload, mapDeployAccountOptions, mapDeployOrganization, mapDeployOrganizations } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -18,11 +19,13 @@ export default defineComponent({
     setup(props, { emit }) {
         /**部门树结构**/
         const deptOptions = useSelectService(() => Service.httpBaseSystemDepartmentTreeStructure(), {
-            immediate: false
+            immediate: false,
+            transform: mapDeployOrganizations
         })
         /**负责人账号列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount(), {
-            immediate: false
+        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount({ page: 1, size: 100, status: 'enabled' }), {
+            immediate: false,
+            transform: mapDeployAccountOptions
         })
         const typeOptions = [
             { label: '公司', name: '公司', value: 'company' },
@@ -62,7 +65,7 @@ export default defineComponent({
                 }
                 try {
                     const deptRes = await Service.httpBaseSystemDepartmentResolver({ keyId: props.node.keyId })
-                    return await setForm(fetchReste(deptRes.data)).then(async () => {
+                    return await setForm(fetchReste(mapDeployOrganization(deptRes.data))).then(async () => {
                         return await setState({ initialize: false })
                     })
                 } catch (err) {
@@ -81,11 +84,11 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateDepartment(formState.value)
+                        await Service.httpBaseSystemCreateDepartment(createDeployOrganizationPayload(formState.value))
                     } else if (['UPDATE'].includes(props.command)) {
                         await Service.httpBaseSystemUpdateDepartment({
-                            ...formState.value,
-                            keyId: props.node.keyId
+                            keyId: props.node.keyId,
+                            ...createDeployOrganizationPayload(formState.value)
                         })
                     }
                     return await setState({ visible: false }).then(async () => {

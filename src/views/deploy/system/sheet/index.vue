@@ -23,22 +23,7 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: async (base, payload) => {
-                const { size, ...filters } = payload
-                const response = await Service.httpBaseSystemColumnSheet({
-                    ...filters,
-                    page: base.page,
-                    pageSize: size
-                })
-                return {
-                    ...response,
-                    data: {
-                        ...response.data,
-                        size: response.data?.pageSize,
-                        list: response.data?.items ?? []
-                    }
-                }
-            },
+            request: (base, payload) => Service.httpBaseSystemColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chatbok:deploy:system:sheet',
             immediate: false,
             chunkNames: {
