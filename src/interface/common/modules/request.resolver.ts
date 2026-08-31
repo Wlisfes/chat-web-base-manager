@@ -7,6 +7,7 @@ export interface ResultNotice extends Omix {
 export interface ResultResolver<T> extends ResultNotice {
     data: Omix<T & ResultNotice>
     code: number
+    logId: string
     timestamp: string
     method: string
     url: string
