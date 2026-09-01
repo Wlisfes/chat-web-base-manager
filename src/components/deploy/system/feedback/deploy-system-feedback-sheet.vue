@@ -200,7 +200,7 @@ export default defineComponent({
                                     v-model:value={formState.value.icon}
                                 ></form-common-column-input>
                             </form-common-column>
-                            <form-common-column label="菜单显示状态" path="visible">
+                            <form-common-column label="菜单显示状态">
                                 <form-common-column-select
                                     placeholder="请选择菜单显示状态"
                                     options={chunkOptions.CHUNK_SHEET_CHECK.value}

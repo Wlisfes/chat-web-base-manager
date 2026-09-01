@@ -7,25 +7,21 @@ import { isEmpty } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
-type SheetTreeKey = number
-
 export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单树结构**/
         const sheetOptions = useSelectService(e => Service.httpBaseSystemSheetTreeStructure(), {
-            callback: fetchReadyCallback,
             immediate: true,
             options: {
-                selectedKeys: [] as Array<SheetTreeKey>,
-                expandedKeys: [] as Array<SheetTreeKey>
+                selectedKeys: [] as Array<number>,
+                expandedKeys: [] as Array<number>
             }
         })
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSystemColumnSheet({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chatbok:deploy:system:sheet',
-            immediate: false,
+            keyName: 'chat:deploy:system:sheet',
             chunkNames: {
                 CHUNK_SHEET_STATUS: true,
                 CHUNK_SHEET_CHUNK: true
@@ -37,39 +33,25 @@ export default defineComponent({
                 path: undefined //菜单地址
             },
             columns: [
+                { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
                 { title: '菜单名称', key: 'name', width: 150, disabled: true },
-                { title: '图标', key: 'icon', width: 100, align: 'center', className: 'p-block-0!', check: true },
-                { title: '类型', key: 'type', width: 100, check: true },
-                { title: '权限标识', key: 'permissionCode', minWidth: 200, check: true },
-                { title: '路由地址', key: 'path', minWidth: 200, check: true },
-                { title: '排序号', key: 'sort', width: 100, align: 'center', check: true },
-                { title: '状态', key: 'status', width: 100, align: 'center', check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                { title: '类型', key: 'type', width: 100 },
+                { title: '排序号', key: 'sort', width: 100 },
+                { title: '状态', key: 'status', width: 100 },
+                { title: '权限标识', key: 'permissionCode', minWidth: 200 },
+                { title: '路由地址', key: 'path', minWidth: 200 },
+                { title: '创建时间', key: 'createTime', width: 160 },
+                { title: '更新时间', key: 'modifyTime', width: 160 }
             ]
         })
 
-        /**初始化回调**/
-        async function fetchReadyCallback(data: Omix) {
-            if (sheetOptions.selectedKeys.value.length > 0) {
-                return false
-            }
-            const expandeds = data.dataSource.map((item: Omix) => item.keyId)
-            const selecteds = expandeds.filter((e: Omix, index: number) => [0].includes(index))
-            return await sheetOptions.setState({ selectedKeys: selecteds, expandedKeys: expandeds }).then(async (event: Omix) => {
-                return await setForm({ parentKeyId: selecteds[0] ?? undefined }).then(async () => {
-                    return await instOptions.fetchRequest()
-                })
-            })
-        }
-
         /**左侧树展开变更回调**/
-        async function fetchUpdateExpanded(keys: Array<SheetTreeKey>) {
+        async function fetchUpdateExpanded(keys: Array<number>) {
             return await sheetOptions.setState({ expandedKeys: keys })
         }
 
         /**左侧树选中变更回调**/
-        async function fetchUpdateSelected(keys: Array<SheetTreeKey>) {
+        async function fetchUpdateSelected(keys: Array<number>) {
             return await sheetOptions.setState({ selectedKeys: keys }).then(async () => {
                 return await setForm({ parentKeyId: keys[0] }).then(() => {
                     return fetchRefresh({ page: 1, size: state.size })
@@ -149,7 +131,6 @@ export default defineComponent({
                                 <n-element class="p-inline-14">
                                     <n-tree
                                         block-line
-                                        cancelable={false}
                                         key-field="keyId"
                                         label-field="name"
                                         children-field="children"
