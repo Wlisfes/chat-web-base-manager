@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-09-02：对齐 Account 菜单与部门接口路径
+
+- 影响机器：`chat-home-server`；本次仅提交 `developer`，未合并 `main` 或触发部署。
+- 关联版本：Manager 与 Account 的本次 `developer` 分支提交。
+- 变更内容：管理端菜单 API 统一调用 `/api/account/sheet/**`，部门 API 统一调用 `/api/account/dept/**`，与页面目录及 Account 后端模块命名保持一致。
+- 机器侧操作：发布时与 Account 新版本一起部署；无需新增 Nginx、Nacos 或数据库配置。
+- 验证命令：执行 `vue-tsc --noEmit -p tsconfig.json`、`tsc --noEmit -p tsconfig.node.json` 和 `vite build --config vite.config.ts`；部署后打开菜单管理和部门组织页面验证列表、详情、增删改请求。
+- 回滚方法：恢复上一版 Manager 与 Account 完整 Git SHA，客户端请求路径随旧版本恢复。
+
 ## 2026-08-30 修复本地开发登录验证码 Cookie
 
 - 影响机器：开发机 `chat-home-server`；生产云端页面和 API 配置不变。

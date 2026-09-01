@@ -4,7 +4,7 @@ import * as env from '@/interface/instance.resolver'
 /**新增菜单资源。*/
 export function httpBaseSystemCreateSheetResource(data: env.SheetCreateRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/menu/create',
+        url: '/api/account/sheet/create',
         method: 'POST',
         data
     })
@@ -13,7 +13,7 @@ export function httpBaseSystemCreateSheetResource(data: env.SheetCreateRequest) 
 /**编辑菜单资源。*/
 export function httpBaseSystemUpdateSheetResource(data: env.SheetUpdateRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/menu/update',
+        url: '/api/account/sheet/update',
         method: 'POST',
         data
     })
@@ -22,7 +22,7 @@ export function httpBaseSystemUpdateSheetResource(data: env.SheetUpdateRequest) 
 /**菜单分页列表。*/
 export function httpBaseSystemColumnSheet(data: env.SheetColumnRequest) {
     return request<env.SheetColumnResponse>({
-        url: '/api/account/menu/column',
+        url: '/api/account/sheet/column',
         method: 'POST',
         data
     })
@@ -31,7 +31,7 @@ export function httpBaseSystemColumnSheet(data: env.SheetColumnRequest) {
 /**菜单树结构。*/
 export function httpBaseSystemSheetTreeStructure() {
     return request<Array<env.SheetNode>>({
-        url: '/api/account/menu/tree/structure',
+        url: '/api/account/sheet/tree/structure',
         method: 'GET'
     })
 }
@@ -39,7 +39,7 @@ export function httpBaseSystemSheetTreeStructure() {
 /**菜单或按钮详情。*/
 export function httpBaseSystemSheetResolver(data: env.SheetKeyRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/menu/resolver',
+        url: '/api/account/sheet/resolver',
         method: 'GET',
         params: data
     })
@@ -48,7 +48,7 @@ export function httpBaseSystemSheetResolver(data: env.SheetKeyRequest) {
 /**新增权限按钮。*/
 export function httpBaseSystemCreateSheetAuthorize(data: env.SheetCreateRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/menu/create',
+        url: '/api/account/sheet/create',
         method: 'POST',
         data
     })
@@ -57,7 +57,7 @@ export function httpBaseSystemCreateSheetAuthorize(data: env.SheetCreateRequest)
 /**编辑权限按钮。*/
 export function httpBaseSystemUpdateSheetAuthorize(data: env.SheetUpdateRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/menu/update',
+        url: '/api/account/sheet/update',
         method: 'POST',
         data
     })
@@ -66,7 +66,7 @@ export function httpBaseSystemUpdateSheetAuthorize(data: env.SheetUpdateRequest)
 /**删除菜单或按钮。*/
 export function httpBaseSystemDeleteSheet(data: env.SheetKeyRequest) {
     return request<env.SheetDeleteResponse>({
-        url: '/api/account/menu/delete',
+        url: '/api/account/sheet/delete',
         method: 'POST',
         data
     })
