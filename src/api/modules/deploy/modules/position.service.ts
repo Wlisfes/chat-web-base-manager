@@ -1,62 +1,52 @@
 import { request } from '@/utils'
+import type * as Position from '@/interface/deploy/deploy-position.resolver'
 
 /**新增职位**/
-export function httpBaseSystemCreatePosition(data: Omix) {
-    return request({
-        url: `/api/windows/deploy/position/create`,
+export function httpBaseSystemCreatePosition(data: Position.PositionCreateRequest) {
+    return request<Position.PositionItem>({
+        url: '/api/account/position/create',
         method: 'POST',
         data
     })
 }
 
 /**编辑职位**/
-export function httpBaseSystemUpdatePosition(data: Omix) {
-    return request({
-        url: `/api/windows/deploy/position/update`,
+export function httpBaseSystemUpdatePosition(data: Position.PositionUpdateRequest) {
+    return request<Position.PositionItem>({
+        url: '/api/account/position/update',
         method: 'POST',
         data
     })
 }
 
 /**职位详情**/
-export function httpBaseSystemPositionResolver(data: Omix) {
-    return request({
-        url: `/api/windows/deploy/position/resolver`,
-        method: 'POST',
-        data
+export function httpBaseSystemPositionResolver(params: Position.PositionResolverRequest) {
+    return request<Position.PositionItem>({
+        url: '/api/account/position/resolver',
+        method: 'GET',
+        params
     })
 }
 
 /**职位分页列表查询**/
-export function httpBaseSystemColumnPosition(data: Omix) {
-    return request({
-        url: `/api/windows/deploy/position/column`,
+export function httpBaseSystemColumnPosition(data: Position.PositionColumnRequest) {
+    return request<Position.PositionColumnResponse>({
+        url: '/api/account/position/column',
         method: 'POST',
         data
     })
 }
 
 /**删除职位**/
-export function httpBaseSystemDeletePosition(data: Omix) {
-    return request({
-        url: `/api/windows/deploy/position/delete`,
-        method: 'POST',
-        data
-    })
+export function httpBaseSystemDeletePosition(data: Position.PositionKeyRequest) {
+    return request<Position.PositionDeleteResponse>({ url: '/api/account/position/delete', method: 'POST', data })
 }
 
 /**职位下拉列表**/
-export function httpBaseSystemSelectPosition() {
-    return request({
-        url: `/api/windows/deploy/position/select`,
-        method: 'POST'
-    })
-}
-
-/**职级下拉列表**/
-export function httpBaseSystemSelectRank() {
-    return request({
-        url: `/api/windows/deploy/position/rank/select`,
-        method: 'POST'
+export function httpBaseSystemSelectPosition(params?: Position.PositionSelectRequest) {
+    return request<Position.PositionSelectItem[]>({
+        url: '/api/account/position/select',
+        method: 'GET',
+        ...(params ? { params } : {})
     })
 }

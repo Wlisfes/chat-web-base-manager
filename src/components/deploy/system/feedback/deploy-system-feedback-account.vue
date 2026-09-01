@@ -22,12 +22,17 @@ export default defineComponent({
         const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
             transform: mapDeployOrganizations
         })
+        /**职位选项**/
+        const positionOptions = useSelectService(() => Service.httpBaseSystemSelectPosition(), { immediate: false })
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
             chunkNames: { CHUNK_ACCOUNT_STATUS: true },
             formState: {
                 depts: (props.node.depts ?? []).map((item: Omix) => item.keyId), //归属部门
+                positionKeyIds: (props.node.positions ?? [])
+                    .map((item: Omix) => item.keyId)
+                    .filter((keyId: unknown): keyId is number => typeof keyId === 'number' && Number.isInteger(keyId) && keyId > 0), //职位
                 name: props.node.name, //姓名
                 number: props.node.number, //工号
                 phone: props.node.phone, //手机号
@@ -62,7 +67,7 @@ export default defineComponent({
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [deptOptions.fetchRequest()]
+            const taskNames = [deptOptions.fetchRequest(), positionOptions.fetchRequest()]
             return await Promise.all(taskNames).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await fetchInstState().then(async formData => {
@@ -156,6 +161,18 @@ export default defineComponent({
                             v-model:value={formState.value.depts}
                             options={deptOptions.dataSource.value}
                         ></form-common-column-cascader>
+                    </form-common-column>
+                    <form-common-column label="职位" path="positionKeyIds">
+                        <form-common-column-select
+                            multiple
+                            filterable
+                            clearable
+                            placeholder="请选择职位"
+                            loading={positionOptions.loading.value}
+                            options={positionOptions.dataSource.value}
+                            label-value="keyId"
+                            v-model:value={formState.value.positionKeyIds}
+                        ></form-common-column-select>
                     </form-common-column>
                     <form-common-column label="姓名" path="name">
                         <form-common-column-input

@@ -9,19 +9,18 @@ export default defineComponent({
     name: 'DeploySystemPosition',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnPosition(payload),
-            keyName: 'chatbok:deploy:system:position',
+        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+            request: (base, payload) => Service.httpBaseSystemColumnPosition({ ...payload, page: base.page, size: base.size }),
+            keyName: 'chat:deploy:system:position',
             formState: {
-                name: undefined //职位名称
+                /**职位名称**/
+                name: undefined
             },
             columns: [
                 { title: '职位名称', key: 'name', minWidth: 200, disabled: true },
                 { title: '排序号', key: 'sort', width: 100, check: true },
                 { title: '关联账号', key: 'accountCount', align: 'center', width: 100, check: true },
-                { title: '创建人', key: 'createBy', width: 120, check: true },
                 { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新人', key: 'modifyBy', width: 120, check: true },
                 { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
         })
@@ -128,14 +127,6 @@ export default defineComponent({
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
-                    {{
-                        col_createBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.createByOptions}></common-database-table-user>
-                        ),
-                        col_modifyBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
-                        )
-                    }}
                 </common-database-table>
             </layout-common-container>
         )

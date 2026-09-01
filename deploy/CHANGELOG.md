@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-09-02：完善职位管理页面与账号职位选择
+
+- 影响机器：云服务器 `47.119.21.228`。
+- 关联版本：Manager 本次完整 Git SHA 镜像；依赖 Account 职位接口已完成部署。
+- 变更内容：职位管理页面改用 Account `/api/account/position/**` 接口，分页统一传递 `page`、`size`，支持职位新增、编辑、删除、详情和下拉；账号表单增加职位多选并提交 `positionKeyIds`；移除后端未提供的创建人/更新人列。
+- 机器侧操作：待 Account 健康并完成职位菜单权限修复后，再部署 Manager 到 `/opt/chat-web-cloud`；无需新增 Nginx、Nacos 或数据库配置。
+- 验证命令：执行 `vue-tsc --noEmit -p tsconfig.json`、`tsc --noEmit -p tsconfig.node.json` 和 `vite build --config vite.config.ts`；部署后打开 `/deploy/system/position` 和 `/deploy/system/user`，验证职位列表、新增/编辑/删除及账号职位多选回填。
+- 回滚方法：恢复上一版 Manager 完整镜像；Account 职位表和数据无需回滚，旧页面继续使用原有账号字段。
+
 ## 2026-09-02：对齐 Account 菜单与部门接口路径
 
 - 影响机器：`chat-home-server`；本次仅提交 `developer`，未合并 `main` 或触发部署。

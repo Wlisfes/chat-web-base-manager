@@ -4,6 +4,8 @@ Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到�
 
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。CRM 页面使用 `/crm/consumer`、`/crm/partner`、`/crm/sms/quote/create` 和 `/crm/sms/quote` 路由。
 
+系统职位页面位于 `/deploy/system/position`，通过 Account `/api/account/position/**` 管理职位；账号表单使用职位多选并提交 `positionKeyIds` 数组。Account 职位接口部署并健康后再发布 Manager。
+
 ```bash
 yarn install
 yarn dev

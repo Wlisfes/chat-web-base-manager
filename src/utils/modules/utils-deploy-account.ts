@@ -8,7 +8,7 @@ export function mapDeployAccountUser(user: Omix): Omix {
             user.positions ??
             organizations
                 .filter((item: Omix) => item.positionName)
-                .map((item: Omix) => ({ keyId: item.keyId, name: item.positionName })),
+                .map((item: Omix) => ({ name: item.positionName })),
         ranks: user.ranks ?? [],
         roles: user.roles ?? []
     }
@@ -50,6 +50,7 @@ export function createDeployAccountPayload(data: Omix, creating = false): Omix {
         name: data.name,
         avatar: data.avatar || undefined,
         status: data.status ?? 'enabled',
+        positionKeyIds: data.positionKeyIds ?? [],
         ...(creating ? { employmentStatus: data.employmentStatus ?? 'employed' } : {}),
         ...(creating ? { employmentTime: data.employmentTime ?? new Date().toISOString() } : {}),
         resignationTime: data.resignationTime || undefined

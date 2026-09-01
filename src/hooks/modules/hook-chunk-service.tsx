@@ -50,7 +50,6 @@ export function useChunkService<T extends ChunkName[]>(options: ChunkServiceOpti
             try {
                 const { data } = await Service.httpBaseChunkSelect({ type: (state as ChunkBaseState<T>).type })
 
-                console.log('data', data)
                 const s = options.transform ? (options.transform(cloneDeep(data.data)) ?? {}) : data
                 return await (setState as Function)({ ...s, loading: false, initialize: false }).then(async () => {
                     return options.callback?.(state)
