@@ -18,10 +18,10 @@ export default [
         component: () => import('@/views/deploy/system/role/index.vue')
     },
     {
-        path: '/deploy/system/account',
-        name: 'DeploySystemAccount',
-        meta: { title: '账号管理', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/deploy/system/account/index.vue')
+        path: '/deploy/system/user',
+        name: 'DeploySystemUser',
+        meta: { title: '用户管理', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/system/user/index.vue')
     },
     {
         path: '/deploy/system/dept',

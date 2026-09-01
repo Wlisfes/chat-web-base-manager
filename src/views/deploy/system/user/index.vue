@@ -7,7 +7,7 @@ import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'DeploySystemAccount',
+    name: 'DeploySystemUser',
     setup(props, ctx) {
         /**通用字典枚举**/
         const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
@@ -18,9 +18,10 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+            request: (base, payload) =>
+                Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
             transform: data => mapDeployAccountUsers(data.list),
-            keyName: 'chatbok:deploy:system:account',
+            keyName: 'chat:deploy:system:user',
             formState: {
                 /**名称工号**/
                 name: undefined,
