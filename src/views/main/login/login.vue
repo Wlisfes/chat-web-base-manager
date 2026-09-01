@@ -17,7 +17,7 @@ export default defineComponent({
                 code: ''
             },
             rules: {
-                number: { required: true, trigger: 'blur', message: '请输入登录账号' },
+                number: { required: true, trigger: 'blur', message: '请输入工号/手机号或邮箱' },
                 password: { required: true, trigger: 'blur', max: 128, message: '请输入登录密码' },
                 code: { required: true, trigger: 'blur', len: 4, message: '请输入4位验证码' }
             }
@@ -67,7 +67,7 @@ export default defineComponent({
                             <form-common-column-input
                                 maxlength={128}
                                 type="text"
-                                placeholder="请输入登录账号"
+                                placeholder="请输入工号、手机号或邮箱"
                                 v-model:value={formState.value.number}
                                 input-props={{ autocomplete: 'on' }}
                                 onSubmit={fetchSubmit}

@@ -54,7 +54,7 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
         return await Service.httpAuthAccountToken({
             code: formState.code,
             account: formState.number,
-            password: formState.password
+            password: window.btoa(encodeURIComponent(formState.password))
         })
     }
 
