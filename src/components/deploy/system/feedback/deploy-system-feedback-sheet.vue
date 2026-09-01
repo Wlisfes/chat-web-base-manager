@@ -29,19 +29,32 @@ export default defineComponent({
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemSheetResolver,
             formState: {
-                type: props.node.type ?? 'menu', //后端菜单类型
-                permissionCode: props.node.permissionCode, //权限标识
-                name: props.node.name, //名称
-                path: props.node.path, //菜单地址
-                routeName: props.node.routeName, //前端路由名称
-                component: props.node.component, //前端组件标识
-                externalUrl: props.node.externalUrl, //外部链接地址
-                sort: props.node.sort ?? 10, //排序号
-                status: props.node.status ?? 'enabled', //状态
-                visible: props.node.visible ?? true, //菜单显示状态
-                keepAlive: props.node.keepAlive ?? false, //页面缓存
-                icon: props.node.icon, //菜单图标
-                parentKeyId: props.node.parentKeyId //父级菜单
+                /**后端菜单类型**/
+                type: props.node.type ?? 'menu',
+                /**权限标识**/
+                permissionCode: props.node.permissionCode,
+                /**名称**/
+                name: props.node.name,
+                /**菜单地址**/
+                path: props.node.path,
+                /**前端路由名称**/
+                routeName: props.node.routeName,
+                /**前端组件标识**/
+                component: props.node.component,
+                /**外部链接地址**/
+                externalUrl: props.node.externalUrl,
+                /**排序号**/
+                sort: props.node.sort ?? 10,
+                /**状态**/
+                status: props.node.status ?? 'enabled',
+                /**菜单显示状态**/
+                visible: props.node.visible ?? true,
+                /**页面缓存**/
+                keepAlive: props.node.keepAlive ?? false,
+                /**菜单图标**/
+                icon: props.node.icon,
+                /**父级菜单**/
+                parentKeyId: props.node.parentKeyId
             },
             rules: {
                 type: { required: true, trigger: 'blur', message: '请选择类型' },

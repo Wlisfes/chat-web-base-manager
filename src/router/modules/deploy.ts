@@ -2,7 +2,7 @@ export default [
     {
         path: '/deploy/datetask/system',
         name: 'DeployDatetaskSystem',
-        meta: { title: '定时任务管理', AUTH: 'AUTH', keepAlive: true },
+        meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/deploy/datetask/system/index.vue')
     },
     {
