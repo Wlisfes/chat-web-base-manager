@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
@@ -36,6 +36,12 @@ export default defineComponent({
                 { title: '创建时间', key: 'createTime', width: 160, check: true },
                 { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
+        })
+
+        /**已完成任务不可再修改或触发。*/
+        const isFinishedSelected = computed(() => {
+            const node = state.select.length === 1 ? (state.select[0] as Datetask.DatetaskItem) : undefined
+            return node?.status === 'finish'
         })
 
         /**启用/停用任务**/
@@ -127,15 +133,25 @@ export default defineComponent({
                         <common-element-button
                             dashed
                             type="warning"
-                            disabled={instState.value.isUpdate}
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskStatusToggle}
                         >
                             启用/停用
                         </common-element-button>
-                        <common-element-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDatetaskCronUpdate}>
+                        <common-element-button
+                            dashed
+                            type="primary"
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
+                            onClick={fetchDatetaskCronUpdate}
+                        >
                             修改Cron
                         </common-element-button>
-                        <common-element-button dashed type="info" disabled={instState.value.isUpdate} onClick={fetchDatetaskTrigger}>
+                        <common-element-button
+                            dashed
+                            type="info"
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
+                            onClick={fetchDatetaskTrigger}
+                        >
                             手动触发
                         </common-element-button>
                         <common-element-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
