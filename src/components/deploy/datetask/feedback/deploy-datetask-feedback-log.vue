@@ -2,6 +2,18 @@
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
 import * as Service from '@/api/instance.service'
+import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
+
+/** 将任务结果压缩成可读的单行 JSON，避免表格把对象隐式显示为 [object Object]。 */
+function formatDatetaskResult(value: unknown): string {
+    if (value === undefined || value === null || value === '') return '-'
+    if (typeof value === 'string') return value
+    try {
+        return JSON.stringify(value) ?? '-'
+    } catch {
+        return '-'
+    }
+}
 
 export default defineComponent({
     name: 'DeployDatetaskFeedbackLog',
@@ -30,7 +42,7 @@ export default defineComponent({
                 { title: '耗时(ms)', key: 'duration', width: 100, check: true },
                 { title: '开始时间', key: 'startTime', width: 160, check: true },
                 { title: '结束时间', key: 'endTime', width: 160, check: true },
-                { title: '结果/错误', key: 'result', minWidth: 200, check: true, ellipsis: { tooltip: true } }
+                { title: '结果/错误', key: 'result', minWidth: 200, check: true }
             ]
         })
 
@@ -62,12 +74,18 @@ export default defineComponent({
                         on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                     >
                         {{
-                            col_status: (data: Omix) => (
+                            col_status: (data: Datetask.DatetaskLogItem) => (
                                 <common-database-table-chunk
                                     element="chunk"
                                     value={data.status}
                                     options={chunkState.CHUNK_DATETASK_LOG_STATUS}
                                 ></common-database-table-chunk>
+                            ),
+                            col_result: (data: Datetask.DatetaskLogItem) => (
+                                <common-database-table-content
+                                    element="performant-ellipsis"
+                                    value={formatDatetaskResult(data.result)}
+                                ></common-database-table-content>
                             )
                         }}
                     </common-database-table>

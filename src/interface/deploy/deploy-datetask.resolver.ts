@@ -84,6 +84,8 @@ export interface DatetaskExecutionResult {
 
 /**系统任务执行日志项。*/
 export interface DatetaskLogItem {
+    /**执行记录唯一标识，用于表格行标识。*/
+    keyId: string
     taskId: string
     status: DatetaskLogStatus
     duration: number

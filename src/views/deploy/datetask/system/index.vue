@@ -17,7 +17,7 @@ export default defineComponent({
                     page: base.page,
                     size: base.size
                 }),
-            keyName: 'chatbok:deploy:datetask:system',
+            keyName: 'chat:deploy:datetask:system',
             chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
             formState: {
                 taskName: undefined,
@@ -39,15 +39,14 @@ export default defineComponent({
         })
 
         /**已完成任务不可再修改或触发。*/
-        const isFinishedSelected = computed(() => {
-            const node = state.select.length === 1 ? (state.select[0] as Datetask.DatetaskItem) : undefined
-            return node?.status === 'finish'
-        })
+        const isFinishedSelected = computed(() =>
+            (state.select as Array<Datetask.DatetaskItem>).some(node => node.status === 'finish')
+        )
 
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle() {
             const node = state.select[0] as Datetask.DatetaskItem
-            const nextStatus = node.status === 'running' ? 'stop' : 'running'
+            const nextStatus: Datetask.DatetaskManageStatus = ['running', 'wait'].includes(node.status) ? 'stop' : 'running'
             const nextLabel = nextStatus === 'running' ? '启用' : '停用'
             return await fetchDialogService({
                 title: '提示',
