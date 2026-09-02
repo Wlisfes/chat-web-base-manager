@@ -4,6 +4,9 @@ export type DatetaskType = 'system' | 'cron' | 'manual'
 /**系统任务状态。*/
 export type DatetaskStatus = 'stop' | 'wait' | 'running' | 'finish'
 
+/**系统任务可通过管理接口切换的状态。*/
+export type DatetaskManageStatus = Extract<DatetaskStatus, 'stop' | 'running'>
+
 /**系统任务执行日志状态。*/
 export type DatetaskLogStatus = 'running' | 'success' | 'failed'
 
@@ -14,15 +17,15 @@ export interface DatetaskItem {
     taskId: string
     taskName: string
     handler: string
-    comment?: string | null
-    cron?: string | null
+    comment: string | null
+    cron: string | null
     type: DatetaskType
     status: DatetaskStatus
-    body?: Record<string, unknown> | null
-    lastTime?: string | Date | null
-    nextTime?: string | Date | null
-    createTime?: string | Date | null
-    modifyTime?: string | Date | null
+    body: Record<string, unknown> | null
+    lastTime: string | null
+    nextTime: string | null
+    createTime: string
+    modifyTime: string
 }
 
 /**系统任务分页查询请求体。*/
@@ -48,7 +51,7 @@ export interface DatetaskKeyRequest {
 
 /**系统任务状态更新请求体。*/
 export interface DatetaskStatusRequest extends DatetaskKeyRequest {
-    status: DatetaskStatus
+    status: DatetaskManageStatus
 }
 
 /**系统任务 Cron 更新请求体。*/
@@ -59,7 +62,24 @@ export interface DatetaskCronRequest extends DatetaskKeyRequest {
 /**系统任务触发响应数据。*/
 export interface DatetaskTriggerResponse {
     success: boolean
-    result?: unknown
+    result?: DatetaskExecutionResult
+}
+
+/**汇率同步结果明细。*/
+export interface DatetaskExchangeRateItem {
+    currency: string
+    rate: number
+    date: string
+}
+
+/**任务执行结果；同时覆盖汇率同步成功结果和跳过/错误结果。*/
+export interface DatetaskExecutionResult {
+    date?: string
+    count?: number
+    list?: DatetaskExchangeRateItem[]
+    skipped?: boolean
+    reason?: string
+    message?: string
 }
 
 /**系统任务执行日志项。*/
@@ -69,7 +89,7 @@ export interface DatetaskLogItem {
     duration: number
     startTime: string
     endTime?: string | null
-    result?: unknown
+    result?: DatetaskExecutionResult
 }
 
 /**系统任务执行日志分页请求体。*/

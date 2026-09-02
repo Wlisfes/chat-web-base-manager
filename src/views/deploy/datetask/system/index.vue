@@ -82,9 +82,14 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            const response = await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            await fetchRefresh()
                             await done({ visible: false })
-                            return await fetchNotifyService({ title: '任务已触发' })
+                            const result = response.data?.result
+                            if (result?.skipped) {
+                                return await fetchNotifyService({ type: 'warning', title: '任务未执行', message: result.reason ?? '任务被跳过' })
+                            }
+                            return await fetchNotifyService({ title: '任务执行成功' })
                         } catch (err) {
                             await done({ loading: false })
                             return await fetchNotifyService({ type: 'error', title: err.message })
