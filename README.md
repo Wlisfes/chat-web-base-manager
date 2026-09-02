@@ -6,6 +6,8 @@ Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到�
 
 系统职位页面位于 `/deploy/system/position`，通过 Account `/api/account/position/**` 管理职位；账号表单使用职位多选并提交 `positionKeyIds` 数组。Account 职位接口部署并健康后再发布 Manager。
 
+系统任务页面位于 `/deploy/datetask/system`，通过 Skyline `/api/skyline/deploy/datetask/**` 查询初始化任务、切换任务状态、修改 Cron、手动触发任务和查看执行日志；系统任务不支持在页面新增或删除。
+
 ```bash
 yarn install
 yarn dev

@@ -4,13 +4,19 @@ import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
+import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 
 export default defineComponent({
     name: 'DeployDatetaskSystem',
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnDatetask(payload),
+            request: (base, payload) =>
+                Service.httpBaseSystemColumnDatetask({
+                    ...payload,
+                    page: base.page,
+                    size: base.size
+                }),
             keyName: 'chatbok:deploy:datetask:system',
             chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
             formState: {
@@ -26,13 +32,15 @@ export default defineComponent({
                 { title: '任务类型', key: 'type', width: 120, check: true },
                 { title: '任务状态', key: 'status', width: 120, check: true },
                 { title: '上次执行', key: 'lastTime', width: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true }
+                { title: '下次执行', key: 'nextTime', width: 160, check: true },
+                { title: '创建时间', key: 'createTime', width: 160, check: true },
+                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
         })
 
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             const nextStatus = node.status === 'running' ? 'stop' : 'running'
             const nextLabel = nextStatus === 'running' ? '启用' : '停用'
             return await fetchDialogService({
@@ -56,7 +64,7 @@ export default defineComponent({
 
         /**修改Cron表达式**/
         async function fetchDatetaskCronUpdate() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDeployDatetaskCron({
                 title: '修改Cron表达式',
                 node,
@@ -66,7 +74,7 @@ export default defineComponent({
 
         /**手动触发任务**/
         async function fetchDatetaskTrigger() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -88,7 +96,7 @@ export default defineComponent({
 
         /**查看执行日志**/
         async function fetchDatetaskLog() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDeployDatetaskLog({
                 title: `执行日志 - ${node.taskName}`,
                 node
@@ -163,14 +171,14 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_type: (data: Omix) => (
+                        col_type: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.type}
                                 options={chunkState.CHUNK_DATETASK_TYPE}
                             ></common-database-table-chunk>
                         ),
-                        col_status: (data: Omix) => (
+                        col_status: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}

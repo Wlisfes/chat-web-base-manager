@@ -14,7 +14,13 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { state, chunkState, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnDatetaskLog({ ...payload, taskId: props.node.taskId }),
+            request: (base, payload) =>
+                Service.httpBaseSystemColumnDatetaskLog({
+                    ...payload,
+                    taskId: props.node.taskId,
+                    page: base.page,
+                    size: base.size
+                }),
             chunkNames: { CHUNK_DATETASK_LOG_STATUS: true },
             formState: {},
             limit: 0,
