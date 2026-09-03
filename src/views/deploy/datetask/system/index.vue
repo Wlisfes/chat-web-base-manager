@@ -1,17 +1,23 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
+import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 
 export default defineComponent({
     name: 'DeployDatetaskSystem',
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnDatetask(payload),
-            keyName: 'chatbok:deploy:datetask:system',
+            request: (base, payload) =>
+                Service.httpBaseSystemColumnDatetask({
+                    ...payload,
+                    page: base.page,
+                    size: base.size
+                }),
+            keyName: 'chat:deploy:datetask:system',
             chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
             formState: {
                 taskName: undefined,
@@ -26,14 +32,21 @@ export default defineComponent({
                 { title: '任务类型', key: 'type', width: 120, check: true },
                 { title: '任务状态', key: 'status', width: 120, check: true },
                 { title: '上次执行', key: 'lastTime', width: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true }
+                { title: '下次执行', key: 'nextTime', width: 160, check: true },
+                { title: '创建时间', key: 'createTime', width: 160, check: true },
+                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
         })
 
+        /**已完成任务不可再修改或触发。*/
+        const isFinishedSelected = computed(() =>
+            (state.select as Array<Datetask.DatetaskItem>).some(node => node.status === 'finish')
+        )
+
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle() {
-            const node = state.select[0]
-            const nextStatus = node.status === 'running' ? 'stop' : 'running'
+            const node = state.select[0] as Datetask.DatetaskItem
+            const nextStatus: Datetask.DatetaskManageStatus = ['running', 'wait'].includes(node.status) ? 'stop' : 'running'
             const nextLabel = nextStatus === 'running' ? '启用' : '停用'
             return await fetchDialogService({
                 title: '提示',
@@ -56,7 +69,7 @@ export default defineComponent({
 
         /**修改Cron表达式**/
         async function fetchDatetaskCronUpdate() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDeployDatetaskCron({
                 title: '修改Cron表达式',
                 node,
@@ -66,7 +79,7 @@ export default defineComponent({
 
         /**手动触发任务**/
         async function fetchDatetaskTrigger() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -74,9 +87,14 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            const response = await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            await fetchRefresh()
                             await done({ visible: false })
-                            return await fetchNotifyService({ title: '任务已触发' })
+                            const result = response.data?.result
+                            if (result?.skipped) {
+                                return await fetchNotifyService({ type: 'warning', title: '任务未执行', message: result.reason ?? '任务被跳过' })
+                            }
+                            return await fetchNotifyService({ title: '任务执行成功' })
                         } catch (err) {
                             await done({ loading: false })
                             return await fetchNotifyService({ type: 'error', title: err.message })
@@ -88,7 +106,7 @@ export default defineComponent({
 
         /**查看执行日志**/
         async function fetchDatetaskLog() {
-            const node = state.select[0]
+            const node = state.select[0] as Datetask.DatetaskItem
             return await fetchDeployDatetaskLog({
                 title: `执行日志 - ${node.taskName}`,
                 node
@@ -114,15 +132,25 @@ export default defineComponent({
                         <common-element-button
                             dashed
                             type="warning"
-                            disabled={instState.value.isUpdate}
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskStatusToggle}
                         >
                             启用/停用
                         </common-element-button>
-                        <common-element-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDatetaskCronUpdate}>
+                        <common-element-button
+                            dashed
+                            type="primary"
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
+                            onClick={fetchDatetaskCronUpdate}
+                        >
                             修改Cron
                         </common-element-button>
-                        <common-element-button dashed type="info" disabled={instState.value.isUpdate} onClick={fetchDatetaskTrigger}>
+                        <common-element-button
+                            dashed
+                            type="info"
+                            disabled={instState.value.isUpdate || isFinishedSelected.value}
+                            onClick={fetchDatetaskTrigger}
+                        >
                             手动触发
                         </common-element-button>
                         <common-element-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
@@ -163,14 +191,14 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_type: (data: Omix) => (
+                        col_type: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.type}
                                 options={chunkState.CHUNK_DATETASK_TYPE}
                             ></common-database-table-chunk>
                         ),
-                        col_status: (data: Omix) => (
+                        col_status: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}

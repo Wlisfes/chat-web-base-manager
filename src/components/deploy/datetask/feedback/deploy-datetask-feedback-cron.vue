@@ -70,7 +70,7 @@ export default defineComponent({
                     </form-common-column>
                     <form-common-column label="Cron表达式" path="cron">
                         <form-common-column-input
-                            maxlength={64}
+                            maxlength={32}
                             placeholder="请输入Cron表达式，例如：0 0 8 * * *"
                             v-model:value={formState.value.cron}
                         ></form-common-column-input>
