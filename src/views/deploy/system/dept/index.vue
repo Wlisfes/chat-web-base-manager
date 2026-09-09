@@ -1,9 +1,9 @@
 <script lang="tsx">
-import { defineComponent, h } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
-import { createDeployOrganizationColumn, mapDeployOrganizations } from '@/utils'
+import { createDeployOrganizationColumn, mapDeployOrganizations, normalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -17,6 +17,8 @@ export default defineComponent({
             callback: fetchReadyCallback,
             transform: mapDeployOrganizations
         })
+        /**部门树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
+        const departmentTreeData = computed(() => normalizeTreeChildren(deptOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: async (base, payload) => {
@@ -146,7 +148,7 @@ export default defineComponent({
                                         pattern={deptOptions.state.pattern}
                                         selected-keys={deptOptions.state.selectedKeys}
                                         expanded-keys={deptOptions.state.expandedKeys}
-                                        data={deptOptions.dataSource.value}
+                                        data={departmentTreeData.value}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}

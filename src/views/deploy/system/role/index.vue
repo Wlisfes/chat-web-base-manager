@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, h } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { createDeployRoleView, isEmpty, stop } from '@/utils'
+import { createDeployRoleView, isEmpty, normalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -35,6 +35,8 @@ export default defineComponent({
                 expandedKeys: [] as Array<number>
             }
         })
+        /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
+        const departmentRoleTreeData = computed(() => normalizeTreeChildren(faseNode.value.dept ?? []))
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
             if ((data.list ?? []).length === 0 || faseState.selectedKeys.length > 0) {
@@ -187,7 +189,7 @@ export default defineComponent({
                                         children-field="children"
                                         selected-keys={faseState.selectedKeys}
                                         expanded-keys={faseState.expandedKeys}
-                                        data={faseNode.value.dept ?? []}
+                                        data={departmentRoleTreeData.value}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}
