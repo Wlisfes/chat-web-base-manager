@@ -50,6 +50,11 @@ export default defineComponent({
             return await sheetOptions.setState({ expandedKeys: keys })
         }
 
+        /**仅为存在下级菜单的节点返回子节点。*/
+        function fetchTreeChildren(node: Omix) {
+            return node.children?.length > 0 ? node.children : undefined
+        }
+
         /**左侧树选中变更回调**/
         async function fetchUpdateSelected(keys: Array<number>) {
             return await sheetOptions.setState({ selectedKeys: keys }).then(async () => {
@@ -138,6 +143,7 @@ export default defineComponent({
                                         selected-keys={sheetOptions.state.selectedKeys}
                                         expanded-keys={sheetOptions.state.expandedKeys}
                                         data={sheetOptions.dataSource.value}
+                                        get-children={fetchTreeChildren}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}
