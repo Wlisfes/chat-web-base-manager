@@ -1,9 +1,9 @@
 <script lang="tsx">
-import { defineComponent, h } from 'vue'
+import { computed, defineComponent, h } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
-import { isEmpty } from '@/utils'
+import { isEmpty, normalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -18,6 +18,7 @@ export default defineComponent({
                 expandedKeys: [] as Array<number>
             }
         })
+        const sheetTreeData = computed(() => normalizeTreeChildren(sheetOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSystemColumnSheet({ ...payload, page: base.page, size: base.size }),
@@ -48,11 +49,6 @@ export default defineComponent({
         /**左侧树展开变更回调**/
         async function fetchUpdateExpanded(keys: Array<number>) {
             return await sheetOptions.setState({ expandedKeys: keys })
-        }
-
-        /**仅为存在下级菜单的节点返回子节点。*/
-        function fetchTreeChildren(node: Omix) {
-            return node.children?.length > 0 ? node.children : undefined
         }
 
         /**左侧树选中变更回调**/
@@ -142,8 +138,7 @@ export default defineComponent({
                                         pattern={sheetOptions.state.pattern}
                                         selected-keys={sheetOptions.state.selectedKeys}
                                         expanded-keys={sheetOptions.state.expandedKeys}
-                                        data={sheetOptions.dataSource.value}
-                                        get-children={fetchTreeChildren}
+                                        data={sheetTreeData.value}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}
