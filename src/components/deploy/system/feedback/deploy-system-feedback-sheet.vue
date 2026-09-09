@@ -180,7 +180,7 @@ export default defineComponent({
                             v-model:value={formState.value.name}
                         ></form-common-column-input>
                     </form-common-column>
-                    {['menu'].includes(formState.value.type) && (
+                    {['menu', 'directory'].includes(formState.value.type) && (
                         <Fragment>
                             <form-common-column
                                 label="菜单地址"

@@ -23,6 +23,7 @@ export default defineComponent({
 
         return () => (
             <n-menu
+                class="layout-common-sider"
                 style={{ '--n-item-height': '36px' }}
                 label-field="name"
                 key-field="router"
@@ -38,3 +39,11 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.layout-common-sider.n-menu {
+    > :deep(.n-menu-item):first-child {
+        margin-top: 0;
+    }
+}
+</style>

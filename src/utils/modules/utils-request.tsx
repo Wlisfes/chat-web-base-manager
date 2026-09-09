@@ -15,7 +15,7 @@ export const request: AxiosRequest = axios.create({
 /**自定义错误处理**/
 async function fetchInizeNotice(response: AxiosResponse) {
     const data = response.data
-    const isLoginRequest = response.config.url?.includes('/api/account/auth/token/login')
+    const isLoginRequest = response.config.url?.includes('/api/auth/token/login')
     if (data.code === 401 && !isLoginRequest) {
         await fetchDestroy()
         window.location.replace('/login')
@@ -48,7 +48,7 @@ function fetchAuthAccountTokenContinue(): Promise<string> {
                 /**需要续时且当前无续时任务**/
                 isRefreshing = true
                 try {
-                    const { data } = await axios.post(`${API_BASE_URL}/api/account/auth/token/continue`, null, {
+                    const { data } = await axios.post(`${API_BASE_URL}/api/auth/token/continue`, null, {
                         withCredentials: true,
                         headers: {
                             Authorization: `Bearer ${token}`
