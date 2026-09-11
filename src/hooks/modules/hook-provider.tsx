@@ -41,7 +41,7 @@ export function useProvider() {
             primaryColorPressed: lightenStr.value,
             primaryColorSuppl: primaryColor.value,
             heightMedium: '32px',
-            CommonBodyBgColor: '#fafafa'
+            CommonBodyBgColor: '#f5f5f5'
         },
         Scrollbar: { width: '6px', height: '6px' },
         Tree: { nodeHeight: '36px' }
