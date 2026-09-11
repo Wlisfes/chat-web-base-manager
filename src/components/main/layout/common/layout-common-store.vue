@@ -37,8 +37,8 @@ export default defineComponent({
         }
 
         return () => (
-            <n-layout-header class="layout-common-store flex gap-10 overflow-hidden p-inline-12 p-be-8">
-                <div ref={element} class="flex-1 whitespace-nowrap overflow-hidden relative  cursor-pointer">
+            <n-layout-header class="layout-common-store flex gap-10 p-ie-12 p-be-8 overflow-hidden">
+                <div ref={element} class="flex-1 whitespace-nowrap relative cursor-pointer overflow-hidden">
                     <div class="inline-flex gap-10 element-bscrollbar">
                         {tabOptions.value.map(item => (
                             <div key={item.fullPath} class="select-none inline-flex element-block">

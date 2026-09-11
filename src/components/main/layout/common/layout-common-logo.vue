@@ -8,8 +8,8 @@ export default defineComponent({
         const { collapsed } = useStore(useConfiger)
 
         return () => (
-            <router-link to="/manager" class={{ 'layout-common-logo p-inline-16': true, 'p-inline-11!': collapsed.value }}>
-                <div class="h-full flex gap-8 items-center overflow-hidden transform-gpu">
+            <router-link to="/manager" class="layout-common-logo">
+                <div class="h-full flex gap-8 items-center transform-gpu overflow-hidden">
                     <common-element-icon size={36} color="var(--primary-color)" name="nest-logo"></common-element-icon>
                     <common-element-icon size={30} color="var(--primary-color)" name="nest-logo-name"></common-element-icon>
                 </div>
