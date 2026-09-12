@@ -20,7 +20,7 @@ export function httpAuthAccountTokenContinue() {
 /**登录账户信息**/
 export function httpAuthAccountTokenResolver() {
     return request({
-        url: `/api/auth/token/resolver`,
+        url: `/api/auth/token/resolve`,
         method: 'GET'
     })
 }
@@ -28,7 +28,7 @@ export function httpAuthAccountTokenResolver() {
 /**登录账户菜单和按钮权限**/
 export function httpAuthAccountPermissions() {
     return request({
-        url: `/api/account/permission/resolver`,
+        url: `/api/account/permission/resolve`,
         method: 'GET'
     })
 }

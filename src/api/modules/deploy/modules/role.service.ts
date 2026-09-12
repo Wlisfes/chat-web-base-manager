@@ -19,7 +19,7 @@ export function httpBaseSystemUpdateRole(data: Omix) {
 
 /**角色详情**/
 export function httpBaseSystemRoleResolver(params: Omix) {
-    return request({ url: `${ROLE_API}/resolver`, method: 'GET', params })
+    return request({ url: `${ROLE_API}/resolve`, method: 'GET', params })
 }
 
 /**角色列表查询**/
@@ -43,7 +43,7 @@ export function httpBaseSystemUpdateAccountRole(data: Omix) {
 
 /**角色菜单权限列表**/
 export function httpBaseSystemColumnRoleSheet(params: Omix) {
-    return request({ url: `${ROLE_API}/resolver`, method: 'GET', params })
+    return request({ url: `${ROLE_API}/resolve`, method: 'GET', params })
 }
 
 /**更新角色菜单权限**/

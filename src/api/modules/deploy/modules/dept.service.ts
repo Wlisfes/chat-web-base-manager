@@ -16,7 +16,7 @@ export function httpBaseSystemUpdateDepartment(data: Omix) {
 
 /**部门详情**/
 export function httpBaseSystemDepartmentResolver(params: Omix) {
-    return request({ url: '/api/account/dept/resolver', method: 'GET', params })
+    return request({ url: '/api/account/dept/resolve', method: 'GET', params })
 }
 
 /**部门树结构**/

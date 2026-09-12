@@ -24,7 +24,7 @@ export function httpBaseAccountUpdateConsumerStatus(data: Omix) {
 
 /** 查询外部客户详情。 */
 export function httpBaseAccountResolverConsumer(params: Omix) {
-    return request({ url: `${CONSUMER_API}/resolver`, method: 'GET', params })
+    return request({ url: `${CONSUMER_API}/resolve`, method: 'GET', params })
 }
 
 /** 查询可用外部客户下拉列表。 */

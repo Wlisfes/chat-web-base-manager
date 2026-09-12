@@ -22,7 +22,7 @@ export function httpBaseSystemUpdatePosition(data: Position.PositionUpdateReques
 /**职位详情**/
 export function httpBaseSystemPositionResolver(params: Position.PositionResolverRequest) {
     return request<Position.PositionItem>({
-        url: '/api/account/position/resolver',
+        url: '/api/account/position/resolve',
         method: 'GET',
         params
     })

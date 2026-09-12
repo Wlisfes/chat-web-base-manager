@@ -37,7 +37,7 @@ export function httpBaseSystemUpdateAccountOrganization(data: Omix) {
 /**账号详情**/
 export function httpBaseSystemAccountResolver(params: Omix) {
     return request({
-        url: `${USER_API}/resolver`,
+        url: `${USER_API}/resolve`,
         method: 'GET',
         params
     })

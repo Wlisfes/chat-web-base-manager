@@ -39,7 +39,7 @@ export function httpBaseSystemSheetTreeStructure() {
 /**菜单或按钮详情。*/
 export function httpBaseSystemSheetResolver(data: env.SheetKeyRequest) {
     return request<env.SheetNode>({
-        url: '/api/account/sheet/resolver',
+        url: '/api/account/sheet/resolve',
         method: 'GET',
         params: data
     })
