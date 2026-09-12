@@ -13,8 +13,8 @@ export default defineComponent({
         observer: { type: Object as PropType<EventType>, required: true },
         /**角色ID**/
         roleId: { type: Number as PropType<number> },
-        /**菜单树数据**/
-        faseNode: { type: Object as PropType<Omix>, default: () => ({}) }
+        /**菜单树数据。接口直接返回数组，不是分页结果包装对象。*/
+        faseNode: { type: Array as PropType<Array<Omix>>, default: () => [] }
     },
     setup(props, ctx) {
         /**角色关联菜单数据**/
@@ -41,7 +41,7 @@ export default defineComponent({
 
         /**角色关联菜单回调：过滤非叶子节点，仅设置叶子节点为checked**/
         async function fetchSheetCallback(data: Omix) {
-            const parentIds = fetchParentKeyIds(props.faseNode.list ?? [])
+            const parentIds = fetchParentKeyIds(props.faseNode ?? [])
             const checkedKeys = (data.menuKeyIds ?? []).filter((id: number) => !parentIds.has(id))
             return await setState({ checkedKeys })
         }
@@ -90,7 +90,7 @@ export default defineComponent({
                             children-field="children"
                             checked-keys={faseState.checkedKeys}
                             expanded-keys={faseState.expandedKeys}
-                            data={props.faseNode.list ?? []}
+                            data={props.faseNode ?? []}
                             render-switcher-icon={() => h(SendFilled)}
                             on-update:checked-keys={(checkedKeys: Array<number>) => setState({ checkedKeys })}
                             on-update:indeterminate-keys={(indeterminateKeys: Array<number>) => setState({ indeterminateKeys })}
