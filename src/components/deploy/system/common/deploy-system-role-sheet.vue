@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, PropType, h } from 'vue'
+import { computed, defineComponent, PropType, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { EventType, fetchParentKeyIds } from '@/utils'
+import { EventType, fetchParentKeyIds, normalizeTreeChildren } from '@/utils'
 import { SendFilled } from '@vicons/carbon'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -28,6 +28,8 @@ export default defineComponent({
                 expandedKeys: [] as Array<number>
             }
         })
+        /**权限树移除叶子节点的空 children，避免显示无效展开图标。*/
+        const menuTreeData = computed(() => normalizeTreeChildren(props.faseNode ?? []))
         /**监听结束事件**/
         props.observer.on('finish', async () => {
             return await setState({ loading: false, initialize: false })
@@ -90,7 +92,7 @@ export default defineComponent({
                             children-field="children"
                             checked-keys={faseState.checkedKeys}
                             expanded-keys={faseState.expandedKeys}
-                            data={props.faseNode ?? []}
+                            data={menuTreeData.value}
                             render-switcher-icon={() => h(SendFilled)}
                             on-update:checked-keys={(checkedKeys: Array<number>) => setState({ checkedKeys })}
                             on-update:indeterminate-keys={(indeterminateKeys: Array<number>) => setState({ indeterminateKeys })}
