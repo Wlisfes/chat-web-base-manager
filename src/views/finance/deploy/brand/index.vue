@@ -14,17 +14,19 @@ export default defineComponent({
             keyName: 'chatbok:finance:deploy:brand',
             chunkNames: { CHUNK_BRAND_STATUS: true },
             formState: {
-                name: undefined, //品牌名称
-                status: undefined //状态
+                /**品牌名称**/
+                name: undefined,
+                /**状态**/
+                status: undefined
             },
             columns: [
-                { title: '品牌名称', key: 'name', minWidth: 200, disabled: true },
-                { title: '品牌描述', key: 'document', minWidth: 200, ellipsis: { tooltip: true }, check: true },
-                { title: '状态', key: 'status', minWidth: 120, check: true },
-                { title: '创建人', key: 'createBy', minWidth: 120, check: true },
-                { title: '更新人', key: 'modifyBy', minWidth: 120, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                { title: '品牌名称', key: 'name', width: 200, disabled: true },
+                { title: '状态', key: 'status', width: 120 },
+                { title: '创建人', key: 'createBy', width: 120 },
+                { title: '更新人', key: 'modifyBy', width: 120 },
+                { title: '品牌描述', key: 'document', minWidth: 200, ellipsis: true },
+                { title: '创建时间', key: 'createTime', width: 160 },
+                { title: '更新时间', key: 'modifyTime', width: 160 }
             ]
         })
 

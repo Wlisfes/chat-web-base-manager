@@ -6,8 +6,6 @@ import { useVModels } from '@vueuse/core'
 import { useState } from '@/hooks'
 import { cloneDeep } from 'lodash-es'
 
-const TABLE_ELLIPSIS = { tooltip: { scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } } }
-
 export default defineComponent({
     name: 'CommonDatabaseTable',
     emits: [
@@ -76,7 +74,10 @@ export default defineComponent({
         const headerRef = ref<Omix<{ $el: HTMLElement }>>()
         const tableRef = ref<HTMLElement>()
         const { data, page, size, initialize, loading, select, customize } = useVModels(props)
-        const { state } = useState({ width: 86 })
+        const { state } = useState({
+            width: 86,
+            TABLE_ELLIPSIS: { tooltip: { scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } } }
+        })
         /**最小滚动宽度**/
         const width = computed(() => {
             return fetchBaseColumns(props.columns).reduce((a, b) => fetchPlusNumber(a, b.width ?? b.minWidth ?? 0), 0)
@@ -102,15 +103,9 @@ export default defineComponent({
                 return base
             }
             if (!['selection', 'expand'].includes(String(base.type ?? '')) && !['settings', 'command'].includes(key)) {
-                if (base.ellipsis === undefined) {
-                    if (base.minWidth !== undefined) {
-                        base.ellipsis = TABLE_ELLIPSIS
-                        base.ellipsisComponent = 'performant-ellipsis'
-                    } else {
-                        base.ellipsis = true
-                    }
-                } else if (isObject(base.ellipsis) && isEmpty(base.ellipsisComponent)) {
-                    base.ellipsisComponent = 'performant-ellipsis'
+                base.ellipsisComponent = base.ellipsisComponent ?? 'performant-ellipsis'
+                if (isEmpty(base.ellipsis) || base.ellipsis === true) {
+                    base.ellipsis = state.TABLE_ELLIPSIS
                 }
             }
             return base
