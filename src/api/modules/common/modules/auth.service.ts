@@ -28,7 +28,7 @@ export function httpAuthAccountTokenResolver() {
 /**登录账户菜单和按钮权限**/
 export function httpAuthAccountPermissions() {
     return request({
-        url: `/api/account/permission/resolve`,
+        url: `/api/auth/permission/resolve`,
         method: 'GET'
     })
 }
