@@ -1,5 +1,11 @@
 export default [
     {
+        path: '/deploy/chunk/system',
+        name: 'DeployChunkSystem',
+        meta: { title: '系统枚举设置', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/chunk/system/index.vue')
+    },
+    {
         path: '/deploy/datetask/system',
         name: 'DeployDatetaskSystem',
         meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },

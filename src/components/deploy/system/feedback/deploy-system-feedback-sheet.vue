@@ -48,7 +48,7 @@ export default defineComponent({
                 /**状态**/
                 status: props.node.status ?? 'enabled',
                 /**菜单显示状态**/
-                visible: props.node.visible ?? true,
+                visible: props.node.visible ?? 1,
                 /**页面缓存**/
                 keepAlive: props.node.keepAlive ?? false,
                 /**菜单图标**/

@@ -94,7 +94,7 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
 
     function fetchMenuOptions(nodes: Array<Omix>): Array<Omix> {
         return nodes.reduce<Array<Omix>>((items, node) => {
-            if (node.visible === false || node.type === 'button') return items
+            if (node.visible === 0 || node.type === 'button') return items
             const children = fetchMenuOptions(node.children ?? [])
             const router = String(node.path ?? '').trim()
             if (node.type === 'directory' && !router && children.length === 0) return items

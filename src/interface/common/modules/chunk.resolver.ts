@@ -6,7 +6,7 @@ export interface ChunkCommonOptions<T> extends Record<ChunkName, T> {}
 export interface ChunkColumnOptions extends Omix {
     keyId: number
     name: string
-    value: string
+    value: string | number
     json: Omix<{ type: string }>
 }
 /**通用下拉字典**/

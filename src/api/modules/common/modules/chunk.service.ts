@@ -1,6 +1,6 @@
 import { ChunkName, ChunkCommonOptions, ChunkColumnOptions } from '@/interface/instance.resolver'
 
-const option = (keyId: number, name: string, value: string | boolean, type = 'default'): Omix<ChunkColumnOptions> => ({
+const option = (keyId: number, name: string, value: string | number, type = 'default'): Omix<ChunkColumnOptions> => ({
     keyId,
     name,
     value,
@@ -10,7 +10,7 @@ const option = (keyId: number, name: string, value: string | boolean, type = 'de
 
 const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
     CHUNK_ACCOUNT_STATUS: [option(1, '启用', 'enabled', 'success'), option(2, '禁用', 'disabled', 'error')],
-    CHUNK_SHEET_CHECK: [option(1, '显示', true, 'success'), option(2, '隐藏', false, 'warning')],
+    CHUNK_SHEET_CHECK: [option(1, '显示', 1, 'success'), option(2, '隐藏', 0, 'warning')],
     CHUNK_SHEET_CHUNK: [
         option(1, '目录', 'directory'),
         option(2, '菜单', 'menu', 'info'),

@@ -17,7 +17,7 @@ export interface SheetNode extends Omix {
     icon?: string | null
     externalUrl?: string | null
     sort: number
-    visible: boolean
+    visible: 0 | 1
     keepAlive: boolean
     status: SheetNodeStatus
     createTime?: string | Date | null
@@ -37,7 +37,7 @@ export interface SheetCreateRequest extends Omix {
     icon?: string | null
     externalUrl?: string | null
     sort: number
-    visible: boolean
+    visible: 0 | 1
     keepAlive: boolean
     status: SheetNodeStatus
 }
