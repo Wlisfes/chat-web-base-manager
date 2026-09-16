@@ -1,7 +1,7 @@
 {
     "name": "chat-web-base-manager",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
     "type": "module",
     "scripts": {
         "install": "node scripts/yarn-auth.cjs install --ignore-scripts",
