@@ -26,7 +26,7 @@ export default defineComponent({
     ],
     props: {
         /**边距值**/
-        limit: { type: Number, default: 14 },
+        limit: { type: Number, default: 12 },
         /**分页数**/
         page: { type: Number, default: 1 },
         /**分页大小**/

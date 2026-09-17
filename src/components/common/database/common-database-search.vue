@@ -29,7 +29,7 @@ export default defineComponent({
         /**收缩最小显示行**/
         line: { type: Number, default: 0 },
         /**边距值**/
-        limit: { type: Number, default: 14 },
+        limit: { type: Number, default: 12 },
         /**折叠收缩配置**/
         when: { type: Boolean, default: true },
         /**开启边框**/
