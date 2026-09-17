@@ -17,7 +17,7 @@ export const router = createRouter({
             path: '/',
             redirect: '/manager',
             name: 'BaseLayout',
-            meta: { title: '昆仑服务平台', AUTH: 'AUTH' },
+            meta: { title: 'ChatBook服务平台', AUTH: 'AUTH' },
             component: () => import('@/views/main/layout/layout.vue'),
             children: fetchSetupRouter()
         }
@@ -72,7 +72,7 @@ export function setupGuardRouter(router: Router) {
         }
     })
     router.afterEach(async (to, from) => {
-        document.title = `昆仑服务平台${fetchWherer(!!to.meta.title, ` - ${to.meta.title}`, '')}`
+        document.title = `ChatBook服务平台${fetchWherer(!!to.meta.title, ` - ${to.meta.title}`, '')}`
         window.$loadingBar.finish()
         return await fetchHandler(['AUTH'].includes(String(to.meta.AUTH)), async () => {
             return await fetchUpdateRouter(to).then(async menu => {
