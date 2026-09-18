@@ -4,7 +4,6 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "install": "node scripts/yarn-auth.cjs install --ignore-scripts",
         "dev": "vite --config vite.config.ts",
         "build": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build --config vite.config.ts",
         "preview": "vite preview --config vite.config.ts"

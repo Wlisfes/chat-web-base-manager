@@ -24,7 +24,7 @@ jobs:
                   cache: yarn
 
             - name: 安装依赖
-              run: yarn install --frozen-lockfile --non-interactive
+              run: yarn install --frozen-lockfile --non-interactive --ignore-scripts
 
             - name: 构建管理端
               run: yarn build
