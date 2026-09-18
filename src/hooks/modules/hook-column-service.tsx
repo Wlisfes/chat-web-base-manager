@@ -69,7 +69,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     })
     const { state, setState } = useState({
         when: options.when ?? true,
-        limit: options.limit ?? 14,
+        limit: options.limit ?? 12,
         visible: options.visible ?? false,
         initialize: options.initialize ?? true,
         loading: options.loading ?? true,
