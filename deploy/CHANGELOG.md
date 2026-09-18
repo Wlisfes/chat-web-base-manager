@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-09-18：修复 CI 安装依赖被 yarn install 生命周期脚本拦住
+
+- 影响机器：云服务器 `47.119.21.228`。
+- 关联版本：Manager `v1.0.0`。
+- 变更内容：管理端没有 GitHub Packages 私有依赖，但 `package.json` 的 `install` 生命周期脚本会调用 `yarn-auth.cjs` 索要凭据。PR #22 合并后 Verify 在「安装依赖」失败，镜像未构建、云端未部署。现已移除该生命周期脚本，CI 安装与 Dockerfile 一致增加 `--ignore-scripts`。
+- 机器侧操作：合并 `main` 后由 Actions 重新构建并部署到 `/opt/chat-web-cloud`。
+- 验证命令：GitHub Actions「验证管理端」安装依赖成功，随后构建镜像并完成云端部署。
+- 回滚方法：恢复上一版完整 Git SHA 镜像。
+
 ## 2026-09-02：完善职位管理页面与账号职位选择
 
 - 影响机器：云服务器 `47.119.21.228`。
