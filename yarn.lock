@@ -1308,6 +1308,11 @@ balanced-match@^1.0.0:
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
+balkan-orgchart-js@^9.3.28:
+  version "9.3.28"
+  resolved "https://registry.npmmirror.com/balkan-orgchart-js/-/balkan-orgchart-js-9.3.28.tgz#9fe1ee7f0701e2e9fc7ebb69b56ae50d5c906897"
+  integrity sha512-f5ebuR/Z3De/6PXSNx6INLXaAVGtELGY+6L3VzeNXY/rqkfrkezG1+V74Q5x+AM4WI2uq96MTCitvmKa5B7YPQ==
+
 baseline-browser-mapping@^2.11.12:
   version "2.11.15"
   resolved "https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.11.15.tgz#9c0cac93d7d304f3d61bb41088a102cd62e68676"

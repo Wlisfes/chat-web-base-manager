@@ -3,10 +3,15 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
     name: 'BaseManager',
-    setup(props, ctx) {
+    setup() {
+        function onNodeClick(data: Record<string, any>) {
+            console.log('node-click', data)
+        }
+
         return () => (
-            <layout-common-container class="absolute inset-0 p-12" class-name="p-12 gap-12 overflow-hidden">
-                Home
+            <layout-common-container class="absolute inset-0" class-name="flex-col overflow-hidden">
+                {/* <main-manager-orgchart class="h-full min-h-0 w-full" /> */}
+                <common-chart-dept-manager class="h-full min-h-0 w-full" onNodeClick={onNodeClick}></common-chart-dept-manager>
             </layout-common-container>
         )
     }

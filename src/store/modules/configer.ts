@@ -10,7 +10,7 @@ export const useConfiger = defineStore(
             /**默认路由地址**/
             router: '/manager',
             /**默认主题**/
-            theme: 'light',
+            theme: 'light' as 'light' | 'dark',
             /**默认主题色**/
             primaryColor: '#536dfe',
             /**窗口宽度**/
