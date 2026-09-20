@@ -8,7 +8,7 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        return () => <div class="deploy-system-dept-balkan flex overflow-hidden">卡片内容</div>
+        return () => <div class="deploy-system-dept-balkan flex overflow-hidden">{props.node.name}</div>
     }
 })
 </script>

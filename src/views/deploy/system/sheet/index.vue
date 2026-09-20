@@ -11,7 +11,7 @@ export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单树结构**/
-        const sheetOptions = useSelectService(e => Service.httpBaseSystemSheetTreeStructure(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTree(), {
             immediate: true,
             options: {
                 selectedKeys: [] as Array<number>,
@@ -21,7 +21,7 @@ export default defineComponent({
         const sheetTreeData = computed(() => normalizeTreeChildren(sheetOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnSheet({ ...payload, page: base.page, size: base.size }),
+            request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
             chunkNames: {
                 CHUNK_SHEET_STATUS: true,
@@ -105,7 +105,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeleteSheet({ keyId: node.keyId })
+                            await Service.httpBaseAccountDeleteSheet({ keyId: node.keyId })
                             await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                             return await done({ visible: false })
                         } catch (err) {

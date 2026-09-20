@@ -12,15 +12,15 @@ export default defineComponent({
     setup(props, ctx) {
         /**菜单树数据**/
         const treeOptions = useBaseService({
-            request: () => Service.httpBaseSystemSheetTreeStructure(),
+            request: () => Service.httpBaseAccountSheetTree(),
             immediate: true
         })
         /**角色列表**/
         const { faseNode, faseState, observer, setState, fetchRefresh } = useBaseService({
             request: async () => {
                 const [roleResponse, organizationResponse] = await Promise.all([
-                    Service.httpBaseSystemSelectRole(),
-                    Service.httpBaseSystemDepartmentTreeStructure()
+                    Service.httpBaseAccountSelectRole(),
+                    Service.httpBaseAccountOrganizationTreeStructure()
                 ])
                 return {
                     ...roleResponse,
@@ -63,7 +63,7 @@ export default defineComponent({
                     keyId: item.keyId,
                     sort: (index + 1) * 10
                 }))
-                await Promise.all(list.map((item: Omix) => Service.httpBaseSystemUpdateRoleSort(item)))
+                await Promise.all(list.map((item: Omix) => Service.httpBaseAccountUpdateRole(item)))
                 return await fetchNotifyService({ title: '操作成功' })
             } catch (err) {
                 return await fetchNotifyService({ type: 'error', title: err.message })
@@ -97,7 +97,7 @@ export default defineComponent({
                     async onSubmit(done: Function) {
                         return await done({ loading: true }).then(async () => {
                             try {
-                                await Service.httpBaseSystemDeleteRole({ keyId: node.keyId })
+                                await Service.httpBaseAccountDeleteRole({ keyId: node.keyId })
                                 await fetchRefresh()
                                 return await done({ visible: false })
                             } catch (err) {

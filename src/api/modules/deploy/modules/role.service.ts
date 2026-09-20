@@ -1,75 +1,48 @@
 import { request } from '@/utils'
 
-const ROLE_API = '/api/account/role'
-const USER_API = '/api/account/user'
-
-/**新增岗位角色**/
-export function httpBaseSystemCreateRole(data: Omix) {
-    return request({ url: `${ROLE_API}/create`, method: 'POST', data })
+/**获取角色列表**/
+export function httpBaseAccountSelectRole() {
+    return request({ url: '/api/account/role/select', method: 'GET' })
 }
 
-/**编辑岗位角色**/
-export function httpBaseSystemUpdateRole(data: Omix) {
+/**获取角色、菜单和数据范围详情**/
+export function httpBaseAccountRoleResolver(params: Omix) {
+    return request({ url: '/api/account/role/resolve', method: 'GET', params })
+}
+
+/**创建角色**/
+export function httpBaseAccountCreateRole(data: Omix) {
+    return request({ url: '/api/account/role/create', method: 'POST', data })
+}
+
+/**更新角色**/
+export function httpBaseAccountUpdateRole(data: Omix) {
     return request({
-        url: `${ROLE_API}/update`,
+        url: '/api/account/role/update',
         method: 'POST',
         data
     })
 }
 
-/**角色详情**/
-export function httpBaseSystemRoleResolver(params: Omix) {
-    return request({ url: `${ROLE_API}/resolve`, method: 'GET', params })
+/**删除未分配用户的非内置角色**/
+export function httpBaseAccountDeleteRole(data: Omix) {
+    return request({ url: '/api/account/role/delete', method: 'POST', data })
 }
 
-/**角色列表查询**/
-export function httpBaseSystemSelectRole() {
-    return request({ url: `${ROLE_API}/select`, method: 'GET' })
-}
-
-/**角色关联账号列表**/
-export function httpBaseSystemColumnAccountRole(data: Omix) {
+/**替换角色的全部菜单和按钮权限**/
+export function httpBaseAccountUpdateRoleMenu(data: Omix) {
     return request({
-        url: `${USER_API}/column`,
+        url: '/api/account/role/update/menu',
         method: 'POST',
         data
     })
 }
 
-/**更新账号角色关系。*/
-export function httpBaseSystemUpdateAccountRole(data: Omix) {
-    return request({ url: `${USER_API}/update/role`, method: 'POST', data })
-}
-
-/**角色菜单权限列表**/
-export function httpBaseSystemColumnRoleSheet(params: Omix) {
-    return request({ url: `${ROLE_API}/resolve`, method: 'GET', params })
-}
-
-/**更新角色菜单权限**/
-export function httpBaseSystemUpdateRoleSheet(data: Omix) {
+/**替换角色的全部资源数据范围**/
+export function httpBaseAccountUpdateRoleDataScope(data: Omix) {
     return request({
-        url: `${ROLE_API}/update/menu`,
+        url: '/api/account/role/update/data/scope',
         method: 'POST',
         data
     })
-}
-
-/**更新角色数据权限**/
-export function httpBaseSystemUpdateRoleModel(data: Omix) {
-    return request({
-        url: `${ROLE_API}/update/data/scope`,
-        method: 'POST',
-        data
-    })
-}
-
-/**删除岗位角色**/
-export function httpBaseSystemDeleteRole(data: Omix) {
-    return request({ url: `${ROLE_API}/delete`, method: 'POST', data })
-}
-
-/**更新单个角色排序。*/
-export function httpBaseSystemUpdateRoleSort(data: Omix) {
-    return request({ url: `${ROLE_API}/update`, method: 'POST', data })
 }

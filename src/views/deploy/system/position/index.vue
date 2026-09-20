@@ -10,7 +10,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnPosition({ ...payload, page: base.page, size: base.size }),
+            request: (base, payload) => Service.httpBaseAccountColumnPosition({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:position',
             formState: {
                 /**职位名称**/
@@ -58,7 +58,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeletePosition({ keyId: node.keyId })
+                            await Service.httpBaseAccountDeletePosition({ keyId: node.keyId })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {

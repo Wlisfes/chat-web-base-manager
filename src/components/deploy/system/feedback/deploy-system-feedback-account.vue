@@ -19,11 +19,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             transform: mapDeployOrganizations
         })
         /**职位选项**/
-        const positionOptions = useSelectService(() => Service.httpBaseSystemSelectPosition(), { immediate: false })
+        const positionOptions = useSelectService(() => Service.httpBaseAccountSelectPosition(), { immediate: false })
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
@@ -77,7 +77,7 @@ export default defineComponent({
                     })
                 }
                 try {
-                    return await Service.httpBaseSystemAccountResolver({ uid: props.node.uid }).then(async ({ data }) => {
+                    return await Service.httpBaseAccountUserResolver({ uid: props.node.uid }).then(async ({ data }) => {
                         const account = mapDeployAccountUser(data)
                         const formOptions: Omix = fetchReste({
                             ...account,
@@ -103,7 +103,7 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateAccount({
+                        await Service.httpBaseAccountCreateUser({
                             ...createDeployAccountPayload(formState.value, true),
                             password: formState.value.password,
                             memberships: createDeployAccountMemberships(formState.value.depts),
@@ -111,11 +111,11 @@ export default defineComponent({
                         })
                     } else if (['UPDATE'].includes(props.command)) {
                         const uid = props.node.uid
-                        await Service.httpBaseSystemUpdateAccount({
+                        await Service.httpBaseAccountUpdateUser({
                             uid,
                             ...createDeployAccountPayload(formState.value)
                         })
-                        await Service.httpBaseSystemUpdateAccountOrganization({
+                        await Service.httpBaseAccountUpdateUserOrganization({
                             uid,
                             memberships: createDeployAccountMemberships(formState.value.depts)
                         })

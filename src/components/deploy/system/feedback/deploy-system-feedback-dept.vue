@@ -18,12 +18,12 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(() => Service.httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: false,
             transform: mapDeployOrganizations
         })
         /**负责人账号列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount({ page: 1, size: 100, status: 'enabled' }), {
+        const accountOptions = useSelectService(() => Service.httpBaseAccountColumnUser({ page: 1, size: 100, status: 'enabled' }), {
             immediate: false,
             transform: mapDeployAccountOptions
         })
@@ -64,7 +64,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 }
                 try {
-                    const deptRes = await Service.httpBaseSystemDepartmentResolver({ keyId: props.node.keyId })
+                    const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
                     return await setForm(fetchReste(mapDeployOrganization(deptRes.data))).then(async () => {
                         return await setState({ initialize: false })
                     })
@@ -84,9 +84,9 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateDepartment(createDeployOrganizationPayload(formState.value))
+                        await Service.httpBaseAccountCreateOrganization(createDeployOrganizationPayload(formState.value))
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdateDepartment({
+                        await Service.httpBaseAccountUpdateOrganization({
                             keyId: props.node.keyId,
                             ...createDeployOrganizationPayload(formState.value)
                         })

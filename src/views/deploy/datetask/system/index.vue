@@ -12,7 +12,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnDatetask({
+                Service.httpBaseSkylineColumnDatetask({
                     ...payload,
                     page: base.page,
                     size: base.size
@@ -55,7 +55,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
+                            await Service.httpBaseSkylineUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -87,7 +87,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            const response = await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            const response = await Service.httpBaseSkylineTriggerDatetask({ taskId: node.taskId })
                             await fetchRefresh()
                             await done({ visible: false })
                             const result = response.data?.result

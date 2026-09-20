@@ -12,14 +12,14 @@ export default defineComponent({
         /**通用字典枚举**/
         const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: true,
             transform: mapDeployOrganizations
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+                Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
             transform: data => mapDeployAccountUsers(data.list),
             keyName: 'chat:deploy:system:user',
             formState: {
@@ -78,7 +78,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeleteAccount({ uid: node.uid, status: 'disabled' })
+                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status: 'disabled' })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -99,7 +99,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemResetPasswordAccount({ uid: node.uid, password: '123456' })
+                            await Service.httpBaseAccountResetUserPassword({ uid: node.uid, password: '123456' })
                             return await done({ visible: false }).then(async () => {
                                 return await fetchNotifyService({ title: '密码重置成功' })
                             })

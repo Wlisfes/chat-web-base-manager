@@ -31,7 +31,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Service.httpBaseSystemUpdateDatetaskCron({ taskId: props.node.taskId, cron: formState.value.cron })
+                    await Service.httpBaseSkylineUpdateDatetaskCron({ taskId: props.node.taskId, cron: formState.value.cron })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })

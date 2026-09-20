@@ -17,7 +17,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setState, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnAccountRole(
+                Service.httpBaseAccountColumnUser(
                     createDeployAccountQuery({ ...payload, page: base.page, size: base.size, roleKeyId: props.roleId })
                 ),
             keyName: 'chatbok:deploy:system:role:account',
@@ -61,9 +61,9 @@ export default defineComponent({
             return await stop(event).then(async () => {
                 return await Promise.all(
                     uids.map(async uid => {
-                        const detail = await Service.httpBaseSystemAccountResolver({ uid })
+                        const detail = await Service.httpBaseAccountUserResolver({ uid })
                         const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId!, false)
-                        return Service.httpBaseSystemUpdateAccountRole({ uid, roleKeyIds })
+                        return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
                     })
                 ).then(() => {
                     return fetchRefresh({ page: 1 })

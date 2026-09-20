@@ -16,7 +16,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**账号下拉列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseSystemSelectAccount({ page: 1, size: 100, status: 'enabled' }), {
+        const accountOptions = useSelectService(() => Service.httpBaseAccountColumnUser({ page: 1, size: 100, status: 'enabled' }), {
             immediate: false,
             transform: mapDeployAccountOptions
         })
@@ -45,9 +45,9 @@ export default defineComponent({
                 try {
                     await Promise.all(
                         formState.value.uids.map(async (uid: string) => {
-                            const detail = await Service.httpBaseSystemAccountResolver({ uid })
+                            const detail = await Service.httpBaseAccountUserResolver({ uid })
                             const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId, true)
-                            return Service.httpBaseSystemUpdateAccountRole({ uid, roleKeyIds })
+                            return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
                         })
                     )
                     return await setState({ visible: false }).then(async () => {

@@ -27,7 +27,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { state, chunkState, instOptions, setState, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnDatetaskLog({
+                Service.httpBaseSkylineColumnDatetaskLog({
                     ...payload,
                     taskId: props.node.taskId,
                     page: base.page,

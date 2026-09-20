@@ -17,7 +17,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**菜单资源树结构表**/
-        const sheetOptions = useSelectService(() => Service.httpBaseSystemSheetTreeStructure(), {
+        const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTree(), {
             immediate: false
         })
         /**通用字典枚举**/
@@ -72,7 +72,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 }
                 try {
-                    return await Service.httpBaseSystemSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                    return await Service.httpBaseAccountSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                         return await setForm({ ...fetchReste(data), parentKeyId: data.parentKeyId }).then(async () => {
                             return await setState({ initialize: false })
                         })
@@ -93,15 +93,15 @@ export default defineComponent({
                 try {
                     if (['menu', 'directory'].includes(formState.value.type)) {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseSystemCreateSheetResource(formState.value)
+                            await Service.httpBaseAccountCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseSystemUpdateSheetResource({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     } else {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseSystemCreateSheetAuthorize(formState.value)
+                            await Service.httpBaseAccountCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseSystemUpdateSheetAuthorize({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     }
                     return await setState({ visible: false }).then(async () => {

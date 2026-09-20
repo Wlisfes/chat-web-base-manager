@@ -3,7 +3,7 @@ import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { createDeployRoleDataScopePayload, createDeployRolePayload, mapDeployOrganizations, mapDeployRole } from '@/utils'
-import { httpBaseSystemDepartmentTreeStructure } from '@/api/modules/deploy/modules/dept.service'
+import { httpBaseAccountOrganizationTreeStructure } from '@/api/modules/deploy/modules/organization.service'
 import * as Service from '@/api/modules/deploy/modules/role.service'
 
 export default defineComponent({
@@ -24,7 +24,7 @@ export default defineComponent({
             type: ['CHUNK_ROLE_MODEL', 'CHUNK_ROLE_CHUNK', 'CHUNK_ACCOUNT_STATUS']
         })
         /**部门树结构（仅部门角色需要）**/
-        const deptOptions = useSelectService(() => httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(() => httpBaseAccountOrganizationTreeStructure(), {
             immediate: false,
             transform: mapDeployOrganizations
         })
@@ -56,7 +56,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 }
                 try {
-                    return await Service.httpBaseSystemRoleResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                    return await Service.httpBaseAccountRoleResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                         return await setForm(fetchReste(mapDeployRole(data))).then(async () => {
                             return await setState({ initialize: false })
                         })
@@ -76,20 +76,20 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        const response = await Service.httpBaseSystemCreateRole(createDeployRolePayload(formState.value))
+                        const response = await Service.httpBaseAccountCreateRole(createDeployRolePayload(formState.value))
                         if (formState.value.model) {
-                            await Service.httpBaseSystemUpdateRoleModel({
+                            await Service.httpBaseAccountUpdateRoleDataScope({
                                 keyId: response.data.keyId,
                                 ...createDeployRoleDataScopePayload(formState.value)
                             })
                         }
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdateRole({
+                        await Service.httpBaseAccountUpdateRole({
                             keyId: props.node.keyId,
                             ...createDeployRolePayload(formState.value)
                         })
                         if (formState.value.model) {
-                            await Service.httpBaseSystemUpdateRoleModel({
+                            await Service.httpBaseAccountUpdateRoleDataScope({
                                 keyId: props.node.keyId,
                                 ...createDeployRoleDataScopePayload(formState.value)
                             })

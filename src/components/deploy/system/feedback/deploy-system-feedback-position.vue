@@ -35,7 +35,7 @@ export default defineComponent({
                 return await setState({ initialize: false })
             }
             try {
-                return await Service.httpBaseSystemPositionResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                return await Service.httpBaseAccountPositionResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                     return await setForm(fetchReste(data)).then(async () => {
                         return await setState({ initialize: false })
                     })
@@ -55,9 +55,9 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreatePosition(formState.value)
+                        await Service.httpBaseAccountCreatePosition(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdatePosition({ ...formState.value, keyId: props.node.keyId })
+                        await Service.httpBaseAccountUpdatePosition({ ...formState.value, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

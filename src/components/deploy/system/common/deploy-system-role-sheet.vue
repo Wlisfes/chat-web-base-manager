@@ -19,7 +19,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**角色关联菜单数据**/
         const { faseNode, faseState, setState, fetchInitialize, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseSystemColumnRoleSheet({ keyId: props.roleId }),
+            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.roleId }),
             callback: fetchSheetCallback,
             immediate: true,
             options: {
@@ -52,7 +52,7 @@ export default defineComponent({
         async function fetchSubmit() {
             return await setState({ loading: true }).then(async () => {
                 try {
-                    await Service.httpBaseSystemUpdateRoleSheet({
+                    await Service.httpBaseAccountUpdateRoleMenu({
                         keyId: props.roleId,
                         menuKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
