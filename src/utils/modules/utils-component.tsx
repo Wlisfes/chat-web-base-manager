@@ -1,4 +1,4 @@
-import { createApp, createVNode, nextTick, App } from 'vue'
+import { createApp, createVNode, nextTick, App, getCurrentInstance } from 'vue'
 import { setupStore } from '@/store'
 import { setupRouter } from '@/router'
 import * as utils from '@/utils'
@@ -64,6 +64,16 @@ export async function createComponent<T extends Omix>(
     })
 
     return { element, app, unmount }
+}
+
+/**创建虚拟DOM实例**/
+export function fetchCreateVNode(Component: Parameters<typeof createVNode>['0']) {
+    const vnode = createVNode(Component)
+    const instance = getCurrentInstance()
+    if (instance && instance.appContext) {
+        vnode.appContext = instance.appContext
+    }
+    return vnode
 }
 
 /**异步返回VNode**/

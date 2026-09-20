@@ -11,11 +11,11 @@ export default defineComponent({
     setup(props, { emit }) {
         const element = useCurrentElement<HTMLElement>()
 
-        onMounted(() => {
-            console.log(element.value, props.node)
-        })
-
-        return () => <div class="deploy-system-dept-balkan">balkan</div>
+        return () => (
+            <div class="deploy-system-dept-balkan" onClick={e => console.log(e, props.node)}>
+                balkan
+            </div>
+        )
     }
 })
 </script>

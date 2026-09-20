@@ -1,6 +1,5 @@
 import OrgChart from 'balkan-orgchart-js'
-import { createVNode, render } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, isString } from 'lodash-es'
 OrgChart.SEARCH_PLACEHOLDER = '请输入...'
 
 export interface ArgsOptions extends Omix {
@@ -14,22 +13,11 @@ export function fetchRootTemplates(node: Omix) {
 }
 
 /**自定义根节点**/
-export function fetchForeignTemplates(node: OrgChart.node) {
-    // const element = createVNode(
-    //     <div
-    //         data-vue-node={node.id}
-    //         style={`width:${node.w}px;height:${node.h}px;`}
-    //         onClick={e => {
-    //             console.log(e, data)
-    //         }}
-    //     >
-    //         {data.name}
-    //     </div>
-    // )
-    // const div = document.createElement('div')
-    // render(element, div)
-    console.log(node)
-    return `<foreignObject x="0" y="0" width="${node.w}" height="${node.h}"></foreignObject>`
+export function fetchForeignTemplates(node: OrgChart.node, str?: string) {
+    const html = isString(str) ? str : ''
+    return `<foreignObject x="0" y="0" width="${node.w}" height="${node.h}">
+        <div xmlns="http://www.w3.org/1999/xhtml" data-vue-node="${node.id}" class="w-full h-full">${html ?? ''}</div>
+    </foreignObject>`
 }
 
 /**默认根节点容器配置**/
