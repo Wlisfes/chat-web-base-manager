@@ -77,11 +77,12 @@ export default defineComponent({
                     chart.config.mode = value
                     chart.mainElement.classList.remove('boc-dark', 'boc-light')
                     chart.mainElement.classList.add(`boc-${value}`)
+                    chart.draw()
                 })
             })
         }
 
-        return () => <n-element class={`deploy-system-dept-orgchart w-full h-full boc-${theme.value}`}></n-element>
+        return () => <common-element class="deploy-system-dept-orgchart w-full h-full"></common-element>
     }
 })
 </script>

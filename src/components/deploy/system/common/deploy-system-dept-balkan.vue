@@ -8,20 +8,19 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        return () => <div class="deploy-system-dept-balkan w-full h-full">卡片内容</div>
+        return () => <div class="deploy-system-dept-balkan flex overflow-hidden">卡片内容</div>
     }
 })
 </script>
 
 <style lang="scss" scoped>
 .deploy-system-dept-balkan {
+    width: 100%;
+    height: 100%;
     user-select: none;
     box-sizing: border-box;
     border-radius: var(--border-radius);
     border: 1px solid #aeaeae;
-    transition:
-        color 0.3s var(--cubic-bezier-ease-in-out),
-        border-color 0.3s var(--cubic-bezier-ease-in-out),
-        background-color 0.3s var(--cubic-bezier-ease-in-out);
+    transition: border-color 0.3s var(--cubic-bezier-ease-in-out);
 }
 </style>
