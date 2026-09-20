@@ -16,15 +16,22 @@ export default defineComponent({
 
         function fetchCreateBalkan(node: Omix, data: Omix) {
             const root = document.createElement('div')
-            render(fetchCreateVNode(<deploy-system-dept-balkan node={data}></deploy-system-dept-balkan>), root)
+            render(
+                fetchCreateVNode(
+                    <layout-common-provider>
+                        <deploy-system-dept-balkan node={data}></deploy-system-dept-balkan>
+                    </layout-common-provider>
+                ),
+                root
+            )
             return fetchForeignTemplates(node, root.innerHTML)
         }
 
         async function fetchInitTemplates() {
             return Promise.all([
-                fetchBaseTemplates('company', { w: 250, h: 80 }, fetchCreateBalkan),
+                fetchBaseTemplates('company', { w: 260, h: 80 }, fetchCreateBalkan),
                 fetchBaseTemplates('department', { w: 200, h: 52 }, fetchCreateBalkan),
-                fetchBaseTemplates('user', { w: 200, h: 40 }, fetchCreateBalkan)
+                fetchBaseTemplates('user', { w: 130, h: 42 }, fetchCreateBalkan)
             ])
         }
 

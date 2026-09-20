@@ -1,28 +1,45 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
-import { UserActivity } from '@vicons/carbon'
+import { defineComponent, PropType, Fragment } from 'vue'
 
 export default defineComponent({
-    name: 'DeploySystemDeptbalkan',
+    name: 'DeploySystemDeptBalkan',
     props: {
         /**节点数据**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
-    setup(props, { emit }) {
+    setup(props) {
         return () => (
-            <div class="deploy-system-dept-balkan flex items-center gap-x-10 p-inline-10 overflow-hidden">
-                <n-icon size={32}>
-                    <local-nest-stock />
-                </n-icon>
+            <div
+                class="deploy-system-dept-balkan flex items-center gap-x-10 overflow-hidden"
+                style={{ padding: `0px ${['company', 'department'].includes(props.node.type) ? '10px' : '5px'}` }}
+            >
                 {['company', 'department'].includes(props.node.type) ? (
-                    <div class="flex flex-col flex-1 overflow-hidden">
-                        <n-h4 class="m-0 line-height-22">{props.node.name}</n-h4>
-                        <n-text depth={3} class="m-0 line-height-18">
-                            {`${props.node.memberCount}人`}
-                        </n-text>
-                    </div>
+                    <Fragment>
+                        <n-button text type="primary">
+                            <common-element-icon
+                                size={['company'].includes(props.node.type) ? 42 : 32}
+                                name="nest-stock"
+                            ></common-element-icon>
+                        </n-button>
+                        <div class="flex flex-col flex-1 overflow-hidden">
+                            <n-text depth={1} class="text-16 line-height-22">
+                                {props.node.name}
+                            </n-text>
+                            <n-text depth={3} class="line-height-18">
+                                {`${props.node.memberCount}人`}
+                            </n-text>
+                        </div>
+                    </Fragment>
                 ) : (
-                    <div class="flex flex-col flex-1 overflow-hidden">{props.node.name}</div>
+                    <Fragment>
+                        <common-element-image
+                            class="w-30 h-30 b-rd-3"
+                            src="https://chat-oss.lisfes.cn/chat/image/2164042228379484160.jpg"
+                        ></common-element-image>
+                        <n-text depth={1} class="line-height-22">
+                            {props.node.name}
+                        </n-text>
+                    </Fragment>
                 )}
             </div>
         )
@@ -39,5 +56,8 @@ export default defineComponent({
     border: 1px solid #aeaeae;
     border-radius: var(--border-radius);
     transition: border-color 0.3s var(--cubic-bezier-ease-in-out);
+    &:hover {
+        border-color: var(--primary-color-hover);
+    }
 }
 </style>
