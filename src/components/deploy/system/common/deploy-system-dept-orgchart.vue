@@ -1,7 +1,6 @@
 <script lang="tsx">
 import { defineComponent, onMounted, watch, render, PropType } from 'vue'
-import { fetchBaseTemplates, fetchCloneTemplates, fetchForeignTemplates } from '@/utils'
-import { ChartOptions, fetchChartInitialization, fetchCreateVNode } from '@/utils'
+import { ChartOptions, fetchChartInitialization, fetchCreateVNode, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
 import * as Service from '@/api/instance.service'
@@ -15,20 +14,23 @@ export default defineComponent({
         const { theme } = useStore(useConfiger)
         const element = useCurrentElement<HTMLElement>()
 
-        function fetchCreateBalkan(data: Omix) {
-            return fetchCreateVNode(<deploy-system-dept-balkan node={data}></deploy-system-dept-balkan>)
+        function fetchCreateBalkan(node: Omix, data: Omix) {
+            const root = document.createElement('div')
+            render(fetchCreateVNode(<deploy-system-dept-balkan node={data}></deploy-system-dept-balkan>), root)
+            return fetchForeignTemplates(node, root.innerHTML)
         }
 
         async function fetchInitTemplates() {
-            return fetchCloneTemplates('user', fetchBaseTemplates('ana', { w: 200, h: 80 }), { w: 200, h: 40 }, (node, data) => {
-                const root = document.createElement('div')
-                render(fetchCreateBalkan(data), root)
-                return fetchForeignTemplates(node, root.innerHTML)
-            })
+            return Promise.all([
+                fetchBaseTemplates('company', { w: 250, h: 80 }, fetchCreateBalkan),
+                fetchBaseTemplates('department', { w: 200, h: 52 }, fetchCreateBalkan),
+                fetchBaseTemplates('user', { w: 200, h: 40 }, fetchCreateBalkan)
+            ])
         }
 
         onMounted(fetchInitialization)
         async function fetchInitialization() {
+            console.log(props.items)
             return await fetchInitTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
@@ -37,9 +39,14 @@ export default defineComponent({
                     searchFields: ['name'],
                     nodeBinding: { field_0: 'name' },
                     tags: {
-                        dept: { template: 'ana' },
+                        company: { template: 'company' },
+                        department: { template: 'department' },
                         user: { template: 'user' }
                     }
+                })
+                chart.onInit(() => {
+                    const [left, top, right, bottom] = chart.getViewBox()
+                    chart.setViewBox([-150, top, right, bottom])
                 })
                 chart.onNodeClick((args: Omix<{ node: Omix; event: MouseEvent }>) => {
                     console.log(args, chart.get(args.node.id))

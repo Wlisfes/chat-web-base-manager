@@ -128,7 +128,7 @@ export function mapDeployOrganizationChartNodes<T extends Omix>(nodes: Array<T> 
                 id,
                 pid: parentId,
                 name: node.name,
-                tags: ['dept']
+                tags: [node.type]
             })
             for (const member of node.members ?? []) {
                 result.push({
