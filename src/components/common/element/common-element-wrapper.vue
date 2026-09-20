@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType, Fragment } from 'vue'
 
 export default defineComponent({
     name: 'CommonElementWrapper',
@@ -8,6 +8,8 @@ export default defineComponent({
         className: { type: String, default: 'flex flex-col flex-1 overflow-hidden' },
         /**加载状态**/
         loading: { type: Boolean, default: false },
+        /**初始化状态**/
+        initialize: { type: Boolean, default: false },
         /**加载大小**/
         size: { type: [String, Number], default: 48 },
         /**透明度**/
@@ -26,12 +28,16 @@ export default defineComponent({
                 size={props.size}
                 show={props.loading}
             >
-                {props.scrollbar ? (
-                    <n-scrollbar trigger="none" class="flex-1 overflow-hidden" {...props.scrollbarProps}>
-                        {slots.default && slots.default()}
-                    </n-scrollbar>
-                ) : (
-                    slots.default && slots.default()
+                {props.initialize ? undefined : (
+                    <Fragment>
+                        {props.scrollbar ? (
+                            <n-scrollbar trigger="none" class="flex-1 overflow-hidden" {...props.scrollbarProps}>
+                                {slots.default && slots.default()}
+                            </n-scrollbar>
+                        ) : (
+                            slots.default && slots.default()
+                        )}
+                    </Fragment>
                 )}
             </n-spin>
         )

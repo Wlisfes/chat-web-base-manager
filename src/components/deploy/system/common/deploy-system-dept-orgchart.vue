@@ -1,19 +1,16 @@
 <script lang="tsx">
-import {
-    fetchChartInitialization,
-    fetchBaseTemplates,
-    fetchCloneTemplates,
-    fetchForeignTemplates,
-    fetchCreateVNode,
-    mapDeployOrganizationChartNodes
-} from '@/utils'
-import { defineComponent, onMounted, watch, render } from 'vue'
+import { defineComponent, onMounted, watch, render, PropType } from 'vue'
+import { fetchBaseTemplates, fetchCloneTemplates, fetchForeignTemplates } from '@/utils'
+import { ChartOptions, fetchChartInitialization, fetchCreateVNode } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemDeptOrgchart',
+    props: {
+        items: { type: Array as PropType<ChartOptions['nodes']>, default: () => [] }
+    },
     setup(props, { emit }) {
         const { theme } = useStore(useConfiger)
         const element = useCurrentElement<HTMLElement>()
@@ -32,12 +29,11 @@ export default defineComponent({
 
         onMounted(fetchInitialization)
         async function fetchInitialization() {
-            const { data } = await Service.httpBaseAccountOrganizationTreeUser()
-            const nodes = mapDeployOrganizationChartNodes(data ?? [])
             return await fetchInitTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
-                    nodes,
+                    paddingLeft: 150,
+                    nodes: props.items,
                     searchFields: ['name'],
                     nodeBinding: { field_0: 'name' },
                     tags: {
@@ -57,7 +53,7 @@ export default defineComponent({
             })
         }
 
-        return () => <common-element class="deploy-system-dept-orgchart w-full h-full"></common-element>
+        return () => <common-element is-white class="deploy-system-dept-orgchart w-full h-full"></common-element>
     }
 })
 </script>

@@ -7,6 +7,11 @@ export interface ArgsOptions extends Omix {
     h: number
 }
 
+export interface ChartOptions extends Omix, OrgChart.options {
+    nodes: Array<Omix<OrgChart.nodeData>>
+    paddingLeft?: number
+}
+
 /**默认根节点**/
 export function fetchRootTemplates(node: Omix) {
     return `<rect x="0" y="0" width="${node.w}" height="${node.h}" fill="none"></rect>`
@@ -43,12 +48,16 @@ export function fetchCloneTemplates(
     })
 }
 
-export async function fetchChartInitialization(element: HTMLElement, options: OrgChart.options) {
-    return new OrgChart(
+export async function fetchChartInitialization(element: HTMLElement, options: ChartOptions) {
+    const { paddingLeft, ...chartOptions } = options
+    const chart = new OrgChart(
         element,
         Object.assign(
             {
+                orientation: OrgChart.orientation.left,
                 layout: OrgChart.layout.treeRightOffset,
+                align: OrgChart.align.orientation,
+                scaleInitial: 1,
                 mouseScroll: OrgChart.action.ctrlZoom,
                 nodeMouseClick: OrgChart.action.none,
                 levelSeparation: 50,
@@ -67,7 +76,15 @@ export async function fetchChartInitialization(element: HTMLElement, options: Or
                     layout_right_offset: { title: '右偏移布局', anchor: OrgChart.anchor.right }
                 }
             },
-            cloneDeep(options)
+            cloneDeep(chartOptions)
         )
     )
+    if (paddingLeft != null) {
+        chart.onInit(() => {
+            const box = chart.getViewBox()
+            box[0] = -paddingLeft
+            chart.setViewBox(box)
+        })
+    }
+    return chart
 }
