@@ -1,6 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType, onMounted } from 'vue'
-import { useCurrentElement } from '@vueuse/core'
+import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
     name: 'DeploySystemDeptbalkan',
@@ -9,13 +8,20 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const element = useCurrentElement<HTMLElement>()
-
-        return () => (
-            <div class="deploy-system-dept-balkan" onClick={e => console.log(e, props.node)}>
-                balkan
-            </div>
-        )
+        return () => <div class="deploy-system-dept-balkan w-full h-full">卡片内容</div>
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.deploy-system-dept-balkan {
+    user-select: none;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: 1px solid #aeaeae;
+    transition:
+        color 0.3s var(--cubic-bezier-ease-in-out),
+        border-color 0.3s var(--cubic-bezier-ease-in-out),
+        background-color 0.3s var(--cubic-bezier-ease-in-out);
+}
+</style>

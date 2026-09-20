@@ -85,18 +85,3 @@ export default defineComponent({
     }
 })
 </script>
-
-<style lang="scss" scoped>
-.deplo-system-dept-orgchart {
-    position: relative;
-
-    :deep(circle.boc-hoverable) {
-        fill: #ffffff;
-        transition: fill 0.3s var(--cubic-bezier-ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));
-    }
-
-    :deep(.boc-dark circle.boc-hoverable) {
-        fill: #1e1e1e;
-    }
-}
-</style>
