@@ -4,6 +4,7 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
+        "install": "yarn install --ignore-scripts --ignore-engines",
         "dev": "vite --config vite.config.ts",
         "build": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build --config vite.config.ts",
         "preview": "vite preview --config vite.config.ts"

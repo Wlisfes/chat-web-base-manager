@@ -2,7 +2,7 @@
 import { defineComponent, onMounted, watch } from 'vue'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
-import { fetchChartInitialization, fetchAnaTemplates, fetchChunkTemplates } from '@/utils'
+import { fetchChartInitialization, fetchBaseTemplates, fetchCloneTemplates } from '@/utils'
 
 export default defineComponent({
     name: 'CommonChartDeptManager',
@@ -11,58 +11,69 @@ export default defineComponent({
         const { theme } = useStore(useConfiger)
         const element = useCurrentElement<HTMLElement>()
         const nodes = [
-            { id: 1, name: 'Office of the Executive Director' },
+            { id: 1, name: 'Office of the Executive Director', tags: ['dept'] },
 
-            { id: 2, pid: 1, name: 'National Regional Offices', tags: ['head'] },
-            { id: 3, pid: 1, name: 'Office of Compliance Director', tags: ['head'] },
-            { id: 4, pid: 1, name: 'Division of Operational Services', tags: ['head'] },
-            { id: 5, pid: 1, name: 'Division of Policy & Strategy', tags: ['head'] },
-            { id: 6, pid: 1, name: 'Division of Administrative Services', tags: ['head'] },
+            { id: 2, pid: 1, name: 'National Regional Offices', tags: ['dept'] },
+            { id: 3, pid: 1, name: 'Office of Compliance Director', tags: ['dept'] },
+            { id: 4, pid: 1, name: 'Division of Operational Services', tags: ['dept'] },
+            { id: 5, pid: 1, name: 'Division of Policy & Strategy', tags: ['dept'] },
+            { id: 6, pid: 1, name: 'Division of Administrative Services', tags: ['dept'] },
 
-            { id: 7, pid: 2, name: 'North Region', tags: ['item'] },
-            { id: 8, pid: 2, name: 'South Region', tags: ['item'] },
-            { id: 9, pid: 2, name: 'East Region', tags: ['item'] },
-            { id: 10, pid: 2, name: 'West Region', tags: ['item'] },
-            { id: 11, pid: 2, name: 'Central Region', tags: ['item'] },
-            { id: 12, pid: 2, name: 'International Region', tags: ['item'] },
+            { id: 7, pid: 2, name: 'North Region', tags: ['user'] },
+            { id: 8, pid: 2, name: 'South Region', tags: ['user'] },
+            { id: 9, pid: 2, name: 'East Region', tags: ['user'] },
+            { id: 10, pid: 2, name: 'West Region', tags: ['user'] },
+            { id: 11, pid: 2, name: 'Central Region', tags: ['user'] },
+            { id: 12, pid: 2, name: 'International Region', tags: ['user'] },
 
-            { id: 13, pid: 3, name: 'Inspection Services', tags: ['item'] },
-            { id: 14, pid: 3, name: 'Audit & Review', tags: ['item'] },
+            { id: 13, pid: 3, name: 'Inspection Services', tags: ['user'] },
+            { id: 14, pid: 3, name: 'Audit & Review', tags: ['user'] },
 
-            { id: 15, pid: 4, name: 'Scheduling & Coordination', tags: ['item'] },
-            { id: 16, pid: 4, name: 'Performance Monitoring', tags: ['item'] },
-            { id: 17, pid: 4, name: 'Quality Management', tags: ['item'] },
-            { id: 18, pid: 4, name: 'National Initiatives', tags: ['item'] },
-            { id: 19, pid: 4, name: 'Systems & Data Services', tags: ['item'] },
+            { id: 15, pid: 4, name: 'Scheduling & Coordination', tags: ['user'] },
+            { id: 16, pid: 4, name: 'Performance Monitoring', tags: ['user'] },
+            { id: 17, pid: 4, name: 'Quality Management', tags: ['user'] },
+            { id: 18, pid: 4, name: 'National Initiatives', tags: ['user'] },
+            { id: 19, pid: 4, name: 'Systems & Data Services', tags: ['user'] },
 
-            { id: 20, pid: 5, name: 'Regulatory Affairs', tags: ['item'] },
-            { id: 21, pid: 5, name: 'Policy Development', tags: ['item'] },
-            { id: 22, pid: 5, name: 'Training & Education', tags: ['item'] },
-            { id: 23, pid: 5, name: 'Public Outreach', tags: ['item'] },
-            { id: 24, pid: 5, name: 'Support Services Branch', tags: ['item'] },
+            { id: 20, pid: 5, name: 'Regulatory Affairs', tags: ['user'] },
+            { id: 21, pid: 5, name: 'Policy Development', tags: ['user'] },
+            { id: 22, pid: 5, name: 'Training & Education', tags: ['user'] },
+            { id: 23, pid: 5, name: 'Public Outreach', tags: ['user'] },
+            { id: 24, pid: 5, name: 'Support Services Branch', tags: ['user'] },
 
-            { id: 25, pid: 6, name: 'Financial Management', tags: ['item'] },
-            { id: 26, pid: 6, name: 'Human Capital Management', tags: ['item'] },
-            { id: 27, pid: 6, name: 'Information Technology Services', tags: ['item'] }
+            { id: 25, pid: 6, name: 'Financial Management', tags: ['user'] },
+            { id: 26, pid: 6, name: 'Human Capital Management', tags: ['user'] },
+            { id: 27, pid: 6, name: 'Information Technology Services', tags: ['user'] }
         ]
 
-        onMounted(fetchChartCreate)
-        async function fetchChartCreate() {
-            return await fetchChunkTemplates(fetchAnaTemplates({ w: 200, h: 80 }), { w: 200, h: 40 }).then(async () => {
+        async function fetchUserTemplates() {
+            const template = fetchBaseTemplates('ana', { w: 200, h: 80 })
+            return fetchCloneTemplates('user', template, { w: 200, h: 40 }, (node, data) => {
+                console.log(data)
+
+                return `<foreignObject x="0" y="0" width="${node.w}" height="${node.h}">
+                    <div data-vue-node="${node.id}" class="w-full h-full">dasdas</div>
+                </foreignObject>`
+            })
+        }
+
+        onMounted(fetchInitialization)
+        async function fetchInitialization() {
+            return await fetchUserTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
                     nodes,
                     searchFields: ['name'],
-                    nodeBinding: {
-                        field_0: 'name'
+                    nodeBinding: { field_0: 'name' },
+                    tags: {
+                        dept: { template: 'ana' },
+                        user: { template: 'user' }
                     }
-                })
-                chart.onNodeClick((args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    console.log(args)
-                    return emit('node-click', args)
                 })
                 return watch(theme, value => {
                     chart.config.mode = value
+                    chart.mainElement.classList.remove('boc-dark', 'boc-light')
+                    chart.mainElement.classList.add(`boc-${value}`)
                 })
             })
         }
@@ -73,16 +84,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.common-chart-dept-manager {
+.deplo-system-dept-orgchart {
     position: relative;
-}
 
-.common-chart-dept-manager :deep(circle.boc-hoverable) {
-    fill: #ffffff;
-    transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    :deep(circle.boc-hoverable) {
+        fill: #ffffff;
+        transition: fill 0.3s var(--cubic-bezier-ease-in-out, cubic-bezier(0.4, 0, 0.2, 1));
+    }
 
-.common-chart-dept-manager.boc-dark :deep(circle.boc-hoverable) {
-    fill: #1e1e1e;
+    :deep(.boc-dark circle.boc-hoverable) {
+        fill: #1e1e1e;
+    }
 }
 </style>

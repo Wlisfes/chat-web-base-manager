@@ -8,32 +8,51 @@ export interface ArgsOptions extends Omix {
     h: number
 }
 
+/**默认根节点**/
 export function fetchRootTemplates(node: Omix) {
     return `<rect x="0" y="0" width="${node.w}" height="${node.h}" fill="none"></rect>`
 }
 
-export function fetchForeignTemplates(node: OrgChart.node, data: OrgChart.nodeData, template: OrgChart.template, config: OrgChart.options) {
-    const element = createVNode(<div data-vue-node={node.id} class="bg-red" style={`width:${node.w}px;height:${node.h}px;`}></div>)
-    const div = document.createElement('div')
-    render(element, div)
-    console.log(data)
-    return `<foreignObject x="0" y="0" width="${node.w}" height="${node.h}">${div.innerHTML}</foreignObject>`
+/**自定义根节点**/
+export function fetchForeignTemplates(node: OrgChart.node) {
+    // const element = createVNode(
+    //     <div
+    //         data-vue-node={node.id}
+    //         style={`width:${node.w}px;height:${node.h}px;`}
+    //         onClick={e => {
+    //             console.log(e, data)
+    //         }}
+    //     >
+    //         {data.name}
+    //     </div>
+    // )
+    // const div = document.createElement('div')
+    // render(element, div)
+    console.log(node)
+    return `<foreignObject x="0" y="0" width="${node.w}" height="${node.h}"></foreignObject>`
 }
 
-export function fetchAnaTemplates(options: ArgsOptions) {
-    return Object.assign(OrgChart.templates.ana, {
+/**默认根节点容器配置**/
+export function fetchBaseTemplates(key: string, options: ArgsOptions) {
+    return Object.assign(OrgChart.templates[key], {
         size: [options.w, options.h],
         node: fetchRootTemplates,
         field_0: fetchForeignTemplates
     })
 }
 
-export async function fetchChunkTemplates(ana: OrgChart.template, options: ArgsOptions) {
-    return (OrgChart.templates.item = Object.assign(cloneDeep(ana), {
+/**基于根节点容器克隆一份新的配置**/
+export function fetchCloneTemplates(
+    key: string,
+    ana: OrgChart.template,
+    options: ArgsOptions,
+    render?: (node: OrgChart.node, data: OrgChart.nodeData, template: OrgChart.template, config: OrgChart.options) => string
+) {
+    OrgChart.templates[key] = Object.assign(ana, {
         size: [options.w, options.h],
         node: fetchRootTemplates,
-        field_0: fetchForeignTemplates
-    }))
+        field_0: render ?? fetchForeignTemplates
+    })
 }
 
 export async function fetchChartInitialization(element: HTMLElement, options: OrgChart.options) {
@@ -48,7 +67,6 @@ export async function fetchChartInitialization(element: HTMLElement, options: Or
                 mixedHierarchyNodesSeparation: 15,
                 subtreeSeparation: 20,
                 siblingSeparation: 20,
-                tags: { item: { template: 'item' } },
                 controls: {
                     zoom_in: { title: '放大' },
                     zoom_out: { title: '缩小' },
