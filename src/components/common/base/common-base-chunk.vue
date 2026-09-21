@@ -19,8 +19,7 @@ export const COMMON_BASE_CHUNK_TYPES = [
     'geekblue',
     'purple',
     'pink',
-    'volcano',
-    'gray'
+    'volcano'
 ] as const
 
 export type NaiveChunkType = (typeof NAIVE_CHUNK_TYPES)[number]
@@ -69,7 +68,7 @@ export default defineComponent({
             'common-base-chunk',
             `is-${props.type}`,
             `is-${props.mode}`,
-            { 'is-dark': inverted.value, 'is-fill': props.type !== 'default' }
+            { 'is-dark': inverted.value, 'is-fill': true }
         ])
 
         return () => {
@@ -92,6 +91,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 $chunk-colors: (
+    'default': (
+        #333639,
+        #ffffffd1
+    ),
     'red': (
         #ed4014,
         #f87171
@@ -131,10 +134,6 @@ $chunk-colors: (
     'pink': (
         #db2777,
         #f9a8d4
-    ),
-    'gray': (
-        #6c7887,
-        #aeb6c1
     )
 );
 
