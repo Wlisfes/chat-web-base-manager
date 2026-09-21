@@ -1,6 +1,6 @@
 import { ref, toRefs, Ref, onMounted } from 'vue'
 import { Observer, fetchHandler } from '@/utils'
-import { useState } from '@/hooks'
+import { useState, useChunkService } from '@/hooks'
 import { ResultResolver, ChunkName } from '@/interface/instance.resolver'
 
 interface BaseServiceState extends Omix {
@@ -32,6 +32,10 @@ export function useBaseService<T extends Omix, R extends Omix, C extends Partial
 ) {
     const faseNode = ref<T>({} as T) as Ref<T>
     const observer = ref(Observer<Record<string, Omix>>())
+    const chunkOptions = useChunkService({
+        immediate: false,
+        type: Object.keys(options.chunkNames ?? {}) as Array<Extract<keyof C, ChunkName>>
+    })
     const { state: faseState, setState } = useState({
         initialize: options.initialize ?? true,
         loading: options.loading ?? true,
@@ -43,6 +47,9 @@ export function useBaseService<T extends Omix, R extends Omix, C extends Partial
         return await fetchHandler(Boolean(options.immediate), async () => {
             return await setState({ visible: true } as never).then(async () => {
                 const tasks: Array<any> = [fetchRequest()]
+                if (Object.keys(options.chunkNames ?? {}).length > 0) {
+                    tasks.push(chunkOptions.fetchRequest())
+                }
                 return await Promise.all(tasks).then(() => {
                     return options.callback?.(faseNode.value, faseState as never)
                 })
@@ -89,6 +96,8 @@ export function useBaseService<T extends Omix, R extends Omix, C extends Partial
         faseNode,
         faseState,
         observer,
+        chunkOptions,
+        chunkState: chunkOptions.chunkState,
         ...toRefs(faseState),
         setState,
         fetchUpdate,

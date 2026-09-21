@@ -21,9 +21,7 @@ export default defineComponent({
             immediate: false
         })
         /**菜单静态枚举**/
-        const enumOptions = useChunkService({
-            request: Service.httpBaseAccountSheetEnums,
-            fields: ['typeOptions', 'statusOptions', 'visibleOptions'],
+        const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountSheetEnums, {
             immediate: false
         })
         /**表单实例**/
@@ -68,7 +66,7 @@ export default defineComponent({
 
         /**菜单资源详情**/
         async function fetchBaseSystemSheetResolver() {
-            return await Promise.all([sheetOptions.fetchRequest(), enumOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([sheetOptions.fetchRequest(), fetchChunk()]).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
                 }
@@ -140,7 +138,7 @@ export default defineComponent({
                     <form-base-column label="类型" path="type">
                         <form-base-select
                             placeholder="请选择类型"
-                            options={enumOptions.enumState.typeOptions}
+                            options={chunkOptions.value.typeOptions}
                             v-model:value={formState.value.type}
                         ></form-base-select>
                     </form-base-column>
@@ -204,7 +202,7 @@ export default defineComponent({
                             <form-base-column label="菜单显示状态">
                                 <form-base-select
                                     placeholder="请选择菜单显示状态"
-                                    options={enumOptions.enumState.visibleOptions}
+                                    options={chunkOptions.value.visibleOptions}
                                     v-model:value={formState.value.visible}
                                 ></form-base-select>
                             </form-base-column>
@@ -213,7 +211,7 @@ export default defineComponent({
                     <form-base-column label="菜单/按钮状态" path="status">
                         <form-base-select
                             placeholder="请选择菜单/按钮状态"
-                            options={enumOptions.enumState.statusOptions}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </form-base-column>

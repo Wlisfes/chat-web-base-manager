@@ -1,6 +1,6 @@
 import { ref, Ref, toRefs, onMounted } from 'vue'
 import { FormInst, FormRules, FormItemRule } from 'naive-ui'
-import { useState } from '@/hooks'
+import { useState, useChunkService } from '@/hooks'
 import { isEmpty, fetchHandler, Observer } from '@/utils'
 import { useRouter, useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash-es'
@@ -40,6 +40,10 @@ export function useFormService<T extends Omix, R extends FormRules, U extends Om
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const observer = ref(Observer<Record<string, Omix>>())
     const formState = ref<typeof options.formState>(options.formState)
+    const chunkOptions = useChunkService({
+        immediate: false,
+        type: Object.keys(options.chunkNames ?? {}) as Array<Extract<keyof C, ChunkName>>
+    })
     const { state, setState } = useState({
         initialize: options.initialize ?? true,
         disabled: options.disabled ?? false,
@@ -53,6 +57,9 @@ export function useFormService<T extends Omix, R extends FormRules, U extends Om
         return await fetchHandler(Boolean(options.immediate ?? true), async () => {
             return await setState({ visible: true } as never).then(async () => {
                 const tasks: Array<any> = []
+                if (Object.keys(options.chunkNames ?? {}).length > 0) {
+                    tasks.push(chunkOptions.fetchRequest())
+                }
                 return await Promise.all(tasks).then(() => {
                     return options.callback?.(formState.value, state)
                 })
@@ -116,6 +123,8 @@ export function useFormService<T extends Omix, R extends FormRules, U extends Om
         formRef,
         formState,
         observer,
+        chunkOptions,
+        chunkState: chunkOptions.chunkState,
         ...toRefs(state),
         setState,
         setForm,
