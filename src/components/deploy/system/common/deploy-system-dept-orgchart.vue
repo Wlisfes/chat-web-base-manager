@@ -1,8 +1,10 @@
 <script lang="tsx">
 import { defineComponent, onMounted, watch, render, PropType } from 'vue'
-import { ChartOptions, fetchChartInitialization, fetchCreateVNode, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
+import { fetchChartInitialization, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
+import { OrgChart, ChartOptions, fetchCreateVNode, fetchCreateSvgIcon } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
+import { Add } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -39,17 +41,27 @@ export default defineComponent({
             ])
         }
 
-        async function fetchDeploySystemDepartment(chart: Awaited<ReturnType<typeof fetchChartInitialization>>, node: Omix) {
+        async function fetchDrawUpdate(chart: Awaited<ReturnType<typeof fetchChartInitialization>>) {
+            return await props.fetchUpdate().then(() => {
+                chart.config.nodes = props.items
+                return chart.draw()
+            })
+        }
+
+        async function fetchCreateDeploySystemDepartment(chart: Awaited<ReturnType<typeof fetchChartInitialization>>) {
+            return await feedback.fetchDeploySystemDepartment({
+                title: '新增部门',
+                command: 'CREATE',
+                onSubmit: event => fetchDrawUpdate(chart)
+            })
+        }
+
+        async function fetchUpdateDeploySystemDepartment(chart: Awaited<ReturnType<typeof fetchChartInitialization>>, node: Omix) {
             return await feedback.fetchDeploySystemDepartment({
                 title: '编辑部门',
                 command: 'UPDATE',
                 node: node,
-                async onSubmit() {
-                    return await props.fetchUpdate().then(() => {
-                        chart.config.nodes = props.items
-                        return chart.draw()
-                    })
-                }
+                onSubmit: event => fetchDrawUpdate(chart)
             })
         }
 
@@ -66,14 +78,21 @@ export default defineComponent({
                         company: { template: 'company' },
                         department: { template: 'department' },
                         user: { template: 'user' }
+                    },
+                    controls: {
+                        myControl: {
+                            title: '新增',
+                            icon: fetchCreateSvgIcon(Add, 22),
+                            onClick: () => fetchCreateDeploySystemDepartment(chart)
+                        }
                     }
                 })
-                chart.onInit(() => {
-                    const [left, top, right, bottom] = chart.getViewBox()
-                    chart.setViewBox([-150, top, right, bottom])
-                })
+                // chart.onInit(() => {
+                //     const [left, top, right, bottom] = chart.getViewBox()
+                //     chart.setViewBox([-150, top, right, bottom])
+                // })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    return fetchDeploySystemDepartment(chart, chart.get(args.node.id))
+                    return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
                 })
                 return watch(theme, value => {
                     chart.config.mode = value
@@ -84,7 +103,21 @@ export default defineComponent({
             })
         }
 
-        return () => <common-base-element is-white class="deploy-system-dept-orgchart w-full h-full"></common-base-element>
+        return () => <common-base-element class="deploy-system-dept-orgchart relative"></common-base-element>
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.deploy-system-dept-orgchart {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    :deep(.boc-controls [data-control-id]) {
+        width: 42px;
+        height: 42px;
+        border-radius: 4px;
+        justify-content: center;
+    }
+}
+</style>

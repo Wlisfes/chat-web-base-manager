@@ -1,5 +1,5 @@
-import OrgChart from 'balkan-orgchart-js'
-import { cloneDeep, isString } from 'lodash-es'
+import { Add, Subtract, FitToScreen, ZoomIn, ZoomOut } from '@vicons/carbon'
+import { fetchCreateSvgIcon, OrgChart } from '@/utils'
 OrgChart.SEARCH_PLACEHOLDER = '请输入...'
 
 export interface ArgsOptions extends Omix {
@@ -37,35 +37,31 @@ export function fetchBaseTemplates(
 }
 
 export async function fetchChartInitialization(element: HTMLElement, options: ChartOptions) {
-    const { paddingLeft, ...chartOptions } = options
     const chart = new OrgChart(
         element,
-        Object.assign(
-            {
-                orientation: OrgChart.orientation.left,
-                layout: OrgChart.layout.treeRight,
-                align: OrgChart.align.center,
-                scaleInitial: 1,
-                mouseScroll: OrgChart.action.ctrlZoom,
-                nodeMouseClick: OrgChart.action.none,
-                levelSeparation: 50,
-                mixedHierarchyNodesSeparation: 15,
-                subtreeSeparation: 20,
-                siblingSeparation: 20,
-                controls: {
-                    zoom_in: { title: '放大' },
-                    zoom_out: { title: '缩小' },
-                    full_screen: { title: '切换全屏模式' }
-                    // layout_mixed: { title: '混合布局', anchor: OrgChart.anchor.right },
-                    // layout_normal: { title: '正常布局', anchor: OrgChart.anchor.right },
-                    // layout_tree: { title: '树形布局', anchor: OrgChart.anchor.right },
-                    // layout_grid: { title: '网格布局', anchor: OrgChart.anchor.right },
-                    // layout_left_offset: { title: '左偏移布局', anchor: OrgChart.anchor.right },
-                    // layout_right_offset: { title: '右偏移布局', anchor: OrgChart.anchor.right }
-                }
-            },
-            cloneDeep(chartOptions)
-        )
+        Object.assign({}, options, {
+            orientation: OrgChart.orientation.left,
+            layout: OrgChart.layout.mixed,
+            align: OrgChart.align.center,
+            scaleInitial: 1,
+            mouseScroll: OrgChart.action.ctrlZoom,
+            nodeMouseClick: OrgChart.action.none,
+            levelSeparation: 50,
+            mixedHierarchyNodesSeparation: 15,
+            subtreeSeparation: 20,
+            siblingSeparation: 20,
+            controls: Object.assign({}, options.controls ?? {}, {
+                zoom_in: { title: '放大', icon: fetchCreateSvgIcon(ZoomIn, 26) },
+                zoom_out: { title: '缩小', icon: fetchCreateSvgIcon(ZoomOut, 26) },
+                full_screen: { title: '切换全屏模式', icon: fetchCreateSvgIcon(FitToScreen, 24) },
+                layout_mixed: { title: '混合布局', anchor: OrgChart.anchor.right },
+                layout_normal: { title: '正常布局', anchor: OrgChart.anchor.right },
+                layout_tree: { title: '树形布局', anchor: OrgChart.anchor.right },
+                layout_grid: { title: '网格布局', anchor: OrgChart.anchor.right },
+                layout_left_offset: { title: '左偏移布局', anchor: OrgChart.anchor.right },
+                layout_right_offset: { title: '右偏移布局', anchor: OrgChart.anchor.right }
+            })
+        })
     )
     return chart
 }

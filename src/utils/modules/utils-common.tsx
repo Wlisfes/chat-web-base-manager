@@ -3,15 +3,27 @@ import { Faker, zh_CN, en } from '@faker-js/faker'
 import { cloneDeep, concat, omit, pick } from 'lodash-es'
 import { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean } from 'class-validator'
 import chineseLorem from '@easonliu1995/chinese-lorem'
+import OrgChart from 'balkan-orgchart-js'
 import tree from 'tree-tool'
 import dayjs from 'dayjs'
 
-export { tree, cloneDeep, concat, omit, pick, isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
+export { tree, OrgChart, cloneDeep, concat, omit, pick, isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
 
 /**图标示例对象**/
 export const modules: Record<string, VNode> = import.meta.glob(`@/assets/icons/*.svg`, { query: '?component', eager: true })
 export const iconNames = Object.keys(modules).reduce((icons: typeof modules, next) => {
     icons[next.match(/([^/]+)\.svg$/)?.[1] as string] = modules[next] as never as VNode
+    return icons
+}, {})
+
+/**本地 SVG 原始字符串，可直接用于只接受 svg 字符串的场景**/
+export const svgModules: Record<string, string> = import.meta.glob(`@/assets/icons/*.svg`, {
+    query: '?raw',
+    import: 'default',
+    eager: true
+})
+export const iconSvgs = Object.keys(svgModules).reduce((icons: Record<string, string>, next) => {
+    icons[next.match(/([^/]+)\.svg$/)?.[1] as string] = svgModules[next]
     return icons
 }, {})
 
