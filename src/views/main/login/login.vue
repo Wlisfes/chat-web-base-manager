@@ -51,7 +51,7 @@ export default defineComponent({
                     content-class="p-0 flex flex-col justify-center"
                     style={{ boxShadow: 'var(--box-shadow-1)' }}
                 >
-                    <form-common-container
+                    <form-base-container
                         class="w-full max-w-375 m-auto select-none"
                         size="large"
                         ref={formRef}
@@ -64,18 +64,18 @@ export default defineComponent({
                             <n-text depth={2}>欢迎登录</n-text>
                         </n-h2>
                         <n-form-item path="number">
-                            <form-common-column-input
+                            <form-base-input
                                 maxlength={128}
                                 type="text"
                                 placeholder="请输入工号、手机号或邮箱"
                                 v-model:value={formState.value.number}
                                 input-props={{ autocomplete: 'on' }}
                                 onSubmit={fetchSubmit}
-                                prefix={<common-element-icon size={22} name="nest-unset-user"></common-element-icon>}
-                            ></form-common-column-input>
+                                prefix={<common-base-icon size={22} name="nest-unset-user"></common-base-icon>}
+                            ></form-base-input>
                         </n-form-item>
                         <n-form-item path="password">
-                            <form-common-column-input
+                            <form-base-input
                                 maxlength={128}
                                 placeholder="请输入登录密码"
                                 type="password"
@@ -84,21 +84,21 @@ export default defineComponent({
                                 style={{ '--input-password-right': '46px' }}
                                 v-model:value={formState.value.password}
                                 onSubmit={fetchSubmit}
-                                prefix={<common-element-icon size={22} name="nest-unset-ockes"></common-element-icon>}
-                            ></form-common-column-input>
+                                prefix={<common-base-icon size={22} name="nest-unset-ockes"></common-base-icon>}
+                            ></form-base-input>
                         </n-form-item>
                         <n-form-item path="code">
                             <n-flex class="w-full">
-                                <form-common-column-input
+                                <form-base-input
                                     class="flex-1"
                                     type="text"
                                     placeholder="验证码"
                                     maxlength={4}
                                     v-model:value={formState.value.code}
                                     onSubmit={fetchSubmit}
-                                    prefix={<common-element-icon size={22} name="nest-unset-codex"></common-element-icon>}
-                                ></form-common-column-input>
-                                <common-element-codex
+                                    prefix={<common-base-icon size={22} name="nest-unset-codex"></common-base-icon>}
+                                ></form-base-input>
+                                <common-base-codex
                                     link={link.value}
                                     loading={loading.value}
                                     error={error.value}
@@ -106,11 +106,11 @@ export default defineComponent({
                                     onClick={fetchRefresh}
                                     onComplete={fetchComplete}
                                     onError={fetchError}
-                                ></common-element-codex>
+                                ></common-base-codex>
                             </n-flex>
                         </n-form-item>
                         <n-form-item>
-                            <common-element-button
+                            <common-base-button
                                 class="w-full"
                                 type="info"
                                 disabled={state.loading}
@@ -118,20 +118,20 @@ export default defineComponent({
                                 onClick={fetchSubmit}
                             >
                                 立即登录
-                            </common-element-button>
+                            </common-base-button>
                         </n-form-item>
                         <n-flex size={32} wrap-item={false} justify="center" align="center" style={{ marginTop: '24px' }}>
-                            <common-element-button text>
-                                <common-element-icon size={44} name="nest-github"></common-element-icon>
-                            </common-element-button>
-                            <common-element-button text>
-                                <common-element-icon size={24} name="nest-specor"></common-element-icon>
-                            </common-element-button>
-                            <common-element-button text>
-                                <common-element-icon size={44} name="nest-google"></common-element-icon>
-                            </common-element-button>
+                            <common-base-button text>
+                                <common-base-icon size={44} name="nest-github"></common-base-icon>
+                            </common-base-button>
+                            <common-base-button text>
+                                <common-base-icon size={24} name="nest-specor"></common-base-icon>
+                            </common-base-button>
+                            <common-base-button text>
+                                <common-base-icon size={44} name="nest-google"></common-base-icon>
+                            </common-base-button>
                         </n-flex>
-                    </form-common-container>
+                    </form-base-container>
                 </n-card>
             </n-element>
         )

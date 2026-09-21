@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, PropType, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { EventType, fetchParentKeyIds, normalizeTreeChildren } from '@/utils'
+import { EventType, fetchParentKeyIds, fetchNormalizeTreeChildren } from '@/utils'
 import { SendFilled } from '@vicons/carbon'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -19,7 +19,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**角色关联菜单数据**/
         const { faseNode, faseState, setState, fetchInitialize, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseSystemColumnRoleSheet({ keyId: props.roleId }),
+            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.roleId }),
             callback: fetchSheetCallback,
             immediate: true,
             options: {
@@ -29,7 +29,7 @@ export default defineComponent({
             }
         })
         /**权限树移除叶子节点的空 children，避免显示无效展开图标。*/
-        const menuTreeData = computed(() => normalizeTreeChildren(props.faseNode ?? []))
+        const menuTreeData = computed(() => fetchNormalizeTreeChildren(props.faseNode ?? []))
         /**监听结束事件**/
         props.observer.on('finish', async () => {
             return await setState({ loading: false, initialize: false })
@@ -52,7 +52,7 @@ export default defineComponent({
         async function fetchSubmit() {
             return await setState({ loading: true }).then(async () => {
                 try {
-                    await Service.httpBaseSystemUpdateRoleSheet({
+                    await Service.httpBaseAccountUpdateRoleMenu({
                         keyId: props.roleId,
                         menuKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
@@ -69,12 +69,12 @@ export default defineComponent({
         }
 
         return () => (
-            <common-element
+            <common-base-element
                 class="deploy-system-role-sheet h-full flex flex-col gap-14 overflow-hidden"
                 style={{ 'border-radius': '0 0 var(--border-radius) var(--border-radius)' }}
             >
-                <common-element is-white class="flex flex-col flex-1 p-block-14 overflow-hidden">
-                    <common-element-wrapper
+                <common-base-element is-white class="flex flex-col flex-1 p-block-14 overflow-hidden">
+                    <common-base-wrapper
                         scrollbar
                         opacity={0}
                         loading={faseState.initialize}
@@ -98,10 +98,10 @@ export default defineComponent({
                             on-update:indeterminate-keys={(indeterminateKeys: Array<number>) => setState({ indeterminateKeys })}
                             on-update:expanded-keys={(expandedKeys: Array<number>) => setState({ expandedKeys })}
                         />
-                    </common-element-wrapper>
-                </common-element>
-                <common-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
-                    <common-element-button
+                    </common-base-wrapper>
+                </common-base-element>
+                <common-base-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
+                    <common-base-button
                         class="min-w-80"
                         type="primary"
                         loading={faseState.loading}
@@ -109,12 +109,12 @@ export default defineComponent({
                         onClick={fetchSubmit}
                     >
                         保存
-                    </common-element-button>
-                    <common-element-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
+                    </common-base-button>
+                    <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
                         重置
-                    </common-element-button>
-                </common-element>
-            </common-element>
+                    </common-base-button>
+                </common-base-element>
+            </common-base-element>
         )
     }
 })

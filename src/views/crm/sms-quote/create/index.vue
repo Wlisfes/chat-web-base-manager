@@ -36,15 +36,15 @@ export default defineComponent({
 
         return () => (
             <layout-common-container>
-                <common-element is-white class="flex justify-center p-inline-14 p-bs-10 p-be-16">
+                <common-base-element is-white class="flex justify-center p-inline-14 p-bs-10 p-be-16">
                     <common-business-steps-wrapper current={state.current} class="max-w-680">
                         <n-step class="items-center" title="填写报价内容" />
                         <n-step class="items-center" title="编辑报价" />
                         <n-step class="items-center" title="报价预览" />
                         <n-step class="items-center" title="发布报价" />
                     </common-business-steps-wrapper>
-                </common-element>
-                <form-common-container
+                </common-base-element>
+                <form-base-container
                     class="flex flex-col flex-1 overflow-hidden"
                     ref={formRef}
                     model={formState.value}
@@ -55,7 +55,7 @@ export default defineComponent({
                         animated
                         type="line"
                         tabs-padding={14}
-                        class="common-element-tabser inset-absolute inset-bar flex-1 overflow-hidden "
+                        class="common-base-tabser inset-absolute inset-bar flex-1 overflow-hidden "
                         v-model:value={state.current}
                     >
                         <n-tab-pane name={1} tab="填写报价内容">
@@ -104,7 +104,7 @@ export default defineComponent({
                             ></crm-sms-quote-publish>
                         </n-tab-pane>
                     </n-tabs>
-                </form-common-container>
+                </form-base-container>
             </layout-common-container>
         )
     }

@@ -27,7 +27,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { state, chunkState, instOptions, setState, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnDatetaskLog({
+                Service.httpBaseSkylineColumnDatetaskLog({
                     ...payload,
                     taskId: props.node.taskId,
                     page: base.page,
@@ -56,7 +56,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <common-element class="h-90vh max-h-640 flex flex-col overflow-hidden">
+                <common-base-element class="h-90vh max-h-640 flex flex-col overflow-hidden">
                     <common-database-table
                         pagination-class="p-bs-14!"
                         bordered={false}
@@ -89,7 +89,7 @@ export default defineComponent({
                             )
                         }}
                     </common-database-table>
-                </common-element>
+                </common-base-element>
             </common-dialog-provider>
         )
     }

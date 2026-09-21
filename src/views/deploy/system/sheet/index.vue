@@ -3,7 +3,7 @@ import { computed, defineComponent, h } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
-import { isEmpty, normalizeTreeChildren } from '@/utils'
+import { isEmpty, fetchNormalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -11,17 +11,17 @@ export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单树结构**/
-        const sheetOptions = useSelectService(e => Service.httpBaseSystemSheetTreeStructure(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTree(), {
             immediate: true,
             options: {
                 selectedKeys: [] as Array<number>,
                 expandedKeys: [] as Array<number>
             }
         })
-        const sheetTreeData = computed(() => normalizeTreeChildren(sheetOptions.dataSource.value))
+        const sheetTreeData = computed(() => fetchNormalizeTreeChildren(sheetOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnSheet({ ...payload, page: base.page, size: base.size }),
+            request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
             chunkNames: {
                 CHUNK_SHEET_STATUS: true,
@@ -105,7 +105,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeleteSheet({ keyId: node.keyId })
+                            await Service.httpBaseAccountDeleteSheet({ keyId: node.keyId })
                             await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                             return await done({ visible: false })
                         } catch (err) {
@@ -127,7 +127,7 @@ export default defineComponent({
                     content-class="flex flex-col flex-1 overflow-hidden! p-block-14 p-is-14"
                 >
                     <n-card class="flex-1 overflow-hidden" content-class="flex flex-col flex-1 p-inline-0! p-block-14! overflow-hidden">
-                        <common-element-wrapper opacity={0} loading={sheetOptions.state.loading}>
+                        <common-base-wrapper opacity={0} loading={sheetOptions.state.loading}>
                             <n-scrollbar trigger="none" class="flex-1 overflow-hidden">
                                 <n-element class="p-inline-14">
                                     <n-tree
@@ -146,7 +146,7 @@ export default defineComponent({
                                     />
                                 </n-element>
                             </n-scrollbar>
-                        </common-element-wrapper>
+                        </common-base-wrapper>
                     </n-card>
                 </n-layout-sider>
                 <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-14 gap-14 overflow-hidden">
@@ -166,57 +166,57 @@ export default defineComponent({
                             on-submit={instOptions.fetchRequest}
                         >
                             <common-database-search-function abstract class="flex gap-col-10">
-                                <common-element-button type="primary" onClick={fetchDeploySheetCreate}>
+                                <common-base-button type="primary" onClick={fetchDeploySheetCreate}>
                                     新增
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="primary"
                                     disabled={instState.value.isUpdate}
                                     onClick={fetchDeploySheetUpdate}
                                 >
                                     编辑
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="primary"
                                     disabled={instState.value.isClone}
                                     onClick={fetchDeploySheetClone}
                                 >
                                     克隆
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="error"
                                     disabled={instState.value.isDelete}
                                     onClick={fetchDeploySheetDelete}
                                 >
                                     删除
-                                </common-element-button>
+                                </common-base-button>
                             </common-database-search-function>
                             <common-database-search-column disabled prop="name" label="菜单名称">
-                                <form-common-column-input
+                                <form-base-input
                                     clearable
                                     placeholder="请输入菜单名称"
                                     v-model:value={formState.value.name}
                                     on-submit={fetchRefresh}
-                                ></form-common-column-input>
+                                ></form-base-input>
                             </common-database-search-column>
                             <common-database-search-column prop="permissionCode" label="权限标识">
-                                <form-common-column-input
+                                <form-base-input
                                     clearable
                                     placeholder="请输入权限标识"
                                     v-model:value={formState.value.permissionCode}
                                     on-submit={fetchRefresh}
-                                ></form-common-column-input>
+                                ></form-base-input>
                             </common-database-search-column>
                             <common-database-search-column prop="path" label="菜单地址">
-                                <form-common-column-input
+                                <form-base-input
                                     clearable
                                     placeholder="请输入菜单地址"
                                     v-model:value={formState.value.path}
                                     on-submit={fetchRefresh}
-                                ></form-common-column-input>
+                                ></form-base-input>
                             </common-database-search-column>
                         </common-database-search>
                     </n-layout-header>
@@ -245,7 +245,7 @@ export default defineComponent({
                                         {isEmpty(data.icon) ? (
                                             <span>-</span>
                                         ) : (
-                                            <common-element-icon size={26} name={data.icon}></common-element-icon>
+                                            <common-base-icon size={26} name={data.icon}></common-base-icon>
                                         )}
                                     </div>
                                 ),

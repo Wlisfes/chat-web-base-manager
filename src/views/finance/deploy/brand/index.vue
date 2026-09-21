@@ -93,30 +93,30 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchDeployBrandCreate}>
+                        <common-base-button type="primary" onClick={fetchDeployBrandCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployBrandUpdate}>
+                        </common-base-button>
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployBrandUpdate}>
                             编辑
-                        </common-element-button>
-                        <common-element-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployBrandStatus}>
+                        </common-base-button>
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployBrandStatus}>
                             切换状态
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="品牌名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入品牌名称"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
-                        <form-common-column-select
+                        <form-base-select
                             placeholder="请选择付款模式"
                             options={chunkState.CHUNK_BRAND_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

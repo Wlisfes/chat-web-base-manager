@@ -2,18 +2,18 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElementImage',
+    name: 'CommonBaseImage',
     props: {
         src: { type: String }
     },
     setup(props, ctx) {
-        return () => <n-image class="common-element-image" src={props.src}></n-image>
+        return () => <n-image class="common-base-image" src={props.src}></n-image>
     }
 })
 </script>
 
 <style lang="scss" scoped>
-.common-element-image.n-image {
+.common-base-image.n-image {
     position: relative;
     :deep(img) {
         display: block;

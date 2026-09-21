@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElementAuthorize',
+    name: 'CommonBaseAlertWrapper',
     props: {
         /**是否显示边框**/
         bordered: { type: Boolean, default: true },
@@ -13,7 +13,7 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         return () => (
-            <n-alert class="common-element-alert-wrapper" closable={props.closable} bordered={props.bordered} show-icon={props.showIcon}>
+            <n-alert class="common-base-alert-wrapper" closable={props.closable} bordered={props.bordered} show-icon={props.showIcon}>
                 {slots.default && slots.default()}
             </n-alert>
         )
@@ -22,7 +22,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.common-element-alert-wrapper.n-alert {
+.common-base-alert-wrapper.n-alert {
     display: flex;
     flex-direction: column;
     :deep(.n-alert-body),

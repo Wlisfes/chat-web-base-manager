@@ -5,7 +5,7 @@ import { useVModels } from '@vueuse/core'
 import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
-    name: 'FormCommonColumn',
+    name: 'FormBaseColumn',
     emits: ['update:value'],
     props: {
         /**字段值**/
@@ -16,7 +16,7 @@ export default defineComponent({
         const initialValue = ref<any>(cloneDeep(props.value))
         const element = ref() as Ref<Omix<FormItemInst>>
         /**获取formRef实例**/
-        const formRef = inject('FORM_COMMON_INSTANCE', ref({} as Omix<FormInst>))
+        const formRef = inject('FORM_BASE_INSTANCE', ref({} as Omix<FormInst>))
         /**字段重置**/
         function restore() {
             value.value = initialValue.value ?? null
@@ -35,7 +35,7 @@ export default defineComponent({
         })
 
         return () => (
-            <n-form-item ref={element} class="form-common-column">
+            <n-form-item ref={element} class="form-base-column">
                 {slots.default && slots.default()}
             </n-form-item>
         )

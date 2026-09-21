@@ -24,7 +24,7 @@ body,
 }
 
 /**tabs组件二次封装**/
-.common-element-tabser.n-tabs.n-tabs--line-type {
+.common-base-tabser.n-tabs.n-tabs--line-type {
     position: relative;
     > .n-tabs-nav--line-type {
         border-radius: var(--border-radius) var(--border-radius) 0 0;

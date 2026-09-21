@@ -32,14 +32,14 @@ export default defineComponent({
                 ) : (
                     <Fragment>
                         {props.items.map((item, index) => (
-                            <common-element-button
+                            <common-base-button
                                 class="common-progressbar"
                                 size="small"
                                 type="primary"
                                 secondary={!(level.value >= index)}
                             >
                                 {item.name}
-                            </common-element-button>
+                            </common-base-button>
                         ))}
                     </Fragment>
                 )}

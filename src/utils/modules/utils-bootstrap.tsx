@@ -6,7 +6,7 @@ import App from '@/App.vue'
 
 export function createBootstrap(props: Omix = {}) {
     const app = createApp(<App {...props} />)
-    app.component('common-element-draggable', VueDraggable)
+    app.component('common-base-draggable', VueDraggable)
     setupStore(app)
     setupRouter(app, { interceptor: true })
     return { app }

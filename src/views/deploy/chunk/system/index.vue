@@ -12,7 +12,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnDatetask({
+                Service.httpBaseSkylineColumnDatetask({
                     ...payload,
                     page: base.page,
                     size: base.size
@@ -53,7 +53,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
+                            await Service.httpBaseSkylineUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -85,7 +85,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            const response = await Service.httpBaseSystemTriggerDatetask({ taskId: node.taskId })
+                            const response = await Service.httpBaseSkylineTriggerDatetask({ taskId: node.taskId })
                             await fetchRefresh()
                             await done({ visible: false })
                             const result = response.data?.result
@@ -131,48 +131,48 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskStatusToggle}
                         >
                             启用/停用
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="primary"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskCronUpdate}
                         >
                             修改Cron
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="info"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskTrigger}
                         >
                             手动触发
-                        </common-element-button>
-                        <common-element-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
+                        </common-base-button>
+                        <common-base-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
                             执行日志
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="taskName" label="任务名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入任务名称"
                             v-model:value={formState.value.taskName}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="任务状态">
-                        <form-common-column-select
+                        <form-base-select
                             placeholder="请选择任务状态"
                             options={chunkState.CHUNK_DATETASK_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

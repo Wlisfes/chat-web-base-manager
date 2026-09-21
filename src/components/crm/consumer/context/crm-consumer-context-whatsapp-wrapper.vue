@@ -6,11 +6,11 @@ export default defineComponent({
     props: {},
     setup(props, { slots }) {
         return () => (
-            <common-element is-white class="crm-consumer-context-whatsapp-wrapper">
+            <common-base-element is-white class="crm-consumer-context-whatsapp-wrapper">
                 {Array.from({ length: 50 }, () => (
                     <n-h2>crm-consumer-context-whatsapp-wrapper</n-h2>
                 ))}
-            </common-element>
+            </common-base-element>
         )
     }
 })

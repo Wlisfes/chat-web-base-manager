@@ -19,11 +19,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             transform: mapDeployOrganizations
         })
         /**职位选项**/
-        const positionOptions = useSelectService(() => Service.httpBaseSystemSelectPosition(), { immediate: false })
+        const positionOptions = useSelectService(() => Service.httpBaseAccountSelectPosition(), { immediate: false })
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
@@ -77,7 +77,7 @@ export default defineComponent({
                     })
                 }
                 try {
-                    return await Service.httpBaseSystemAccountResolver({ uid: props.node.uid }).then(async ({ data }) => {
+                    return await Service.httpBaseAccountUserResolver({ uid: props.node.uid }).then(async ({ data }) => {
                         const account = mapDeployAccountUser(data)
                         const formOptions: Omix = fetchReste({
                             ...account,
@@ -103,7 +103,7 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreateAccount({
+                        await Service.httpBaseAccountCreateUser({
                             ...createDeployAccountPayload(formState.value, true),
                             password: formState.value.password,
                             memberships: createDeployAccountMemberships(formState.value.depts),
@@ -111,11 +111,11 @@ export default defineComponent({
                         })
                     } else if (['UPDATE'].includes(props.command)) {
                         const uid = props.node.uid
-                        await Service.httpBaseSystemUpdateAccount({
+                        await Service.httpBaseAccountUpdateUser({
                             uid,
                             ...createDeployAccountPayload(formState.value)
                         })
-                        await Service.httpBaseSystemUpdateAccountOrganization({
+                        await Service.httpBaseAccountUpdateUserOrganization({
                             uid,
                             memberships: createDeployAccountMemberships(formState.value.depts)
                         })
@@ -143,7 +143,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     class="grid-auto-350 gap-col-20"
                     require-mark-placement="left"
                     size="medium"
@@ -152,18 +152,18 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="归属部门" path="depts">
-                        <form-common-column-cascader
+                    <form-base-column label="归属部门" path="depts">
+                        <form-base-cascader
                             multiple
                             clearable
                             cascade={false}
                             placeholder="请选择归属部门"
                             v-model:value={formState.value.depts}
                             options={deptOptions.dataSource.value}
-                        ></form-common-column-cascader>
-                    </form-common-column>
-                    <form-common-column label="职位" path="positionKeyIds">
-                        <form-common-column-select
+                        ></form-base-cascader>
+                    </form-base-column>
+                    <form-base-column label="职位" path="positionKeyIds">
+                        <form-base-select
                             multiple
                             filterable
                             clearable
@@ -172,54 +172,54 @@ export default defineComponent({
                             options={positionOptions.dataSource.value}
                             label-value="keyId"
                             v-model:value={formState.value.positionKeyIds}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="姓名" path="name">
-                        <form-common-column-input
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="姓名" path="name">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入姓名"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="工号" path="number">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="工号" path="number">
+                        <form-base-input
                             maxlength={4}
                             placeholder="请输入工号（4位）"
                             disabled={['UPDATE'].includes(props.command)}
                             v-model:value={formState.value.number}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="手机号" path="phone">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="手机号" path="phone">
+                        <form-base-input
                             maxlength={11}
                             placeholder="请输入手机号"
                             v-model:value={formState.value.phone}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="邮箱" path="email">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="邮箱" path="email">
+                        <form-base-input
                             maxlength={128}
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
-                        ></form-common-column-input>
-                    </form-common-column>
+                        ></form-base-input>
+                    </form-base-column>
                     {['CREATE'].includes(props.command) && (
-                        <form-common-column label="密码" path="password">
-                            <form-common-column-input
+                        <form-base-column label="密码" path="password">
+                            <form-base-input
                                 maxlength={32}
                                 placeholder="请输入密码（6~32位）"
                                 v-model:value={formState.value.password}
-                            ></form-common-column-input>
-                        </form-common-column>
+                            ></form-base-input>
+                        </form-base-column>
                     )}
-                    <form-common-column label="状态" path="status">
-                        <form-common-column-select
+                    <form-base-column label="状态" path="status">
+                        <form-base-select
                             placeholder="请选择状态"
                             options={chunkState.CHUNK_ACCOUNT_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                </form-common-container>
+                        ></form-base-select>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

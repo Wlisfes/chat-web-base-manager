@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useSelectService, useChunkService } from '@/hooks'
+import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { createDeployAccountQuery, mapDeployAccountUsers, mapDeployOrganizations } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
@@ -9,17 +9,15 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemUser',
     setup(props, ctx) {
-        /**通用字典枚举**/
-        const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseSystemDepartmentTreeStructure(), {
+        const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: true,
             transform: mapDeployOrganizations
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnAccount(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+                Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
             transform: data => mapDeployAccountUsers(data.list),
             keyName: 'chat:deploy:system:user',
             formState: {
@@ -78,7 +76,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeleteAccount({ uid: node.uid, status: 'disabled' })
+                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status: 'disabled' })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -99,7 +97,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemResetPasswordAccount({ uid: node.uid, password: '123456' })
+                            await Service.httpBaseAccountResetUserPassword({ uid: node.uid, password: '123456' })
                             return await done({ visible: false }).then(async () => {
                                 return await fetchNotifyService({ title: '密码重置成功' })
                             })
@@ -128,65 +126,65 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchDeployAccountCreate}>
+                        <common-base-button type="primary" onClick={fetchDeployAccountCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployAccountUpdate}>
+                        </common-base-button>
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployAccountUpdate}>
                             编辑
-                        </common-element-button>
-                        <common-element-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
+                        </common-base-button>
+                        <common-base-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
                             禁用
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
                             onClick={fetchDeployAccountResetPassword}
                         >
                             重置密码
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="名称/工号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入名称或工号"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="depts" label="归属部门">
-                        <form-common-column-cascader
+                        <form-base-cascader
                             multiple
                             clearable
                             placeholder="请选择归属部门"
                             v-model:value={formState.value.depts}
                             options={deptOptions.dataSource.value}
-                        ></form-common-column-cascader>
+                        ></form-base-cascader>
                     </common-database-search-column>
                     <common-database-search-column prop="phone" label="手机号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入手机号"
                             v-model:value={formState.value.phone}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="email" label="邮箱">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
-                        <form-common-column-select
+                        <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             v-model:value={formState.value.status}
                             on-change:value={fetchRefresh}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
@@ -241,7 +239,7 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                                //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             ></common-database-table-chunk>
                         )
                     }}

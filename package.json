@@ -1,9 +1,10 @@
 {
     "name": "chat-web-base-manager",
     "private": true,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "module",
     "scripts": {
+        "install": "yarn install --ignore-scripts --ignore-engines",
         "dev": "vite --config vite.config.ts",
         "build": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build --config vite.config.ts",
         "preview": "vite preview --config vite.config.ts"
@@ -20,6 +21,7 @@
         "@vueuse/components": "^11.0.3",
         "@vueuse/core": "^11.0.3",
         "axios": "1.7.7",
+        "balkan-orgchart-js": "^9.3.28",
         "big.js": "^7.0.1",
         "class-validator": "^0.14.1",
         "dayjs": "^1.11.13",

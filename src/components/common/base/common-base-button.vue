@@ -3,7 +3,7 @@ import { defineComponent, h, PropType, VNode } from 'vue'
 import * as utils from '@/utils'
 
 export default defineComponent({
-    name: 'CommonElementButton',
+    name: 'CommonBaseButton',
     emits: ['click'],
     props: {
         /**是否表格操作按钮**/
@@ -23,7 +23,7 @@ export default defineComponent({
             if (utils.isEmpty(props.icon)) {
                 return null
             } else if (utils.isString(props.icon)) {
-                return <common-element-icon size={props.iconSize} name={props.icon}></common-element-icon>
+                return <common-base-icon size={props.iconSize} name={props.icon}></common-base-icon>
             }
             return h(props.icon as VNode)
         }
@@ -34,7 +34,7 @@ export default defineComponent({
 
         return () => (
             <n-button
-                class={{ 'common-element-button': true, 'element-database': props.database }}
+                class={{ 'common-base-button': true, 'element-database': props.database }}
                 style={{ '--n-icon-size': props.iconSize + 'px' }}
                 focusable={false}
                 onClick={(event: MouseEvent) => emit('click', event, { setState: props.setState })}
@@ -47,7 +47,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.common-element-button.element-database {
+.common-base-button.element-database {
     --n-icon-margin: 3px;
 }
 </style>

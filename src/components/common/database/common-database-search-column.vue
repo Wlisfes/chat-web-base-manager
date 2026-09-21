@@ -32,7 +32,7 @@ export default defineComponent({
                 return null
             }
             return (
-                <form-common-column
+                <form-base-column
                     class={`common-database-search-column ${props.span > 1 ? 'grid-col-span-2' : 'grid-col-span-1'}`}
                     show-feedback={false}
                     prop={props.prop}
@@ -40,7 +40,7 @@ export default defineComponent({
                     label={props.label}
                 >
                     {slots.default && slots.default()}
-                </form-common-column>
+                </form-base-column>
             )
         }
     }

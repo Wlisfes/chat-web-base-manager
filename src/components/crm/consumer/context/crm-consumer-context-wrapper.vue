@@ -1,11 +1,7 @@
 <script lang="tsx">
-import { defineComponent, ref, PropType } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { useVModels } from '@vueuse/core'
-import { Observer, fetchNumCurrency } from '@/utils'
-import { useColumnService, useState, useChunkService } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import * as feedback from '@/components/finance/hooks'
-import * as Service from '@/api/instance.service'
+import { fetchNumCurrency } from '@/utils'
 
 export default defineComponent({
     name: 'CrmConsumerContextWrapper',

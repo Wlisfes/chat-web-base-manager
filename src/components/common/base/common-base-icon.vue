@@ -3,7 +3,7 @@ import { defineComponent, computed, h, PropType, VNode, Fragment } from 'vue'
 import { iconNames } from '@/utils'
 
 export default defineComponent({
-    name: 'CommonElementIcon',
+    name: 'CommonBaseIcon',
     emits: ['click'],
     props: {
         /**图标名称**/
@@ -15,7 +15,7 @@ export default defineComponent({
         const VNodeCurrent = computed(() => iconNames[String(props.name)])
 
         return () => (
-            <n-icon class="common-element-icon">
+            <n-icon class="common-base-icon">
                 {slots.default ? (
                     slots.default()
                 ) : props.component ? (

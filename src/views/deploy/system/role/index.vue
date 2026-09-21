@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { createDeployRoleView, isEmpty, normalizeTreeChildren, stop } from '@/utils'
+import { createDeployRoleView, isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -12,15 +12,15 @@ export default defineComponent({
     setup(props, ctx) {
         /**菜单树数据**/
         const treeOptions = useBaseService({
-            request: () => Service.httpBaseSystemSheetTreeStructure(),
+            request: () => Service.httpBaseAccountSheetTree(),
             immediate: true
         })
         /**角色列表**/
         const { faseNode, faseState, observer, setState, fetchRefresh } = useBaseService({
             request: async () => {
                 const [roleResponse, organizationResponse] = await Promise.all([
-                    Service.httpBaseSystemSelectRole(),
-                    Service.httpBaseSystemDepartmentTreeStructure()
+                    Service.httpBaseAccountSelectRole(),
+                    Service.httpBaseAccountOrganizationTreeStructure()
                 ])
                 return {
                     ...roleResponse,
@@ -36,7 +36,7 @@ export default defineComponent({
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
-        const departmentRoleTreeData = computed(() => normalizeTreeChildren(faseNode.value.dept ?? []))
+        const departmentRoleTreeData = computed(() => fetchNormalizeTreeChildren(faseNode.value.dept ?? []))
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
             if ((data.list ?? []).length === 0 || faseState.selectedKeys.length > 0) {
@@ -63,7 +63,7 @@ export default defineComponent({
                     keyId: item.keyId,
                     sort: (index + 1) * 10
                 }))
-                await Promise.all(list.map((item: Omix) => Service.httpBaseSystemUpdateRoleSort(item)))
+                await Promise.all(list.map((item: Omix) => Service.httpBaseAccountUpdateRole(item)))
                 return await fetchNotifyService({ title: '操作成功' })
             } catch (err) {
                 return await fetchNotifyService({ type: 'error', title: err.message })
@@ -97,7 +97,7 @@ export default defineComponent({
                     async onSubmit(done: Function) {
                         return await done({ loading: true }).then(async () => {
                             try {
-                                await Service.httpBaseSystemDeleteRole({ keyId: node.keyId })
+                                await Service.httpBaseAccountDeleteRole({ keyId: node.keyId })
                                 await fetchRefresh()
                                 return await done({ visible: false })
                             } catch (err) {
@@ -120,18 +120,18 @@ export default defineComponent({
                     content-class="flex flex-col flex-1 overflow-hidden! p-block-14 p-is-14"
                 >
                     <n-card class="flex-1 overflow-hidden" content-class="flex flex-col flex-1 p-0! overflow-hidden">
-                        <common-element-wrapper scrollbar opacity={0} loading={faseState.initialize}>
+                        <common-base-wrapper scrollbar opacity={0} loading={faseState.initialize}>
                             <n-element class="flex flex-col gap-10 overflow-hidden">
                                 <div class="flex flex-col p-inline-14 overflow-hidden">
                                     <div class="flex items-center justify-between p-block-12 overflow-hidden">
                                         <n-h4 class="line-height-21 m-0">通用角色</n-h4>
-                                        <common-element-button
+                                        <common-base-button
                                             text
                                             type="primary"
                                             onClick={(event: MouseEvent) => fetchDeployUpdateSystemRole(event)}
                                         >
                                             新增角色
-                                        </common-element-button>
+                                        </common-base-button>
                                     </div>
                                     {(faseNode.value.list ?? []).length > 0 && (
                                         <n-radio-group
@@ -139,7 +139,7 @@ export default defineComponent({
                                             value={faseState.selectedKeys[0]}
                                             on-update:value={(keyId: number) => fetchUpdateSelected([keyId])}
                                         >
-                                            <common-element-draggable
+                                            <common-base-draggable
                                                 class="flex flex-col overflow-hidden"
                                                 handle=".cursor-move"
                                                 animation={200}
@@ -157,25 +157,25 @@ export default defineComponent({
                                                             <n-text>{item.name}</n-text>
                                                         </n-ellipsis>
                                                         <div class="flex items-center p-inline-7 overflow-hidden" title="编辑角色">
-                                                            <common-element-button
+                                                            <common-base-button
                                                                 text
                                                                 icon-size={16}
                                                                 icon="nest-settings"
                                                                 onClick={(e: MouseEvent) => fetchDeployUpdateSystemRole(e, item)}
-                                                            ></common-element-button>
+                                                            ></common-base-button>
                                                         </div>
                                                         <div class="flex items-center p-inline-7 overflow-hidden" title="删除角色">
-                                                            <common-element-button
+                                                            <common-base-button
                                                                 text
                                                                 icon-size={16}
                                                                 type="error"
                                                                 icon="nest-delete"
                                                                 onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
-                                                            ></common-element-button>
+                                                            ></common-base-button>
                                                         </div>
                                                     </n-radio>
                                                 ))}
-                                            </common-element-draggable>
+                                            </common-base-draggable>
                                         </n-radio-group>
                                     )}
                                 </div>
@@ -196,7 +196,7 @@ export default defineComponent({
                                     />
                                 </div>
                             </n-element>
-                        </common-element-wrapper>
+                        </common-base-wrapper>
                     </n-card>
                 </n-layout-sider>
                 <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-14 overflow-hidden">
@@ -206,7 +206,7 @@ export default defineComponent({
                         default-value="account"
                         tab-class="p-block-12!"
                         tabs-padding={14}
-                        class="common-element-tabser inset-absolute h-full overflow-hidden "
+                        class="common-base-tabser inset-absolute h-full overflow-hidden "
                         v-model:value={faseState.tabName}
                     >
                         <n-tab-pane name="account" tab="关联账号" display-directive="show">

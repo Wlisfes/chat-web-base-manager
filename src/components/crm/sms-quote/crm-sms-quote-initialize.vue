@@ -57,44 +57,44 @@ export default defineComponent({
 
         return () => (
             <Fragment>
-                <common-element class="flex flex-col flex-1 p-14 overflow-hidden">
-                    <common-element is-white class="flex-1 flex flex-col p-inline-24 p-bs-24 b-rd-3 overflow-hidden">
+                <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden">
+                    <common-base-element is-white class="flex-1 flex flex-col p-inline-24 p-bs-24 b-rd-3 overflow-hidden">
                         <div class="flex flex-col gap-y-10 overflow-hidden">
                             <common-business-header bar title="基本信息"></common-business-header>
-                            <common-element-columns-template class="gap-x-24" type="auto-fit" number={450}>
-                                <form-common-column
+                            <common-base-columns-template class="gap-x-24" type="auto-fit" number={450}>
+                                <form-base-column
                                     label="客户别名"
                                     path="consumerKeyId"
                                     rule={{ required: true, trigger: ['blur'], type: 'number', message: '请选择报价客户' }}
                                 >
-                                    <form-common-column-select
+                                    <form-base-select
                                         filterable
                                         label-field="showName"
                                         label-value="keyId"
                                         v-model:value={formState.value.consumerKeyId}
                                         options={props.consumerOptions.dataSource.value}
                                         on-change:value={fetchChangeConsumer}
-                                    ></form-common-column-select>
-                                </form-common-column>
-                                <form-common-column
+                                    ></form-base-select>
+                                </form-base-column>
+                                <form-base-column
                                     label="选择应用"
                                     path="appId"
                                     rule={{ required: true, trigger: ['blur'], message: '请选择报价应用' }}
                                 >
-                                    <form-common-column-select
+                                    <form-base-select
                                         filterable
                                         label-field="appAlias"
                                         label-value="appId"
                                         v-model:value={formState.value.appId}
                                         options={props.appOptions.dataSource.value}
-                                    ></form-common-column-select>
-                                </form-common-column>
-                            </common-element-columns-template>
+                                    ></form-base-select>
+                                </form-base-column>
+                            </common-base-columns-template>
                         </div>
                         <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
                             <common-business-header bar title="配置报价方向"></common-business-header>
                             <div class="flex-1 relative overflow-hidden">
-                                <form-common-column
+                                <form-base-column
                                     class="inset-0 position-absolute"
                                     path="countryKeyIds"
                                     show-label={false}
@@ -107,12 +107,12 @@ export default defineComponent({
                                         v-model:value={formState.value.countryKeyIds}
                                         options={props.mccOptions.dataSource.value}
                                     ></n-transfer>
-                                </form-common-column>
+                                </form-base-column>
                             </div>
                         </div>
-                    </common-element>
-                </common-element>
-                <common-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
+                    </common-base-element>
+                </common-base-element>
+                <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
                     <n-button
                         class="min-w-168"
                         type="primary"
@@ -122,7 +122,7 @@ export default defineComponent({
                     >
                         下一步：编辑报价
                     </n-button>
-                </common-element>
+                </common-base-element>
             </Fragment>
         )
     }

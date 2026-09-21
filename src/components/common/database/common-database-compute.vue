@@ -39,7 +39,7 @@ export default defineComponent({
                     <div class="flex items-center">
                         {props.keys.includes('refresh') && (
                             <Fragment>
-                                <common-element-button
+                                <common-base-button
                                     text
                                     class="h-full p-inline-6"
                                     icon="nest-refresh"
@@ -47,7 +47,7 @@ export default defineComponent({
                                     disabled={loading.value}
                                     loading={loading.value}
                                     onClick={() => emit('refresh')}
-                                ></common-element-button>
+                                ></common-base-button>
                                 <n-divider class="m-0!" vertical />
                             </Fragment>
                         )}
@@ -69,13 +69,13 @@ export default defineComponent({
                         )}
                         {props.keys.includes('full') && (
                             <Fragment>
-                                <common-element-button
+                                <common-base-button
                                     text
                                     class="h-full p-inline-6"
                                     icon={full.value ? 'nest-shrink' : 'nest-screen'}
                                     icon-size={22}
                                     onClick={props.toggle}
-                                ></common-element-button>
+                                ></common-base-button>
                             </Fragment>
                         )}
                     </div>

@@ -13,7 +13,7 @@ export default defineComponent({
                     animated
                     type="line"
                     tabs-padding={14}
-                    class="common-element-tabser inset-absolute flex-1 overflow-hidden"
+                    class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     v-model:value={state.tabName}
                 >
                     <n-tab-pane name="effective" tab="已生效" display-directive="show:lazy">

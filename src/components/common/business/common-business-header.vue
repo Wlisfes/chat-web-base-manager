@@ -11,9 +11,9 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         return () => (
-            <common-element class={{ 'common-business-header': true, 'is-bar': props.bar }}>
+            <common-base-element class={{ 'common-business-header': true, 'is-bar': props.bar }}>
                 {slots.default ? slots.default() : props.title}
-            </common-element>
+            </common-base-element>
         )
     }
 })

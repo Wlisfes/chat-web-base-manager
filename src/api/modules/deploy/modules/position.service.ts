@@ -2,7 +2,7 @@ import { request } from '@/utils'
 import type * as Position from '@/interface/deploy/deploy-position.resolver'
 
 /**新增职位**/
-export function httpBaseSystemCreatePosition(data: Position.PositionCreateRequest) {
+export function httpBaseAccountCreatePosition(data: Position.PositionCreateRequest) {
     return request<Position.PositionItem>({
         url: '/api/account/position/create',
         method: 'POST',
@@ -11,7 +11,7 @@ export function httpBaseSystemCreatePosition(data: Position.PositionCreateReques
 }
 
 /**编辑职位**/
-export function httpBaseSystemUpdatePosition(data: Position.PositionUpdateRequest) {
+export function httpBaseAccountUpdatePosition(data: Position.PositionUpdateRequest) {
     return request<Position.PositionItem>({
         url: '/api/account/position/update',
         method: 'POST',
@@ -19,8 +19,8 @@ export function httpBaseSystemUpdatePosition(data: Position.PositionUpdateReques
     })
 }
 
-/**职位详情**/
-export function httpBaseSystemPositionResolver(params: Position.PositionResolverRequest) {
+/**获取职位详情**/
+export function httpBaseAccountPositionResolver(params: Position.PositionResolverRequest) {
     return request<Position.PositionItem>({
         url: '/api/account/position/resolve',
         method: 'GET',
@@ -28,8 +28,8 @@ export function httpBaseSystemPositionResolver(params: Position.PositionResolver
     })
 }
 
-/**职位分页列表查询**/
-export function httpBaseSystemColumnPosition(data: Position.PositionColumnRequest) {
+/**分页查询职位**/
+export function httpBaseAccountColumnPosition(data: Position.PositionColumnRequest) {
     return request<Position.PositionColumnResponse>({
         url: '/api/account/position/column',
         method: 'POST',
@@ -37,13 +37,13 @@ export function httpBaseSystemColumnPosition(data: Position.PositionColumnReques
     })
 }
 
-/**删除职位**/
-export function httpBaseSystemDeletePosition(data: Position.PositionKeyRequest) {
+/**删除未关联员工的职位**/
+export function httpBaseAccountDeletePosition(data: Position.PositionKeyRequest) {
     return request<Position.PositionDeleteResponse>({ url: '/api/account/position/delete', method: 'POST', data })
 }
 
-/**职位下拉列表**/
-export function httpBaseSystemSelectPosition(params?: Position.PositionSelectRequest) {
+/**获取职位下拉选项**/
+export function httpBaseAccountSelectPosition(params?: Position.PositionSelectRequest) {
     return request<Position.PositionSelectItem[]>({
         url: '/api/account/position/select',
         method: 'GET',

@@ -1,4 +1,4 @@
-import { createApp, createVNode, nextTick, App } from 'vue'
+import { createApp, render, createVNode, nextTick, App, Component, getCurrentInstance } from 'vue'
 import { setupStore } from '@/store'
 import { setupRouter } from '@/router'
 import * as utils from '@/utils'
@@ -64,6 +64,53 @@ export async function createComponent<T extends Omix>(
     })
 
     return { element, app, unmount }
+}
+
+/**创建虚拟DOM实例**/
+export function fetchCreateVNode(Component: Parameters<typeof createVNode>['0']) {
+    const vnode = createVNode(Component)
+    const instance = getCurrentInstance()
+    if (instance && instance.appContext) {
+        vnode.appContext = instance.appContext
+    }
+    return vnode
+}
+
+/**把本地 svg 字符串或 @vicons 组件转成 Balkan controls.icon 可用的 svg 字符串**/
+export function fetchCreateSvgIcon(source: string | Component, size = 16, color = '#7A7A7A', padding = 2) {
+    const holder = document.createElement('div')
+    holder.style.cssText = 'position:fixed;left:-9999px;top:-9999px;pointer-events:none;'
+    document.body.appendChild(holder)
+    if (typeof source !== 'string') {
+        render(createVNode(source), holder)
+    } else {
+        holder.innerHTML = source
+    }
+    const svgEl = holder.querySelector('svg')
+    if (!svgEl) {
+        if (typeof source !== 'string') {
+            render(null, holder)
+        }
+        holder.remove()
+        return String(source)
+    }
+    svgEl.setAttribute('width', String(size))
+    svgEl.setAttribute('height', String(size))
+    const bbox = svgEl.getBBox()
+    if (bbox.width > 0 && bbox.height > 0) {
+        const maxSide = Math.max(bbox.width, bbox.height)
+        const inner = Math.max(size - padding * 2, 1)
+        const viewSize = (maxSide * size) / inner
+        const x = bbox.x + (bbox.width - viewSize) / 2
+        const y = bbox.y + (bbox.height - viewSize) / 2
+        svgEl.setAttribute('viewBox', `${x} ${y} ${viewSize} ${viewSize}`)
+    }
+    const html = svgEl.outerHTML.replace(/currentColor/g, color)
+    if (typeof source !== 'string') {
+        render(null, holder)
+    }
+    holder.remove()
+    return html
 }
 
 /**异步返回VNode**/

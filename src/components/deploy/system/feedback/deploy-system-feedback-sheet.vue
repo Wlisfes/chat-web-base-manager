@@ -17,12 +17,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**菜单资源树结构表**/
-        const sheetOptions = useSelectService(() => Service.httpBaseSystemSheetTreeStructure(), {
+        const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTree(), {
             immediate: false
         })
-        /**通用字典枚举**/
-        const chunkOptions = useChunkService({
-            type: ['CHUNK_SHEET_CHECK', 'CHUNK_SHEET_STATUS', 'CHUNK_SHEET_CHUNK'],
+        /**菜单静态枚举**/
+        const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountSheetEnums, {
             immediate: false
         })
         /**表单实例**/
@@ -67,12 +66,12 @@ export default defineComponent({
 
         /**菜单资源详情**/
         async function fetchBaseSystemSheetResolver() {
-            return await Promise.all([sheetOptions.fetchRequest(), chunkOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([sheetOptions.fetchRequest(), fetchChunk()]).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
                 }
                 try {
-                    return await Service.httpBaseSystemSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                    return await Service.httpBaseAccountSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                         return await setForm({ ...fetchReste(data), parentKeyId: data.parentKeyId }).then(async () => {
                             return await setState({ initialize: false })
                         })
@@ -93,15 +92,15 @@ export default defineComponent({
                 try {
                     if (['menu', 'directory'].includes(formState.value.type)) {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseSystemCreateSheetResource(formState.value)
+                            await Service.httpBaseAccountCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseSystemUpdateSheetResource({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     } else {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseSystemCreateSheetAuthorize(formState.value)
+                            await Service.httpBaseAccountCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseSystemUpdateSheetAuthorize({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     }
                     return await setState({ visible: false }).then(async () => {
@@ -127,7 +126,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     class="grid-auto-350 gap-col-20"
                     require-mark-placement="left"
                     size="medium"
@@ -136,25 +135,25 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="类型" path="type">
-                        <form-common-column-select
+                    <form-base-column label="类型" path="type">
+                        <form-base-select
                             placeholder="请选择类型"
-                            options={chunkOptions.CHUNK_SHEET_CHUNK.value}
+                            options={chunkOptions.value.typeOptions}
                             v-model:value={formState.value.type}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column
                         label="权限标识"
                         path="permissionCode"
                         rule={{ required: formState.value.type !== 'directory', trigger: 'blur', message: '请输入权限标识' }}
                     >
-                        <form-common-column-input
+                        <form-base-input
                             maxlength={255}
                             placeholder="请输入权限标识"
                             v-model:value={formState.value.permissionCode}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column
                         label="父级菜单/按钮"
                         path="parentKeyId"
                         key={formState.value.type}
@@ -165,58 +164,58 @@ export default defineComponent({
                             message: '请选择父级菜单/按钮'
                         }}
                     >
-                        <form-common-column-cascader
+                        <form-base-cascader
                             clearable
                             expand-trigger="click"
                             placeholder="请选择父级菜单/按钮"
                             v-model:value={formState.value.parentKeyId}
                             options={sheetOptions.dataSource.value}
-                        ></form-common-column-cascader>
-                    </form-common-column>
-                    <form-common-column label="菜单/按钮名称" path="name">
-                        <form-common-column-input
+                        ></form-base-cascader>
+                    </form-base-column>
+                    <form-base-column label="菜单/按钮名称" path="name">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入菜单/按钮名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
+                        ></form-base-input>
+                    </form-base-column>
                     {['menu', 'directory'].includes(formState.value.type) && (
                         <Fragment>
-                            <form-common-column
+                            <form-base-column
                                 label="菜单地址"
                                 path="path"
                                 rule={{ required: true, trigger: 'blur', message: '请输入菜单地址' }}
                             >
-                                <form-common-column-input
+                                <form-base-input
                                     maxlength={255}
                                     placeholder="请输入菜单地址"
                                     v-model:value={formState.value.path}
-                                ></form-common-column-input>
-                            </form-common-column>
-                            <form-common-column label="菜单图标" path="icon">
-                                <form-common-column-input
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column label="菜单图标" path="icon">
+                                <form-base-input
                                     maxlength={255}
                                     placeholder="请输入菜单图标"
                                     v-model:value={formState.value.icon}
-                                ></form-common-column-input>
-                            </form-common-column>
-                            <form-common-column label="菜单显示状态">
-                                <form-common-column-select
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column label="菜单显示状态">
+                                <form-base-select
                                     placeholder="请选择菜单显示状态"
-                                    options={chunkOptions.CHUNK_SHEET_CHECK.value}
+                                    options={chunkOptions.value.visibleOptions}
                                     v-model:value={formState.value.visible}
-                                ></form-common-column-select>
-                            </form-common-column>
+                                ></form-base-select>
+                            </form-base-column>
                         </Fragment>
                     )}
-                    <form-common-column label="菜单/按钮状态" path="status">
-                        <form-common-column-select
+                    <form-base-column label="菜单/按钮状态" path="status">
+                        <form-base-select
                             placeholder="请选择菜单/按钮状态"
-                            options={chunkOptions.CHUNK_SHEET_STATUS.value}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="排序号" path="sort" v-model:value={formState.value.sort}>
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="排序号" path="sort" v-model:value={formState.value.sort}>
                         <n-input-number
                             class="w-full"
                             min={1}
@@ -225,8 +224,8 @@ export default defineComponent({
                             placeholder="请输入排序号"
                             v-model:value={formState.value.sort}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

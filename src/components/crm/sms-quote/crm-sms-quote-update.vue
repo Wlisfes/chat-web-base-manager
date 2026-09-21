@@ -103,18 +103,18 @@ export default defineComponent({
 
         return () => (
             <Fragment>
-                <common-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
+                <common-base-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
                     <div class="flex flex-col gap-y-10 p-14 overflow-hidden">
                         <common-business-header bar title="基本信息"></common-business-header>
-                        <common-element-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
-                            <common-element-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-element-columns-wrapper>
-                            <common-element-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-element-columns-wrapper>
-                            <common-element-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-element-columns-wrapper>
-                            <common-element-columns-wrapper label="报价币种：">{consumerInfo.value.currency ?? '-'}</common-element-columns-wrapper>
-                        </common-element-columns-template>
+                        <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
+                            <common-base-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="报价币种：">{consumerInfo.value.currency ?? '-'}</common-base-columns-wrapper>
+                        </common-base-columns-template>
                     </div>
-                </common-element>
-                <common-element class="flex flex-col flex-1 p-14 overflow-hidden">
+                </common-base-element>
+                <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden">
                     <common-database-table
                         class="p-0! overflow-hidden"
                         show-command
@@ -177,7 +177,7 @@ export default defineComponent({
                             ),
                             col_command: (data: Omix) => (
                                 <div class="flex items-center gap-x-8 overflow-hidden">
-                                    <common-element-button
+                                    <common-base-button
                                         text
                                         type="error"
                                         onClick={async () => {
@@ -186,13 +186,13 @@ export default defineComponent({
                                         }}
                                     >
                                         移除
-                                    </common-element-button>
+                                    </common-base-button>
                                 </div>
                             )
                         }}
                     </common-database-table>
-                </common-element>
-                <common-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
+                </common-base-element>
+                <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
                     <n-button class="min-w-168" disabled={props.state.loading} onClick={() => props.setState({ current: 1 })}>
                         上一步：填写报价内容
                     </n-button>
@@ -205,7 +205,7 @@ export default defineComponent({
                     >
                         下一步：报价预览
                     </n-button>
-                </common-element>
+                </common-base-element>
             </Fragment>
         )
     }

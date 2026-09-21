@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElementCodex',
+    name: 'CommonBaseCodex',
     emits: ['click', 'complete', 'error'],
     props: {
         /**加载状态**/
@@ -16,8 +16,8 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         return () => (
-            <n-spin class="common-element-codex" size="small" content-class="flex flex-col" show={props.loading}>
-                <common-element-button
+            <n-spin class="common-base-codex" size="small" content-class="flex flex-col" show={props.loading}>
+                <common-base-button
                     class="p-0"
                     size="large"
                     secondary
@@ -47,7 +47,7 @@ export default defineComponent({
                             }}
                         </n-image>
                     )}
-                </common-element-button>
+                </common-base-button>
             </n-spin>
         )
     }

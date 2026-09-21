@@ -4,6 +4,11 @@ import { useMessage, useLoadingBar, useNotification, useDialog } from 'naive-ui'
 import { AxiosInstance, InternalAxiosRequestConfig, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ResultResolver } from '@/interface/instance.resolver'
 
+declare module '*.svg?raw' {
+    const src: string
+    export default src
+}
+
 declare module '*.vue' {
     const Component: DefineComponent<{}, {}, any>
     export default Component

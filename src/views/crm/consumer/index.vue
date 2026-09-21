@@ -18,7 +18,7 @@ export default defineComponent({
                     type="line"
                     default-value="account"
                     tabs-padding={14}
-                    class="common-element-tabser inset-absolute flex-1 overflow-hidden "
+                    class="common-base-tabser inset-absolute flex-1 overflow-hidden "
                     v-model:value={state.tabName}
                 >
                     <n-tab-pane name="common" tab="普通客户" display-directive="show">

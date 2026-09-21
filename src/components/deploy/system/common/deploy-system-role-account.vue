@@ -17,7 +17,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setState, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSystemColumnAccountRole(
+                Service.httpBaseAccountColumnUser(
                     createDeployAccountQuery({ ...payload, page: base.page, size: base.size, roleKeyId: props.roleId })
                 ),
             keyName: 'chatbok:deploy:system:role:account',
@@ -61,9 +61,9 @@ export default defineComponent({
             return await stop(event).then(async () => {
                 return await Promise.all(
                     uids.map(async uid => {
-                        const detail = await Service.httpBaseSystemAccountResolver({ uid })
+                        const detail = await Service.httpBaseAccountUserResolver({ uid })
                         const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId!, false)
-                        return Service.httpBaseSystemUpdateAccountRole({ uid, roleKeyIds })
+                        return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
                     })
                 ).then(() => {
                     return fetchRefresh({ page: 1 })
@@ -89,33 +89,33 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button dashed type="primary" onClick={fetchDeployRoleAccount}>
+                        <common-base-button dashed type="primary" onClick={fetchDeployRoleAccount}>
                             关联员工
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column prop="vague" label="姓名/工号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入姓名/工号"
                             v-model:value={formState.value.vague}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="phone" label="手机号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入手机号"
                             v-model:value={formState.value.phone}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="email" label="邮箱">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
@@ -145,10 +145,10 @@ export default defineComponent({
                             <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
                         ),
                         col_action: (data: Omix) => (
-                            <common-element-button
+                            <common-base-button
                                 {...{ text: true, iconSize: 14, icon: 'nest-delete', type: 'error' }}
                                 onClick={(e: MouseEvent) => fetchDeleteAccountRole(e, [data.uid])}
-                            ></common-element-button>
+                            ></common-base-button>
                         )
                     }}
                 </common-database-table>

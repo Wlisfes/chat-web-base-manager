@@ -71,39 +71,39 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-column prop="consumerKeyId" label="客户ID">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入客户ID"
                             v-model:value={formState.value.consumerKeyId}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="consumerAlias" label="客户别名">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入客户别名"
                             v-model:value={formState.value.consumerAlias}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="appId" label="应用ID">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入应用ID"
                             v-model:value={formState.value.appId}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="appAlias" label="应用别名">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入应用别名"
                             v-model:value={formState.value.appAlias}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="countryKeyIds" label="国家/地区">
-                        <form-common-column-select
+                        <form-base-select
                             clearable
                             filterable
                             multiple
@@ -112,15 +112,15 @@ export default defineComponent({
                             label-field="showName"
                             options={countryOptions.dataSource.value}
                             v-model:value={formState.value.countryKeyIds}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="mcc" label="MCC">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入MCC"
                             v-model:value={formState.value.mcc}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

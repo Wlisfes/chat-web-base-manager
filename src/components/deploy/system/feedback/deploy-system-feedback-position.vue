@@ -35,7 +35,7 @@ export default defineComponent({
                 return await setState({ initialize: false })
             }
             try {
-                return await Service.httpBaseSystemPositionResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                return await Service.httpBaseAccountPositionResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                     return await setForm(fetchReste(data)).then(async () => {
                         return await setState({ initialize: false })
                     })
@@ -55,9 +55,9 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseSystemCreatePosition(formState.value)
+                        await Service.httpBaseAccountCreatePosition(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseSystemUpdatePosition({ ...formState.value, keyId: props.node.keyId })
+                        await Service.httpBaseAccountUpdatePosition({ ...formState.value, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -82,7 +82,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -90,14 +90,14 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="职位名称" path="name">
-                        <form-common-column-input
+                    <form-base-column label="职位名称" path="name">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入职位名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="排序号" path="sort">
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="排序号" path="sort">
                         <n-input-number
                             class="w-full"
                             min={1}
@@ -106,8 +106,8 @@ export default defineComponent({
                             placeholder="请输入排序号"
                             v-model:value={formState.value.sort}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

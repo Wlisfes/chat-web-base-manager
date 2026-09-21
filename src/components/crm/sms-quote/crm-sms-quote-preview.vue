@@ -78,32 +78,32 @@ export default defineComponent({
 
         return () => (
             <Fragment>
-                <common-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
+                <common-base-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
                     <div class="flex flex-col gap-y-10 p-14 overflow-hidden">
                         <common-business-header bar title="基本信息"></common-business-header>
-                        <common-element-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
-                            <common-element-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-element-columns-wrapper>
-                            <common-element-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-element-columns-wrapper>
-                            <common-element-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-element-columns-wrapper>
-                        </common-element-columns-template>
+                        <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
+                            <common-base-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                        </common-base-columns-template>
                     </div>
                     <div class="flex flex-col p-14 common-skyline--top overflow-hidden">
-                        <common-element-columns-template class="gap-10" type="auto-fit" number={100}>
-                            <common-element-columns-wrapper class="flex-col-reverse text-center" label="修改国家/地区">
+                        <common-base-columns-template class="gap-10" type="auto-fit" number={100}>
+                            <common-base-columns-wrapper class="flex-col-reverse text-center" label="修改国家/地区">
                                 {summary.value.countries}
-                            </common-element-columns-wrapper>
-                            <common-element-columns-wrapper class="flex-col-reverse text-center" label="报价条目">
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper class="flex-col-reverse text-center" label="报价条目">
                                 {state.total}
-                            </common-element-columns-wrapper>
-                            <common-element-columns-wrapper class="flex-col-reverse text-center" label="新增报价">
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper class="flex-col-reverse text-center" label="新增报价">
                                 {summary.value.additions}
-                            </common-element-columns-wrapper>
-                            <common-element-columns-wrapper class="flex-col-reverse text-center" label="定时生效数">
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper class="flex-col-reverse text-center" label="定时生效数">
                                 {summary.value.scheduled}
-                            </common-element-columns-wrapper>
-                        </common-element-columns-template>
+                            </common-base-columns-wrapper>
+                        </common-base-columns-template>
                     </div>
-                </common-element>
+                </common-base-element>
 
                 <common-database-table
                     pagination={false}
@@ -134,7 +134,7 @@ export default defineComponent({
                         )
                     }}
                 </common-database-table>
-                <common-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
+                <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
                     <n-button class="min-w-168" disabled={props.state.loading} onClick={() => props.setState({ current: 2 })}>
                         上一步：编辑报价
                     </n-button>
@@ -147,7 +147,7 @@ export default defineComponent({
                     >
                         下一步：发布报价
                     </n-button>
-                </common-element>
+                </common-base-element>
             </Fragment>
         )
     }

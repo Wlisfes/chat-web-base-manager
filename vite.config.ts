@@ -22,6 +22,9 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
                 '@': path.resolve(__dirname, 'src')
             }
         },
+        optimizeDeps: {
+            include: ['balkan-orgchart-js']
+        },
         plugins: [
             Vue(),
             VueJsx(),

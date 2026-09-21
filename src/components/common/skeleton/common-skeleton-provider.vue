@@ -15,9 +15,9 @@ export default defineComponent({
         return () => (
             <Fragment>
                 {props.loading ? (
-                    <common-element is-white={props.isWhite} class={`common-skeleton-provider ${props.className}`}>
+                    <common-base-element is-white={props.isWhite} class={`common-skeleton-provider ${props.className}`}>
                         {slots.default && slots.default()}
-                    </common-element>
+                    </common-base-element>
                 ) : (
                     <Fragment>{slots.render && slots.render()}</Fragment>
                 )}

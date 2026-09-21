@@ -10,7 +10,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSystemColumnPosition({ ...payload, page: base.page, size: base.size }),
+            request: (base, payload) => Service.httpBaseAccountColumnPosition({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:position',
             formState: {
                 /**职位名称**/
@@ -58,7 +58,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSystemDeletePosition({ keyId: node.keyId })
+                            await Service.httpBaseAccountDeletePosition({ keyId: node.keyId })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -86,28 +86,28 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchDeployPositionCreate}>
+                        <common-base-button type="primary" onClick={fetchDeployPositionCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="primary"
                             disabled={instState.value.isUpdate}
                             onClick={fetchDeployPositionUpdate}
                         >
                             编辑
-                        </common-element-button>
-                        <common-element-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployPositionDelete}>
+                        </common-base-button>
+                        <common-base-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployPositionDelete}>
                             删除
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="职位名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入职位名称"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

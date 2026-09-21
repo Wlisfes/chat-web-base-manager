@@ -18,7 +18,7 @@ export default defineComponent({
 
         /**渲染图标**/
         function fetchIconRender(data: Omix) {
-            return isEmpty(data.iconName) ? null : h(<common-element-icon name={data.iconName}></common-element-icon>)
+            return isEmpty(data.iconName) ? null : h(<common-base-icon name={data.iconName}></common-base-icon>)
         }
 
         return () => (

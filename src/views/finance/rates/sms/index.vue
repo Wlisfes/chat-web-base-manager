@@ -71,33 +71,33 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchDeployRatesSmsCreate}>
+                        <common-base-button type="primary" onClick={fetchDeployRatesSmsCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="primary"
                             disabled={instState.value.isUpdate}
                             onClick={fetchDeployRatesSmsUpdate}
                         >
                             编辑
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column prop="code" label="编码">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入国家/地区编码"
                             v-model:value={formState.value.code}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="mcc" label="MCC">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入MCC"
                             v-model:value={formState.value.mcc}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

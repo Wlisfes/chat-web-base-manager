@@ -31,7 +31,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Service.httpBaseSystemUpdateDatetaskCron({ taskId: props.node.taskId, cron: formState.value.cron })
+                    await Service.httpBaseSkylineUpdateDatetaskCron({ taskId: props.node.taskId, cron: formState.value.cron })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })
@@ -54,7 +54,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -62,20 +62,20 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="任务名称">
-                        <form-common-column-input disabled value={props.node.taskName}></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="处理器标识">
-                        <form-common-column-input disabled value={props.node.handler}></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="Cron表达式" path="cron">
-                        <form-common-column-input
+                    <form-base-column label="任务名称">
+                        <form-base-input disabled value={props.node.taskName}></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="处理器标识">
+                        <form-base-input disabled value={props.node.handler}></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="Cron表达式" path="cron">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入Cron表达式，例如：0 0 8 * * *"
                             v-model:value={formState.value.cron}
-                        ></form-common-column-input>
-                    </form-common-column>
-                </form-common-container>
+                        ></form-base-input>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

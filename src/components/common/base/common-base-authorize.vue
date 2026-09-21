@@ -3,7 +3,7 @@ import { defineComponent, PropType, Fragment } from 'vue'
 import { useGlobal, useStore } from '@/store'
 
 export default defineComponent({
-    name: 'CommonElementAuthorize',
+    name: 'CommonBaseAuthorize',
     props: {
         /**权限标识**/
         value: { type: [String, Array] as PropType<string | Array<string>> }

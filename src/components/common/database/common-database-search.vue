@@ -122,8 +122,8 @@ export default defineComponent({
                         bordered={props.bordered}
                     >
                         {columns.length > 0 && (
-                            <common-element-collapse base-height={height.value} v-model:when={when.value}>
-                                <form-common-container
+                            <common-base-collapse base-height={height.value} v-model:when={when.value}>
+                                <form-base-container
                                     ref={formRef}
                                     class={formClass.value}
                                     label-placement="left"
@@ -131,8 +131,8 @@ export default defineComponent({
                                     label-width={props.labelWidth}
                                 >
                                     <Fragment>{columns}</Fragment>
-                                </form-common-container>
-                            </common-element-collapse>
+                                </form-base-container>
+                            </common-base-collapse>
                         )}
                         {props.function.length + functions.length > 0 && (
                             <n-element class={`flex flex-wrap gap-10 ${props.functionClass}`}>
@@ -145,7 +145,7 @@ export default defineComponent({
                                     </Fragment>
                                 )}
                                 {props.function.includes('search') && (
-                                    <common-element-button
+                                    <common-base-button
                                         class="min-w-80"
                                         type="primary"
                                         secondary
@@ -155,21 +155,21 @@ export default defineComponent({
                                         onClick={(e: MouseEvent) => emit('-submit', formState.value)}
                                     >
                                         查询
-                                    </common-element-button>
+                                    </common-base-button>
                                 )}
                                 {props.function.includes('restore') && columns.length > 0 && (
-                                    <common-element-button class="min-w-80" onClick={() => emit('-restore')}>
+                                    <common-base-button class="min-w-80" onClick={() => emit('-restore')}>
                                         重置
-                                    </common-element-button>
+                                    </common-base-button>
                                 )}
                                 {props.function.includes('collapse') && columns.length > 0 && (
-                                    <common-element-button
+                                    <common-base-button
                                         class="min-w-80"
                                         icon={when.value ? UpToTop : DownToBottom}
                                         onClick={fetchClickUpdate}
                                     >
                                         {when.value ? '收起' : '展开'}
-                                    </common-element-button>
+                                    </common-base-button>
                                 )}
                                 {props.function.includes('deploy') && columns.length > 0 && (
                                     <common-database-search-settings

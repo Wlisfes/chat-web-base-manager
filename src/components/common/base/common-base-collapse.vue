@@ -4,7 +4,7 @@ import { useVModels } from '@vueuse/core'
 import { Collapse } from 'vue-collapsed'
 
 export default defineComponent({
-    name: 'CommonDatabasePopover',
+    name: 'CommonBasePopover',
     emits: ['update:when'],
     props: {
         /**是否展示**/
