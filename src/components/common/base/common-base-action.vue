@@ -5,7 +5,7 @@ import { useVModels } from '@vueuse/core'
 import { enter, fetchWherer, isNotEmpty } from '@/utils'
 
 export default defineComponent({
-    name: 'CommonElementSearch',
+    name: 'CommonBaseAction',
     emits: ['update:initialize', 'update:loading', 'update:vague', 'update:event', 'submit'],
     props: {
         /**组件模式**/
@@ -70,7 +70,7 @@ export default defineComponent({
         }
 
         return () => (
-            <div class={`common-element-action flex flex-1 gap-10 ${props.className}`}>
+            <div class={`common-base-action flex flex-1 gap-10 ${props.className}`}>
                 {/* <form-common-input
                     v-model:value={vague.value}
                     placeholder={props.placeholder}
@@ -78,7 +78,7 @@ export default defineComponent({
                     onKeyup={fetchKeyup}
                 ></form-common-input> */}
                 {props.mode === 'input' ? (
-                    <common-element-button
+                    <common-base-button
                         secondary
                         class="min-w-80"
                         type="primary"
@@ -87,18 +87,18 @@ export default defineComponent({
                         disabled={initialize.value || loading.value}
                         loading={loading.value}
                         onClick={() => fetchEvent('input-submit')}
-                    ></common-element-button>
+                    ></common-base-button>
                 ) : (
                     <n-popover ref={instance} placement={props.placement} trigger="click" arrow-point-to-center style={{ padding: 0 }}>
                         {{
                             trigger: () => (
-                                <common-element-button
+                                <common-base-button
                                     secondary
                                     class="min-w-80"
                                     type="primary"
                                     icon="nest-search"
                                     content="筛选"
-                                ></common-element-button>
+                                ></common-base-button>
                             ),
                             default: () => (
                                 <n-element class="flex flex-col" style={elementNodes.value}>
@@ -115,10 +115,10 @@ export default defineComponent({
                                         </n-form>
                                     </n-scrollbar>
                                     <n-flex justify="center" class="p-inline-14 p-block-14">
-                                        <common-element-button class="min-w-80">重置</common-element-button>
-                                        <common-element-button class="min-w-80" type="primary" onClick={fetchSubmit}>
+                                        <common-base-button class="min-w-80">重置</common-base-button>
+                                        <common-base-button class="min-w-80" type="primary" onClick={fetchSubmit}>
                                             确定
-                                        </common-element-button>
+                                        </common-base-button>
                                     </n-flex>
                                 </n-element>
                             )

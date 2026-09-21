@@ -274,19 +274,19 @@ export default defineComponent({
                                     goto: () => <span>前往</span>,
                                     prefix: () => <span class="whitespace-nowrap">{`共 ${props.total} 条`}</span>,
                                     label: (data: Omix<{ node: number; active: boolean }>) => (
-                                        <common-element-button size="small" secondary type={data.active ? 'primary' : undefined}>
+                                        <common-base-button size="small" secondary type={data.active ? 'primary' : undefined}>
                                             {data.node}
-                                        </common-element-button>
+                                        </common-base-button>
                                     ),
                                     prev: (data: Omix<PaginationInfo>) => (
-                                        <common-element-button size="small" secondary disabled={data.page <= 1}>
+                                        <common-base-button size="small" secondary disabled={data.page <= 1}>
                                             上一页
-                                        </common-element-button>
+                                        </common-base-button>
                                     ),
                                     next: (data: Omix<PaginationInfo>) => (
-                                        <common-element-button size="small" secondary disabled={data.page >= data.pageCount}>
+                                        <common-base-button size="small" secondary disabled={data.page >= data.pageCount}>
                                             下一页
-                                        </common-element-button>
+                                        </common-base-button>
                                     )
                                 }}
                             </n-pagination>

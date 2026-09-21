@@ -45,7 +45,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <common-element class="h-90vh max-h-640 flex flex-col p-be-20 overflow-hidden">
+                <common-base-element class="h-90vh max-h-640 flex flex-col p-be-20 overflow-hidden">
                     <common-database-table
                         pagination={false}
                         limit={state.limit}
@@ -88,7 +88,7 @@ export default defineComponent({
                             )
                         }}
                     </common-database-table>
-                </common-element>
+                </common-base-element>
             </common-dialog-provider>
         )
     }

@@ -126,25 +126,25 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchAccountConsumerCreate}>
+                        <common-base-button type="primary" onClick={fetchAccountConsumerCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="primary"
                             disabled={instState.value.isUpdate}
                             onClick={fetchAccountConsumerUpdate}
                         >
                             编辑
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
                             onClick={fetchAccountConsumerStatus}
                         >
                             切换状态
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="客户名称">
                         <form-common-column-input

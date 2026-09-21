@@ -3,7 +3,7 @@ import { defineComponent, PropType, VNode } from 'vue'
 import { isNotEmpty } from '@/utils'
 
 export default defineComponent({
-    name: 'CommonElementColumnsWrapper',
+    name: 'CommonBaseColumnsWrapper',
     props: {
         /**描述**/
         label: { type: [String, Number, Object] as PropType<string | number | VNode> },
@@ -14,11 +14,11 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         return () => (
-            <div class="common-element-columns-wrapper flex overflow-hidden line-height-22">
+            <div class="common-base-columns-wrapper flex overflow-hidden line-height-22">
                 {isNotEmpty(props.label) && (
-                    <div class={`common-element-columns-wrapper__label box-border ${props.labelClass}`}>{props.label}</div>
+                    <div class={`common-base-columns-wrapper__label box-border ${props.labelClass}`}>{props.label}</div>
                 )}
-                <div class={`common-element-columns-wrapper__content flex-1 overflow-hidden ${props.contentClass}`}>
+                <div class={`common-base-columns-wrapper__content flex-1 overflow-hidden ${props.contentClass}`}>
                     {slots.default && slots.default()}
                 </div>
             </div>
@@ -28,7 +28,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.common-element-columns-wrapper {
+.common-base-columns-wrapper {
     position: relative;
     font-size: 14px;
     &__label {

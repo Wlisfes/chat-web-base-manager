@@ -128,23 +128,23 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={fetchDeployAccountCreate}>
+                        <common-base-button type="primary" onClick={fetchDeployAccountCreate}>
                             新增
-                        </common-element-button>
-                        <common-element-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployAccountUpdate}>
+                        </common-base-button>
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployAccountUpdate}>
                             编辑
-                        </common-element-button>
-                        <common-element-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
+                        </common-base-button>
+                        <common-base-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
                             禁用
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
                             onClick={fetchDeployAccountResetPassword}
                         >
                             重置密码
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="名称/工号">
                         <form-common-column-input

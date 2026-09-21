@@ -19,7 +19,7 @@ export default defineComponent({
 
         return () => {
             return (
-                <common-element-popover
+                <common-base-popover
                     placement="bottom-end"
                     style={{ padding: '8px' }}
                     v-model:visible={state.visible}
@@ -27,7 +27,7 @@ export default defineComponent({
                 >
                     {{
                         trigger: () => (
-                            <common-element-button
+                            <common-base-button
                                 database
                                 text
                                 content="更多"
@@ -35,7 +35,7 @@ export default defineComponent({
                                 icon-size={16}
                                 type={props.type}
                                 onClick={(event: MouseEvent) => setState({ visible: true })}
-                            ></common-element-button>
+                            ></common-base-button>
                         ),
                         default: () => (
                             <n-element
@@ -45,7 +45,7 @@ export default defineComponent({
                             </n-element>
                         )
                     }}
-                </common-element-popover>
+                </common-base-popover>
             )
         }
     }

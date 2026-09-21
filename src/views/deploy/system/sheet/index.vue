@@ -127,7 +127,7 @@ export default defineComponent({
                     content-class="flex flex-col flex-1 overflow-hidden! p-block-14 p-is-14"
                 >
                     <n-card class="flex-1 overflow-hidden" content-class="flex flex-col flex-1 p-inline-0! p-block-14! overflow-hidden">
-                        <common-element-wrapper opacity={0} loading={sheetOptions.state.loading}>
+                        <common-base-wrapper opacity={0} loading={sheetOptions.state.loading}>
                             <n-scrollbar trigger="none" class="flex-1 overflow-hidden">
                                 <n-element class="p-inline-14">
                                     <n-tree
@@ -146,7 +146,7 @@ export default defineComponent({
                                     />
                                 </n-element>
                             </n-scrollbar>
-                        </common-element-wrapper>
+                        </common-base-wrapper>
                     </n-card>
                 </n-layout-sider>
                 <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-14 gap-14 overflow-hidden">
@@ -166,33 +166,33 @@ export default defineComponent({
                             on-submit={instOptions.fetchRequest}
                         >
                             <common-database-search-function abstract class="flex gap-col-10">
-                                <common-element-button type="primary" onClick={fetchDeploySheetCreate}>
+                                <common-base-button type="primary" onClick={fetchDeploySheetCreate}>
                                     新增
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="primary"
                                     disabled={instState.value.isUpdate}
                                     onClick={fetchDeploySheetUpdate}
                                 >
                                     编辑
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="primary"
                                     disabled={instState.value.isClone}
                                     onClick={fetchDeploySheetClone}
                                 >
                                     克隆
-                                </common-element-button>
-                                <common-element-button
+                                </common-base-button>
+                                <common-base-button
                                     dashed
                                     type="error"
                                     disabled={instState.value.isDelete}
                                     onClick={fetchDeploySheetDelete}
                                 >
                                     删除
-                                </common-element-button>
+                                </common-base-button>
                             </common-database-search-function>
                             <common-database-search-column disabled prop="name" label="菜单名称">
                                 <form-common-column-input
@@ -245,7 +245,7 @@ export default defineComponent({
                                         {isEmpty(data.icon) ? (
                                             <span>-</span>
                                         ) : (
-                                            <common-element-icon size={26} name={data.icon}></common-element-icon>
+                                            <common-base-icon size={26} name={data.icon}></common-base-icon>
                                         )}
                                     </div>
                                 ),

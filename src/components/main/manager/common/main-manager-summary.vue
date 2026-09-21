@@ -8,9 +8,9 @@ export default defineComponent({
             <div class="main-manager-summary line-height-24 select-none">
                 <n-grid cols="0:1 400:1 816:2 1232:3 1648:4 4" x-gap={16} y-gap={16} item-responsive>
                     <n-grid-item span={1}>
-                        <common-element class-name="flex items-center gap-20">
+                        <common-base-element class-name="flex items-center gap-20">
                             <n-icon-wrapper size={64} border-radius={6}>
-                                <common-element-icon size={32} name="nest-logo"></common-element-icon>
+                                <common-base-icon size={32} name="nest-logo"></common-base-icon>
                             </n-icon-wrapper>
                             <div class="flex flex-col">
                                 <n-h1 class="m-0 line-height-40">0</n-h1>
@@ -18,12 +18,12 @@ export default defineComponent({
                                     我的客户
                                 </n-text>
                             </div>
-                        </common-element>
+                        </common-base-element>
                     </n-grid-item>
                     <n-grid-item span={1}>
-                        <common-element class-name="flex items-center gap-20">
+                        <common-base-element class-name="flex items-center gap-20">
                             <n-icon-wrapper size={64} border-radius={6}>
-                                <common-element-icon size={32} name="nest-logo"></common-element-icon>
+                                <common-base-icon size={32} name="nest-logo"></common-base-icon>
                             </n-icon-wrapper>
                             <div class="flex flex-col">
                                 <n-h1 class="m-0 line-height-40">0</n-h1>
@@ -31,12 +31,12 @@ export default defineComponent({
                                     今日新增客户
                                 </n-text>
                             </div>
-                        </common-element>
+                        </common-base-element>
                     </n-grid-item>
                     <n-grid-item span={1}>
-                        <common-element class-name="flex items-center gap-20">
+                        <common-base-element class-name="flex items-center gap-20">
                             <n-icon-wrapper size={64} border-radius={6}>
-                                <common-element-icon size={32} name="nest-logo"></common-element-icon>
+                                <common-base-icon size={32} name="nest-logo"></common-base-icon>
                             </n-icon-wrapper>
                             <div class="flex flex-col">
                                 <n-h1 class="m-0 line-height-40">0</n-h1>
@@ -44,12 +44,12 @@ export default defineComponent({
                                     今日发送报价
                                 </n-text>
                             </div>
-                        </common-element>
+                        </common-base-element>
                     </n-grid-item>
                     <n-grid-item span={1}>
-                        <common-element class-name="flex items-center gap-20">
+                        <common-base-element class-name="flex items-center gap-20">
                             <n-icon-wrapper size={64} border-radius={6}>
-                                <common-element-icon size={32} name="nest-logo"></common-element-icon>
+                                <common-base-icon size={32} name="nest-logo"></common-base-icon>
                             </n-icon-wrapper>
                             <div class="flex flex-col">
                                 <n-h1 class="m-0 line-height-40">0</n-h1>
@@ -57,7 +57,7 @@ export default defineComponent({
                                     待完成任务
                                 </n-text>
                             </div>
-                        </common-element>
+                        </common-base-element>
                     </n-grid-item>
                 </n-grid>
             </div>

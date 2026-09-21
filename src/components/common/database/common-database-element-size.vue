@@ -28,20 +28,20 @@ export default defineComponent({
         }
 
         return () => (
-            <common-element-popover
+            <common-base-popover
                 style={{ padding: '5px' }}
                 v-model:visible={state.visible}
                 on-update:show={(visible: boolean) => setState({ visible })}
             >
                 {{
                     trigger: () => (
-                        <common-element-button
+                        <common-base-button
                             text
                             class="h-full p-inline-6"
                             icon="nest-density"
                             icon-size={22}
                             onClick={fetchTrigger}
-                        ></common-element-button>
+                        ></common-base-button>
                     ),
                     default: (vm: PopoverInst) => (
                         <n-element class="flex flex-col overflow-hidden">
@@ -51,7 +51,7 @@ export default defineComponent({
                                         <n-text type={configer.elementSize === item.value ? 'success' : undefined}>{item.label}</n-text>
                                         {configer.elementSize === item.value && (
                                             <n-text type="success">
-                                                <common-element-icon name="nest-check"></common-element-icon>
+                                                <common-base-icon name="nest-check"></common-base-icon>
                                             </n-text>
                                         )}
                                     </div>
@@ -60,7 +60,7 @@ export default defineComponent({
                         </n-element>
                     )
                 }}
-            </common-element-popover>
+            </common-base-popover>
         )
     }
 })

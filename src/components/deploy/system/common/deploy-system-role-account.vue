@@ -89,9 +89,9 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button dashed type="primary" onClick={fetchDeployRoleAccount}>
+                        <common-base-button dashed type="primary" onClick={fetchDeployRoleAccount}>
                             关联员工
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column prop="vague" label="姓名/工号">
                         <form-common-column-input
@@ -145,10 +145,10 @@ export default defineComponent({
                             <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
                         ),
                         col_action: (data: Omix) => (
-                            <common-element-button
+                            <common-base-button
                                 {...{ text: true, iconSize: 14, icon: 'nest-delete', type: 'error' }}
                                 onClick={(e: MouseEvent) => fetchDeleteAccountRole(e, [data.uid])}
-                            ></common-element-button>
+                            ></common-base-button>
                         )
                     }}
                 </common-database-table>

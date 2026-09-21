@@ -42,7 +42,7 @@ export default defineComponent({
                     <div class="inline-flex gap-10 element-bscrollbar">
                         {tabOptions.value.map(item => (
                             <div key={item.fullPath} class="select-none inline-flex element-block">
-                                <common-element-button
+                                <common-base-button
                                     class={{ 'p-ie-2': item.meta.showClose ?? true }}
                                     secondary
                                     size="small"
@@ -54,26 +54,26 @@ export default defineComponent({
                                         {(item.meta.showClose ?? true) && (
                                             <div class="flex items-center p-7" onClick={(e: Event) => fetchCloseTab(e, item)}>
                                                 <n-icon size={14}>
-                                                    <common-element-icon size={14} name="nest-close"></common-element-icon>
+                                                    <common-base-icon size={14} name="nest-close"></common-base-icon>
                                                 </n-icon>
                                             </div>
                                         )}
                                     </span>
-                                </common-element-button>
+                                </common-base-button>
                             </div>
                         ))}
                     </div>
                 </div>
                 <div class="flex gap-10">
-                    <common-element-button secondary size="small" class="p-inline-4!">
-                        <common-element-icon size={20} name="nest-double-left"></common-element-icon>
-                    </common-element-button>
-                    <common-element-button secondary size="small" class="p-inline-4!">
-                        <common-element-icon size={20} name="nest-double-right"></common-element-icon>
-                    </common-element-button>
-                    <common-element-button secondary size="small" class="p-inline-3!">
-                        <common-element-icon size={22} name="nest-vertical-more"></common-element-icon>
-                    </common-element-button>
+                    <common-base-button secondary size="small" class="p-inline-4!">
+                        <common-base-icon size={20} name="nest-double-left"></common-base-icon>
+                    </common-base-button>
+                    <common-base-button secondary size="small" class="p-inline-4!">
+                        <common-base-icon size={20} name="nest-double-right"></common-base-icon>
+                    </common-base-button>
+                    <common-base-button secondary size="small" class="p-inline-3!">
+                        <common-base-icon size={22} name="nest-vertical-more"></common-base-icon>
+                    </common-base-button>
                 </div>
             </n-layout-header>
         )

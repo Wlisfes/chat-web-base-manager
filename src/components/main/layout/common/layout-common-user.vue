@@ -90,7 +90,7 @@ export default defineComponent({
                     <n-list hoverable clickable show-divider={false} class="p-inline-10 p-block-10 select-none">
                         <n-list-item style={{ padding: 0 }}>
                             <div class="h-24 flex items-center gap-10 p-inline-10 p-block-10">
-                                <common-element-icon size={22} name="nest-settings"></common-element-icon>
+                                <common-base-icon size={22} name="nest-settings"></common-base-icon>
                                 <n-text>账户设置</n-text>
                             </div>
                         </n-list-item>
@@ -98,12 +98,12 @@ export default defineComponent({
                             <div class="h-24 flex items-center gap-10 p-inline-10 p-block-10">
                                 {theme.value === 'dark' ? (
                                     <Fragment>
-                                        <common-element-icon size={24} name="nest-light"></common-element-icon>
+                                        <common-base-icon size={24} name="nest-light"></common-base-icon>
                                         <n-text>浅色模式</n-text>
                                     </Fragment>
                                 ) : (
                                     <Fragment>
-                                        <common-element-icon size={24} name="nest-dark"></common-element-icon>
+                                        <common-base-icon size={24} name="nest-dark"></common-base-icon>
                                         <n-text>深色模式</n-text>
                                     </Fragment>
                                 )}
@@ -111,9 +111,9 @@ export default defineComponent({
                         </n-list-item>
                     </n-list>
                     <div class="p-inline-10 p-block-10 flex flex-col p-bs-0">
-                        <common-element-button size="large" icon="nest-quit" secondary onClick={fetchCompose}>
+                        <common-base-button size="large" icon="nest-quit" secondary onClick={fetchCompose}>
                             退出登录
-                        </common-element-button>
+                        </common-base-button>
                     </div>
                 </n-element>
             </n-popover>

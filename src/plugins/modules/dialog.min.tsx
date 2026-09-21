@@ -124,7 +124,7 @@ export async function fetchDialogService(opts: BaseDialogServiceOtipns): Promise
                 opts.icon
             ) : (
                 <n-text class="flex items-center" type={opts.type ?? 'warning'}>
-                    <common-element-icon size={28} name="nest-state-warning"></common-element-icon>
+                    <common-base-icon size={28} name="nest-state-warning"></common-base-icon>
                 </n-text>
             )
         },

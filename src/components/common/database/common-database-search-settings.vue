@@ -109,7 +109,7 @@ export default defineComponent({
 
         return () => {
             return (
-                <common-element-popover
+                <common-base-popover
                     placement="bottom-end"
                     style={{ padding: '0px' }}
                     v-model:visible={state.visible}
@@ -117,9 +117,9 @@ export default defineComponent({
                 >
                     {{
                         trigger: () => (
-                            <common-element-button class="min-w-80" icon={Settings} onClick={fetchState}>
+                            <common-base-button class="min-w-80" icon={Settings} onClick={fetchState}>
                                 设置
-                            </common-element-button>
+                            </common-base-button>
                         ),
                         default: () => (
                             <n-element class="common-database-search-settings flex flex-col overflow-hidden">
@@ -132,12 +132,12 @@ export default defineComponent({
                                     >
                                         全选
                                     </n-checkbox>
-                                    <common-element-button text onClick={fetchReset}>
+                                    <common-base-button text onClick={fetchReset}>
                                         重置
-                                    </common-element-button>
+                                    </common-base-button>
                                 </div>
                                 <n-scrollbar class="max-h-450 overflow-hidden select-none">
-                                    <common-element-draggable
+                                    <common-base-draggable
                                         class="w-220 flex flex-col p-be-6 overflow-hidden"
                                         handle=".cursor-move"
                                         animation={200}
@@ -169,12 +169,12 @@ export default defineComponent({
                                                 </n-checkbox>
                                             </n-element>
                                         ))}
-                                    </common-element-draggable>
+                                    </common-base-draggable>
                                 </n-scrollbar>
                             </n-element>
                         )
                     }}
-                </common-element-popover>
+                </common-base-popover>
             )
         }
     }
@@ -184,7 +184,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .common-database-search-settings {
     position: relative;
-    :deep(.common-element-draggable) > .chunk-column {
+    :deep(.common-base-draggable) > .chunk-column {
         position: relative;
         transition: background-color 0.3s var(--n-bezier);
         &:hover {

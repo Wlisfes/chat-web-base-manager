@@ -67,7 +67,7 @@ export default defineComponent({
             })
         }
 
-        return () => <common-element is-white class="deploy-system-dept-orgchart w-full h-full"></common-element>
+        return () => <common-base-element is-white class="deploy-system-dept-orgchart w-full h-full"></common-base-element>
     }
 })
 </script>

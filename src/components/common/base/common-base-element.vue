@@ -2,19 +2,19 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElement',
+    name: 'CommonBaseElement',
     props: {
         /**开启背景色**/
         isWhite: { type: Boolean, default: false }
     },
     setup(props, { slots }) {
-        return () => <n-element class={{ 'common-element': true, 'is-white': props.isWhite }}>{slots.default && slots.default()}</n-element>
+        return () => <n-element class={{ 'common-base-element': true, 'is-white': props.isWhite }}>{slots.default && slots.default()}</n-element>
     }
 })
 </script>
 
 <style lang="scss" scoped>
-.common-element {
+.common-base-element {
     box-sizing: border-box;
     transition:
         color 0.3s var(--n-bezier),

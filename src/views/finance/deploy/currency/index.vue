@@ -66,14 +66,14 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
                             onClick={fetchDeployCurrencyStatus}
                         >
                             切换状态
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="币种名称">
                         <form-common-column-input

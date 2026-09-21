@@ -75,22 +75,22 @@ export default defineComponent({
 
             return (
                 <Fragment>
-                    <common-element class="crm-sms-quote-publish flex flex-col flex-1 p-14 overflow-y-auto">
-                        <common-element is-white class="p-20 flex-1 flex flex-col b-rd-3 shadow-sm border border-gray-100 max-w-1000 mx-auto w-full">
+                    <common-base-element class="crm-sms-quote-publish flex flex-col flex-1 p-14 overflow-y-auto">
+                        <common-base-element is-white class="p-20 flex-1 flex flex-col b-rd-3 shadow-sm border border-gray-100 max-w-1000 mx-auto w-full">
                             <common-business-header bar title="发布报价确认" class="m-be-16"></common-business-header>
 
-                            <common-element class="flex flex-col gap-14 flex-1">
+                            <common-base-element class="flex flex-col gap-14 flex-1">
                                 <div class="text-13 text-gray-600 bg-indigo-50/50 p-12 b-rd-2 border border-indigo-100 flex flex-col gap-4">
                                     <div>报价客户：<span>{consumerInfo.value.name || '-'} ({consumerInfo.value.alias || '-'})</span></div>
                                     <div>报价应用：<span>{f.appId || '-'}</span></div>
                                     <div class="text-11 text-gray-400 m-ts-4">发布后将按设置的生效时间更新该应用的国家/地区短信报价。</div>
                                 </div>
                                 <n-alert type="info" title="本次操作仅发布报价数据，不发送邮件通知。" />
-                            </common-element>
-                        </common-element>
-                    </common-element>
+                            </common-base-element>
+                        </common-base-element>
+                    </common-base-element>
                     
-                    <common-element is-white class="flex p-14 gap-x-14 justify-center items-center border-t border-gray-100 shadow-sm">
+                    <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center border-t border-gray-100 shadow-sm">
                         <n-button class="min-w-168 h-36" onClick={handlePrev}>
                             上一步：报价预览
                         </n-button>
@@ -102,7 +102,7 @@ export default defineComponent({
                         >
                             确认发布
                         </n-button>
-                    </common-element>
+                    </common-base-element>
                 </Fragment>
             )
         }

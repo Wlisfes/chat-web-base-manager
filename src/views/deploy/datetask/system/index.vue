@@ -129,33 +129,33 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button
+                        <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskStatusToggle}
                         >
                             启用/停用
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="primary"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskCronUpdate}
                         >
                             修改Cron
-                        </common-element-button>
-                        <common-element-button
+                        </common-base-button>
+                        <common-base-button
                             dashed
                             type="info"
                             disabled={instState.value.isUpdate || isFinishedSelected.value}
                             onClick={fetchDatetaskTrigger}
                         >
                             手动触发
-                        </common-element-button>
-                        <common-element-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
+                        </common-base-button>
+                        <common-base-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
                             执行日志
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="taskName" label="任务名称">
                         <form-common-column-input

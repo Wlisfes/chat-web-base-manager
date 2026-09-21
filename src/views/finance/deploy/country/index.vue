@@ -67,9 +67,9 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployCountryStatus}>
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployCountryStatus}>
                             切换状态
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="cnName" label="名称">
                         <form-common-column-input

@@ -93,9 +93,9 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-element-button type="primary" onClick={openConsumerCreate}>
+                        <common-base-button type="primary" onClick={openConsumerCreate}>
                             新增
-                        </common-element-button>
+                        </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="客户名称/ID">
                         <form-common-column-input

@@ -38,46 +38,46 @@ export default defineComponent({
                     default-value="sms"
                     bar-width={0}
                     tabs-padding={14}
-                    class="common-element-tabser inset-absolute flex-1 overflow-hidden"
+                    class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                 >
                     <n-tab-pane name="basic" display-directive="show" tab={() => <common-skeleton-block>详情信息</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane name="sms" display-directive="show" tab={() => <common-skeleton-block>短信应用</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane name="mail" display-directive="show" tab={() => <common-skeleton-block>邮件应用</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane
                         name="whatsapp"
                         display-directive="show"
                         tab={() => <common-skeleton-block>社媒应用</common-skeleton-block>}
                     >
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane name="deploy" display-directive="show" tab={() => <common-skeleton-block>配置</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane name="attachment" display-directive="show" tab={() => <common-skeleton-block>附件</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                     <n-tab-pane name="daily" display-directive="show" tab={() => <common-skeleton-block>日志</common-skeleton-block>}>
-                        <common-element-scrollbar>
+                        <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-element-scrollbar>
+                        </common-base-scrollbar>
                     </n-tab-pane>
                 </n-tabs>
             </common-skeleton-provider>

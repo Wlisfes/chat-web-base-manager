@@ -16,10 +16,10 @@ export default defineComponent({
                 {['company', 'department'].includes(props.node.type) ? (
                     <Fragment>
                         <n-button text type="primary">
-                            <common-element-icon
+                            <common-base-icon
                                 size={['company'].includes(props.node.type) ? 42 : 32}
                                 name="nest-stock"
-                            ></common-element-icon>
+                            ></common-base-icon>
                         </n-button>
                         <div class="flex flex-col flex-1 overflow-hidden">
                             <n-text depth={1} class="text-16 line-height-22">
@@ -32,10 +32,10 @@ export default defineComponent({
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <common-element-image
+                        <common-base-image
                             class="w-30 h-30 b-rd-3"
                             src="https://chat-oss.lisfes.cn/chat/image/2164042228379484160.jpg"
-                        ></common-element-image>
+                        ></common-base-image>
                         <n-text depth={1} class="line-height-22">
                             {props.node.name}
                         </n-text>

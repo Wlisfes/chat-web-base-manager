@@ -10,8 +10,8 @@ export default defineComponent({
         return () => (
             <router-link to="/manager" class="layout-common-logo">
                 <div class="h-full flex gap-8 items-center transform-gpu overflow-hidden">
-                    <common-element-icon size={36} color="var(--primary-color)" name="nest-logo"></common-element-icon>
-                    <common-element-icon size={30} color="var(--primary-color)" name="nest-logo-name"></common-element-icon>
+                    <common-base-icon size={36} color="var(--primary-color)" name="nest-logo"></common-base-icon>
+                    <common-base-icon size={30} color="var(--primary-color)" name="nest-logo-name"></common-base-icon>
                 </div>
             </router-link>
         )

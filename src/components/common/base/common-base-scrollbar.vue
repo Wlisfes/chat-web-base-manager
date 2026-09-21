@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElementScrollbar',
+    name: 'CommonBaseScrollbar',
     props: {
         /**滚动容器类名**/
         className: { type: String, default: '' }
@@ -10,7 +10,7 @@ export default defineComponent({
     setup(props, { slots }) {
         return () => (
             <n-scrollbar
-                class="common-element-scrollbar flex-1 overflow-hidden"
+                class="common-base-scrollbar flex-1 overflow-hidden"
                 content-class={`min-h-full flex flex-col ${props.className}`}
                 trigger="none"
             >

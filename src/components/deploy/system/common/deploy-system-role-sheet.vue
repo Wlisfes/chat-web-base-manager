@@ -69,12 +69,12 @@ export default defineComponent({
         }
 
         return () => (
-            <common-element
+            <common-base-element
                 class="deploy-system-role-sheet h-full flex flex-col gap-14 overflow-hidden"
                 style={{ 'border-radius': '0 0 var(--border-radius) var(--border-radius)' }}
             >
-                <common-element is-white class="flex flex-col flex-1 p-block-14 overflow-hidden">
-                    <common-element-wrapper
+                <common-base-element is-white class="flex flex-col flex-1 p-block-14 overflow-hidden">
+                    <common-base-wrapper
                         scrollbar
                         opacity={0}
                         loading={faseState.initialize}
@@ -98,10 +98,10 @@ export default defineComponent({
                             on-update:indeterminate-keys={(indeterminateKeys: Array<number>) => setState({ indeterminateKeys })}
                             on-update:expanded-keys={(expandedKeys: Array<number>) => setState({ expandedKeys })}
                         />
-                    </common-element-wrapper>
-                </common-element>
-                <common-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
-                    <common-element-button
+                    </common-base-wrapper>
+                </common-base-element>
+                <common-base-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
+                    <common-base-button
                         class="min-w-80"
                         type="primary"
                         loading={faseState.loading}
@@ -109,12 +109,12 @@ export default defineComponent({
                         onClick={fetchSubmit}
                     >
                         保存
-                    </common-element-button>
-                    <common-element-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
+                    </common-base-button>
+                    <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
                         重置
-                    </common-element-button>
-                </common-element>
-            </common-element>
+                    </common-base-button>
+                </common-base-element>
+            </common-base-element>
         )
     }
 })

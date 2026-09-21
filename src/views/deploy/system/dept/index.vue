@@ -15,9 +15,9 @@ export default defineComponent({
 
         return () => (
             <layout-common-container class="absolute inset-0" class-name="flex-col overflow-hidden">
-                <common-element-wrapper loading={organOptions.loading.value} initialize={organOptions.initialize.value}>
+                <common-base-wrapper loading={organOptions.loading.value} initialize={organOptions.initialize.value}>
                     <deploy-system-dept-orgchart items={organOptions.dataSource.value}></deploy-system-dept-orgchart>
-                </common-element-wrapper>
+                </common-base-wrapper>
             </layout-common-container>
         )
     }

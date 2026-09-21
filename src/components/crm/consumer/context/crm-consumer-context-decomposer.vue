@@ -32,7 +32,7 @@ export default defineComponent({
 
         return () => (
             <crm-consumer-context-skeleton initialize={faseState.initialize}>
-                <common-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
+                <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
                     <crm-consumer-context-wrapper
                         initialize={faseState.initialize}
                         chunk-state={chunkState}
@@ -42,7 +42,7 @@ export default defineComponent({
                         animated
                         type="line"
                         tabs-padding={14}
-                        class="common-element-tabser inset-absolute flex-1 overflow-hidden "
+                        class="common-base-tabser inset-absolute flex-1 overflow-hidden "
                         v-model:value={faseState.tabName}
                     >
                         <n-tab-pane name="basic" tab="详情信息" display-directive="show">
@@ -73,7 +73,7 @@ export default defineComponent({
                             <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
                         </n-tab-pane>
                     </n-tabs>
-                </common-element>
+                </common-base-element>
             </crm-consumer-context-skeleton>
         )
     }

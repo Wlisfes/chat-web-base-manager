@@ -2,7 +2,7 @@
 import { defineComponent, computed, PropType, CSSProperties } from 'vue'
 
 export default defineComponent({
-    name: 'CommonElementColumnsTemplate',
+    name: 'CommonBaseColumnsTemplate',
     props: {
         /**类型**/
         type: { type: String as PropType<'fixed' | 'auto-fill' | 'auto-fit'>, default: 'fixed' },
@@ -18,9 +18,9 @@ export default defineComponent({
         })
 
         return () => (
-            <common-element class="common-element-columns-template grid" style={elementStyle.value}>
+            <common-base-element class="common-base-columns-template grid" style={elementStyle.value}>
                 {slots.default && slots.default()}
-            </common-element>
+            </common-base-element>
         )
     }
 })

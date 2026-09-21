@@ -4,7 +4,7 @@ import { PopoverInst } from 'naive-ui'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
-    name: 'CommonDatabasePopover',
+    name: 'CommonBasePopover',
     props: {
         /**是否展示**/
         visible: { type: Boolean, default: false }

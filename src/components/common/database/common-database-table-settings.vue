@@ -107,7 +107,7 @@ export default defineComponent({
 
         return () => {
             return (
-                <common-element-popover
+                <common-base-popover
                     placement="bottom-end"
                     style={{ padding: '0px' }}
                     v-model:visible={state.visible}
@@ -116,12 +116,12 @@ export default defineComponent({
                     {{
                         trigger: () => (
                             <div class="common-database-table-settings flex items-center justify-center">
-                                <common-element-button
+                                <common-base-button
                                     style={{ '--n-icon-size': '22px' }}
                                     text
-                                    icon={<common-element-icon size={20} name="nest-settings"></common-element-icon>}
+                                    icon={<common-base-icon size={20} name="nest-settings"></common-base-icon>}
                                     onClick={fetchState}
-                                ></common-element-button>
+                                ></common-base-button>
                             </div>
                         ),
                         default: () => (
@@ -135,12 +135,12 @@ export default defineComponent({
                                     >
                                         全选
                                     </n-checkbox>
-                                    <common-element-button text onClick={fetchReset}>
+                                    <common-base-button text onClick={fetchReset}>
                                         重置
-                                    </common-element-button>
+                                    </common-base-button>
                                 </div>
                                 <n-scrollbar class="max-h-450 overflow-hidden select-none">
-                                    <common-element-draggable
+                                    <common-base-draggable
                                         class="w-220 flex flex-col p-be-6 overflow-hidden"
                                         handle=".cursor-move"
                                         animation={200}
@@ -172,12 +172,12 @@ export default defineComponent({
                                                 </n-checkbox>
                                             </n-element>
                                         ))}
-                                    </common-element-draggable>
+                                    </common-base-draggable>
                                 </n-scrollbar>
                             </n-element>
                         )
                     }}
-                </common-element-popover>
+                </common-base-popover>
             )
         }
     }
@@ -187,7 +187,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .common-database-table-settings-popover {
     position: relative;
-    :deep(.common-element-draggable) > .chunk-column {
+    :deep(.common-base-draggable) > .chunk-column {
         position: relative;
         transition: background-color 0.3s var(--n-bezier);
         &:hover {

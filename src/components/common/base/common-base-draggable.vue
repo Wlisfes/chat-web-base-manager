@@ -3,10 +3,10 @@ import { defineComponent } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 
 export default defineComponent({
-    name: 'CommonElementDraggable',
+    name: 'CommonBaseDraggable',
     components: { VueDraggable },
     setup(props, { slots }) {
-        return () => <vue-draggable class="common-element-draggable">{slots.default && slots.default()}</vue-draggable>
+        return () => <vue-draggable class="common-base-draggable">{slots.default && slots.default()}</vue-draggable>
     }
 })
 </script>
