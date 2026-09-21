@@ -102,12 +102,12 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="职位名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入职位名称"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

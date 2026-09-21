@@ -4,7 +4,7 @@ import { moment, isNotEmpty } from '@/utils'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
-    name: 'FormCommonColumnDatePicker',
+    name: 'FormBaseDatePicker',
     emits: ['update:startTime', 'update:endTime', 'update:value', '-change:value'],
     props: {
         /**Date Picker 的类型**/
@@ -43,14 +43,14 @@ export default defineComponent({
             if (isNotEmpty(props.type) && props.type.includes('range')) {
                 return (
                     <n-date-picker
-                        class="form-common-column-date-picker w-full"
+                        class="form-base-date-picker w-full"
                         type={props.type}
                         value={rangeTime.value}
                         on-update:value={fetchRangeUpdate}
                     />
                 )
             }
-            return <n-date-picker class="form-common-column-date-picker w-full" type={props.type} />
+            return <n-date-picker class="form-base-date-picker w-full" type={props.type} />
         }
     }
 })

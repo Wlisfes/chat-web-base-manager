@@ -51,7 +51,7 @@ export default defineComponent({
                     content-class="p-0 flex flex-col justify-center"
                     style={{ boxShadow: 'var(--box-shadow-1)' }}
                 >
-                    <form-common-container
+                    <form-base-container
                         class="w-full max-w-375 m-auto select-none"
                         size="large"
                         ref={formRef}
@@ -64,7 +64,7 @@ export default defineComponent({
                             <n-text depth={2}>欢迎登录</n-text>
                         </n-h2>
                         <n-form-item path="number">
-                            <form-common-column-input
+                            <form-base-input
                                 maxlength={128}
                                 type="text"
                                 placeholder="请输入工号、手机号或邮箱"
@@ -72,10 +72,10 @@ export default defineComponent({
                                 input-props={{ autocomplete: 'on' }}
                                 onSubmit={fetchSubmit}
                                 prefix={<common-base-icon size={22} name="nest-unset-user"></common-base-icon>}
-                            ></form-common-column-input>
+                            ></form-base-input>
                         </n-form-item>
                         <n-form-item path="password">
-                            <form-common-column-input
+                            <form-base-input
                                 maxlength={128}
                                 placeholder="请输入登录密码"
                                 type="password"
@@ -85,11 +85,11 @@ export default defineComponent({
                                 v-model:value={formState.value.password}
                                 onSubmit={fetchSubmit}
                                 prefix={<common-base-icon size={22} name="nest-unset-ockes"></common-base-icon>}
-                            ></form-common-column-input>
+                            ></form-base-input>
                         </n-form-item>
                         <n-form-item path="code">
                             <n-flex class="w-full">
-                                <form-common-column-input
+                                <form-base-input
                                     class="flex-1"
                                     type="text"
                                     placeholder="验证码"
@@ -97,7 +97,7 @@ export default defineComponent({
                                     v-model:value={formState.value.code}
                                     onSubmit={fetchSubmit}
                                     prefix={<common-base-icon size={22} name="nest-unset-codex"></common-base-icon>}
-                                ></form-common-column-input>
+                                ></form-base-input>
                                 <common-base-codex
                                     link={link.value}
                                     loading={loading.value}
@@ -131,7 +131,7 @@ export default defineComponent({
                                 <common-base-icon size={44} name="nest-google"></common-base-icon>
                             </common-base-button>
                         </n-flex>
-                    </form-common-container>
+                    </form-base-container>
                 </n-card>
             </n-element>
         )

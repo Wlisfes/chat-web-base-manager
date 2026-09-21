@@ -84,20 +84,20 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column prop="code" label="编码">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入国家/地区编码"
                             v-model:value={formState.value.code}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="mcc" label="MCC">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入MCC"
                             v-model:value={formState.value.mcc}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

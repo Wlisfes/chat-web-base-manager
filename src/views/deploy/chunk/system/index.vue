@@ -160,19 +160,19 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="taskName" label="任务名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入任务名称"
                             v-model:value={formState.value.taskName}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="任务状态">
-                        <form-common-column-select
+                        <form-base-select
                             placeholder="请选择任务状态"
                             options={chunkState.CHUNK_DATETASK_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

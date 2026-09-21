@@ -123,7 +123,7 @@ export default defineComponent({
                     >
                         {columns.length > 0 && (
                             <common-base-collapse base-height={height.value} v-model:when={when.value}>
-                                <form-common-container
+                                <form-base-container
                                     ref={formRef}
                                     class={formClass.value}
                                     label-placement="left"
@@ -131,7 +131,7 @@ export default defineComponent({
                                     label-width={props.labelWidth}
                                 >
                                     <Fragment>{columns}</Fragment>
-                                </form-common-container>
+                                </form-base-container>
                             </common-base-collapse>
                         )}
                         {props.function.length + functions.length > 0 && (

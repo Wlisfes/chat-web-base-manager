@@ -94,28 +94,28 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column prop="vague" label="姓名/工号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入姓名/工号"
                             v-model:value={formState.value.vague}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="phone" label="手机号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入手机号"
                             v-model:value={formState.value.phone}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="email" label="邮箱">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

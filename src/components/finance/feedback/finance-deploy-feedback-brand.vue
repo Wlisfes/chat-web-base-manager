@@ -83,7 +83,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -91,21 +91,21 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="品牌名称" path="name">
-                        <form-common-column-input
+                    <form-base-column label="品牌名称" path="name">
+                        <form-base-input
                             maxlength={64}
                             placeholder="请输入品牌名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="状态" path="status">
-                        <form-common-column-select
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="状态" path="status">
+                        <form-base-select
                             placeholder="请选择状态"
                             options={chunkState.CHUNK_BRAND_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="品牌描述" path="document">
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="品牌描述" path="document">
                         <n-input
                             type="textarea"
                             maxlength={1024}
@@ -114,8 +114,8 @@ export default defineComponent({
                             v-model:value={formState.value.document}
                             autosize={{ minRows: 3, maxRows: 6 }}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

@@ -113,7 +113,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -121,64 +121,64 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="角色编码" path="code">
-                        <form-common-column-input
+                    <form-base-column label="角色编码" path="code">
+                        <form-base-input
                             maxlength={64}
                             placeholder="例如 department_manager"
                             disabled={props.node.builtin === true}
                             v-model:value={formState.value.code}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="角色名称" path="name">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="角色名称" path="name">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入角色名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="数据权限" path="model">
-                        <form-common-column-select
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="数据权限" path="model">
+                        <form-base-select
                             placeholder="请选择数据权限"
                             //options={chunkOptions.CHUNK_ROLE_MODEL.value}
                             v-model:value={formState.value.model}
-                        ></form-common-column-select>
-                    </form-common-column>
+                        ></form-base-select>
+                    </form-base-column>
                     {formState.value.model === 'custom' && (
-                        <form-common-column
+                        <form-base-column
                             label="指定组织"
                             path="organizationKeyIds"
                             rule={{ required: true, type: 'array', min: 1, message: '请选择至少一个组织', trigger: 'change' }}
                         >
-                            <form-common-column-cascader
+                            <form-base-cascader
                                 multiple
                                 clearable
                                 cascade={false}
                                 placeholder="请选择可访问的组织"
                                 options={deptOptions.dataSource.value}
                                 v-model:value={formState.value.organizationKeyIds}
-                            ></form-common-column-cascader>
-                        </form-common-column>
+                            ></form-base-cascader>
+                        </form-base-column>
                     )}
-                    <form-common-column label="角色状态" path="status">
-                        <form-common-column-select
+                    <form-base-column label="角色状态" path="status">
+                        <form-base-select
                             placeholder="请选择角色状态"
                             //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="排序号" path="sort">
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="排序号" path="sort">
                         <n-input-number class="w-full" placeholder="请输入排序号" v-model:value={formState.value.sort} />
-                    </form-common-column>
-                    <form-common-column label="角色描述" path="comment">
-                        <form-common-column-input
+                    </form-base-column>
+                    <form-base-column label="角色描述" path="comment">
+                        <form-base-input
                             type="textarea"
                             placeholder="请输入角色描述"
                             maxlength={128}
                             autosize={{ minRows: 2, maxRows: 5 }}
                             v-model:value={formState.value.comment}
-                        ></form-common-column-input>
-                    </form-common-column>
-                </form-common-container>
+                        ></form-base-input>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

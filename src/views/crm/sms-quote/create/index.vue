@@ -44,7 +44,7 @@ export default defineComponent({
                         <n-step class="items-center" title="发布报价" />
                     </common-business-steps-wrapper>
                 </common-base-element>
-                <form-common-container
+                <form-base-container
                     class="flex flex-col flex-1 overflow-hidden"
                     ref={formRef}
                     model={formState.value}
@@ -104,7 +104,7 @@ export default defineComponent({
                             ></crm-sms-quote-publish>
                         </n-tab-pane>
                     </n-tabs>
-                </form-common-container>
+                </form-base-container>
             </layout-common-container>
         )
     }

@@ -104,19 +104,19 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="品牌名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入品牌名称"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
-                        <form-common-column-select
+                        <form-base-select
                             placeholder="请选择付款模式"
                             options={chunkState.CHUNK_BRAND_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

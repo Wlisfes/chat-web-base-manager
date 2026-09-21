@@ -40,20 +40,20 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-column prop="currency" label="币种">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入币种编码"
                             v-model:value={formState.value.currency}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="date" label="日期">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入汇率日期"
                             v-model:value={formState.value.date}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

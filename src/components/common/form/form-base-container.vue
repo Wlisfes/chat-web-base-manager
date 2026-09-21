@@ -4,7 +4,7 @@ import { FormInst } from 'naive-ui'
 import { stop } from '@/utils'
 
 export default defineComponent({
-    name: 'FormCommonContainer',
+    name: 'FormBaseContainer',
     props: {
         formState: { type: Object as PropType<Omix>, default: () => ({}) }
     },
@@ -56,12 +56,12 @@ export default defineComponent({
         }
 
         /**注入实例**/
-        provide('FORM_COMMON_INSTANCE', formOptions)
+        provide('FORM_BASE_INSTANCE', formOptions)
         /**导出配置**/
         expose(formOptions.value)
 
         return () => (
-            <n-form ref={formRef} class="form-common-container" onSubmit={stop}>
+            <n-form ref={formRef} class="form-base-container" onSubmit={stop}>
                 {slots.default && slots.default()}
             </n-form>
         )

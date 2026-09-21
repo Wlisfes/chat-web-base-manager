@@ -71,12 +71,12 @@ export default defineComponent({
 
         return () => (
             <div class={`common-base-action flex flex-1 gap-10 ${props.className}`}>
-                {/* <form-common-input
+                {/* <form-base-input
                     v-model:value={vague.value}
                     placeholder={props.placeholder}
                     clearable
                     onKeyup={fetchKeyup}
-                ></form-common-input> */}
+                ></form-base-input> */}
                 {props.mode === 'input' ? (
                     <common-base-button
                         secondary

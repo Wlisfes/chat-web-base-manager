@@ -107,7 +107,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -115,54 +115,54 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="客户名称" path="name">
-                        <form-common-column-input
+                    <form-base-column label="客户名称" path="name">
+                        <form-base-input
                             maxlength={64}
                             placeholder="请输入客户名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="归属品牌" path="brandId">
-                        <form-common-column-select
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="归属品牌" path="brandId">
+                        <form-base-select
                             filterable
                             placeholder="请选择归属品牌"
                             value-field="keyId"
                             options={brandOptions.dataSource.value}
                             v-model:value={formState.value.brandId}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="币种" path="currency">
-                        <form-common-column-select
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="币种" path="currency">
+                        <form-base-select
                             filterable
                             placeholder="请选择币种"
                             value-field="currency"
                             label-field="currency"
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="邮箱" path="email">
-                        <form-common-column-input
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="邮箱" path="email">
+                        <form-base-input
                             maxlength={128}
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="电话号码" path="phone">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="电话号码" path="phone">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入电话号码"
                             v-model:value={formState.value.phone}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="付款模式" path="payMode">
-                        <form-common-column-select
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="付款模式" path="payMode">
+                        <form-base-select
                             placeholder="请选择付款模式"
                             //options={chunkState.CHUNK_CONSUMER_PAY_MODE}
                             v-model:value={formState.value.payMode}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="备注" path="remark">
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="备注" path="remark">
                         <n-input
                             type="textarea"
                             maxlength={1024}
@@ -171,8 +171,8 @@ export default defineComponent({
                             v-model:value={formState.value.remark}
                             autosize={{ minRows: 3, maxRows: 6 }}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

@@ -73,7 +73,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -81,8 +81,8 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="关联账号" path="uids">
-                        <form-common-column-select
+                    <form-base-column label="关联账号" path="uids">
+                        <form-base-select
                             multiple
                             filterable
                             clearable
@@ -90,9 +90,9 @@ export default defineComponent({
                             loading={accountOptions.loading.value}
                             options={accountOptions.dataSource.value}
                             v-model:value={formState.value.uids}
-                        ></form-common-column-select>
-                    </form-common-column>
-                </form-common-container>
+                        ></form-base-select>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

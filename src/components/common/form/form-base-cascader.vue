@@ -3,7 +3,7 @@ import { defineComponent, nextTick } from 'vue'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
-    name: 'FormCommonColumnCascader',
+    name: 'FormBaseCascader',
     emits: ['update:value', '-change:value'],
     props: {
         /**开启多选**/
@@ -30,7 +30,7 @@ export default defineComponent({
 
         return () => (
             <n-cascader
-                class={{ 'form-common-column-cascader': true, 'is-multiple': props.multiple }}
+                class={{ 'form-base-cascader': true, 'is-multiple': props.multiple }}
                 multiple={props.multiple}
                 max-tag-count={props.maxTagCount}
                 label-field={props.labelField}
@@ -45,7 +45,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.form-common-column-cascader.is-multiple {
+.form-base-cascader.is-multiple {
     :deep(.n-base-selection-tags) {
         padding-block-start: 0;
         height: 100%;

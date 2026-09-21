@@ -145,46 +145,46 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="名称/工号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入名称或工号"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="depts" label="归属部门">
-                        <form-common-column-cascader
+                        <form-base-cascader
                             multiple
                             clearable
                             placeholder="请选择归属部门"
                             v-model:value={formState.value.depts}
                             options={deptOptions.dataSource.value}
-                        ></form-common-column-cascader>
+                        ></form-base-cascader>
                     </common-database-search-column>
                     <common-database-search-column prop="phone" label="手机号">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入手机号"
                             v-model:value={formState.value.phone}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="email" label="邮箱">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入邮箱"
                             v-model:value={formState.value.email}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
-                        <form-common-column-select
+                        <form-base-select
                             clearable
                             placeholder="请选择状态"
                             //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             v-model:value={formState.value.status}
                             on-change:value={fetchRefresh}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

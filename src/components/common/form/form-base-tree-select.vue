@@ -3,7 +3,7 @@ import { defineComponent, nextTick } from 'vue'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
-    name: 'FormCommonColumnTreeSelect',
+    name: 'FormBaseTreeSelect',
     emits: ['update:value', '-change:value'],
     props: {
         /**绑定数据**/
@@ -26,7 +26,7 @@ export default defineComponent({
 
         return () => (
             <n-tree-select
-                class="form-common-column-tree-select"
+                class="form-base-tree-select"
                 label-field={props.labelField}
                 key-field={props.keyField}
                 children-field={props.childrenField}

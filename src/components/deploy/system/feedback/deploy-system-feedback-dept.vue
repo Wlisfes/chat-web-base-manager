@@ -118,7 +118,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -126,40 +126,42 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="上级部门" path="parentKeyId">
-                        <form-common-column-cascader
-                            v-model:value={formState.value.parentKeyId}
-                            label-field="name"
-                            label-value="keyId"
-                            children-field="children"
-                            placeholder="请选择上级部门"
-                            expand-trigger="click"
-                            options={deptOptions.dataSource.value}
-                        ></form-common-column-cascader>
-                    </form-common-column>
-                    <form-common-column label="部门名称" path="name">
-                        <form-common-column-input
-                            maxlength={32}
-                            placeholder="请输入部门名称"
-                            v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="组织编码" path="code">
-                        <form-common-column-input
+                    <common-base-columns-template class="gap-x-20" type="auto-fit" number={400}>
+                        <form-base-column label="上级部门" path="parentKeyId">
+                            <form-base-cascader
+                                v-model:value={formState.value.parentKeyId}
+                                label-field="name"
+                                label-value="keyId"
+                                children-field="children"
+                                placeholder="请选择上级部门"
+                                expand-trigger="click"
+                                options={deptOptions.dataSource.value}
+                            ></form-base-cascader>
+                        </form-base-column>
+                        <form-base-column label="部门名称" path="name">
+                            <form-base-input
+                                maxlength={32}
+                                placeholder="请输入部门名称"
+                                v-model:value={formState.value.name}
+                            ></form-base-input>
+                        </form-base-column>
+                    </common-base-columns-template>
+                    <form-base-column label="组织编码" path="code">
+                        <form-base-input
                             maxlength={64}
                             placeholder="例如 RD 或 PRODUCT_TEAM"
                             v-model:value={formState.value.code}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="组织类型" path="type">
-                        <form-common-column-select
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="组织类型" path="type">
+                        <form-base-select
                             placeholder="请选择组织类型"
                             options={enumOptions.enumState.typeOptions}
                             v-model:value={formState.value.type}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="负责人" path="leaderUserUid">
-                        <form-common-column-select
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="负责人" path="leaderUserUid">
+                        <form-base-select
                             clearable
                             filterable
                             label-field="name"
@@ -167,19 +169,19 @@ export default defineComponent({
                             placeholder="请选择负责人"
                             options={leaderOptions.dataSource.value}
                             v-model:value={formState.value.leaderUserUid}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="排序号" path="sort">
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="排序号" path="sort">
                         <n-input-number class="w-full" min={0} precision={0} v-model:value={formState.value.sort} />
-                    </form-common-column>
-                    <form-common-column label="组织状态" path="status">
-                        <form-common-column-select
+                    </form-base-column>
+                    <form-base-column label="组织状态" path="status">
+                        <form-base-select
                             placeholder="请选择组织状态"
                             options={enumOptions.enumState.statusOptions}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                </form-common-container>
+                        ></form-base-select>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

@@ -72,19 +72,19 @@ export default defineComponent({
                         </common-base-button>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="cnName" label="名称">
-                        <form-common-column-input
+                        <form-base-input
                             clearable
                             placeholder="请输入国家/地区名称、编码"
                             v-model:value={formState.value.cnName}
                             on-submit={fetchRefresh}
-                        ></form-common-column-input>
+                        ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
-                        <form-common-column-select
+                        <form-base-select
                             placeholder="请选择状态"
                             options={chunkState.CHUNK_COUNTRY_STATUS}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table

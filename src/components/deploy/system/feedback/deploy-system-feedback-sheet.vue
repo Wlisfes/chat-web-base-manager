@@ -128,7 +128,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     class="grid-auto-350 gap-col-20"
                     require-mark-placement="left"
                     size="medium"
@@ -137,25 +137,25 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="类型" path="type">
-                        <form-common-column-select
+                    <form-base-column label="类型" path="type">
+                        <form-base-select
                             placeholder="请选择类型"
                             options={enumOptions.enumState.typeOptions}
                             v-model:value={formState.value.type}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column
                         label="权限标识"
                         path="permissionCode"
                         rule={{ required: formState.value.type !== 'directory', trigger: 'blur', message: '请输入权限标识' }}
                     >
-                        <form-common-column-input
+                        <form-base-input
                             maxlength={255}
                             placeholder="请输入权限标识"
                             v-model:value={formState.value.permissionCode}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column
                         label="父级菜单/按钮"
                         path="parentKeyId"
                         key={formState.value.type}
@@ -166,58 +166,58 @@ export default defineComponent({
                             message: '请选择父级菜单/按钮'
                         }}
                     >
-                        <form-common-column-cascader
+                        <form-base-cascader
                             clearable
                             expand-trigger="click"
                             placeholder="请选择父级菜单/按钮"
                             v-model:value={formState.value.parentKeyId}
                             options={sheetOptions.dataSource.value}
-                        ></form-common-column-cascader>
-                    </form-common-column>
-                    <form-common-column label="菜单/按钮名称" path="name">
-                        <form-common-column-input
+                        ></form-base-cascader>
+                    </form-base-column>
+                    <form-base-column label="菜单/按钮名称" path="name">
+                        <form-base-input
                             maxlength={32}
                             placeholder="请输入菜单/按钮名称"
                             v-model:value={formState.value.name}
-                        ></form-common-column-input>
-                    </form-common-column>
+                        ></form-base-input>
+                    </form-base-column>
                     {['menu', 'directory'].includes(formState.value.type) && (
                         <Fragment>
-                            <form-common-column
+                            <form-base-column
                                 label="菜单地址"
                                 path="path"
                                 rule={{ required: true, trigger: 'blur', message: '请输入菜单地址' }}
                             >
-                                <form-common-column-input
+                                <form-base-input
                                     maxlength={255}
                                     placeholder="请输入菜单地址"
                                     v-model:value={formState.value.path}
-                                ></form-common-column-input>
-                            </form-common-column>
-                            <form-common-column label="菜单图标" path="icon">
-                                <form-common-column-input
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column label="菜单图标" path="icon">
+                                <form-base-input
                                     maxlength={255}
                                     placeholder="请输入菜单图标"
                                     v-model:value={formState.value.icon}
-                                ></form-common-column-input>
-                            </form-common-column>
-                            <form-common-column label="菜单显示状态">
-                                <form-common-column-select
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column label="菜单显示状态">
+                                <form-base-select
                                     placeholder="请选择菜单显示状态"
                                     options={enumOptions.enumState.visibleOptions}
                                     v-model:value={formState.value.visible}
-                                ></form-common-column-select>
-                            </form-common-column>
+                                ></form-base-select>
+                            </form-base-column>
                         </Fragment>
                     )}
-                    <form-common-column label="菜单/按钮状态" path="status">
-                        <form-common-column-select
+                    <form-base-column label="菜单/按钮状态" path="status">
+                        <form-base-select
                             placeholder="请选择菜单/按钮状态"
                             options={enumOptions.enumState.statusOptions}
                             v-model:value={formState.value.status}
-                        ></form-common-column-select>
-                    </form-common-column>
-                    <form-common-column label="排序号" path="sort" v-model:value={formState.value.sort}>
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="排序号" path="sort" v-model:value={formState.value.sort}>
                         <n-input-number
                             class="w-full"
                             min={1}
@@ -226,8 +226,8 @@ export default defineComponent({
                             placeholder="请输入排序号"
                             v-model:value={formState.value.sort}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }

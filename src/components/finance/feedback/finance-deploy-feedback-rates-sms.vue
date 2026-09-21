@@ -96,7 +96,7 @@ export default defineComponent({
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <form-common-container
+                <form-base-container
                     require-mark-placement="left"
                     size="medium"
                     ref={formRef}
@@ -104,21 +104,21 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="国家/地区编码" path="code">
-                        <form-common-column-input
+                    <form-base-column label="国家/地区编码" path="code">
+                        <form-base-input
                             maxlength={10}
                             placeholder="请输入国家/地区编码"
                             v-model:value={formState.value.code}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="移动国家代码" path="mcc">
-                        <form-common-column-input
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="移动国家代码" path="mcc">
+                        <form-base-input
                             maxlength={4}
                             placeholder="请输入移动国家代码 (MCC)"
                             v-model:value={formState.value.mcc}
-                        ></form-common-column-input>
-                    </form-common-column>
-                    <form-common-column label="上行短信价格" path="upUsd">
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="上行短信价格" path="upUsd">
                         <n-input-number
                             v-model:value={formState.value.upUsd}
                             placeholder="请输入上行短信价格 (USD)"
@@ -127,8 +127,8 @@ export default defineComponent({
                             precision={6}
                             style={{ width: '100%' }}
                         />
-                    </form-common-column>
-                    <form-common-column label="下行短信价格" path="downUsd">
+                    </form-base-column>
+                    <form-base-column label="下行短信价格" path="downUsd">
                         <n-input-number
                             v-model:value={formState.value.downUsd}
                             placeholder="请输入下行短信价格 (USD)"
@@ -137,8 +137,8 @@ export default defineComponent({
                             precision={6}
                             style={{ width: '100%' }}
                         />
-                    </form-common-column>
-                    <form-common-column label="备注" path="remark">
+                    </form-base-column>
+                    <form-base-column label="备注" path="remark">
                         <n-input
                             type="textarea"
                             maxlength={1024}
@@ -147,8 +147,8 @@ export default defineComponent({
                             v-model:value={formState.value.remark}
                             autosize={{ minRows: 3, maxRows: 6 }}
                         />
-                    </form-common-column>
-                </form-common-container>
+                    </form-base-column>
+                </form-base-container>
             </common-dialog-provider>
         )
     }
