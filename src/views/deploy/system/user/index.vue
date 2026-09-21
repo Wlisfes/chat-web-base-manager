@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useSelectService, useChunkService } from '@/hooks'
+import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { createDeployAccountQuery, mapDeployAccountUsers, mapDeployOrganizations } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
@@ -9,8 +9,6 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemUser',
     setup(props, ctx) {
-        /**通用字典枚举**/
-        const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
         /**部门树结构**/
         const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: true,
@@ -183,7 +181,7 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             placeholder="请选择状态"
-                            options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             v-model:value={formState.value.status}
                             on-change:value={fetchRefresh}
                         ></form-common-column-select>
@@ -241,7 +239,7 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                                //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             ></common-database-table-chunk>
                         )
                     }}

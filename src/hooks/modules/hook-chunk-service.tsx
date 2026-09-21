@@ -7,7 +7,7 @@ import * as Service from '@/api/instance.service'
 
 /**枚举下拉通用hooks配置**/
 interface ChunkServiceOptions<T extends Array<ChunkName>> {
-    /**旧版本地枚举类型**/
+    /** @deprecated 旧版本地枚举类型；新代码改用 request + fields。 */
     type?: T
     /**新版后端枚举接口**/
     request?: () => Promise<{ data?: Omix }>

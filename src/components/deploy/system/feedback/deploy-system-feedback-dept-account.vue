@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService, useChunkService } from '@/hooks'
+import { useColumnService } from '@/hooks'
 import { isNotEmpty } from 'class-validator'
 import { createDeployAccountQuery, mapDeployAccountUsers } from '@/utils'
 import * as Service from '@/api/instance.service'
@@ -16,10 +16,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**通用字典枚举**/
-        const chunkOptions = useChunkService({ type: ['CHUNK_ACCOUNT_STATUS'] })
+
         /**表格实例**/
         const { state, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
+            request: (base, payload) =>
+                Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
             transform: data => mapDeployAccountUsers(data.list),
             formState: { depts: [props.node.keyId].filter(isNotEmpty) },
             limit: 0,
@@ -80,11 +81,7 @@ export default defineComponent({
                                 ></common-database-table-content>
                             ),
                             col_status: (data: Omix) => (
-                                <common-database-table-chunk
-                                    element="chunk"
-                                    value={data.status}
-                                    options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
-                                ></common-database-table-chunk>
+                                <common-database-table-chunk element="chunk" value={data.status}></common-database-table-chunk>
                             )
                         }}
                     </common-database-table>

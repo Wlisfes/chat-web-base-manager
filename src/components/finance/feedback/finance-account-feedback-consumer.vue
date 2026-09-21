@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType, ref } from 'vue'
-import { useFormService, useChunkService, useSelectService } from '@/hooks'
+import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -158,7 +158,7 @@ export default defineComponent({
                     <form-common-column label="付款模式" path="payMode">
                         <form-common-column-select
                             placeholder="请选择付款模式"
-                            options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                            //options={chunkState.CHUNK_CONSUMER_PAY_MODE}
                             v-model:value={formState.value.payMode}
                         ></form-common-column-select>
                     </form-common-column>

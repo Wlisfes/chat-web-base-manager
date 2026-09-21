@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { createDeployRoleDataScopePayload, createDeployRolePayload, mapDeployOrganizations, mapDeployRole } from '@/utils'
 import { httpBaseAccountOrganizationTreeStructure } from '@/api/modules/deploy/modules/organization.service'
@@ -18,11 +18,6 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        /**通用字典枚举**/
-        const chunkOptions = useChunkService({
-            immediate: false,
-            type: ['CHUNK_ROLE_MODEL', 'CHUNK_ROLE_CHUNK', 'CHUNK_ACCOUNT_STATUS']
-        })
         /**部门树结构（仅部门角色需要）**/
         const deptOptions = useSelectService(() => httpBaseAccountOrganizationTreeStructure(), {
             immediate: false,
@@ -51,7 +46,7 @@ export default defineComponent({
         })
         /**角色详情**/
         async function fetchBaseSystemRoleResolver() {
-            return await Promise.all([deptOptions.fetchRequest(), chunkOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([deptOptions.fetchRequest()]).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
                 }
@@ -144,7 +139,7 @@ export default defineComponent({
                     <form-common-column label="数据权限" path="model">
                         <form-common-column-select
                             placeholder="请选择数据权限"
-                            options={chunkOptions.CHUNK_ROLE_MODEL.value}
+                            //options={chunkOptions.CHUNK_ROLE_MODEL.value}
                             v-model:value={formState.value.model}
                         ></form-common-column-select>
                     </form-common-column>
@@ -167,7 +162,7 @@ export default defineComponent({
                     <form-common-column label="角色状态" path="status">
                         <form-common-column-select
                             placeholder="请选择角色状态"
-                            options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
                             v-model:value={formState.value.status}
                         ></form-common-column-select>
                     </form-common-column>
