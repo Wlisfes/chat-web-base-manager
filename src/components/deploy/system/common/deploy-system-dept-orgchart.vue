@@ -87,10 +87,10 @@ export default defineComponent({
                         }
                     }
                 })
-                // chart.onInit(() => {
-                //     const [left, top, right, bottom] = chart.getViewBox()
-                //     chart.setViewBox([-150, top, right, bottom])
-                // })
+                chart.onInit(() => {
+                    const [left, top, right, bottom] = chart.getViewBox()
+                    chart.setViewBox([-150, top, right, bottom])
+                })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
                     return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
                 })

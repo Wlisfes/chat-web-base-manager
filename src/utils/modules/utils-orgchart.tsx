@@ -41,15 +41,16 @@ export async function fetchChartInitialization(element: HTMLElement, options: Ch
         element,
         Object.assign({}, options, {
             orientation: OrgChart.orientation.left,
-            layout: OrgChart.layout.mixed,
+            layout: OrgChart.layout.treeRight,
             align: OrgChart.align.center,
-            scaleInitial: 1,
+            scaleInitial: 0.8,
             mouseScroll: OrgChart.action.ctrlZoom,
             nodeMouseClick: OrgChart.action.none,
             levelSeparation: 50,
             mixedHierarchyNodesSeparation: 15,
             subtreeSeparation: 20,
             siblingSeparation: 20,
+            collapse: Object.assign({ level: 3, allChildren: true }, options.collapse ?? {}),
             controls: Object.assign({}, options.controls ?? {}, {
                 zoom_in: { title: '放大', icon: fetchCreateSvgIcon(ZoomIn, 26) },
                 zoom_out: { title: '缩小', icon: fetchCreateSvgIcon(ZoomOut, 26) },
