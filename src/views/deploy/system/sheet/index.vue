@@ -3,7 +3,7 @@ import { computed, defineComponent, h } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
-import { isEmpty, normalizeTreeChildren } from '@/utils'
+import { isEmpty, fetchNormalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -18,7 +18,7 @@ export default defineComponent({
                 expandedKeys: [] as Array<number>
             }
         })
-        const sheetTreeData = computed(() => normalizeTreeChildren(sheetOptions.dataSource.value))
+        const sheetTreeData = computed(() => fetchNormalizeTreeChildren(sheetOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),

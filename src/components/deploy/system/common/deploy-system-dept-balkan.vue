@@ -53,7 +53,10 @@ export default defineComponent({
     box-sizing: border-box;
     border: 1px solid #aeaeae;
     border-radius: var(--border-radius);
-    transition: border-color 0.3s var(--cubic-bezier-ease-in-out);
+    background-color: var(--card-color);
+    transition:
+        border-color 0.3s var(--cubic-bezier-ease-in-out),
+        background-color 0.3s var(--cubic-bezier-ease-in-out);
     &:hover {
         border-color: var(--primary-color-hover);
     }

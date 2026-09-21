@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, PropType, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { EventType, fetchParentKeyIds, normalizeTreeChildren } from '@/utils'
+import { EventType, fetchParentKeyIds, fetchNormalizeTreeChildren } from '@/utils'
 import { SendFilled } from '@vicons/carbon'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -29,7 +29,7 @@ export default defineComponent({
             }
         })
         /**权限树移除叶子节点的空 children，避免显示无效展开图标。*/
-        const menuTreeData = computed(() => normalizeTreeChildren(props.faseNode ?? []))
+        const menuTreeData = computed(() => fetchNormalizeTreeChildren(props.faseNode ?? []))
         /**监听结束事件**/
         props.observer.on('finish', async () => {
             return await setState({ loading: false, initialize: false })

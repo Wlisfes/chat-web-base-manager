@@ -6,7 +6,7 @@ export default defineComponent({
     emits: ['-change:value'],
     props: {
         /**选项label的字段名**/
-        labelField: { type: String, default: 'name' },
+        labelField: { type: String, default: 'label' },
         /**选项value的字段名**/
         labelValue: { type: String, default: 'value' }
     },

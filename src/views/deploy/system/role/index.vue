@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { createDeployRoleView, isEmpty, normalizeTreeChildren, stop } from '@/utils'
+import { createDeployRoleView, isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -36,7 +36,7 @@ export default defineComponent({
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
-        const departmentRoleTreeData = computed(() => normalizeTreeChildren(faseNode.value.dept ?? []))
+        const departmentRoleTreeData = computed(() => fetchNormalizeTreeChildren(faseNode.value.dept ?? []))
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
             if ((data.list ?? []).length === 0 || faseState.selectedKeys.length > 0) {

@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { fetchNormalizeTreeChildren } from '@/utils'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -17,17 +18,16 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure(), {
+        const deptOptions = useSelectService(Service.httpBaseAccountOrganizationTreeStructure, {
+            transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**负责人账号列表**/
-        const leaderOptions = useSelectService(() => Service.httpBaseAccountSelectUser(), {
+        const leaderOptions = useSelectService(Service.httpBaseAccountSelectUser, {
             immediate: false
         })
-        /**后端组织枚举**/
-        const enumOptions = useChunkService({
-            request: Service.httpBaseAccountOrganizationEnums,
-            fields: ['typeOptions', 'statusOptions'],
+        /**后端部门枚举**/
+        const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountOrganizationEnums, {
             immediate: false
         })
 
@@ -37,11 +37,11 @@ export default defineComponent({
             formState: {
                 /**部门名称**/
                 name: props.node.name,
-                /**组织编码**/
+                /**部门编码**/
                 code: props.node.code,
                 /**上级部门**/
                 parentKeyId: props.node.parentKeyId,
-                /**组织类型**/
+                /**部门类型**/
                 type: props.node.type ?? 'department',
                 /**负责人**/
                 leaderUserUid: props.node.leaderUserUid,
@@ -52,32 +52,31 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入部门名称', trigger: 'blur' },
-                code: { required: true, message: '请输入组织编码', trigger: 'blur' },
-                type: { required: true, message: '请选择组织类型', trigger: 'change' },
-                status: { required: true, message: '请选择组织状态', trigger: 'change' },
+                code: { required: true, message: '请输入部门编码', trigger: 'blur' },
+                type: { required: true, message: '请选择部门类型', trigger: 'change' },
+                status: { required: true, message: '请选择部门状态', trigger: 'change' },
+                leaderUserUid: { required: true, message: '请选择负责人', trigger: 'change' },
                 sort: { required: true, type: 'number', message: '请输入排序号', trigger: 'blur' }
             }
         })
 
         /**部门详情**/
         async function fetchBaseSystemDeptResolver() {
-            return await Promise.all([deptOptions.fetchRequest(), leaderOptions.fetchRequest(), enumOptions.fetchRequest()]).then(
-                async () => {
-                    if (['CREATE'].includes(props.command)) {
-                        return await setState({ initialize: false })
-                    }
-                    try {
-                        const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
-                        return await setForm(fetchReste(deptRes.data)).then(async () => {
-                            return await setState({ initialize: false })
-                        })
-                    } catch (err) {
-                        return await setState({ initialize: false }).then(async () => {
-                            return await fetchNotifyService({ type: 'error', title: err.message })
-                        })
-                    }
+            return await Promise.all([fetchChunk(), deptOptions.fetchRequest(), leaderOptions.fetchRequest()]).then(async () => {
+                if (['CREATE'].includes(props.command)) {
+                    return await setState({ initialize: false })
                 }
-            )
+                try {
+                    const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
+                    return await setForm(fetchReste(deptRes.data)).then(async () => {
+                        return await setState({ initialize: false })
+                    })
+                } catch (err) {
+                    return await setState({ initialize: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
+            })
         }
 
         /**确定提交表单**/
@@ -110,7 +109,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={750}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -126,7 +125,7 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <common-base-columns-template class="gap-x-20" type="auto-fit" number={400}>
+                    <common-base-columns-template class="gap-x-20" type="auto-fit" number={320}>
                         <form-base-column label="上级部门" path="parentKeyId">
                             <form-base-cascader
                                 v-model:value={formState.value.parentKeyId}
@@ -145,42 +144,41 @@ export default defineComponent({
                                 v-model:value={formState.value.name}
                             ></form-base-input>
                         </form-base-column>
+                        <form-base-column label="部门编码" path="code">
+                            <form-base-input
+                                maxlength={64}
+                                placeholder="例如 RD 或 PRODUCT_TEAM"
+                                v-model:value={formState.value.code}
+                            ></form-base-input>
+                        </form-base-column>
+                        <form-base-column label="部门类型" path="type">
+                            <form-base-select
+                                placeholder="请选择部门类型"
+                                options={chunkOptions.value.typeOptions}
+                                v-model:value={formState.value.type}
+                            ></form-base-select>
+                        </form-base-column>
+                        <form-base-column label="负责人" path="leaderUserUid">
+                            <form-base-select
+                                filterable
+                                label-value="uid"
+                                label-field="showName"
+                                placeholder="请选择负责人"
+                                options={leaderOptions.dataSource.value}
+                                v-model:value={formState.value.leaderUserUid}
+                            ></form-base-select>
+                        </form-base-column>
+                        <form-base-column label="排序号" path="sort">
+                            <n-input-number class="w-full" min={0} precision={0} v-model:value={formState.value.sort} />
+                        </form-base-column>
+                        <form-base-column label="部门状态" path="status">
+                            <form-base-select
+                                placeholder="请选择部门状态"
+                                options={chunkOptions.value.statusOptions}
+                                v-model:value={formState.value.status}
+                            ></form-base-select>
+                        </form-base-column>
                     </common-base-columns-template>
-                    <form-base-column label="组织编码" path="code">
-                        <form-base-input
-                            maxlength={64}
-                            placeholder="例如 RD 或 PRODUCT_TEAM"
-                            v-model:value={formState.value.code}
-                        ></form-base-input>
-                    </form-base-column>
-                    <form-base-column label="组织类型" path="type">
-                        <form-base-select
-                            placeholder="请选择组织类型"
-                            options={enumOptions.enumState.typeOptions}
-                            v-model:value={formState.value.type}
-                        ></form-base-select>
-                    </form-base-column>
-                    <form-base-column label="负责人" path="leaderUserUid">
-                        <form-base-select
-                            clearable
-                            filterable
-                            label-field="name"
-                            label-value="uid"
-                            placeholder="请选择负责人"
-                            options={leaderOptions.dataSource.value}
-                            v-model:value={formState.value.leaderUserUid}
-                        ></form-base-select>
-                    </form-base-column>
-                    <form-base-column label="排序号" path="sort">
-                        <n-input-number class="w-full" min={0} precision={0} v-model:value={formState.value.sort} />
-                    </form-base-column>
-                    <form-base-column label="组织状态" path="status">
-                        <form-base-select
-                            placeholder="请选择组织状态"
-                            options={enumOptions.enumState.statusOptions}
-                            v-model:value={formState.value.status}
-                        ></form-base-select>
-                    </form-base-column>
                 </form-base-container>
             </common-dialog-provider>
         )
