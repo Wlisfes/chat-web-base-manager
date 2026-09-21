@@ -19,6 +19,11 @@ export function httpBaseAccountOrganizationResolver(params: Omix) {
     return request({ url: '/api/account/dept/resolve', method: 'GET', params })
 }
 
+/**获取组织类型和状态枚举**/
+export function httpBaseAccountOrganizationEnums(params: Omix = {}) {
+    return request({ url: '/api/account/dept/enums', method: 'GET', params })
+}
+
 /**获取完整组织树**/
 export function httpBaseAccountOrganizationTreeStructure() {
     return request({ url: '/api/account/dept/tree/structure', method: 'GET' })

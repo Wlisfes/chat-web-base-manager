@@ -18,6 +18,11 @@ export function httpBaseAccountColumnUser(data: Omix) {
     })
 }
 
+/**获取账号下拉选项**/
+export function httpBaseAccountSelectUser() {
+    return request({ url: '/api/account/user/select', method: 'GET' })
+}
+
 /**按当前用户的数据范围获取账号详情**/
 export function httpBaseAccountUserResolver(params: Omix) {
     return request({

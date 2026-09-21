@@ -3,11 +3,15 @@ import { defineComponent, onMounted, watch, render, PropType } from 'vue'
 import { ChartOptions, fetchChartInitialization, fetchCreateVNode, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
+import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemDeptOrgchart',
     props: {
+        /**刷新数据方法**/
+        fetchUpdate: { type: Function, required: true },
+        /**部门数据**/
         items: { type: Array as PropType<ChartOptions['nodes']>, default: () => [] }
     },
     setup(props, { emit }) {
@@ -35,9 +39,22 @@ export default defineComponent({
             ])
         }
 
+        async function fetchDeploySystemDepartment(chart: Awaited<ReturnType<typeof fetchChartInitialization>>, node: Omix) {
+            return await feedback.fetchDeploySystemDepartment({
+                title: '编辑部门',
+                command: 'UPDATE',
+                node: node,
+                async onSubmit() {
+                    return await props.fetchUpdate().then(() => {
+                        chart.config.nodes = props.items
+                        return chart.draw()
+                    })
+                }
+            })
+        }
+
         onMounted(fetchInitialization)
         async function fetchInitialization() {
-            console.log(props.items)
             return await fetchInitTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
@@ -55,8 +72,8 @@ export default defineComponent({
                     const [left, top, right, bottom] = chart.getViewBox()
                     chart.setViewBox([-150, top, right, bottom])
                 })
-                chart.onNodeClick((args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    console.log(args, chart.get(args.node.id))
+                chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
+                    return fetchDeploySystemDepartment(chart, chart.get(args.node.id))
                 })
                 return watch(theme, value => {
                     chart.config.mode = value

@@ -128,6 +128,21 @@ export function fetchScreenResize(
     return { device: 'MOBILE', collapsed: true }
 }
 
+/**递归移除树节点中的空子节点集合，避免树组件将叶子节点误判为可展开节点。*/
+export function normalizeTreeChildren(nodes: Array<Omix>): Array<Omix> {
+    return nodes.map(node => {
+        const normalized = { ...node }
+        if (Array.isArray(normalized.children)) {
+            if (normalized.children.length === 0) {
+                delete normalized.children
+            } else {
+                normalized.children = normalizeTreeChildren(normalized.children)
+            }
+        }
+        return normalized
+    })
+}
+
 /**收集所有非叶子节点keyId**/
 export function fetchParentKeyIds(nodes: Array<Omix>, result: Set<number> = new Set()): Set<number> {
     for (const node of nodes) {

@@ -20,9 +20,10 @@ export default defineComponent({
         const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTree(), {
             immediate: false
         })
-        /**通用字典枚举**/
-        const chunkOptions = useChunkService({
-            type: ['CHUNK_SHEET_CHECK', 'CHUNK_SHEET_STATUS', 'CHUNK_SHEET_CHUNK'],
+        /**菜单静态枚举**/
+        const enumOptions = useChunkService({
+            request: Service.httpBaseAccountSheetEnums,
+            fields: ['typeOptions', 'statusOptions', 'visibleOptions'],
             immediate: false
         })
         /**表单实例**/
@@ -67,7 +68,7 @@ export default defineComponent({
 
         /**菜单资源详情**/
         async function fetchBaseSystemSheetResolver() {
-            return await Promise.all([sheetOptions.fetchRequest(), chunkOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([sheetOptions.fetchRequest(), enumOptions.fetchRequest()]).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
                 }
@@ -139,7 +140,7 @@ export default defineComponent({
                     <form-common-column label="类型" path="type">
                         <form-common-column-select
                             placeholder="请选择类型"
-                            options={chunkOptions.CHUNK_SHEET_CHUNK.value}
+                            options={enumOptions.enumState.typeOptions}
                             v-model:value={formState.value.type}
                         ></form-common-column-select>
                     </form-common-column>
@@ -203,7 +204,7 @@ export default defineComponent({
                             <form-common-column label="菜单显示状态">
                                 <form-common-column-select
                                     placeholder="请选择菜单显示状态"
-                                    options={chunkOptions.CHUNK_SHEET_CHECK.value}
+                                    options={enumOptions.enumState.visibleOptions}
                                     v-model:value={formState.value.visible}
                                 ></form-common-column-select>
                             </form-common-column>
@@ -212,7 +213,7 @@ export default defineComponent({
                     <form-common-column label="菜单/按钮状态" path="status">
                         <form-common-column-select
                             placeholder="请选择菜单/按钮状态"
-                            options={chunkOptions.CHUNK_SHEET_STATUS.value}
+                            options={enumOptions.enumState.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-common-column-select>
                     </form-common-column>

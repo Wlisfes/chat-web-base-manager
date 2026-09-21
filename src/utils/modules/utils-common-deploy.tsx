@@ -86,19 +86,6 @@ export function flattenDeployOrganizations(nodes: Array<Omix>): Array<Omix> {
     return nodes.flatMap(node => [node, ...flattenDeployOrganizations(node.children ?? [])])
 }
 
-/**将组织表单转换为账号服务协议。*/
-export function createDeployOrganizationPayload(data: Omix): Omix {
-    return {
-        parentKeyId: data.pid ?? data.parentKeyId ?? null,
-        code: data.code ?? data.alias,
-        name: data.name,
-        type: data.type ?? 'department',
-        leaderUserUid: data.leaderUserUid ?? data.adminUid ?? null,
-        sort: data.sort ?? 10,
-        status: data.status ?? 'enabled'
-    }
-}
-
 /**根据页面筛选条件生成组织分页数据。*/
 export function createDeployOrganizationColumn(nodes: Array<Omix>, data: Omix): Omix {
     const list = flattenDeployOrganizations(mapDeployOrganizations(nodes)).filter(item => {

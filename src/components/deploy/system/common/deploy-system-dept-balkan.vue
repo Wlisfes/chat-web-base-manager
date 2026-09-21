@@ -16,10 +16,7 @@ export default defineComponent({
                 {['company', 'department'].includes(props.node.type) ? (
                     <Fragment>
                         <n-button text type="primary">
-                            <common-base-icon
-                                size={['company'].includes(props.node.type) ? 42 : 32}
-                                name="nest-stock"
-                            ></common-base-icon>
+                            <common-base-icon size={['company'].includes(props.node.type) ? 42 : 32} name="nest-stock"></common-base-icon>
                         </n-button>
                         <div class="flex flex-col flex-1 overflow-hidden">
                             <n-text depth={1} class="text-16 line-height-22">
@@ -51,6 +48,7 @@ export default defineComponent({
 .deploy-system-dept-balkan {
     width: 100%;
     height: 100%;
+    cursor: pointer;
     user-select: none;
     box-sizing: border-box;
     border: 1px solid #aeaeae;

@@ -1,8 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService } from '@/hooks'
+import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { createDeployOrganizationPayload, mapDeployAccountOptions, mapDeployOrganization, mapDeployOrganizations } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -19,38 +18,41 @@ export default defineComponent({
     setup(props, { emit }) {
         /**部门树结构**/
         const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure(), {
-            immediate: false,
-            transform: mapDeployOrganizations
+            immediate: false
         })
         /**负责人账号列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseAccountColumnUser({ page: 1, size: 100, status: 'enabled' }), {
-            immediate: false,
-            transform: mapDeployAccountOptions
+        const leaderOptions = useSelectService(() => Service.httpBaseAccountSelectUser(), {
+            immediate: false
         })
-        const typeOptions = [
-            { label: '公司', name: '公司', value: 'company' },
-            { label: '部门', name: '部门', value: 'department' },
-            { label: '团队', name: '团队', value: 'team' }
-        ]
-        const statusOptions = [
-            { label: '启用', name: '启用', value: 'enabled' },
-            { label: '禁用', name: '禁用', value: 'disabled' }
-        ]
+        /**后端组织枚举**/
+        const enumOptions = useChunkService({
+            request: Service.httpBaseAccountOrganizationEnums,
+            fields: ['typeOptions', 'statusOptions'],
+            immediate: false
+        })
+
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemDeptResolver,
             formState: {
-                name: props.node.name, //部门名称
-                alias: props.node.alias, //别名简称
-                pid: props.node.pid, //上级部门
-                type: props.node.type ?? 'department', //组织类型
-                leaderUserUid: props.node.leaderUserUid, //负责人
-                sort: props.node.sort ?? 10, //排序
-                status: props.node.status ?? 'enabled' //状态
+                /**部门名称**/
+                name: props.node.name,
+                /**组织编码**/
+                code: props.node.code,
+                /**上级部门**/
+                parentKeyId: props.node.parentKeyId,
+                /**组织类型**/
+                type: props.node.type ?? 'department',
+                /**负责人**/
+                leaderUserUid: props.node.leaderUserUid,
+                /**排序**/
+                sort: props.node.sort ?? 10,
+                /**状态**/
+                status: props.node.status ?? 'enabled'
             },
             rules: {
                 name: { required: true, message: '请输入部门名称', trigger: 'blur' },
-                alias: { required: true, message: '请输入组织编码', trigger: 'blur' },
+                code: { required: true, message: '请输入组织编码', trigger: 'blur' },
                 type: { required: true, message: '请选择组织类型', trigger: 'change' },
                 status: { required: true, message: '请选择组织状态', trigger: 'change' },
                 sort: { required: true, type: 'number', message: '请输入排序号', trigger: 'blur' }
@@ -59,21 +61,23 @@ export default defineComponent({
 
         /**部门详情**/
         async function fetchBaseSystemDeptResolver() {
-            return await Promise.all([deptOptions.fetchRequest(), accountOptions.fetchRequest()]).then(async () => {
-                if (['CREATE'].includes(props.command)) {
-                    return await setState({ initialize: false })
-                }
-                try {
-                    const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
-                    return await setForm(fetchReste(mapDeployOrganization(deptRes.data))).then(async () => {
+            return await Promise.all([deptOptions.fetchRequest(), leaderOptions.fetchRequest(), enumOptions.fetchRequest()]).then(
+                async () => {
+                    if (['CREATE'].includes(props.command)) {
                         return await setState({ initialize: false })
-                    })
-                } catch (err) {
-                    return await setState({ initialize: false }).then(async () => {
-                        return await fetchNotifyService({ type: 'error', title: err.message })
-                    })
+                    }
+                    try {
+                        const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
+                        return await setForm(fetchReste(deptRes.data)).then(async () => {
+                            return await setState({ initialize: false })
+                        })
+                    } catch (err) {
+                        return await setState({ initialize: false }).then(async () => {
+                            return await fetchNotifyService({ type: 'error', title: err.message })
+                        })
+                    }
                 }
-            })
+            )
         }
 
         /**确定提交表单**/
@@ -84,11 +88,11 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseAccountCreateOrganization(createDeployOrganizationPayload(formState.value))
+                        await Service.httpBaseAccountCreateOrganization(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
                         await Service.httpBaseAccountUpdateOrganization({
-                            keyId: props.node.keyId,
-                            ...createDeployOrganizationPayload(formState.value)
+                            ...formState.value,
+                            keyId: props.node.keyId
                         })
                     }
                     return await setState({ visible: false }).then(async () => {
@@ -122,9 +126,12 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-common-column label="上级部门" path="pid">
+                    <form-common-column label="上级部门" path="parentKeyId">
                         <form-common-column-cascader
-                            v-model:value={formState.value.pid}
+                            v-model:value={formState.value.parentKeyId}
+                            label-field="name"
+                            label-value="keyId"
+                            children-field="children"
                             placeholder="请选择上级部门"
                             expand-trigger="click"
                             options={deptOptions.dataSource.value}
@@ -137,17 +144,17 @@ export default defineComponent({
                             v-model:value={formState.value.name}
                         ></form-common-column-input>
                     </form-common-column>
-                    <form-common-column label="组织编码" path="alias">
+                    <form-common-column label="组织编码" path="code">
                         <form-common-column-input
                             maxlength={64}
                             placeholder="例如 RD 或 PRODUCT_TEAM"
-                            v-model:value={formState.value.alias}
+                            v-model:value={formState.value.code}
                         ></form-common-column-input>
                     </form-common-column>
                     <form-common-column label="组织类型" path="type">
                         <form-common-column-select
                             placeholder="请选择组织类型"
-                            options={typeOptions}
+                            options={enumOptions.enumState.typeOptions}
                             v-model:value={formState.value.type}
                         ></form-common-column-select>
                     </form-common-column>
@@ -155,8 +162,10 @@ export default defineComponent({
                         <form-common-column-select
                             clearable
                             filterable
+                            label-field="name"
+                            label-value="uid"
                             placeholder="请选择负责人"
-                            options={accountOptions.dataSource.value}
+                            options={leaderOptions.dataSource.value}
                             v-model:value={formState.value.leaderUserUid}
                         ></form-common-column-select>
                     </form-common-column>
@@ -166,7 +175,7 @@ export default defineComponent({
                     <form-common-column label="组织状态" path="status">
                         <form-common-column-select
                             placeholder="请选择组织状态"
-                            options={statusOptions}
+                            options={enumOptions.enumState.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-common-column-select>
                     </form-common-column>
