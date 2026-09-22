@@ -4,7 +4,7 @@ import { fetchChartInitialization, fetchBaseTemplates, fetchForeignTemplates } f
 import { ChartOptions, fetchVNodeRender, fetchCreateSvgIcon } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
-import { Add } from '@vicons/carbon'
+import { Add, ChartVennDiagram } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
 
 export default defineComponent({
@@ -79,9 +79,14 @@ export default defineComponent({
                     },
                     controls: {
                         fetchCreate: {
-                            title: '新增',
+                            title: '新增部门',
                             icon: fetchCreateSvgIcon(Add, 22),
                             onClick: () => fetchCreateDeploySystemDepartment(chart)
+                        },
+                        fetchUpdate: {
+                            title: '新增',
+                            icon: fetchCreateSvgIcon(ChartVennDiagram, 26)
+                            //onClick: () => fetchCreateDeploySystemDepartment(chart)
                         }
                     }
 
