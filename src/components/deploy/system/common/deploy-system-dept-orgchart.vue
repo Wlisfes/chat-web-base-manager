@@ -72,7 +72,7 @@ export default defineComponent({
                     mode: theme.value,
                     nodes: props.items,
                     searchFields: ['name'],
-                    nodeBinding: { field_0: 'name' },
+                    nodeBinding: { field_0: 'name', field_1: 'img' },
                     tags: {
                         company: { template: 'company' },
                         department: { template: 'department' },
