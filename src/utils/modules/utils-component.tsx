@@ -66,14 +66,16 @@ export async function createComponent<T extends Omix>(
     return { element, app, unmount }
 }
 
-/**创建虚拟DOM实例**/
-export function fetchCreateVNode(Component: Parameters<typeof createVNode>['0']) {
+/**创建虚拟DOM实例渲染**/
+export function fetchVNodeRender(Component: Parameters<typeof createVNode>['0']) {
+    const element = document.createElement('div')
     const vnode = createVNode(Component)
     const instance = getCurrentInstance()
     if (instance && instance.appContext) {
         vnode.appContext = instance.appContext
     }
-    return vnode
+    render(vnode, element)
+    return element
 }
 
 /**把本地 svg 字符串或 @vicons 组件转成 Balkan controls.icon 可用的 svg 字符串**/
