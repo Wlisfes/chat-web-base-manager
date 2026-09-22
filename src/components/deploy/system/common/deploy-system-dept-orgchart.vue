@@ -21,7 +21,7 @@ export default defineComponent({
 
         function fetchCreateBalkan(node: Omix, data: Omix) {
             const root = fetchVNodeRender(
-                <layout-common-provider>
+                <layout-common-provider element={false}>
                     {['company', 'department'].includes(data.type) ? (
                         <deploy-system-dept-company node={data}></deploy-system-dept-company>
                     ) : (
