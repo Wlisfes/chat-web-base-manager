@@ -41,7 +41,7 @@ export async function fetchChartInitialization(element: HTMLElement, options: Ch
         element,
         Object.assign({}, options, {
             orientation: OrgChart.orientation.left,
-            layout: OrgChart.layout.normal,
+            layout: OrgChart.layout.treeRight,
             align: OrgChart.align.center,
             scaleInitial: 0.8,
             mouseScroll: OrgChart.action.ctrlZoom,
