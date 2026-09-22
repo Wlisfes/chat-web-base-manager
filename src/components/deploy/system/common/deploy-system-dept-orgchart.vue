@@ -70,7 +70,6 @@ export default defineComponent({
             return await fetchInitTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
-                    paddingLeft: 150,
                     nodes: props.items,
                     searchFields: ['name'],
                     nodeBinding: { field_0: 'name' },

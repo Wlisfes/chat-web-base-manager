@@ -1,4 +1,4 @@
-import { Add, Subtract, FitToScreen, ZoomIn, ZoomOut } from '@vicons/carbon'
+import { FitToScreen, ZoomIn, ZoomOut } from '@vicons/carbon'
 import { fetchCreateSvgIcon, OrgChart } from '@/utils'
 OrgChart.SEARCH_PLACEHOLDER = '请输入...'
 

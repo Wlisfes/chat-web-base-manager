@@ -110,21 +110,9 @@ export function mapDeployOrganizationChartNodes<T extends Omix>(nodes: Array<T> 
     function walk(list: Array<Omix>, parentId?: number | string) {
         for (const node of list) {
             const id = node.keyId ?? node.id
-            result.push({
-                ...node,
-                id,
-                pid: parentId,
-                name: node.name,
-                tags: [node.type]
-            })
+            result.push({ ...node, id, pid: parentId, name: node.name, tags: [node.type] })
             for (const member of node.members ?? []) {
-                result.push({
-                    ...member,
-                    id: `user:${id}:${member.uid}`,
-                    pid: id,
-                    name: member.name,
-                    tags: ['user']
-                })
+                result.push({ ...member, id: `user:${id}:${member.uid}`, img: member.avatar, pid: id, name: member.name, tags: ['user'] })
             }
             walk(node.children ?? [], id)
         }
