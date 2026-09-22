@@ -36,7 +36,7 @@ export default defineComponent({
             return Promise.all([
                 fetchBaseTemplates('company', { w: 260, h: 80 }, fetchCreateBalkan),
                 fetchBaseTemplates('department', { w: 200, h: 52 }, fetchCreateBalkan),
-                fetchBaseTemplates('user', { w: 130, h: 42 }, fetchCreateBalkan)
+                fetchBaseTemplates('user', { w: 140, h: 42 }, fetchCreateBalkan)
             ])
         }
 
