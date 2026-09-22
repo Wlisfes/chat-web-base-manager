@@ -78,12 +78,14 @@ export default defineComponent({
                         user: { template: 'user' }
                     },
                     controls: {
-                        myControl: {
+                        fetchCreate: {
                             title: '新增',
                             icon: fetchCreateSvgIcon(Add, 22),
                             onClick: () => fetchCreateDeploySystemDepartment(chart)
                         }
                     }
+
+                    // ChartVennDiagram
                 })
                 chart.onInit(() => {
                     const [left, top, right, bottom] = chart.getViewBox()

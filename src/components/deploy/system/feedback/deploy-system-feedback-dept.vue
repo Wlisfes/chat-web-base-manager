@@ -30,7 +30,6 @@ export default defineComponent({
         const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountOrganizationEnums, {
             immediate: false
         })
-
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemDeptResolver,
@@ -62,13 +61,17 @@ export default defineComponent({
 
         /**部门详情**/
         async function fetchBaseSystemDeptResolver() {
-            return await Promise.all([fetchChunk(), deptOptions.fetchRequest(), leaderOptions.fetchRequest()]).then(async () => {
-                if (['CREATE'].includes(props.command)) {
+            const taskNames = [fetchChunk(), deptOptions.fetchRequest(), leaderOptions.fetchRequest()]
+            if (['CREATE'].includes(props.command)) {
+                return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
-                }
+                })
+            } else {
+                taskNames.unshift(Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId }))
+            }
+            return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
-                    const deptRes = await Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId })
-                    return await setForm(fetchReste(deptRes.data)).then(async () => {
+                    return await setForm(fetchReste(data)).then(async () => {
                         return await setState({ initialize: false })
                     })
                 } catch (err) {
