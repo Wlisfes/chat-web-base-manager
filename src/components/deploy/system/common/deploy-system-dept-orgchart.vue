@@ -1,12 +1,11 @@
 <script lang="tsx">
 import { defineComponent, onMounted, watch, render, PropType } from 'vue'
 import { fetchChartInitialization, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
-import { OrgChart, ChartOptions, fetchCreateVNode, fetchCreateSvgIcon } from '@/utils'
+import { ChartOptions, fetchCreateVNode, fetchCreateSvgIcon } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
 import { Add } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
-import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemDeptOrgchart',
@@ -16,7 +15,7 @@ export default defineComponent({
         /**部门数据**/
         items: { type: Array as PropType<ChartOptions['nodes']>, default: () => [] }
     },
-    setup(props, { emit }) {
+    setup(props) {
         const { theme } = useStore(useConfiger)
         const element = useCurrentElement<HTMLElement>()
 
@@ -72,7 +71,7 @@ export default defineComponent({
                     mode: theme.value,
                     nodes: props.items,
                     searchFields: ['name'],
-                    nodeBinding: { field_0: 'name', field_1: 'img' },
+                    nodeBinding: { field_0: 'name', img_0: 'avatar' },
                     tags: {
                         company: { template: 'company' },
                         department: { template: 'department' },

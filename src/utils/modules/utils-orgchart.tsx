@@ -32,7 +32,8 @@ export function fetchBaseTemplates(
     OrgChart.templates[key] = Object.assign({}, OrgChart.templates.ana, {
         size: [options.w, options.h],
         node: fetchRootTemplates,
-        field_0: render
+        field_0: render,
+        img_0: null
     })
 }
 

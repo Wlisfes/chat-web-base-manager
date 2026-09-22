@@ -112,14 +112,7 @@ export function mapDeployOrganizationChartNodes<T extends Omix>(nodes: Array<T> 
             const id = node.keyId ?? node.id
             result.push({ ...node, id, pid: parentId, name: node.name, tags: [node.type] })
             for (const item of node.members ?? []) {
-                result.push({
-                    ...item,
-                    pid: id,
-                    tags: ['user'],
-                    img: item.avatar,
-                    id: `user:${id}:${item.uid}`,
-                    name: `${item.name} ${item.number}`
-                })
+                result.push({ ...item, pid: id, tags: ['user'], id: `user:${id}:${item.uid}`, name: `${item.name} ${item.number}` })
             }
             walk(node.children ?? [], id)
         }

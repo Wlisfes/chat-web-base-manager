@@ -29,10 +29,7 @@ export default defineComponent({
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <common-base-image
-                            class="w-30 h-30 b-rd-3"
-                            src="https://chat-oss.lisfes.cn/chat/image/2164042228379484160.jpg"
-                        ></common-base-image>
+                        <common-base-image class="w-30 h-30 b-rd-3" src={props.node.avatar}></common-base-image>
                         <n-text depth={1} class="line-height-22">
                             {props.node.name}
                         </n-text>
