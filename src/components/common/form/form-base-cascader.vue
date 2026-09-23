@@ -46,15 +46,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .form-base-cascader.is-multiple {
-    :deep(.n-base-selection-tags) {
-        padding-block-start: 0;
-        height: 100%;
-    }
+    // 与 form-base-select 相同：保留 Naive 多选 tag / 聚焦输入框的 3px 成对间距，避免聚焦时 tag 上移。
     :deep(.n-base-selection-tags) {
         row-gap: 3px;
-    }
-    :deep(.n-base-selection-tag-wrapper) {
-        padding-block-end: 0;
     }
 }
 </style>

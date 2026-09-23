@@ -9,7 +9,7 @@ export default defineComponent({
         /**开启多选**/
         multiple: { type: Boolean, default: false },
         /**多选标签的最大显示数量**/
-        maxTagCount: { type: String, default: 'responsive' },
+        maxTagCount: { type: [String, Number], default: 'responsive' },
         /**绑定数据**/
         value: { type: [Number, String, Array] },
         /**选项label的字段名**/
@@ -46,15 +46,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .form-base-select.is-multiple {
-    :deep(.n-base-selection-tags) {
-        padding-block-start: 0;
-        height: 100%;
-    }
+    // Naive 多选 tag 的 padding-bottom: 3px 和聚焦输入框 margin-bottom: 3px 成对出现。
+    // 不能只去掉 tag 的纵向 padding，否则 filterable 聚焦时输入框出现，tag 会被对齐顶上去。
     :deep(.n-base-selection-tags) {
         row-gap: 3px;
-    }
-    :deep(.n-base-selection-tag-wrapper) {
-        padding-block-end: 0;
     }
 }
 </style>

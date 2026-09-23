@@ -103,6 +103,7 @@ export default defineComponent({
                             multiple
                             filterable
                             clearable
+                            max-tag-count={999}
                             label-value="uid"
                             label-field="showName"
                             placeholder="请选择关联账号"
