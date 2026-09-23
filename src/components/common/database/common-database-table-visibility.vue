@@ -19,10 +19,9 @@ export default defineComponent({
 
         watch(() => element.width.value, fetchCurrentWatcher, { immediate: true })
         function fetchCurrentWatcher() {
-            if (props.showSettings) {
-                return (width.value = Math.max(86, Math.max(48, element.width.value + 16)))
-            }
-            return (width.value = Math.max(86, element.width.value + 16))
+            const next = Math.max(86, Math.ceil(element.width.value + 16))
+            if (next === width.value) return
+            width.value = next
         }
 
         return () => (
