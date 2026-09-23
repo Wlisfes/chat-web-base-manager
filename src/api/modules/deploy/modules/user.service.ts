@@ -23,6 +23,11 @@ export function httpBaseAccountSelectUser() {
     return request({ url: '/api/account/user/select', method: 'GET' })
 }
 
+/**获取账号状态、员工状态和组织关系状态枚举**/
+export function httpBaseAccountUserEnums() {
+    return request({ url: '/api/account/user/enums', method: 'GET' })
+}
+
 /**按当前用户的数据范围获取账号详情**/
 export function httpBaseAccountUserResolver(params: Omix) {
     return request({

@@ -45,11 +45,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.form-base-select.is-multiple {
-    // Naive 多选 tag 的 padding-bottom: 3px 和聚焦输入框 margin-bottom: 3px 成对出现。
-    // 不能只去掉 tag 的纵向 padding，否则 filterable 聚焦时输入框出现，tag 会被对齐顶上去。
-    :deep(.n-base-selection-tags) {
-        row-gap: 3px;
+.form-base-select {
+    :deep(.n-tag) {
+        --n-height: 26px;
     }
 }
 </style>
