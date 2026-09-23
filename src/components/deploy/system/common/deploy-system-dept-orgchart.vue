@@ -2,10 +2,13 @@
 import { defineComponent, onMounted, watch, PropType } from 'vue'
 import { fetchChartInitialization, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
 import { ChartOptions, fetchVNodeRender, fetchCreateSvgIcon } from '@/utils'
+import { getDeployAccountMemberships, patchDeployAccountMemberships } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
-import { Add, ChartVennDiagram } from '@vicons/carbon'
+import { fetchNotifyService } from '@/plugins'
+import { Add, UserFollow } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
+import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemDeptOrgchart',
@@ -64,6 +67,43 @@ export default defineComponent({
             })
         }
 
+        async function fetchCreateDeploySystemDepartmentUser(chart: Awaited<ReturnType<typeof fetchChartInitialization>>, node?: Omix) {
+            return await feedback.fetchDeploySystemDepartmentUser({
+                title: '新增用户',
+                node: node,
+                onSubmit: event => fetchDrawUpdate(chart)
+            })
+        }
+
+        async function fetchRemoveDeploySystemDepartmentUser(chart: Awaited<ReturnType<typeof fetchChartInitialization>>, node: Omix) {
+            const department = chart.get(node.pid)
+            const organizationKeyId = Number(department?.keyId ?? node.pid)
+            if (!node.uid || !Number.isSafeInteger(organizationKeyId)) {
+                return await fetchNotifyService({ type: 'error', title: '无法识别要移除的用户或部门' })
+            }
+            return await window.$dialog.warning({
+                title: '移除用户',
+                content: `确定将 ${node.name} 从「${department?.name ?? '当前部门'}」移除吗？`,
+                positiveText: '移除',
+                negativeText: '取消',
+                onPositiveClick: async () => {
+                    try {
+                        const detail = await Service.httpBaseAccountUserResolver({ uid: node.uid })
+                        const memberships = patchDeployAccountMemberships(
+                            getDeployAccountMemberships(detail.data ?? detail),
+                            organizationKeyId,
+                            false
+                        )
+                        await Service.httpBaseAccountUpdateUserOrganization({ uid: node.uid, memberships })
+                        await fetchDrawUpdate(chart)
+                        return await fetchNotifyService({ title: '操作成功' })
+                    } catch (err) {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    }
+                }
+            })
+        }
+
         onMounted(fetchInitialization)
         async function fetchInitialization() {
             return await fetchInitTemplates().then(async () => {
@@ -83,21 +123,23 @@ export default defineComponent({
                             icon: fetchCreateSvgIcon(Add, 22),
                             onClick: () => fetchCreateDeploySystemDepartment(chart)
                         },
-                        fetchUpdate: {
-                            title: '新增',
-                            icon: fetchCreateSvgIcon(ChartVennDiagram, 26)
-                            //onClick: () => fetchCreateDeploySystemDepartment(chart)
+                        fetchCreateUser: {
+                            title: '部门用户绑定',
+                            icon: fetchCreateSvgIcon(UserFollow, 28),
+                            onClick: () => fetchCreateDeploySystemDepartmentUser(chart)
                         }
                     }
-
-                    // ChartVennDiagram
                 })
                 chart.onInit(() => {
                     const [left, top, right, bottom] = chart.getViewBox()
                     chart.setViewBox([-150, top, right, bottom])
                 })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
+                    const data = chart.get(args.node.id)
+                    if ((data.tags ?? []).includes('user')) {
+                        return fetchRemoveDeploySystemDepartmentUser(chart, data)
+                    }
+                    return fetchUpdateDeploySystemDepartment(chart, data)
                 })
                 return watch(theme, value => {
                     chart.config.mode = value

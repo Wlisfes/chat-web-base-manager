@@ -38,3 +38,8 @@ export function httpBaseAccountOrganizationTreeUser() {
 export function httpBaseAccountDeleteOrganization(data: Omix) {
     return request({ url: '/api/account/dept/delete', method: 'POST', data })
 }
+
+/**批量把账号加入指定组织**/
+export function httpBaseAccountUpdateOrganizationUser(data: Omix) {
+    return request({ url: '/api/account/dept/update/user', method: 'POST', data })
+}
