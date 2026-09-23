@@ -102,7 +102,9 @@ export default defineComponent({
                     chart.setViewBox([-150, top, right, bottom])
                 })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
+                    if (['company', 'department'].includes(chart.get(args.node.id).type)) {
+                        return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
+                    }
                 })
                 return watch(theme, value => {
                     chart.config.mode = value
@@ -132,7 +134,6 @@ export default defineComponent({
     :deep(.deploy-system-dept-orgchart-template) {
         width: 100%;
         height: 100%;
-        cursor: pointer;
         user-select: none;
         box-sizing: border-box;
         border: 1px solid #aeaeae;
