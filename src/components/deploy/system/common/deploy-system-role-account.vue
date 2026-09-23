@@ -24,6 +24,7 @@ export default defineComponent({
             immediate: false,
             formState: { vague: undefined, phone: undefined, email: undefined },
             columns: [
+                { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                 { title: '姓名', key: 'name', width: 120, disabled: true },
                 { title: '工号', key: 'number', width: 100, check: true },
                 { title: '手机号', key: 'phone', minWidth: 140, check: true },
@@ -138,6 +139,9 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
+                        col_avatar: (data: Omix) => {
+                            return <common-database-table-user element="avatar" data={data}></common-database-table-user>
+                        },
                         col_createBy: (data: Omix) => (
                             <common-database-table-user element="text" data={data.createByOptions}></common-database-table-user>
                         ),

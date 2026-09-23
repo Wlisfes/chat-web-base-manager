@@ -17,11 +17,12 @@ export default defineComponent({
                 name: undefined
             },
             columns: [
+                { title: 'ID', key: 'keyId', width: 100, disabled: true },
                 { title: '职位名称', key: 'name', minWidth: 200, disabled: true },
-                { title: '排序号', key: 'sort', width: 100, check: true },
-                { title: '关联账号', key: 'accountCount', align: 'center', width: 100, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                { title: '排序号', key: 'sort', width: 100 },
+                { title: '关联账号', key: 'accountCount', align: 'center', minWidth: 100 },
+                { title: '创建时间', key: 'createTime', minWidth: 160 },
+                { title: '更新时间', key: 'modifyTime', minWidth: 160 }
             ]
         })
 
@@ -89,12 +90,7 @@ export default defineComponent({
                         <common-base-button type="primary" onClick={fetchDeployPositionCreate}>
                             新增
                         </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate}
-                            onClick={fetchDeployPositionUpdate}
-                        >
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployPositionUpdate}>
                             编辑
                         </common-base-button>
                         <common-base-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployPositionDelete}>
@@ -126,8 +122,7 @@ export default defineComponent({
                     on-update:customize={instOptions.fetchUpdateCustomize}
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                >
-                </common-database-table>
+                ></common-database-table>
             </layout-common-container>
         )
     }
