@@ -1,8 +1,8 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
+import { fetchNormalizeTreeChildren, isEmpty } from '@/utils'
 import { fetchNotifyService } from '@/plugins'
-import { fetchNormalizeTreeChildren } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -16,7 +16,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(Service.httpBaseAccountOrganizationTreeStructure, {
+        const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure({ keyId: 1124100 }), {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
@@ -25,26 +25,53 @@ export default defineComponent({
             immediate: false
         })
         /**表单实例**/
-        const { formState, formRef, state, setState, fetchValidater } = useFormService({
+        const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
                 organizationKeyId: props.node.keyId,
+                leaderUserUid: props.node.leaderUserUid,
                 uids: []
             },
             rules: {
-                organizationKeyId: { required: true, type: 'number', message: '请选择所属部门', trigger: 'change' },
-                uids: { required: true, type: 'array', message: '请选择关联账号', trigger: 'change' }
+                organizationKeyId: { required: true, type: 'number', trigger: 'blur', message: '请选择所属部门' },
+                uids: { required: true, type: 'array', message: '请选择关联账号', trigger: 'blur' }
             }
         })
 
+        /**读取指定部门的现有成员UID**/
+        async function fetchBaseAccountOrganizationColumnUser(keyId?: number) {
+            if (isEmpty(keyId)) {
+                return await setForm({ uids: [] })
+            }
+            return await Service.httpBaseAccountOrganizationColumnUser({
+                keyId: keyId
+            }).then(async ({ data }) => {
+                return await setForm({ uids: (data ?? []).map((item: Omix) => item.uid) })
+            })
+        }
+
+        /**切换部门事件**/
+        async function fetchChnageBaseOrganization(keyId: number, e: Omix) {
+            return await setState({ loading: true }).then(async () => {
+                await fetchBaseAccountOrganizationColumnUser(keyId)
+                return await setForm({ leaderUserUid: e.leaderUserUid }).then(async () => {
+                    return await setState({ loading: false })
+                })
+            })
+        }
+
         /**初始化**/
         async function fetchInitialization() {
-            return await Promise.all([deptOptions.fetchRequest(), accountOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([
+                deptOptions.fetchRequest(),
+                accountOptions.fetchRequest(),
+                fetchBaseAccountOrganizationColumnUser(formState.value.organizationKeyId)
+            ]).then(async () => {
                 return await setState({ initialize: false })
             })
         }
 
-        /**确认提交**/
+        /**确认提交。uids 是该部门的成员全集，服务端按差异新增或移除**/
         async function fetchSubmit() {
             return await fetchValidater().then(async error => {
                 if (error) {
@@ -71,7 +98,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={640}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -96,13 +123,13 @@ export default defineComponent({
                             placeholder="请选择所属部门"
                             expand-trigger="click"
                             options={deptOptions.dataSource.value}
+                            on-change:value={fetchChnageBaseOrganization}
                         ></form-base-cascader>
                     </form-base-column>
                     <form-base-column label="关联账号" path="uids">
                         <form-base-select
                             multiple
                             filterable
-                            clearable
                             max-tag-count={999}
                             label-value="uid"
                             label-field="showName"

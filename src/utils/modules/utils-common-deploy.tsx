@@ -63,36 +63,6 @@ export function createDeployAccountMemberships(depts: Array<number> = []): Array
     }))
 }
 
-/**读取账号当前组织关系。*/
-export function getDeployAccountMemberships(detail: Omix): Array<Omix> {
-    const source = Array.isArray(detail.memberships) ? detail.memberships : (detail.organizations ?? [])
-    return source.map((item: Omix) => ({
-        organizationKeyId: item.organizationKeyId ?? item.keyId,
-        isPrimary: Boolean(item.isPrimary),
-        positionName: item.positionName,
-        status: item.status ?? item.membershipStatus ?? 'enabled'
-    }))
-}
-
-/**向账号组织关系中增加或移除指定组织，并保证至多一个主组织。*/
-export function patchDeployAccountMemberships(memberships: Array<Omix>, organizationKeyId: number, add: boolean): Array<Omix> {
-    if (add && memberships.some(item => item.organizationKeyId === organizationKeyId)) {
-        return memberships
-    }
-    const next = memberships.filter(item => item.organizationKeyId !== organizationKeyId)
-    if (add) {
-        next.push({
-            organizationKeyId,
-            isPrimary: next.length === 0,
-            status: 'enabled'
-        })
-    }
-    if (next.length > 0 && !next.some(item => item.isPrimary)) {
-        next[0] = { ...next[0], isPrimary: true }
-    }
-    return next
-}
-
 /**将账号服务组织节点转换为管理端展示字段。*/
 export function mapDeployOrganization(node: Omix): Omix {
     return {
