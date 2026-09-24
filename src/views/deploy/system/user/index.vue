@@ -15,7 +15,7 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren
         })
         /**账号静态枚举**/
-        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
             immediate: true
         })
         /**表格实例**/
@@ -88,8 +88,7 @@ export default defineComponent({
         }
 
         /**重置密码**/
-        async function fetchDeployAccountResetPassword() {
-            const node = state.select[0]
+        async function fetchBaseAccountResetUserPassword(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -150,7 +149,7 @@ export default defineComponent({
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
-                            onClick={fetchDeployAccountResetPassword}
+                            onClick={() => fetchBaseAccountResetUserPassword(state.select[0])}
                         >
                             重置密码
                         </common-base-button>
@@ -174,6 +173,7 @@ export default defineComponent({
                             children-field="children"
                             placeholder="请选择归属部门"
                             v-model:value={formState.value.organizationKeyIds}
+                            loading={deptOptions.loading.value}
                             options={deptOptions.dataSource.value}
                         ></form-base-tree-select>
                     </common-database-search-column>
@@ -181,7 +181,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                             on-change:value={fetchRefresh}
                         ></form-base-select>
@@ -206,41 +207,25 @@ export default defineComponent({
                 >
                     {{
                         col_name: (data: Omix) => {
-                            return <common-database-table-user element="text" data={data}></common-database-table-user>
+                            return <common-base-user element="text" data={data}></common-base-user>
                         },
                         col_avatar: (data: Omix) => {
-                            return <common-database-table-user element="avatar" data={data}></common-database-table-user>
+                            return <common-base-user element="avatar" data={data}></common-base-user>
                         },
                         col_organizations: (data: Omix) => {
-                            return (
-                                <common-database-table-content
-                                    value={(data.organizations ?? []).map((item: Omix) => item.name)}
-                                ></common-database-table-content>
-                            )
+                            return <common-base-content value={data.organizations}></common-base-content>
                         },
-                        col_positions: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.positions ?? []).map((item: Omix) => item.name)}
-                            ></common-database-table-content>
-                        ),
-                        col_ranks: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.ranks ?? []).map((item: Omix) => item.name)}
-                            ></common-database-table-content>
-                        ),
+                        col_positions: (data: Omix) => {
+                            return <common-base-content value={data.positions}></common-base-content>
+                        },
+                        col_ranks: (data: Omix) => {
+                            return <common-base-content value={data.ranks}></common-base-content>
+                        },
                         col_roles: (data: Omix) => {
-                            return (
-                                <common-database-table-content
-                                    value={(data.roles ?? []).map((item: Omix) => item.name)}
-                                ></common-database-table-content>
-                            )
+                            return <common-base-content value={data.roles}></common-base-content>
                         },
                         col_status: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
-                            ></common-database-table-chunk>
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>

@@ -119,15 +119,15 @@ export default defineComponent({
             if (props.virtualScrollX && isEmpty(base.width)) {
                 base.width = base.minWidth ?? 120
             }
-            if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
-                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
-                return base
-            }
+            // 普通列默认单行省略；选择、展开、设置和操作列不参与。自定义插槽也走同一规则。
             if (!['selection', 'expand'].includes(String(base.type ?? '')) && !['settings', 'command'].includes(key)) {
                 base.ellipsisComponent = base.ellipsisComponent ?? 'performant-ellipsis'
                 if (isEmpty(base.ellipsis) || base.ellipsis === true) {
                     base.ellipsis = state.TABLE_ELLIPSIS
                 }
+            }
+            if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
+                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
             }
             return base
         }
