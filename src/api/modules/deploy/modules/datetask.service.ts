@@ -10,7 +10,7 @@ export function httpBaseSkylineDatetaskEnums() {
 }
 
 /**系统任务分页列表**/
-export function httpBaseSkylineColumnDatetask(data: Datetask.DatetaskColumnRequest) {
+export function httpBaseSkylineColumnDatetask(data: Omix) {
     return request<Datetask.DatetaskColumnResponse>({
         url: '/api/skyline/deploy/datetask/column',
         method: 'POST',

@@ -29,11 +29,10 @@ export interface DatetaskItem {
 }
 
 /**系统任务分页查询请求体。*/
-export interface DatetaskColumnRequest {
+export interface DatetaskColumnRequest extends Omix {
     page: number
     size: number
-    /**任务类型，必填。*/
-    type: DatetaskType
+    type?: DatetaskType
     taskName?: string
     status?: DatetaskStatus
 }
