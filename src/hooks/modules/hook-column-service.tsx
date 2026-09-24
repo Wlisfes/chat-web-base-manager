@@ -1,7 +1,7 @@
 import { ref, Ref, toRefs, onMounted, computed } from 'vue'
 import { FormInst, DataTableColumn } from 'naive-ui'
 import { cloneDeep, pick } from 'lodash-es'
-import { useChunkService, useState } from '@/hooks'
+import { useState } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { Observer, fetchExclude, fetchHandler, isNotEmpty } from '@/utils'
 import { ResultResolver, ResultColumn, ChunkName } from '@/interface/instance.resolver'
@@ -63,10 +63,6 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
     const observer = ref(Observer<Record<string, Omix>>())
-    const chunkOptions = useChunkService({
-        immediate: false,
-        type: Object.keys(options.chunkNames ?? {}) as Array<Extract<keyof C, ChunkName>>
-    })
     const { state, setState } = useState({
         when: options.when ?? true,
         limit: options.limit ?? 12,
@@ -91,9 +87,6 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
             const tasks: Array<any> = []
             if (isNotEmpty(options.keyName)) {
                 tasks.push(fetchBaseColumnChunkCustomize(String(options.keyName)))
-            }
-            if (Object.keys(options.chunkNames ?? {}).length > 0) {
-                tasks.push(chunkOptions.fetchRequest())
             }
             if (options.immediate ?? true) {
                 tasks.push(fetchRequest())
@@ -223,8 +216,6 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         observer,
         instState,
         instOptions,
-        chunkOptions,
-        chunkState: chunkOptions.chunkState, // as unknown as Record<EnabledChunks, Array<ChunkColumnOptions>>,
         ...instOptions,
         ...toRefs(state)
     }
