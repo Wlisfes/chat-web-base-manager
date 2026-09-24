@@ -19,7 +19,8 @@ export default defineComponent({
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: initializeSmsApplication,
-            chunkNames: { CHUNK_CONSUMER_SMS_TYPE: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_CONSUMER_SMS_TYPE: true },
             formState: {
                 consumerKeyId: props.node.consumerKeyId,
                 type: props.node.type,
@@ -91,7 +92,7 @@ export default defineComponent({
                     <form-base-column label="应用类型" path="type">
                         <form-base-select
                             placeholder="请选择应用类型"
-                            options={chunkState.CHUNK_CONSUMER_SMS_TYPE}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SMS_TYPE}
                             v-model:value={formState.value.type}
                         ></form-base-select>
                     </form-base-column>

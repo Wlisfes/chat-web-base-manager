@@ -19,7 +19,8 @@ export default defineComponent({
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseFinanceBrandResolver,
-            chunkNames: { CHUNK_BRAND_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_BRAND_STATUS: true },
             formState: {
                 name: props.node.name, //品牌名称
                 document: props.node.document, //品牌描述
@@ -101,7 +102,7 @@ export default defineComponent({
                     <form-base-column label="状态" path="status">
                         <form-base-select
                             placeholder="请选择状态"
-                            options={chunkState.CHUNK_BRAND_STATUS}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </form-base-column>

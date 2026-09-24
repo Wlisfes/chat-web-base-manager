@@ -33,7 +33,8 @@ export default defineComponent({
                     page: base.page,
                     size: base.size
                 }),
-            chunkNames: { CHUNK_DATETASK_LOG_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_DATETASK_LOG_STATUS: true },
             formState: {},
             limit: 0,
             columns: [
@@ -78,7 +79,7 @@ export default defineComponent({
                                 <common-database-table-chunk
                                     element="chunk"
                                     value={data.status}
-                                    options={chunkState.CHUNK_DATETASK_LOG_STATUS}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_LOG_STATUS}
                                 ></common-database-table-chunk>
                             ),
                             col_result: (data: Datetask.DatetaskLogItem) => (

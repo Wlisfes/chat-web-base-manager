@@ -12,7 +12,8 @@ export default defineComponent({
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseFinanceColumnBasicSmsRate(payload),
             keyName: 'chatbok:finance:rates:sms',
-            chunkNames: { CHUNK_BRAND_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_BRAND_STATUS: true },
             formState: {
                 code: undefined,
                 mcc: undefined

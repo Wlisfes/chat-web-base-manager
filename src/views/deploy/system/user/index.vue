@@ -15,7 +15,7 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:user',
             formState: {

@@ -18,7 +18,8 @@ export default defineComponent({
                     size: base.size
                 }),
             keyName: 'chat:deploy:datetask:system',
-            chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
             formState: {
                 taskName: undefined,
                 status: undefined
@@ -168,7 +169,7 @@ export default defineComponent({
                     <common-database-search-column prop="status" label="任务状态">
                         <form-base-select
                             placeholder="请选择任务状态"
-                            options={chunkState.CHUNK_DATETASK_STATUS}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -195,14 +196,14 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.type}
-                                options={chunkState.CHUNK_DATETASK_TYPE}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_TYPE}
                             ></common-database-table-chunk>
                         ),
                         col_status: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkState.CHUNK_DATETASK_STATUS}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
                             ></common-database-table-chunk>
                         )
                     }}

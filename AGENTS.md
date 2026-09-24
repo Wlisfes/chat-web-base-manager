@@ -165,6 +165,10 @@
 - 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`，将调用方传入的 `params`/`data` 原样发送；禁止在 API 层做参数转换或响应适配，包括字段改名、`Number`/`String`/`Boolean` 类型转换、默认值注入、分页裁剪、数组重组、`map` 映射、响应包装和私有转换函数。
 - GET 请求只通过 `params` 传递查询参数，POST 请求只通过 `data` 传递请求体；无入参时不添加空 `params` 或空 `data`。
 - API 函数按 `httpBase<Service><Action><Resource>` 风格命名并添加中文职责注释，例如 `httpBaseSystemColumnDatetask`、`httpBaseSystemCreateSheetResource`。
+- 接口统一使用 `export function` 声明，禁止写成 `export const xxx = (data: Omix) => {}` 箭头函数形式。
+- `request` 入参一律展开为多行，每个字段独占一行并按 `url` → `method` → `params`/`data` 排序；禁止写成 `return request({ url: ..., method: ..., data })` 单行形式。
+- `url` 直接写完整字面量路径，使用单引号，禁止抽取 `const XXX_API = '/api/...'` 常量再模板拼接，保证全文可直接搜索到接口路径。
+- 每个接口函数上方使用 `/**中文职责**/` 单行注释，前后不加空格、句尾不加句号。
 - 页面字段兼容、请求体转换和响应适配必须放在页面/业务域层（如页面 composable、store 或业务 service）处理；接口字段应通过请求/响应 DTO 或类型定义明确表达，API service 不得承担业务规则和数据加工。历史 API 文件在相关需求修改时按此规则逐步整理。
 
 ### 自动发布与部署

@@ -60,7 +60,7 @@ export default defineComponent({
                                                     <common-database-table-chunk
                                                         element="chunk"
                                                         value={item.type}
-                                                        options={props.chunkState.CHUNK_CONSUMER_SMS_TYPE}
+                                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_SMS_TYPE}
                                                     ></common-database-table-chunk>
                                                 </div>
                                             </div>
@@ -75,7 +75,7 @@ export default defineComponent({
                                                     <common-database-table-chunk
                                                         element="chunk"
                                                         value={item.status}
-                                                        options={props.chunkState.CHUNK_CONSUMER_SMS_STATUS}
+                                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_SMS_STATUS}
                                                     ></common-database-table-chunk>
                                                 </common-base-columns-wrapper>
                                                 <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="备注">

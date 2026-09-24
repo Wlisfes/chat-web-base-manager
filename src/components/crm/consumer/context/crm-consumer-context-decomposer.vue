@@ -17,16 +17,17 @@ export default defineComponent({
         const { faseNode, faseState, chunkState, setState } = useBaseService({
             request: () => Service.httpBaseAccountResolverConsumer({ keyId: props.keyId }),
             immediate: true,
-            chunkNames: {
-                CHUNK_CONSUMER_SMS_TYPE: true,
-                CHUNK_CONSUMER_SMS_STATUS: true,
-                CHUNK_CONSUMER_PAY_MODE: true,
-                CHUNK_CONSUMER_AUTH_STATUS: true,
-                CHUNK_CONSUMER_SOURCE: true,
-                CHUNK_CONSUMER_STATUS: true,
-                CHUNK_CONSUMER_CLASS: true,
-                CHUNK_CONSUMER_STAGE: true
-            },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: {
+            // CHUNK_CONSUMER_SMS_TYPE: true,
+            // CHUNK_CONSUMER_SMS_STATUS: true,
+            // CHUNK_CONSUMER_PAY_MODE: true,
+            // CHUNK_CONSUMER_AUTH_STATUS: true,
+            // CHUNK_CONSUMER_SOURCE: true,
+            // CHUNK_CONSUMER_STATUS: true,
+            // CHUNK_CONSUMER_CLASS: true,
+            // CHUNK_CONSUMER_STAGE: true
+            // },
             options: { tabName: 'sms' }
         })
 
@@ -35,7 +36,7 @@ export default defineComponent({
                 <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
                     <crm-consumer-context-wrapper
                         initialize={faseState.initialize}
-                        chunk-state={chunkState}
+                        // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
                         v-model:faseNode={faseNode.value}
                     ></crm-consumer-context-wrapper>
                     <n-tabs
@@ -47,13 +48,13 @@ export default defineComponent({
                     >
                         <n-tab-pane name="basic" tab="详情信息" display-directive="show">
                             <crm-consumer-context-basic-wrapper
-                                chunk-state={chunkState}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
                         <n-tab-pane name="sms" tab="短信应用" display-directive="show">
                             <crm-consumer-context-sms-wrapper
-                                chunk-state={chunkState}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-sms-wrapper>
                         </n-tab-pane>

@@ -24,7 +24,8 @@ export default defineComponent({
         /**表单实例**/
         const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseCrmConsumerResolver,
-            chunkNames: { CHUNK_CONSUMER_PAY_MODE: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_CONSUMER_PAY_MODE: true },
             formState: {
                 name: props.node.name,
                 brandId: props.node.brandId,
@@ -151,7 +152,7 @@ export default defineComponent({
                     <form-base-column label="付款模式" path="payMode">
                         <form-base-select
                             placeholder="请选择付款模式"
-                            options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </form-base-column>

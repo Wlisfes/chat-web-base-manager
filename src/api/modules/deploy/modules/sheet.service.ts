@@ -30,7 +30,10 @@ export function httpBaseAccountColumnSheet(data: env.SheetColumnRequest) {
 
 /**获取菜单类型、状态和显示状态枚举**/
 export function httpBaseAccountSheetEnums() {
-    return request({ url: '/api/account/sheet/enums', method: 'GET' })
+    return request({
+        url: '/api/account/sheet/enums',
+        method: 'GET'
+    })
 }
 
 /**获取完整菜单树**/

@@ -2,7 +2,11 @@ import { request } from '@/utils'
 
 /**创建组织节点**/
 export function httpBaseAccountCreateOrganization(data: Omix) {
-    return request({ url: '/api/account/dept/create', method: 'POST', data })
+    return request({
+        url: '/api/account/dept/create',
+        method: 'POST',
+        data
+    })
 }
 
 /**更新或移动组织节点**/

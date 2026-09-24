@@ -10,7 +10,8 @@ export default defineComponent({
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
             keyName: 'chatbok:finance:deploy:exchange',
-            chunkNames: {},
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: {},
             formState: {
                 currency: undefined,
                 date: undefined
