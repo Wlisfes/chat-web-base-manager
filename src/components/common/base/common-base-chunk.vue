@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, PropType, CSSProperties } from 'vue'
 import { useProvider } from '@/hooks'
-import { isEmpty } from '@/utils'
+import { isEmpty, isString } from '@/utils'
 
 /**Naive UI 主题类型，提取主题色后用 CSS 变量覆盖，不走 n-tag 自带 type。*/
 export const NAIVE_CHUNK_TYPES = ['primary', 'info', 'success', 'warning', 'error'] as const
@@ -48,6 +48,8 @@ export default defineComponent({
         value: { type: [Number, String] },
         /**value为空时显示内容**/
         empty: { type: [Number, String], default: '-' },
+        /**枚举选项列表，按 value 匹配出 label 与 type**/
+        items: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**颜色类型，Naive 主题色或自定义色板**/
         type: {
             type: String as PropType<CommonBaseChunkType>,
@@ -57,16 +59,42 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         const { inverted, vars } = useProvider()
-        const naiveType = computed(() => (isNaiveChunkType(props.type) ? props.type : undefined))
-        const chunkStyle = computed<CSSProperties | undefined>(() => {
-            if (!naiveType.value) {
+        /**按 value 命中的枚举选项；items 未传或未命中时为 undefined**/
+        const chunkOption = computed(() => {
+            if (isEmpty(props.value)) {
                 return undefined
             }
-            return { '--chunk-color': vars.value[NAIVE_COLOR_KEYS[naiveType.value]] } as CSSProperties
+            return props.items.find(item => String(item.value) === String(props.value))
+        })
+        /**优先使用枚举选项的颜色类型，其次回退到显式传入的 type**/
+        const chunkType = computed<CommonBaseChunkType>(() => {
+            const type = chunkOption.value?.type
+            if (isString(type) && COMMON_BASE_CHUNK_TYPES.includes(type as CommonBaseChunkType)) {
+                return type as CommonBaseChunkType
+            }
+            return props.type
+        })
+        /**优先展示枚举选项的中文名称，其次回退到原始值**/
+        const chunkLabel = computed(() => {
+            if (isEmpty(props.value)) {
+                return props.empty
+            }
+            return chunkOption.value?.label ?? props.value ?? '-'
+        })
+        const naiveType = computed(() => (isNaiveChunkType(chunkType.value) ? chunkType.value : undefined))
+        const chunkStyle = computed<CSSProperties | undefined>(() => {
+            const baseStyle = { '--n-height': '24px', '--n-font-size': '14px' }
+            if (!naiveType.value) {
+                return baseStyle
+            }
+            return {
+                ...baseStyle,
+                '--chunk-color': vars.value[NAIVE_COLOR_KEYS[naiveType.value]]
+            } as CSSProperties
         })
         const chunkClass = computed(() => [
             'common-base-chunk',
-            `is-${props.type}`,
+            `is-${chunkType.value}`,
             `is-${props.mode}`,
             { 'is-dark': inverted.value, 'is-fill': true }
         ])
@@ -75,13 +103,13 @@ export default defineComponent({
             if (['chunk'].includes(props.mode)) {
                 return (
                     <n-tag class={chunkClass.value} style={chunkStyle.value} bordered={props.bordered} type="default">
-                        {slots.default ? slots.default() : isEmpty(props.value) ? props.value : props.empty}
+                        {slots.default ? slots.default() : chunkLabel.value}
                     </n-tag>
                 )
             }
             return (
                 <n-text class={chunkClass.value} style={chunkStyle.value}>
-                    {slots.default ? slots.default() : isEmpty(props.value) ? props.value : props.empty}
+                    {slots.default ? slots.default() : chunkLabel.value}
                 </n-text>
             )
         }
