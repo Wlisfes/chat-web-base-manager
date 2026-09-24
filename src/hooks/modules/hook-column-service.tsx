@@ -38,10 +38,6 @@ interface BaseServiceState<T> extends Omix {
 }
 /**列表包装配置**/
 interface BaseServiceOptions<T, U, R, C extends Partial<Record<ChunkName, true>> = {}> extends Partial<BaseServiceState<T>> {
-    /**枚举开启配置**/
-    chunkNames?: C
-    /**权限标识**/
-    keyName?: string
     /**立即执行**/
     immediate?: boolean
     /**额外字段**/
