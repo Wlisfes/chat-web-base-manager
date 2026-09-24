@@ -50,6 +50,14 @@ export default defineComponent({
             })
         }
 
+        /**查看执行日志**/
+        async function fetchDatetaskLog(node: Omix) {
+            return await fetchDeployDatetaskLog({
+                title: `执行日志 - ${node.taskName}`,
+                node
+            })
+        }
+
         /**修改Cron表达式**/
         async function fetchDatetaskCronUpdate(node: Omix) {
             return await fetchDeployDatetaskCron({
@@ -89,14 +97,6 @@ export default defineComponent({
             })
         }
 
-        /**查看执行日志**/
-        async function fetchDatetaskLog(node: Omix) {
-            return await fetchDeployDatetaskLog({
-                title: `执行日志 - ${node.taskName}`,
-                node
-            })
-        }
-
         return () => (
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
@@ -112,35 +112,6 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    {/* <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskStatusToggle}
-                        >
-                            启用/停用
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskCronUpdate}
-                        >
-                            修改Cron
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="info"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskTrigger}
-                        >
-                            手动触发
-                        </common-base-button>
-                        <common-base-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
-                            执行日志
-                        </common-base-button>
-                    </common-database-search-function> */}
                     <common-database-search-column disabled prop="taskName" label="任务名称">
                         <form-base-input
                             clearable
@@ -250,38 +221,6 @@ export default defineComponent({
                         ))}
                     </common-base-columns-template>
                 </common-database-wrapper>
-                {/* <common-database-table
-                    show-select 
-                    show-settings
-                    limit={state.limit}
-                    total={state.total}
-                    columns={state.columns}
-                    v-model:page={state.page}
-                    v-model:size={state.size}
-                    v-model:select={state.select}
-                    v-model:data={state.dataSource}
-                    v-model:loading={state.loading}
-                    v-model:initialize={state.initialize}
-                    v-model:customize={state.customize}
-                    on-update:customize={instOptions.fetchUpdateCustomize}
-                    on-update:page={(page: number) => fetchRefresh({ page })}
-                    on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                >
-                    {{
-                        col_type: (data: Datetask.DatetaskItem) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.type}
-                            ></common-database-table-chunk>
-                        ),
-                        col_status: (data: Datetask.DatetaskItem) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                            ></common-database-table-chunk>
-                        )
-                    }}
-                </common-database-table> */}
             </layout-common-container>
         )
     }
