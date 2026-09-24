@@ -21,7 +21,7 @@ export default defineComponent({
             immediate: false
         })
         /**菜单静态枚举**/
-        const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountSheetEnums, {
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountSheetEnums(), {
             immediate: false
         })
         /**表单实例**/
@@ -66,7 +66,7 @@ export default defineComponent({
 
         /**菜单资源详情**/
         async function fetchBaseSystemSheetResolver() {
-            return await Promise.all([sheetOptions.fetchRequest(), fetchChunk()]).then(async () => {
+            return await Promise.all([sheetOptions.fetchRequest(), fetchChunkService()]).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
                 }

@@ -224,8 +224,10 @@ export default defineComponent({
         }
         /**节点渲染**/
         function fetchCellRender(value: any) {
-            if (isEmpty(value)) return '-'
             try {
+                if (isEmpty(value)) {
+                    return '-'
+                }
                 return isObject(value) || isArray(value) ? JSON.stringify(value) : value
             } catch (err) {
                 return '-'

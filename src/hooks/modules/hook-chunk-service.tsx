@@ -23,7 +23,7 @@ export function useChunkService(request: ChunkServiceOptions['request'], options
     })
 
     if (options.immediate ?? true) {
-        fetchChunk()
+        fetchChunkService()
     }
 
     /**更新结果对象**/
@@ -31,7 +31,7 @@ export function useChunkService(request: ChunkServiceOptions['request'], options
         return (chunkOptions.value = data)
     }
 
-    async function fetchChunk() {
+    async function fetchChunkService() {
         return await setState({ loading: true }).then(async () => {
             try {
                 return await request(state).then(async ({ data }) => {
@@ -51,6 +51,6 @@ export function useChunkService(request: ChunkServiceOptions['request'], options
         chunkState: state,
         chunkOptions,
         setState,
-        fetchChunk
+        fetchChunkService
     }
 }

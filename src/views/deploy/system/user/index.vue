@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchNormalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
@@ -13,6 +13,10 @@ export default defineComponent({
         const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: true,
             transform: fetchNormalizeTreeChildren
+        })
+        /**账号静态枚举**/
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
+            immediate: true
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
@@ -163,6 +167,7 @@ export default defineComponent({
                         <form-base-tree-select
                             multiple
                             checkable
+                            clearable
                             cascade={false}
                             label-field="name"
                             label-value="keyId"

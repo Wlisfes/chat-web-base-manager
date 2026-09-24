@@ -27,7 +27,7 @@ export default defineComponent({
             immediate: false
         })
         /**账号静态枚举**/
-        const { chunkOptions, fetchChunk } = useChunkService(Service.httpBaseAccountUserEnums, {
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
             immediate: false
         })
         /**表单实例**/
@@ -72,7 +72,7 @@ export default defineComponent({
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [fetchChunk(), deptOptions.fetchRequest(), positionOptions.fetchRequest()]
+            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), positionOptions.fetchRequest()]
             return await Promise.all(taskNames).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await fetchInstState().then(async formData => {
