@@ -1,6 +1,14 @@
 import { request } from '@/utils'
 import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 
+/**获取系统任务类型、任务状态和执行日志状态枚举**/
+export function httpBaseSkylineDatetaskEnums() {
+    return request<Datetask.DatetaskEnumsResponse>({
+        url: '/api/skyline/deploy/datetask/enums',
+        method: 'GET'
+    })
+}
+
 /**系统任务分页列表**/
 export function httpBaseSkylineColumnDatetask(data: Datetask.DatetaskColumnRequest) {
     return request<Datetask.DatetaskColumnResponse>({

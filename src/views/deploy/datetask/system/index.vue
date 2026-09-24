@@ -1,6 +1,7 @@
 <script lang="tsx">
-import { computed, defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
+import { defineComponent } from 'vue'
+import { Document, Edit, Flash, Pause, Play } from '@vicons/carbon'
+import { useColumnService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
@@ -9,44 +10,24 @@ import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 export default defineComponent({
     name: 'DeployDatetaskSystem',
     setup(props, ctx) {
+        /**系统任务静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
+            immediate: true
+        })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseSkylineColumnDatetask({
-                    ...payload,
-                    page: base.page,
-                    size: base.size
-                }),
+                Service.httpBaseSkylineColumnDatetask({ ...payload, type: 'system', page: base.page, size: base.size }),
+            // request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:datetask:system',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
             formState: {
                 taskName: undefined,
                 status: undefined
-            },
-            columns: [
-                { title: '任务ID', key: 'taskId', width: 180, disabled: true },
-                { title: '任务名称', key: 'taskName', width: 200, disabled: true },
-                { title: '处理器标识', key: 'handler', width: 240, disabled: true },
-                { title: '任务描述', key: 'comment', minWidth: 200, check: true },
-                { title: 'Cron表达式', key: 'cron', width: 160, check: true },
-                { title: '任务类型', key: 'type', width: 120, check: true },
-                { title: '任务状态', key: 'status', width: 120, check: true },
-                { title: '上次执行', key: 'lastTime', width: 160, check: true },
-                { title: '下次执行', key: 'nextTime', width: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
+            }
         })
 
-        /**已完成任务不可再修改或触发。*/
-        const isFinishedSelected = computed(() =>
-            (state.select as Array<Datetask.DatetaskItem>).some(node => node.status === 'finish')
-        )
-
         /**启用/停用任务**/
-        async function fetchDatetaskStatusToggle() {
-            const node = state.select[0] as Datetask.DatetaskItem
+        async function fetchDatetaskStatusToggle(node: Datetask.DatetaskItem) {
             const nextStatus: Datetask.DatetaskManageStatus = ['running', 'wait'].includes(node.status) ? 'stop' : 'running'
             const nextLabel = nextStatus === 'running' ? '启用' : '停用'
             return await fetchDialogService({
@@ -69,8 +50,7 @@ export default defineComponent({
         }
 
         /**修改Cron表达式**/
-        async function fetchDatetaskCronUpdate() {
-            const node = state.select[0] as Datetask.DatetaskItem
+        async function fetchDatetaskCronUpdate(node: Datetask.DatetaskItem) {
             return await fetchDeployDatetaskCron({
                 title: '修改Cron表达式',
                 node,
@@ -79,8 +59,7 @@ export default defineComponent({
         }
 
         /**手动触发任务**/
-        async function fetchDatetaskTrigger() {
-            const node = state.select[0] as Datetask.DatetaskItem
+        async function fetchDatetaskTrigger(node: Datetask.DatetaskItem) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -93,7 +72,11 @@ export default defineComponent({
                             await done({ visible: false })
                             const result = response.data?.result
                             if (result?.skipped) {
-                                return await fetchNotifyService({ type: 'warning', title: '任务未执行', message: result.reason ?? '任务被跳过' })
+                                return await fetchNotifyService({
+                                    type: 'warning',
+                                    title: '任务未执行',
+                                    message: result.reason ?? '任务被跳过'
+                                })
                             }
                             return await fetchNotifyService({ title: '任务执行成功' })
                         } catch (err) {
@@ -106,8 +89,7 @@ export default defineComponent({
         }
 
         /**查看执行日志**/
-        async function fetchDatetaskLog() {
-            const node = state.select[0] as Datetask.DatetaskItem
+        async function fetchDatetaskLog(node: Datetask.DatetaskItem) {
             return await fetchDeployDatetaskLog({
                 title: `执行日志 - ${node.taskName}`,
                 node
@@ -129,7 +111,7 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-function abstract class="flex gap-col-10">
+                    {/* <common-database-search-function abstract class="flex gap-col-10">
                         <common-base-button
                             dashed
                             type="warning"
@@ -157,7 +139,7 @@ export default defineComponent({
                         <common-base-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
                             执行日志
                         </common-base-button>
-                    </common-database-search-function>
+                    </common-database-search-function> */}
                     <common-database-search-column disabled prop="taskName" label="任务名称">
                         <form-base-input
                             clearable
@@ -168,14 +150,100 @@ export default defineComponent({
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="任务状态">
                         <form-base-select
+                            clearable
                             placeholder="请选择任务状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
+                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
-                <common-database-table
-                    show-select
+                <common-database-wrapper
+                    limit={state.limit}
+                    total={state.total}
+                    v-model:page={state.page}
+                    v-model:size={state.size}
+                    v-model:data={state.dataSource}
+                    v-model:loading={state.loading}
+                    v-model:initialize={state.initialize}
+                    on-update:page={(page: number) => fetchRefresh({ page })}
+                    on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
+                >
+                    <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
+                        {(state.dataSource as Datetask.DatetaskItem[]).map(item => (
+                            <n-card key={item.taskId} embedded hoverable content-class="p-12! flex flex-col gap-y-5">
+                                <n-h4 class="m-be-0">{item.taskName}</n-h4>
+                                <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
+                                    {item.handler}
+                                </common-base-columns-wrapper>
+                                <common-base-columns-wrapper vertical label="定时规则" label-class="text-12">
+                                    {item.cron}
+                                </common-base-columns-wrapper>
+                                <div class="grid-cols-2 gap-x-10 overflow-hidden">
+                                    <common-base-columns-wrapper vertical label="上次执行" label-class="text-12">
+                                        {item.lastTime ?? '-'}
+                                    </common-base-columns-wrapper>
+                                    <common-base-columns-wrapper vertical label="下次执行" label-class="text-12">
+                                        {item.nextTime ?? '-'}
+                                    </common-base-columns-wrapper>
+                                </div>
+                                <div class="flex items-center justify-between gap-x-8 overflow-hidden p-bs-5">
+                                    <common-base-chunk
+                                        bordered
+                                        value={item.status}
+                                        items={chunkOptions.value.statusOptions}
+                                    ></common-base-chunk>
+                                    <div class="flex items-center gap-x-12 overflow-hidden">
+                                        <div
+                                            class="flex items-center"
+                                            title={['running', 'wait'].includes(item.status) ? '停用任务' : '启用任务'}
+                                        >
+                                            <common-base-button
+                                                text
+                                                icon-size={18}
+                                                type={['running', 'wait'].includes(item.status) ? 'warning' : 'success'}
+                                                icon={['running', 'wait'].includes(item.status) ? Pause : Play}
+                                                disabled={item.status === 'finish'}
+                                                onClick={() => fetchDatetaskStatusToggle(item)}
+                                            ></common-base-button>
+                                        </div>
+                                        <div class="flex items-center" title="编辑任务">
+                                            <common-base-button
+                                                text
+                                                icon-size={18}
+                                                type="primary"
+                                                icon={Edit}
+                                                disabled={item.status === 'finish'}
+                                                onClick={() => fetchDatetaskCronUpdate(item)}
+                                            ></common-base-button>
+                                        </div>
+                                        <div class="flex items-center" title="手动触发">
+                                            <common-base-button
+                                                text
+                                                icon-size={18}
+                                                type="info"
+                                                icon={Flash}
+                                                disabled={item.status === 'finish'}
+                                                onClick={() => fetchDatetaskTrigger(item)}
+                                            ></common-base-button>
+                                        </div>
+                                        <div class="flex items-center" title="查看日志">
+                                            <common-base-button
+                                                text
+                                                icon-size={18}
+                                                icon={Document}
+                                                onClick={() => fetchDatetaskLog(item)}
+                                            ></common-base-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </n-card>
+                        ))}
+                    </common-base-columns-template>
+                </common-database-wrapper>
+                {/* <common-database-table
+                    show-select 
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -196,18 +264,16 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.type}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_TYPE}
                             ></common-database-table-chunk>
                         ),
                         col_status: (data: Datetask.DatetaskItem) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
                             ></common-database-table-chunk>
                         )
                     }}
-                </common-database-table>
+                </common-database-table> */}
             </layout-common-container>
         )
     }

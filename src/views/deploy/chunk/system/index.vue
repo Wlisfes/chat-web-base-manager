@@ -14,6 +14,7 @@ export default defineComponent({
             request: (base, payload) =>
                 Service.httpBaseSkylineColumnDatetask({
                     ...payload,
+                    type: 'system',
                     page: base.page,
                     size: base.size
                 }),

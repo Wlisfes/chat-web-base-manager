@@ -7,6 +7,8 @@ export default defineComponent({
     props: {
         /**描述**/
         label: { type: [String, Number, Object] as PropType<string | number | VNode> },
+        /**开启纵向排列**/
+        vertical: { type: Boolean, default: false },
         /**标签类名**/
         labelClass: { type: String, default: '' },
         /**内容类名**/
@@ -14,7 +16,7 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         return () => (
-            <div class="common-base-columns-wrapper flex overflow-hidden line-height-22">
+            <div class={{ 'common-base-columns-wrapper flex overflow-hidden line-height-22': true, 'flex-col': props.vertical }}>
                 {isNotEmpty(props.label) && (
                     <div class={`common-base-columns-wrapper__label box-border ${props.labelClass}`}>{props.label}</div>
                 )}

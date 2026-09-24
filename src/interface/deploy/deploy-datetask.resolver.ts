@@ -32,8 +32,26 @@ export interface DatetaskItem {
 export interface DatetaskColumnRequest {
     page: number
     size: number
+    /**任务类型，必填。*/
+    type: DatetaskType
     taskName?: string
     status?: DatetaskStatus
+}
+
+/**枚举下拉选项。*/
+export interface DatetaskEnumOption<T extends string = string> {
+    value: T
+    label: string
+    description: string
+    type: string
+}
+
+/**系统任务静态枚举响应数据。*/
+export interface DatetaskEnumsResponse {
+    typeOptions: DatetaskEnumOption<DatetaskType>[]
+    statusOptions: DatetaskEnumOption<DatetaskStatus>[]
+    manageStatusOptions: DatetaskEnumOption<DatetaskManageStatus>[]
+    logStatusOptions: DatetaskEnumOption<DatetaskLogStatus>[]
 }
 
 /**系统任务分页响应数据。*/
