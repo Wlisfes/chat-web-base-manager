@@ -1,127 +1,49 @@
 <script lang="tsx">
-import { computed, defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
+import { defineComponent } from 'vue'
+import { useColumnService, useChunkService } from '@/hooks'
+import { ChunkModule } from '@/interface/deploy/deploy-chunk.resolver'
 import * as Service from '@/api/instance.service'
-import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 
 export default defineComponent({
     name: 'DeployChunkSystem',
     setup(props, ctx) {
+        /**系统枚举静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineChunkEnums(), {
+            immediate: true
+        })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseSkylineColumnDatetask({
-                    ...payload,
-                    type: 'system',
-                    page: base.page,
-                    size: base.size
-                }),
-            keyName: 'chat:deploy:datetask:system',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_DATETASK_TYPE: true, CHUNK_DATETASK_STATUS: true },
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+            request: (base, payload) => Service.httpBaseSkylineColumnChunkModule({ ...payload, page: base.page, size: base.size }),
+            keyName: 'chat:deploy:chunk:system',
             formState: {
-                taskName: undefined,
-                status: undefined
+                module: 'CHUNK_SYSTEM' as ChunkModule,
+                /**分类名称**/
+                name: undefined,
+                /**字段类型**/
+                kind: undefined
             },
             columns: [
-                { title: '任务ID', key: 'taskId', width: 180, disabled: true },
-                { title: '任务名称', key: 'taskName', width: 200, disabled: true },
-                { title: '处理器标识', key: 'handler', width: 240, disabled: true },
-                { title: '任务描述', key: 'comment', minWidth: 200, check: true },
-                { title: 'Cron表达式', key: 'cron', width: 160, check: true },
-                { title: '任务类型', key: 'type', width: 120, check: true },
-                { title: '任务状态', key: 'status', width: 120, check: true },
-                { title: '上次执行', key: 'lastTime', width: 160, check: true },
-                { title: '下次执行', key: 'nextTime', width: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                { title: '分类名称', key: 'name', minWidth: 160, disabled: true },
+                { title: '字段类型', key: 'kind', minWidth: 120, disabled: true },
+                { title: '备注', key: 'remark', minWidth: 220 },
+                { title: '创建人', key: 'createBy', minWidth: 140 },
+                { title: '创建时间', key: 'createTime', minWidth: 160 },
+                { title: '更新人', key: 'modifyBy', minWidth: 140 },
+                { title: '更新时间', key: 'modifyTime', minWidth: 160 }
             ]
         })
 
-        /**已完成任务不可再修改或触发。*/
-        const isFinishedSelected = computed(() => (state.select as Array<Datetask.DatetaskItem>).some(node => node.status === 'finish'))
-
-        /**启用/停用任务**/
-        async function fetchDatetaskStatusToggle() {
-            const node = state.select[0] as Datetask.DatetaskItem
-            const nextStatus: Datetask.DatetaskManageStatus = ['running', 'wait'].includes(node.status) ? 'stop' : 'running'
-            const nextLabel = nextStatus === 'running' ? '启用' : '停用'
-            return await fetchDialogService({
-                title: '提示',
-                type: 'warning',
-                content: `确认将任务【${node.taskName}】${nextLabel}吗？`,
-                async onSubmit(done: Function) {
-                    return await done({ loading: true }).then(async () => {
-                        try {
-                            await Service.httpBaseSkylineUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
-                            await fetchRefresh()
-                            return await done({ visible: false })
-                        } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
-                        }
-                    })
-                }
-            })
-        }
-
-        /**修改Cron表达式**/
-        async function fetchDatetaskCronUpdate() {
-            const node = state.select[0] as Datetask.DatetaskItem
-            return await fetchDeployDatetaskCron({
-                title: '修改Cron表达式',
-                node,
-                onSubmit: () => fetchRefresh()
-            })
-        }
-
-        /**手动触发任务**/
-        async function fetchDatetaskTrigger() {
-            const node = state.select[0] as Datetask.DatetaskItem
-            return await fetchDialogService({
-                title: '提示',
-                type: 'warning',
-                content: `确认手动触发任务【${node.taskName}】吗？任务将立即执行一次。`,
-                async onSubmit(done: Function) {
-                    return await done({ loading: true }).then(async () => {
-                        try {
-                            const response = await Service.httpBaseSkylineTriggerDatetask({ taskId: node.taskId })
-                            await fetchRefresh()
-                            await done({ visible: false })
-                            const result = response.data?.result
-                            if (result?.skipped) {
-                                return await fetchNotifyService({
-                                    type: 'warning',
-                                    title: '任务未执行',
-                                    message: result.reason ?? '任务被跳过'
-                                })
-                            }
-                            return await fetchNotifyService({ title: '任务执行成功' })
-                        } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
-                        }
-                    })
-                }
-            })
-        }
-
-        /**查看执行日志**/
-        async function fetchDatetaskLog() {
-            const node = state.select[0] as Datetask.DatetaskItem
-            return await fetchDeployDatetaskLog({
-                title: `执行日志 - ${node.taskName}`,
-                node
-            })
+        /**种子数据 createBy/modifyBy 为 0 时回显系统**/
+        function fetchChunkUserName(uid?: string | null) {
+            if (!uid || uid === '0') return '系统'
+            return uid
         }
 
         return () => (
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
                     function-class="justify-end"
-                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
+                    function={['search', 'restore', 'collapse', 'deploy']}
                     ref={formRef}
                     limit={state.limit}
                     v-model:loading={state.loading}
@@ -129,56 +51,29 @@ export default defineComponent({
                     v-model:database={state.database}
                     v-model:formState={formState.value}
                     on-update:database={instOptions.fetchUpdateDatabase}
-                    on-restore={instOptions.fetchRestore}
-                    on-submit={instOptions.fetchRequest}
+                    on-restore={fetchRestore}
+                    on-submit={fetchRequest}
                 >
-                    <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskStatusToggle}
-                        >
-                            启用/停用
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskCronUpdate}
-                        >
-                            修改Cron
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="info"
-                            disabled={instState.value.isUpdate || isFinishedSelected.value}
-                            onClick={fetchDatetaskTrigger}
-                        >
-                            手动触发
-                        </common-base-button>
-                        <common-base-button dashed disabled={instState.value.isUpdate} onClick={fetchDatetaskLog}>
-                            执行日志
-                        </common-base-button>
-                    </common-database-search-function>
-                    <common-database-search-column disabled prop="taskName" label="任务名称">
+                    <common-database-search-column disabled prop="name" label="分类名称">
                         <form-base-input
                             clearable
-                            placeholder="请输入任务名称"
-                            v-model:value={formState.value.taskName}
+                            placeholder="请输入分类名称"
+                            v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="status" label="任务状态">
+                    <common-database-search-column prop="kind" label="字段类型">
                         <form-base-select
-                            placeholder="请选择任务状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
-                            v-model:value={formState.value.status}
+                            clearable
+                            placeholder="请选择字段类型"
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.kindOptions}
+                            v-model:value={formState.value.kind}
+                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-select
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -195,20 +90,24 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_type: (data: Datetask.DatetaskItem) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.type}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_TYPE}
-                            ></common-database-table-chunk>
+                        col_name: (data: Omix) => (
+                            <n-ellipsis title={data.name} tooltip={false}>
+                                <router-link
+                                    to={{
+                                        path: '/deploy/chunk/system/item',
+                                        query: { module: data.module, type: data.type, name: data.name }
+                                    }}
+                                    class="decoration-none"
+                                >
+                                    <n-text type="info">{data.name}</n-text>
+                                </router-link>
+                            </n-ellipsis>
                         ),
-                        col_status: (data: Datetask.DatetaskItem) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_DATETASK_STATUS}
-                            ></common-database-table-chunk>
-                        )
+                        col_kind: (data: Omix) => (
+                            <common-base-chunk bordered value={data.kind} items={chunkOptions.value.kindOptions}></common-base-chunk>
+                        ),
+                        col_createBy: (data: Omix) => <span>{fetchChunkUserName(data.createBy)}</span>,
+                        col_modifyBy: (data: Omix) => <span>{fetchChunkUserName(data.modifyBy)}</span>
                     }}
                 </common-database-table>
             </layout-common-container>

@@ -6,6 +6,16 @@ export default [
         component: () => import('@/views/deploy/chunk/system/index.vue')
     },
     {
+        path: '/deploy/chunk/system/item',
+        name: 'DeployChunkSystemItem',
+        meta: { title: '系统枚举明细', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/chunk/system/item.vue'),
+        beforeEnter(to: Omix) {
+            const name = String(to.query.name ?? '').trim()
+            if (name) to.meta.title = name
+        }
+    },
+    {
         path: '/deploy/datetask/system',
         name: 'DeployDatetaskSystem',
         meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },
