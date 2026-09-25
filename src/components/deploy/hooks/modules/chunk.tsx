@@ -6,3 +6,10 @@ export async function fetchDeployChunkSystem(props: PropsState<Omix>) {
         return createComponent(component.default, props)
     })
 }
+
+/**查看枚举列表**/
+export async function fetchDeployChunkManager(props: PropsState<Omix>) {
+    return await import('@/components/deploy/chunk/feedback/deploy-chunk-feedback-manager.vue').then(component => {
+        return createComponent(component.default, props)
+    })
+}

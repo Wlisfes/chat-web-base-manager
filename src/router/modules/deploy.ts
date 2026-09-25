@@ -1,19 +1,21 @@
 export default [
     {
         path: '/deploy/chunk/system',
-        name: 'DeployChunkSystem',
+        name: 'DeployChunkSystemManager',
         meta: { title: '系统枚举设置', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/deploy/chunk/system/index.vue')
     },
     {
-        path: '/deploy/chunk/system/item',
-        name: 'DeployChunkSystemItem',
-        meta: { title: '系统枚举明细', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/deploy/chunk/system/item.vue'),
-        beforeEnter(to: Omix) {
-            const name = String(to.query.name ?? '').trim()
-            if (name) to.meta.title = name
-        }
+        path: '/deploy/chunk/crm',
+        name: 'DeployChunkCrmManager',
+        meta: { title: '销售枚举设置', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/chunk/crm/index.vue')
+    },
+    {
+        path: '/deploy/chunk/srm',
+        name: 'DeployChunkSrmManager',
+        meta: { title: '采购枚举设置', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/chunk/srm/index.vue')
     },
     {
         path: '/deploy/datetask/system',
