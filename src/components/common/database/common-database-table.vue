@@ -191,7 +191,7 @@ export default defineComponent({
                                 <n-ellipsis tooltip={false}>操作</n-ellipsis>
                             </div>
                             <common-database-table-settings
-                                class="p-[var(--n-th-padding)]"
+                                class-name="p-[var(--n-th-padding)]"
                                 columns={props.columns}
                                 v-model:customize={customize.value}
                                 on-update:customize={(...args: Array<any>) => emit('-update:customize', ...args)}
