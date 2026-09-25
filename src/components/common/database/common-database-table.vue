@@ -105,7 +105,8 @@ export default defineComponent({
             const flexColumns = columns.filter(item => isEmpty(item.width) && isNotEmpty(item.minWidth))
             if (flexColumns.length === 0) return columns
             const minTotal = columns.reduce((total, item) => fetchPlusNumber(total, item.width ?? item.minWidth ?? 0), 0)
-            const extra = Math.max(0, tableWidth.value - minTotal)
+            // n-data-table 固定开启 bordered，左右各 1px 边框占用可视宽度，需扣除，否则内容比视口宽 2px 导致常驻横向滚动条
+            const extra = Math.max(0, tableWidth.value - 2 - minTotal)
             const base = Math.floor(extra / flexColumns.length)
             const rest = extra - base * flexColumns.length
             flexColumns.forEach((item, index) => {

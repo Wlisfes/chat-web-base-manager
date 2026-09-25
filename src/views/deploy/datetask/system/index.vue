@@ -169,7 +169,7 @@ export default defineComponent({
                                     <div class="flex items-center gap-x-12 overflow-hidden">
                                         {['running', 'wait'].includes(item.status) ? (
                                             <common-base-button
-                                                class="p-inline-7"
+                                                class="p-inline-6"
                                                 title="停用任务"
                                                 type="warning"
                                                 secondary
@@ -179,7 +179,7 @@ export default defineComponent({
                                             ></common-base-button>
                                         ) : (
                                             <common-base-button
-                                                class="p-inline-7"
+                                                class="p-inline-6"
                                                 title="启用任务"
                                                 type="success"
                                                 secondary
@@ -189,7 +189,7 @@ export default defineComponent({
                                             ></common-base-button>
                                         )}
                                         <common-base-button
-                                            class="p-inline-7"
+                                            class="p-inline-6"
                                             title="修改定时规则"
                                             type="primary"
                                             secondary
@@ -198,7 +198,7 @@ export default defineComponent({
                                             onClick={() => fetchDatetaskCronUpdate(item)}
                                         ></common-base-button>
                                         <common-base-button
-                                            class="p-inline-7"
+                                            class="p-inline-6"
                                             title="手动触发"
                                             type="info"
                                             secondary
@@ -207,7 +207,7 @@ export default defineComponent({
                                             onClick={() => fetchDatetaskTrigger(item)}
                                         ></common-base-button>
                                         <common-base-button
-                                            class="p-inline-7"
+                                            class="p-inline-6"
                                             title="查看日志"
                                             type="info"
                                             secondary
