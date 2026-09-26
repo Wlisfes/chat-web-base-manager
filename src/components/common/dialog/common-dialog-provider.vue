@@ -17,6 +17,10 @@ export default defineComponent({
         opacity: { type: Number, default: 0.1 },
         /**弹窗宽度**/
         width: { type: [String, Number], default: '640px' },
+        /**弹窗容器额外样式**/
+        className: { type: String, default: '' },
+        /**根节点容器额外样式**/
+        classElement: { type: String, default: '' },
         /**开启滚动容器**/
         scrollbar: { type: Boolean, default: true },
         /**开启底部按钮**/
@@ -30,7 +34,6 @@ export default defineComponent({
         const { visible, initialize, loading } = useVModels(props, emit)
         const styleNodes = computed<CSSProperties>(() => ({
             width: utils.isString(props.width) ? props.width : props.width + 'px',
-            'max-height': '90vh',
             '--n-font-size': '15px',
             '--n-padding': '0',
             '--n-close-margin': '16px 16px 0 0',
@@ -48,7 +51,7 @@ export default defineComponent({
                 show-icon={false}
                 show={visible.value}
                 style={styleNodes.value}
-                class="flex flex-col"
+                class={`flex flex-col ${props.className}`}
                 content-class="flex flex-col flex-1 overflow-hidden"
                 title-class="text-20! line-height-28 gap-8 select-none p-inline-20! p-block-20!"
                 action-class="flex flex-col overflow-hidden"
@@ -58,7 +61,7 @@ export default defineComponent({
                 {{
                     action: () => {
                         return !props.action ? null : (
-                            <n-element class="flex justify-center gap-12 p-inline-20 p-block-20">
+                            <common-base-element class="flex justify-center gap-12 p-inline-20 p-block-20">
                                 {props.cancel && (
                                     <n-button class="min-w-80" size="medium" secondary focusable={false} onClick={() => emit('cancel')}>
                                         {props.cancel}
@@ -77,7 +80,7 @@ export default defineComponent({
                                         {props.submit}
                                     </n-button>
                                 )}
-                            </n-element>
+                            </common-base-element>
                         )
                     },
                     default: () => (
@@ -90,10 +93,14 @@ export default defineComponent({
                         >
                             {props.scrollbar ? (
                                 <n-scrollbar class="flex flex-col flex-1" content-class="min-h-full flex flex-col" trigger="none">
-                                    <n-element class="flex flex-col flex-1 p-inline-20">{slots.default && slots.default()}</n-element>
+                                    <common-base-element class={`flex flex-col flex-1 p-inline-20 ${props.classElement}`}>
+                                        {slots.default && slots.default()}
+                                    </common-base-element>
                                 </n-scrollbar>
                             ) : (
-                                <n-element class="flex flex-col flex-1 overflow-hidden">{slots.default && slots.default()}</n-element>
+                                <common-base-element class={`flex flex-col flex-1 overflow-hidden ${props.classElement}`}>
+                                    {slots.default && slots.default()}
+                                </common-base-element>
                             )}
                         </n-spin>
                     )

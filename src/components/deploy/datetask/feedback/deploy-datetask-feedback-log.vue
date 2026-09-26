@@ -35,40 +35,37 @@ export default defineComponent({
             <common-dialog-provider
                 title={props.title}
                 width={1280}
-                showAction={false}
+                action={false}
+                scrollbar={false}
+                class-element="p-inline-20 p-be-20"
+                class-name="h-90vh max-h-750 p-in"
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <common-base-element class="h-90vh max-h-640 flex flex-col overflow-hidden">
-                    <common-database-table
-                        pagination-class="p-bs-14!"
-                        bordered={false}
-                        limit={state.limit}
-                        total={state.total}
-                        columns={state.columns}
-                        v-model:page={state.page}
-                        v-model:size={state.size}
-                        v-model:data={state.dataSource}
-                        v-model:loading={state.loading}
-                        v-model:initialize={state.initialize}
-                        v-model:customize={state.customize}
-                        on-update:customize={instOptions.fetchUpdateCustomize}
-                        on-update:page={(page: number) => fetchRefresh({ page })}
-                        on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                    >
-                        {{
-                            col_status: (data: Omix) => (
-                                <common-base-chunk
-                                    bordered
-                                    value={data.status}
-                                    items={chunkOptions.value.logStatusOptions}
-                                ></common-base-chunk>
-                            )
-                        }}
-                    </common-database-table>
-                </common-base-element>
+                <common-database-table
+                    pagination-class="p-bs-14!"
+                    bordered={false}
+                    limit={state.limit}
+                    total={state.total}
+                    columns={state.columns}
+                    v-model:page={state.page}
+                    v-model:size={state.size}
+                    v-model:data={state.dataSource}
+                    v-model:loading={state.loading}
+                    v-model:initialize={state.initialize}
+                    v-model:customize={state.customize}
+                    on-update:customize={instOptions.fetchUpdateCustomize}
+                    on-update:page={(page: number) => fetchRefresh({ page })}
+                    on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
+                >
+                    {{
+                        col_status: (data: Omix) => (
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.logStatusOptions}></common-base-chunk>
+                        )
+                    }}
+                </common-database-table>
             </common-dialog-provider>
         )
     }
