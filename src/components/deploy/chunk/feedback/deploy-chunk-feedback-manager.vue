@@ -38,7 +38,9 @@ export default defineComponent({
                 { title: '业务值', key: 'value', minWidth: 120 },
                 { title: '排序号', key: 'sort', width: 100 },
                 { title: '状态', key: 'status', width: 100 },
+                { title: '创建人', key: 'createBy', width: 120 },
                 { title: '创建时间', key: 'createTime', width: 160 },
+                { title: '更新人', key: 'modifyBy', width: 120 },
                 { title: '更新时间', key: 'modifyTime', width: 160 }
             ]
         })
@@ -46,10 +48,9 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1280}
+                width={1440}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
-                v-model:initialize={state.initialize}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
