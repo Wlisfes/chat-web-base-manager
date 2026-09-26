@@ -34,9 +34,9 @@ export default defineComponent({
                 { title: '字段类型', key: 'kind', width: 120, disabled: true },
                 { title: '枚举数量', key: 'chunkCount', align: 'center', width: 120, disabled: true },
                 { title: '备注', key: 'remark', minWidth: 220 },
-                { title: '创建人', key: 'createBy', width: 140 },
+                { title: '创建人', key: 'createBy', width: 120 },
                 { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新人', key: 'modifyBy', width: 140 },
+                { title: '更新人', key: 'modifyBy', width: 120 },
                 { title: '更新时间', key: 'modifyTime', width: 160 }
             ]
         })
@@ -109,9 +109,15 @@ export default defineComponent({
                                 {data.chunkCount ?? 0}
                             </n-text>
                         ),
-                        col_kind: (data: Omix) => (
-                            <common-base-chunk bordered value={data.kind} items={chunkOptions.value.kindOptions}></common-base-chunk>
-                        )
+                        col_kind: (data: Omix) => {
+                            return <common-base-chunk bordered value={data.kind} items={chunkOptions.value.kindOptions}></common-base-chunk>
+                        },
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        }
                     }}
                 </common-database-table>
             </common-base-element>

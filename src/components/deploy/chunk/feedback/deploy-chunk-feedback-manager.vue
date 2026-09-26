@@ -38,7 +38,6 @@ export default defineComponent({
             ],
             columns: [
                 { title: 'ID', key: 'keyId', width: 100, disabled: true },
-                { title: 'PID', key: 'pid', width: 100, disabled: true },
                 { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
                 { title: '枚举值', key: 'value', minWidth: 120 },
                 { title: '排序号', key: 'sort', width: 100 },
@@ -109,7 +108,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1440}
+                width={1280}
                 action={false}
                 scrollbar={false}
                 class-element="p-inline-8 p-be-8"
@@ -177,6 +176,12 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
                         ),
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        },
                         col_command: (data: Omix) => (
                             <common-base-authorize
                                 element
@@ -189,7 +194,7 @@ export default defineComponent({
                                         <common-base-button
                                             text
                                             type={item.type}
-                                            disabled={!Boolean(data[item.field])}
+                                            //disabled={!Boolean(data[item.field])}
                                             onClick={() => fetchClick(item, data)}
                                         >
                                             {item.title}

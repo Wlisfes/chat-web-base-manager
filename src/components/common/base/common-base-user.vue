@@ -12,8 +12,12 @@ export default defineComponent({
     },
     setup(props) {
         return () => {
-            if (['text'].includes(props.element) && isNotEmpty(props.data?.name) && isNotEmpty(props.data?.number)) {
-                return <span>{`${props.data.name} ${props.data.number}`}</span>
+            if (['text'].includes(props.element)) {
+                if (isNotEmpty(props.data?.name) && isNotEmpty(props.data?.number)) {
+                    return <span>{`${props.data.name} ${props.data.number}`}</span>
+                } else if (isNotEmpty(props.data?.name) && props.data?.uid == 0) {
+                    return <span>{props.data.name}</span>
+                }
             } else if (['avatar'].includes(props.element) && isNotEmpty(props.data?.avatar)) {
                 return (
                     <div class="flex items-center justify-center">
