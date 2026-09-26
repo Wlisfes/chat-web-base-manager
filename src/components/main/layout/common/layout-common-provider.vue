@@ -1,12 +1,15 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { defineComponent, Fragment } from 'vue'
 import { dateZhCN, zhCN } from 'naive-ui'
 import { useProvider } from '@/hooks'
 
 export default defineComponent({
     name: 'LayoutCommonProvider',
     props: {
-        globalStyle: { type: Boolean, default: false }
+        /**开启global-style**/
+        globalStyle: { type: Boolean, default: false },
+        /**启用element根节点**/
+        element: { type: Boolean, default: true }
     },
     setup(props, { slots }) {
         const { themeStyle, themeOverrides } = useProvider()
@@ -25,7 +28,11 @@ export default defineComponent({
                     <n-dialog-provider>
                         <n-notification-provider max={5}>
                             <n-message-provider>
-                                <n-element class="w-full h-full overflow-hidden">{{ default: slots.default }}</n-element>
+                                {props.element ? (
+                                    <n-element class="w-full h-full overflow-hidden">{{ default: slots.default }}</n-element>
+                                ) : (
+                                    <Fragment>{slots.default && slots.default()}</Fragment>
+                                )}
                             </n-message-provider>
                         </n-notification-provider>
                     </n-dialog-provider>

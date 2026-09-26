@@ -1,14 +1,15 @@
 import { ref, Ref, toRefs, onMounted, computed } from 'vue'
 import { FormInst, DataTableColumn } from 'naive-ui'
-import { cloneDeep, pick } from 'lodash-es'
-import { useChunkService, useState } from '@/hooks'
-import { fetchNotifyService } from '@/plugins'
 import { Observer, fetchExclude, fetchHandler, isNotEmpty } from '@/utils'
-import { ResultResolver, ResultColumn, ChunkName } from '@/interface/instance.resolver'
+import { ResultResolver, ResultColumn } from '@/interface/instance.resolver'
+import { fetchNotifyService } from '@/plugins'
+import { useGlobal, useStore } from '@/store'
+import { cloneDeep, pick } from 'lodash-es'
+import { useState } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 /**列表缓存对象**/
-interface BaseServiceState<T> extends Omix {
+interface BaseServiceState<T, C> extends Omix {
     /**折叠收缩**/
     when: boolean
     /**边距值**/
@@ -35,13 +36,11 @@ interface BaseServiceState<T> extends Omix {
     customize: Array<Omix>
     /**搜索栏字段自定义排版规则**/
     database: Array<Omix>
+    /**权限标识**/
+    actions: Array<Omix<C>>
 }
 /**列表包装配置**/
-interface BaseServiceOptions<T, U, R, C extends Partial<Record<ChunkName, true>> = {}> extends Partial<BaseServiceState<T>> {
-    /**枚举开启配置**/
-    chunkNames?: C
-    /**权限标识**/
-    keyName?: string
+interface BaseServiceOptions<T, U, R, C> extends Partial<BaseServiceState<T, C>> {
     /**立即执行**/
     immediate?: boolean
     /**额外字段**/
@@ -49,24 +48,21 @@ interface BaseServiceOptions<T, U, R, C extends Partial<Record<ChunkName, true>>
     /**筛选条件表单**/
     formState: Omix<U>
     /**列表接口**/
-    request: (base: BaseServiceState<T & Omix<R>>, body: Omix<U>, options: Omix) => Promise<ResultResolver<ResultColumn<T>>>
+    request: (base: BaseServiceState<T & Omix<R>, C>, body: Omix<U>, options: Omix) => Promise<ResultResolver<ResultColumn<T>>>
     /**列表数据转换函数**/
     transform?: (data: ResultColumn<T>) => Array<Omix> | Promise<Array<Omix>>
     /**回调函数**/
-    callback?: (formState: Omix<U>, base: BaseServiceState<T & Omix<R>>) => void | any | Promise<any>
+    callback?: (formState: Omix<U>, base: BaseServiceState<T & Omix<R>, C>) => void | any | Promise<any>
 }
 
 /**列表包装hook**/
-export function useColumnService<T extends Omix, U extends Omix, R extends Omix, C extends Partial<Record<ChunkName, true>> = {}>(
+export function useColumnService<T extends Omix, U extends Omix, R extends Omix, C extends Partial<Omix> = {}>(
     options: BaseServiceOptions<T, U, R, C>
 ) {
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
     const observer = ref(Observer<Record<string, Omix>>())
-    const chunkOptions = useChunkService({
-        immediate: false,
-        type: Object.keys(options.chunkNames ?? {}) as Array<Extract<keyof C, ChunkName>>
-    })
+    const { sheetOptions, superAdmin } = useStore(useGlobal)
     const { state, setState } = useState({
         when: options.when ?? true,
         limit: options.limit ?? 12,
@@ -81,8 +77,9 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         select: options.select ?? [],
         customize: options.customize ?? [],
         database: options.database ?? [],
+        actions: options.actions ?? [],
         ...(options.options ?? {})
-    } as BaseServiceState<T> & typeof options.options)
+    } as BaseServiceState<T, C> & typeof options.options)
 
     /**初始化**/
     onMounted(fetchInitialize)
@@ -91,9 +88,6 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
             const tasks: Array<any> = []
             if (isNotEmpty(options.keyName)) {
                 tasks.push(fetchBaseColumnChunkCustomize(String(options.keyName)))
-            }
-            if (Object.keys(options.chunkNames ?? {}).length > 0) {
-                tasks.push(chunkOptions.fetchRequest())
             }
             if (options.immediate ?? true) {
                 tasks.push(fetchRequest())
@@ -155,7 +149,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     }
 
     /**刷新**/
-    async function fetchRefresh(data: Partial<BaseServiceState<T> & typeof options.options> = {}, opt: Omix = {}) {
+    async function fetchRefresh(data: Partial<BaseServiceState<T, C> & typeof options.options> = {}, opt: Omix = {}) {
         return await setState(pick(data, ['size', 'page']) as typeof state).then(async () => {
             return await fetchRequest(opt)
         })
@@ -171,7 +165,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         } as never).then(async () => {
             return await fetchHandler(isNotEmpty(options.callback), async () => {
                 return await options.callback!(formState.value, state as never)
-            }).then(() => state as BaseServiceState<T> & typeof options.options)
+            }).then(() => state as BaseServiceState<T, C> & typeof options.options)
         })
     }
 
@@ -180,7 +174,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         return await setState({ loading: true } as never).then(async () => {
             try {
                 const body = fetchExclude<U>(formState.value, pick(state, ['page', 'size']))
-                return await options.request(state as BaseServiceState<T & Omix<R>>, body, opts).then(async ({ data }) => {
+                return await options.request(state as BaseServiceState<T & Omix<R>, C>, body, opts).then(async ({ data }) => {
                     if (options.transform && typeof options.transform === 'function') {
                         data.list = ((await options.transform(data)) ?? []) as Array<Omix<T>>
                     }
@@ -223,8 +217,6 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         observer,
         instState,
         instOptions,
-        chunkOptions,
-        chunkState: chunkOptions.chunkState, // as unknown as Record<EnabledChunks, Array<ChunkColumnOptions>>,
         ...instOptions,
         ...toRefs(state)
     }

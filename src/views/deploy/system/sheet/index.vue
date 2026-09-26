@@ -23,10 +23,11 @@ export default defineComponent({
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
-            chunkNames: {
-                CHUNK_SHEET_STATUS: true,
-                CHUNK_SHEET_CHUNK: true
-            },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: {
+            // CHUNK_SHEET_STATUS: true,
+            // CHUNK_SHEET_CHUNK: true
+            // },
             formState: {
                 parentKeyId: undefined as number | undefined, //父级ID
                 name: undefined, //菜单名称
@@ -253,14 +254,14 @@ export default defineComponent({
                                     <common-database-table-chunk
                                         element="chunk"
                                         value={data.type}
-                                        options={chunkState.CHUNK_SHEET_CHUNK}
+                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_CHUNK}
                                     ></common-database-table-chunk>
                                 ),
                                 col_status: (data: Omix) => (
                                     <common-database-table-chunk
                                         element="chunk"
                                         value={data.status}
-                                        options={chunkState.CHUNK_SHEET_STATUS}
+                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_STATUS}
                                     ></common-database-table-chunk>
                                 )
                             }}

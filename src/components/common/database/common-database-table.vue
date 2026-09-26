@@ -1,10 +1,9 @@
 <script lang="tsx">
-import { defineComponent, ref, computed, nextTick, PropType } from 'vue'
+import { defineComponent, ref, computed, nextTick, PropType, toRaw } from 'vue'
 import { fetchWherer, isNotEmpty, isEmpty, isObject, isArray, fetchPlusNumber } from '@/utils'
 import { DataTableColumn, PaginationInfo } from 'naive-ui'
-import { useVModels } from '@vueuse/core'
+import { useVModels, useElementSize } from '@vueuse/core'
 import { useState } from '@/hooks'
-import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
     name: 'CommonDatabaseTable',
@@ -78,55 +77,82 @@ export default defineComponent({
             width: 86,
             TABLE_ELLIPSIS: { tooltip: { scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } } }
         })
+        const rowKey = (e: Omix) => e.keyId
+        const scrollbarProps = { size: 100, trigger: 'none' as const }
+        const tableStyle = computed(() => ({ flex: 1, '--n-opacity-loading': initialize.value ? 0 : 0.5 }))
+        const tableSize = useElementSize(tableRef)
+        /**容器整数宽度，避免亚像素变化触发列重算**/
+        const tableWidth = computed(() => Math.floor(tableSize.width.value))
+        /**表头配置**/
+        const faseColumns = computed(() => {
+            return fetchColumnFlexWidth(
+                fetchBaseColumns(fetchColumnsCustomize(props.columns))
+                    .filter(item => item.disabled || (item.check ?? true))
+                    .map(fetchColumnRender)
+            )
+        })
         /**最小滚动宽度**/
         const width = computed(() => {
-            return fetchBaseColumns(props.columns).reduce((a, b) => fetchPlusNumber(a, b.width ?? b.minWidth ?? 0), 0)
+            return faseColumns.value.reduce((a, b) => fetchPlusNumber(a, b.width ?? b.minWidth ?? 0), 0)
         })
         /**复选框选中id列表**/
         const faseSelect = computed(() => {
             return select.value.map(item => item.keyId)
         })
-        /**表头配置**/
-        const faseColumns = computed(() => {
-            return fetchBaseColumns(fetchColumnsCustomize(props.columns))
-                .filter(item => item.disabled || (item.check ?? true))
-                .map(fetchColumnRender)
-        })
+        /**仅 minWidth 列平分剩余宽度，写入真实 width 保证不低于 minWidth**/
+        function fetchColumnFlexWidth(columns: Array<Omix<DataTableColumn>>) {
+            if (props.virtualScrollX) return columns
+            const flexColumns = columns.filter(item => isEmpty(item.width) && isNotEmpty(item.minWidth))
+            if (flexColumns.length === 0) return columns
+            const minTotal = columns.reduce((total, item) => fetchPlusNumber(total, item.width ?? item.minWidth ?? 0), 0)
+            // n-data-table 固定开启 bordered，左右各 1px 边框占用可视宽度，需扣除，否则内容比视口宽 2px 导致常驻横向滚动条
+            const extra = Math.max(0, tableWidth.value - 2 - minTotal)
+            const base = Math.floor(extra / flexColumns.length)
+            const rest = extra - base * flexColumns.length
+            flexColumns.forEach((item, index) => {
+                item.width = fetchPlusNumber(item.minWidth, index === flexColumns.length - 1 ? base + rest : base)
+            })
+            return columns
+        }
         /**绑定自定义列并配置原生轻量省略渲染**/
         function fetchColumnRender(base: Omix<DataTableColumn>) {
             const key = String(base.key ?? '')
             if (props.virtualScrollX && isEmpty(base.width)) {
                 base.width = base.minWidth ?? 120
             }
-            if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
-                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
-                return base
-            }
+            // 普通列默认单行省略；选择、展开、设置和操作列不参与。自定义插槽也走同一规则。
             if (!['selection', 'expand'].includes(String(base.type ?? '')) && !['settings', 'command'].includes(key)) {
                 base.ellipsisComponent = base.ellipsisComponent ?? 'performant-ellipsis'
                 if (isEmpty(base.ellipsis) || base.ellipsis === true) {
                     base.ellipsis = state.TABLE_ELLIPSIS
                 }
             }
+            if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
+                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
+            }
             return base
         }
         /**按自定义排版规则排序列**/
         function fetchColumnsCustomize(data: Array<Omix<DataTableColumn>>) {
-            if (customize.value.length === 0) return data
-            const columns = cloneDeep(data).map(item => {
-                const node = customize.value.find(c => (c.key ?? c.prop) === item.key)
-                if (node) item.check = node.check ?? item.check ?? true
-                return item
+            const source = toRaw(data)
+            const rules = toRaw(customize.value)
+            /**浅拷贝列配置，避免深度克隆响应式对象导致计算属性过度追踪**/
+            if (rules.length === 0) {
+                return source.map(item => ({ ...item }))
+            }
+            const columns = source.map(item => {
+                const node = rules.find(c => (c.key ?? c.prop) === item.key)
+                return node ? { ...item, check: node.check ?? item.check ?? true } : { ...item }
             })
-            return columns.sort((a, b) => {
-                const aIndex = customize.value.findIndex(c => (c.key ?? c.prop) === a.key)
-                const bIndex = customize.value.findIndex(c => (c.key ?? c.prop) === b.key)
+            return columns.sort((a: Omix, b: Omix) => {
+                const aIndex = rules.findIndex(c => (c.key ?? c.prop) === a.key)
+                const bIndex = rules.findIndex(c => (c.key ?? c.prop) === b.key)
                 return (aIndex === -1 ? Infinity : aIndex) - (bIndex === -1 ? Infinity : bIndex)
             })
         }
         /**默认操作列、设置列配置**/
         function fetchBaseColumns(data: Array<Omix<DataTableColumn>>) {
-            const columns = cloneDeep(data)
+            const columns = data.slice()
             if (props.showSelect) {
                 columns.unshift({ title: '选择框', key: 'selection', type: 'selection', fixed: 'left', width: 40, check: true })
             }
@@ -152,7 +178,7 @@ export default defineComponent({
                     }
                     return item
                 })
-            } else if (props.showSettings && props.showCommand) {
+            } else if (props.showCommand) {
                 columns.push({
                     key: 'command',
                     fixed: 'right',
@@ -164,12 +190,14 @@ export default defineComponent({
                             <div class="flex-1 p-[var(--n-th-padding)] overflow-hidden">
                                 <n-ellipsis tooltip={false}>操作</n-ellipsis>
                             </div>
-                            <common-database-table-settings
-                                class="p-[var(--n-th-padding)]"
-                                columns={props.columns}
-                                v-model:customize={customize.value}
-                                on-update:customize={(...args: Array<any>) => emit('-update:customize', ...args)}
-                            ></common-database-table-settings>
+                            {props.showSettings && (
+                                <common-database-table-settings
+                                    class-name="p-[var(--n-th-padding)]"
+                                    columns={props.columns}
+                                    v-model:customize={customize.value}
+                                    on-update:customize={(...args: Array<any>) => emit('-update:customize', ...args)}
+                                ></common-database-table-settings>
+                            )}
                         </div>
                     )
                 })
@@ -199,8 +227,10 @@ export default defineComponent({
         }
         /**节点渲染**/
         function fetchCellRender(value: any) {
-            if (isEmpty(value)) return '-'
             try {
+                if (isEmpty(value)) {
+                    return '-'
+                }
                 return isObject(value) || isArray(value) ? JSON.stringify(value) : value
             } catch (err) {
                 return '-'
@@ -238,8 +268,8 @@ export default defineComponent({
                                 bordered
                                 flex-height
                                 size="small"
-                                style={{ flex: 1, '--n-opacity-loading': initialize.value ? 0 : 0.5 }}
-                                row-key={(e: Omix) => e.keyId}
+                                style={tableStyle.value}
+                                row-key={rowKey}
                                 loading={loading.value}
                                 min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}
@@ -250,7 +280,7 @@ export default defineComponent({
                                 data={data.value}
                                 columns={faseColumns.value}
                                 checked-row-keys={faseSelect.value}
-                                scrollbar-props={{ size: 100, trigger: 'none' }}
+                                scrollbar-props={scrollbarProps}
                                 render-cell={fetchCellRender}
                                 on-update:checked-row-keys={fetchUpdateSelecter}
                             ></n-data-table>

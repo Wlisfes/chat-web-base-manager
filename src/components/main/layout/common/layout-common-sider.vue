@@ -23,7 +23,7 @@ export default defineComponent({
 
         return () => (
             <n-menu
-                class="layout-common-sider"
+                class="layout-common-sider select-none"
                 style={{ '--n-item-height': '36px' }}
                 label-field="name"
                 key-field="router"

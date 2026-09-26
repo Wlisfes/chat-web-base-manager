@@ -1,19 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useChunkService } from '@/hooks'
 import * as Service from '@/api/instance.service'
-import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
-
-/** 将任务结果压缩成可读的单行 JSON，避免表格把对象隐式显示为 [object Object]。 */
-function formatDatetaskResult(value: unknown): string {
-    if (value === undefined || value === null || value === '') return '-'
-    if (typeof value === 'string') return value
-    try {
-        return JSON.stringify(value) ?? '-'
-    } catch {
-        return '-'
-    }
-}
 
 export default defineComponent({
     name: 'DeployDatetaskFeedbackLog',
@@ -25,71 +13,59 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const { state, chunkState, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseSkylineColumnDatetaskLog({
-                    ...payload,
-                    taskId: props.node.taskId,
-                    page: base.page,
-                    size: base.size
-                }),
-            chunkNames: { CHUNK_DATETASK_LOG_STATUS: true },
-            formState: {},
+        /**系统任务静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
+            immediate: true
+        })
+        const { state, instOptions, setState, fetchRefresh } = useColumnService({
+            request: (base, payload) => Service.httpBaseSkylineColumnDatetaskLog({ ...payload, page: base.page, size: base.size }),
+            formState: { taskId: props.node.taskId },
             limit: 0,
             columns: [
-                { title: '任务ID', key: 'taskId', width: 100, check: true },
-                { title: '执行状态', key: 'status', width: 100, check: true },
-                { title: '耗时(ms)', key: 'duration', width: 100, check: true },
-                { title: '开始时间', key: 'startTime', width: 160, check: true },
-                { title: '结束时间', key: 'endTime', width: 160, check: true },
-                { title: '结果/错误', key: 'result', minWidth: 200, check: true }
+                { title: '任务ID', key: 'taskId', width: 180 },
+                { title: '执行状态', key: 'status', width: 100 },
+                { title: '耗时(ms)', key: 'duration', width: 100 },
+                { title: '开始时间', key: 'startTime', width: 190 },
+                { title: '结束时间', key: 'endTime', width: 190 },
+                { title: '结果/错误', key: 'result', minWidth: 200 }
             ]
         })
 
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1080}
-                showAction={false}
+                width={1280}
+                action={false}
+                scrollbar={false}
+                class-element="p-inline-20 p-be-20"
+                class-name="h-90vh max-h-750 p-in"
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <common-base-element class="h-90vh max-h-640 flex flex-col overflow-hidden">
-                    <common-database-table
-                        pagination-class="p-bs-14!"
-                        bordered={false}
-                        limit={state.limit}
-                        total={state.total}
-                        columns={state.columns}
-                        v-model:page={state.page}
-                        v-model:size={state.size}
-                        v-model:data={state.dataSource}
-                        v-model:loading={state.loading}
-                        v-model:initialize={state.initialize}
-                        v-model:customize={state.customize}
-                        on-update:customize={instOptions.fetchUpdateCustomize}
-                        on-update:page={(page: number) => fetchRefresh({ page })}
-                        on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                    >
-                        {{
-                            col_status: (data: Datetask.DatetaskLogItem) => (
-                                <common-database-table-chunk
-                                    element="chunk"
-                                    value={data.status}
-                                    options={chunkState.CHUNK_DATETASK_LOG_STATUS}
-                                ></common-database-table-chunk>
-                            ),
-                            col_result: (data: Datetask.DatetaskLogItem) => (
-                                <common-database-table-content
-                                    element="performant-ellipsis"
-                                    value={formatDatetaskResult(data.result)}
-                                ></common-database-table-content>
-                            )
-                        }}
-                    </common-database-table>
-                </common-base-element>
+                <common-database-table
+                    pagination-class="p-bs-14!"
+                    bordered={false}
+                    limit={state.limit}
+                    total={state.total}
+                    columns={state.columns}
+                    v-model:page={state.page}
+                    v-model:size={state.size}
+                    v-model:data={state.dataSource}
+                    v-model:loading={state.loading}
+                    v-model:initialize={state.initialize}
+                    v-model:customize={state.customize}
+                    on-update:customize={instOptions.fetchUpdateCustomize}
+                    on-update:page={(page: number) => fetchRefresh({ page })}
+                    on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
+                >
+                    {{
+                        col_status: (data: Omix) => (
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.logStatusOptions}></common-base-chunk>
+                        )
+                    }}
+                </common-database-table>
             </common-dialog-provider>
         )
     }

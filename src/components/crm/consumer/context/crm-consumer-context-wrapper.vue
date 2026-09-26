@@ -40,7 +40,7 @@ export default defineComponent({
                 <common-business-progressbar
                     initialize={props.initialize}
                     stage={faseNode.value.stage}
-                    items={props.chunkState.CHUNK_CONSUMER_STAGE}
+                    // 本地静态枚举已废弃，待切换为后端枚举接口: items={props.chunkState.CHUNK_CONSUMER_STAGE}
                 ></common-business-progressbar>
             </n-card>
         )

@@ -1,12 +1,11 @@
 <script lang="tsx">
-import { defineComponent, onMounted, watch, render, PropType } from 'vue'
+import { defineComponent, onMounted, watch, PropType } from 'vue'
 import { fetchChartInitialization, fetchBaseTemplates, fetchForeignTemplates } from '@/utils'
-import { OrgChart, ChartOptions, fetchCreateVNode, fetchCreateSvgIcon } from '@/utils'
+import { ChartOptions, fetchVNodeRender, fetchCreateSvgIcon } from '@/utils'
 import { useCurrentElement } from '@vueuse/core'
 import { useConfiger, useStore } from '@/store'
-import { Add } from '@vicons/carbon'
+import { Add, UserFollow } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
-import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemDeptOrgchart',
@@ -16,19 +15,19 @@ export default defineComponent({
         /**部门数据**/
         items: { type: Array as PropType<ChartOptions['nodes']>, default: () => [] }
     },
-    setup(props, { emit }) {
+    setup(props) {
         const { theme } = useStore(useConfiger)
         const element = useCurrentElement<HTMLElement>()
 
         function fetchCreateBalkan(node: Omix, data: Omix) {
-            const root = document.createElement('div')
-            render(
-                fetchCreateVNode(
-                    <layout-common-provider>
-                        <deploy-system-dept-balkan node={data}></deploy-system-dept-balkan>
-                    </layout-common-provider>
-                ),
-                root
+            const root = fetchVNodeRender(
+                <layout-common-provider element={false}>
+                    {['company', 'department'].includes(data.type) ? (
+                        <deploy-system-dept-company node={data}></deploy-system-dept-company>
+                    ) : (
+                        <deploy-system-dept-user node={data}></deploy-system-dept-user>
+                    )}
+                </layout-common-provider>
             )
             return fetchForeignTemplates(node, root.innerHTML)
         }
@@ -37,7 +36,7 @@ export default defineComponent({
             return Promise.all([
                 fetchBaseTemplates('company', { w: 260, h: 80 }, fetchCreateBalkan),
                 fetchBaseTemplates('department', { w: 200, h: 52 }, fetchCreateBalkan),
-                fetchBaseTemplates('user', { w: 130, h: 42 }, fetchCreateBalkan)
+                fetchBaseTemplates('user', { w: 140, h: 42 }, fetchCreateBalkan)
             ])
         }
 
@@ -65,25 +64,36 @@ export default defineComponent({
             })
         }
 
+        async function fetchCreateDeploySystemDepartmentUser(chart: Awaited<ReturnType<typeof fetchChartInitialization>>) {
+            return await feedback.fetchDeploySystemDepartmentUser({
+                title: '部门用户绑定',
+                onSubmit: event => fetchDrawUpdate(chart)
+            })
+        }
+
         onMounted(fetchInitialization)
         async function fetchInitialization() {
             return await fetchInitTemplates().then(async () => {
                 const chart = await fetchChartInitialization(element.value, {
                     mode: theme.value,
-                    paddingLeft: 150,
                     nodes: props.items,
                     searchFields: ['name'],
-                    nodeBinding: { field_0: 'name' },
+                    nodeBinding: { field_0: 'name', img_0: 'avatar' },
                     tags: {
                         company: { template: 'company' },
                         department: { template: 'department' },
                         user: { template: 'user' }
                     },
                     controls: {
-                        myControl: {
-                            title: '新增',
+                        fetchCreate: {
+                            title: '新增部门',
                             icon: fetchCreateSvgIcon(Add, 22),
                             onClick: () => fetchCreateDeploySystemDepartment(chart)
+                        },
+                        fetchCreateUser: {
+                            title: '部门用户绑定',
+                            icon: fetchCreateSvgIcon(UserFollow, 28),
+                            onClick: () => fetchCreateDeploySystemDepartmentUser(chart)
                         }
                     }
                 })
@@ -92,7 +102,9 @@ export default defineComponent({
                     chart.setViewBox([-150, top, right, bottom])
                 })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
-                    return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
+                    if (['company', 'department'].includes(chart.get(args.node.id).type)) {
+                        return fetchUpdateDeploySystemDepartment(chart, chart.get(args.node.id))
+                    }
                 })
                 return watch(theme, value => {
                     chart.config.mode = value
@@ -118,6 +130,21 @@ export default defineComponent({
         height: 42px;
         border-radius: 4px;
         justify-content: center;
+    }
+    :deep(.deploy-system-dept-orgchart-template) {
+        width: 100%;
+        height: 100%;
+        user-select: none;
+        box-sizing: border-box;
+        border: 1px solid #aeaeae;
+        border-radius: var(--border-radius);
+        background-color: var(--card-color);
+        transition:
+            border-color 0.3s var(--cubic-bezier-ease-in-out),
+            background-color 0.3s var(--cubic-bezier-ease-in-out);
+        &:hover {
+            border-color: var(--primary-color-hover);
+        }
     }
 }
 </style>

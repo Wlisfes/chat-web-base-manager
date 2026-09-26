@@ -19,15 +19,21 @@ export default defineComponent({
 
         watch(() => element.width.value, fetchCurrentWatcher, { immediate: true })
         function fetchCurrentWatcher() {
-            if (props.showSettings) {
-                return (width.value = Math.max(86, Math.max(48, element.width.value + 16)))
-            }
-            return (width.value = Math.max(86, element.width.value + 16))
+            const next = Math.max(86, Math.ceil(element.width.value + 16))
+            if (next === width.value) return
+            width.value = next
         }
 
         return () => (
-            <div class="absolute top-200% common-database-table-visibility" style={{ visibility: 'hidden' }}>
-                {data.value.length > 0 && <Fragment>{data.value.map(item => (slots.default ? slots.default(item) : null))}</Fragment>}
+            <div class="absolute top-200% w-max common-database-table-visibility" style={{ visibility: 'hidden' }}>
+                {data.value.length > 0 && (
+                    <Fragment>
+                        {data.value.map(item => (
+                            // 每行插槽独立包裹测量，避免 Fragment 返回的文本或组件在隐藏层中横向拼接
+                            <div class="w-max">{slots.default ? slots.default(item) : null}</div>
+                        ))}
+                    </Fragment>
+                )}
             </div>
         )
     }

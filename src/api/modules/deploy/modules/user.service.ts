@@ -20,7 +20,18 @@ export function httpBaseAccountColumnUser(data: Omix) {
 
 /**获取账号下拉选项**/
 export function httpBaseAccountSelectUser() {
-    return request({ url: '/api/account/user/select', method: 'GET' })
+    return request({
+        url: '/api/account/user/select',
+        method: 'GET'
+    })
+}
+
+/**获取账号状态、员工状态和组织关系状态枚举**/
+export function httpBaseAccountUserEnums() {
+    return request({
+        url: '/api/account/user/enums',
+        method: 'GET'
+    })
 }
 
 /**按当前用户的数据范围获取账号详情**/
@@ -34,7 +45,11 @@ export function httpBaseAccountUserResolver(params: Omix) {
 
 /**按当前用户的数据范围更新账号资料和状态**/
 export function httpBaseAccountUpdateUser(data: Omix) {
-    return request({ url: '/api/account/user/update', method: 'POST', data })
+    return request({
+        url: '/api/account/user/update',
+        method: 'POST',
+        data
+    })
 }
 
 /**超级管理员重置账号密码**/
@@ -57,5 +72,9 @@ export function httpBaseAccountUpdateUserOrganization(data: Omix) {
 
 /**替换账号的全部角色**/
 export function httpBaseAccountUpdateUserRole(data: Omix) {
-    return request({ url: '/api/account/user/update/role', method: 'POST', data })
+    return request({
+        url: '/api/account/user/update/role',
+        method: 'POST',
+        data
+    })
 }

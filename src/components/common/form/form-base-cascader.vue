@@ -45,16 +45,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.form-base-cascader.is-multiple {
-    :deep(.n-base-selection-tags) {
-        padding-block-start: 0;
-        height: 100%;
-    }
-    :deep(.n-base-selection-tags) {
-        row-gap: 3px;
-    }
-    :deep(.n-base-selection-tag-wrapper) {
-        padding-block-end: 0;
+.form-base-cascader {
+    :deep(.n-tag) {
+        --n-height: 26px;
     }
 }
 </style>

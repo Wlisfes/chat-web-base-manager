@@ -1,4 +1,4 @@
-import { Add, Subtract, FitToScreen, ZoomIn, ZoomOut } from '@vicons/carbon'
+import { FitToScreen, ZoomIn, ZoomOut } from '@vicons/carbon'
 import { fetchCreateSvgIcon, OrgChart } from '@/utils'
 OrgChart.SEARCH_PLACEHOLDER = '请输入...'
 
@@ -32,7 +32,8 @@ export function fetchBaseTemplates(
     OrgChart.templates[key] = Object.assign({}, OrgChart.templates.ana, {
         size: [options.w, options.h],
         node: fetchRootTemplates,
-        field_0: render
+        field_0: render,
+        img_0: null
     })
 }
 
@@ -41,7 +42,7 @@ export async function fetchChartInitialization(element: HTMLElement, options: Ch
         element,
         Object.assign({}, options, {
             orientation: OrgChart.orientation.left,
-            layout: OrgChart.layout.treeRight,
+            layout: OrgChart.layout.normal,
             align: OrgChart.align.center,
             scaleInitial: 0.8,
             mouseScroll: OrgChart.action.ctrlZoom,
@@ -54,13 +55,13 @@ export async function fetchChartInitialization(element: HTMLElement, options: Ch
             controls: Object.assign({}, options.controls ?? {}, {
                 zoom_in: { title: '放大', icon: fetchCreateSvgIcon(ZoomIn, 26) },
                 zoom_out: { title: '缩小', icon: fetchCreateSvgIcon(ZoomOut, 26) },
-                full_screen: { title: '切换全屏模式', icon: fetchCreateSvgIcon(FitToScreen, 24) },
-                layout_mixed: { title: '混合布局', anchor: OrgChart.anchor.right },
-                layout_normal: { title: '正常布局', anchor: OrgChart.anchor.right },
-                layout_tree: { title: '树形布局', anchor: OrgChart.anchor.right },
-                layout_grid: { title: '网格布局', anchor: OrgChart.anchor.right },
-                layout_left_offset: { title: '左偏移布局', anchor: OrgChart.anchor.right },
-                layout_right_offset: { title: '右偏移布局', anchor: OrgChart.anchor.right }
+                full_screen: { title: '切换全屏模式', icon: fetchCreateSvgIcon(FitToScreen, 24) }
+                // layout_mixed: { title: '混合布局', anchor: OrgChart.anchor.right },
+                // layout_normal: { title: '正常布局', anchor: OrgChart.anchor.right },
+                // layout_tree: { title: '树形布局', anchor: OrgChart.anchor.right },
+                // layout_grid: { title: '网格布局', anchor: OrgChart.anchor.right },
+                // layout_left_offset: { title: '左偏移布局', anchor: OrgChart.anchor.right },
+                // layout_right_offset: { title: '右偏移布局', anchor: OrgChart.anchor.right }
             })
         })
     )

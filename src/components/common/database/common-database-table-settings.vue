@@ -10,6 +10,8 @@ export default defineComponent({
     name: 'CommonDatabaseTableSettings',
     emits: ['update:customize', '-update:customize'],
     props: {
+        /**trigger节点额外样式**/
+        className: { type: String, default: '' },
         /**列数据**/
         columns: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**表头配置自定义排版规则**/
@@ -115,7 +117,7 @@ export default defineComponent({
                 >
                     {{
                         trigger: () => (
-                            <div class="common-database-table-settings flex items-center justify-center">
+                            <div class={`common-database-table-settings flex items-center justify-center ${props.className}`}>
                                 <common-base-button
                                     style={{ '--n-icon-size': '22px' }}
                                     text

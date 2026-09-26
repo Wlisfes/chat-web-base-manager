@@ -29,7 +29,7 @@ export default defineComponent({
                                 <common-database-table-chunk
                                     element="content"
                                     value={faseNode.value.classType}
-                                    options={props.chunkState.CHUNK_CONSUMER_CLASS}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_CLASS}
                                 ></common-database-table-chunk>
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label-class={props.labelClass} label="品牌：">
@@ -60,7 +60,7 @@ export default defineComponent({
                                 <common-database-table-chunk
                                     element="content"
                                     value={faseNode.value.stage}
-                                    options={props.chunkState.CHUNK_CONSUMER_STAGE}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_STAGE}
                                 ></common-database-table-chunk>
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label-class={props.labelClass} label="币种：">
@@ -70,21 +70,21 @@ export default defineComponent({
                                 <common-database-table-chunk
                                     element="content"
                                     value={faseNode.value.authStatus}
-                                    options={props.chunkState.CHUNK_CONSUMER_AUTH_STATUS}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_AUTH_STATUS}
                                 ></common-database-table-chunk>
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label-class={props.labelClass} label="注册来源：">
                                 <common-database-table-chunk
                                     element="content"
                                     value={faseNode.value.source}
-                                    options={props.chunkState.CHUNK_CONSUMER_SOURCE}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_SOURCE}
                                 ></common-database-table-chunk>
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label-class={props.labelClass} label="付款模式：">
                                 <common-database-table-chunk
                                     element="content"
                                     value={faseNode.value.payMode}
-                                    options={props.chunkState.CHUNK_CONSUMER_PAY_MODE}
+                                    // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_PAY_MODE}
                                 ></common-database-table-chunk>
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label-class={props.labelClass} label="信用额度：">

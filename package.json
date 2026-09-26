@@ -1,13 +1,14 @@
 {
     "name": "chat-web-base-manager",
     "private": true,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "module",
     "scripts": {
         "install": "yarn install --ignore-scripts --ignore-engines",
         "dev": "vite --config vite.config.ts",
         "build": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build --config vite.config.ts",
-        "preview": "vite preview --config vite.config.ts"
+        "preview": "vite preview --config vite.config.ts",
+        "deploy": "node scripts/deploy-branch.cjs"
     },
     "dependencies": {
         "@better-scroll/core": "^2.5.1",

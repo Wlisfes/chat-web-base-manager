@@ -16,6 +16,7 @@
 - 统一使用 4 空格、无分号、单引号、`printWidth: 140`、无尾随逗号。
 - 源码和脚本使用 UTF-8；Shell、YAML、Dockerfile 提交为 LF。
 - 业务源码和配置文件必须编写清晰、必要的中文注释；新增配置项必须同步说明用途，修改或格式化时必须保留既有注释，不得删除、覆盖或改写；注释中不得出现真实密码、Token、私钥等敏感信息。
+- 仓库 `.gitattributes` 必须用 `* text=auto` 配合 `*.ts`、`*.cjs`、`*.json`、`*.md` 等 `eol=lf` 固定行尾，`.prettierrc` 显式声明 `"endOfLine": "lf"`；Git 安装默认的 system 级 `core.autocrlf=true` 会把工作区检出成 CRLF，导致本地 `format:check` 报出与 CI 不一致的假失败。克隆或修改行尾规则后如需修正已检出文件，删除 `src`、`test`、`scripts` 目录再 `git checkout --` 重新检出即可，不要用 `prettier --write` 批量改写无关文件。
 
 ## 目录与文件命名
 
@@ -40,6 +41,7 @@
 - 环境变量使用 UPPER_SNAKE_CASE，并优先添加所属服务或模块前缀，例如 `ACCOUNT_*`、`GATEWAY_*`。
 - NestJS 类使用明确职责后缀，例如 `AccountService`、`GatewayController`、`NacosModule`。
 - 禁止无意义的导出别名，例如 `export { TbAccountUser as tbAccountUser }`。
+- 从同一 interface、dto、schema 或类型定义模块具名导入的标识符超过 3 个时，一律改为 `import * as XxxDto from ...` 命名空间导入（仅类型用途时使用 `import type * as XxxTypes from ...`）；`vue`、`naive-ui`、`vue-router` 等框架和组件库无论数量多少一律保持具名导入，禁止写成 `Vue.defineComponent()`、`NaiveUI.NButton` 这类命名空间调用。
 - 日志、校验消息、Swagger 描述和面向维护者的错误信息使用中文；代码标识符使用英文。
 
 ## 模块边界
@@ -70,7 +72,7 @@
 - Controller 必须保持为薄协议层：只声明路由、权限、Swagger/Apifox 元数据，接收 `query`、`body`、当前身份或必要请求/响应上下文，并将参数原样交给同名 Service 方法；禁止解构/改名业务参数、补业务默认值、拼装业务响应、访问 Repository 或编写业务判断。设置 Cookie、响应头、重定向和流式响应等纯 HTTP 协议操作可以保留在 Controller。
 - Controller 与对应 Service 的公开接口方法必须统一使用 `public async`，并采用 `httpBase<Service><Action><Resource>` 命名；两层方法名必须完全一致。Controller 不得调用 `create`、`list`、`findOne`、`update` 等另一套简写方法名。
 - Controller 的 `GET` 只接收 `@Query()` DTO，`POST` 只接收 `@Body()` DTO；局部变量使用 `query`、`body` 或 `input` 等能够准确表达来源的名称，无请求 DTO 的接口不制造空 DTO。每个接口都必须使用 `ApiServiceDecorator` 完整声明请求来源、请求 DTO、响应 DTO、数组标识和中文说明。
-- Service 负责业务编排和事务边界，公开接口方法必须添加简洁中文职责注释并显式声明 `Promise<...>` 返回类型；入参优先接收完整 DTO，不得要求 Controller 拆字段或做协议转换。DTO 在 Service 中优先使用 `import * as XxxDto` 归组引用。
+- Service 负责业务编排和事务边界，公开接口方法必须添加简洁中文职责注释并显式声明 `Promise<...>` 返回类型；入参优先接收完整 DTO，不得要求 Controller 拆字段或做协议转换。DTO 在 Service 中统一使用 `import * as XxxDto` 归组引用。
 - 分页查询统一返回 `PageResult<Entity>`，使用 `DataBaseService.builder` 构造 QueryBuilder，别名统一为 `t`；筛选、排序、分页和 `getManyAndCount` 应在同一 builder 回调内清晰完成。禁止在业务模块重复封装 QueryBuilder 或创建无意义 Repository Adapter。
 - 可复用的实体查找、存在性校验、唯一性校验、树校验、锁表等工具逻辑放入同模块 `<module>.utils.service.ts`，使用 `@Injectable()` 并由 Module 注册注入；主 Service 只保留用例编排。不得把仅调用一次且没有复用价值的简单业务步骤机械拆成工具类。
 - 多步写操作、唯一性检查、层级结构调整和关联关系替换必须由 Service 明确建立事务；需要并发保护时通过 Utils Service 锁定相关数据，再执行校验和写入。
@@ -83,8 +85,15 @@
 - 所有提交信息必须使用 Conventional Commits 类型前缀，格式固定为 `<type>: 中文摘要`；如需填写作用域，使用 `<type>(<scope>): 中文摘要`。
 - `type` 只能使用以下类型：`init`（项目初始化）、`feat`（添加新特性）、`fix`（修复缺陷）、`docs`（仅修改文档）、`style`（仅调整格式或样式）、`refactor`（代码重构）、`perf`（性能优化）、`test`（增加或调整测试）、`build`（构建或依赖变更）、`ci`（持续集成或部署配置）、`chore`（工程工具或其他维护性变更）。
 - 提交摘要、正文和脚注必须使用中文；类型前缀保留上述英文小写关键字，代码标识符、命令和版本号可按实际需要保留原文。
+- Agent 完成代码修改后默认不得执行 `git commit`，改动保留在工作区供用户 review；只有用户明确说出“提交”“commit”或等价表述时才允许提交，且授权只对当次请求有效。不得因改动较小、验证已通过或为了汇报方便而自行提交。
 - 每个提交应聚焦单一目的，摘要使用动词开头并准确说明影响范围，禁止使用 `update`、`modify` 等无意义描述或整句英文提交信息。
 - 示例：`feat: 新增客户归属人筛选`、`fix: 修复 Nacos 服务注册失败`、`docs: 补充部署回滚说明`。
+- 日常开发在 `developer` 分支进行；`main` 只接收来自业务分支的合并，不直接提交。
+- 发布统一执行 `npm run deploy`：同步远端、按需递增版本号、推送当前分支、创建或复用指向 `main` 的 PR 并合并、再把当前分支快进到 `main`。不得手工拆成多条命令执行。
+- 版本号由发布脚本维护：当前 `package.json` 版本号已经存在于 `main` 时递增补丁号并生成 `chore(release): vX.Y.Z` 提交；上一次发布失败、版本号尚未进入 `main` 时沿用同一版本号重试，不得因反复发布把版本号越推越高。
+- 快进这一步不可省略。GitHub 的 Merge commit 会在 `main` 上新建一条合并提交，当前分支指针不会移动；不快进就会一直显示 behind，其他设备在同一分支上同步不到最新代码。
+- `npm run deploy` 在 `main` 分支或工作区有未提交改动时直接失败；最后的快进只做 fast-forward，不产生新的合并提交，也不会改动文件。
+- 禁止为了消除分支落后提示而把 `main` 反向合并进业务分支产生多余的合并提交。
 
 ## 配置、文档与部署
 
@@ -114,6 +123,9 @@
 
 - `package.json` 的 `version` 是本仓库唯一维护的发布版本号，格式固定为 `MAJOR.MINOR.PATCH`。
 - 日常开发、缺陷修复和合并 `developer` 时不得改动 `version`。
+- 发布和部署必须由用户明确指令触发。用户未明确要求发布时，Agent 只能修改工作区代码（用户明确要求提交时才可提交本地改动），不得执行 `npm run deploy`、不得推送 `developer`、不得创建或合并 PR、不得修改 `version`、不得打标签、不得触发任何部署流水线；完成改动后应汇报状态并等待用户决定是否发布。
+- 「修复这个问题」「处理一下」「写入规约」这类改代码指令不包含发布授权；只有用户说出发布、部署、上线、合并 main 或等价表述时才视为授权，且该授权只对当次请求有效，不得延续到后续请求。
+- 用户授权范围内的仓库才允许发布。不得因为存在依赖联动就自行扩大到其他仓库，确有联动需要时先向用户说明再等待确认。
 - 只有用户明确要求发布/部署并合并 `main` 时才变更版本号。每次发布必须自增一个修订号（小版本），规则与 `chat-web-base-schema` 一致：
     - 以当前 `package.json` 版本和已发布版本中的较大者为基准
     - 已发布版本：共享包核对 GitHub Packages；其他仓库核对 git tag `vX.Y.Z`
@@ -154,11 +166,15 @@
 - 每个接口函数应只发起一次 `request`，使用完整的字面量接口路径并显式声明 `method`，将调用方传入的 `params`/`data` 原样发送；禁止在 API 层做参数转换或响应适配，包括字段改名、`Number`/`String`/`Boolean` 类型转换、默认值注入、分页裁剪、数组重组、`map` 映射、响应包装和私有转换函数。
 - GET 请求只通过 `params` 传递查询参数，POST 请求只通过 `data` 传递请求体；无入参时不添加空 `params` 或空 `data`。
 - API 函数按 `httpBase<Service><Action><Resource>` 风格命名并添加中文职责注释，例如 `httpBaseSystemColumnDatetask`、`httpBaseSystemCreateSheetResource`。
+- 接口统一使用 `export function` 声明，禁止写成 `export const xxx = (data: Omix) => {}` 箭头函数形式。
+- `request` 入参一律展开为多行，每个字段独占一行并按 `url` → `method` → `params`/`data` 排序；禁止写成 `return request({ url: ..., method: ..., data })` 单行形式。
+- `url` 直接写完整字面量路径，使用单引号，禁止抽取 `const XXX_API = '/api/...'` 常量再模板拼接，保证全文可直接搜索到接口路径。
+- 每个接口函数上方使用 `/**中文职责**/` 单行注释，前后不加空格、句尾不加句号。
 - 页面字段兼容、请求体转换和响应适配必须放在页面/业务域层（如页面 composable、store 或业务 service）处理；接口字段应通过请求/响应 DTO 或类型定义明确表达，API service 不得承担业务规则和数据加工。历史 API 文件在相关需求修改时按此规则逐步整理。
 
 ### 自动发布与部署
 
-- 用户已经要求完成发布或部署时，Agent 必须自行完成验证、提交、推送、创建 PR、合并和流水线跟踪，不得把这些步骤转交给用户。
+- 用户已经明确要求完成发布或部署时，Agent 必须自行完成验证、提交、推送、创建 PR、合并和流水线跟踪，不得把这些步骤转交给用户；该条只在用户已授权发布的前提下生效，不构成主动发布的依据。
 - 机器侧的云端证书、WireGuard 和 SSH 配置由 Agent 按 `deploy/RUNBOOK.md` 完成；证书私钥和 SSH 私钥只能保存在部署机器或 GitHub Secret，不得提交到仓库或输出到日志。
 - 只有权限、认证、分支保护、目标机器不可达或持续失败的 CI 确实阻止自动完成时，才请求用户介入。
 

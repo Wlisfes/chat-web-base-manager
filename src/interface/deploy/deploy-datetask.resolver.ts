@@ -29,11 +29,28 @@ export interface DatetaskItem {
 }
 
 /**系统任务分页查询请求体。*/
-export interface DatetaskColumnRequest {
+export interface DatetaskColumnRequest extends Omix {
     page: number
     size: number
+    type?: DatetaskType
     taskName?: string
     status?: DatetaskStatus
+}
+
+/**枚举下拉选项。*/
+export interface DatetaskEnumOption<T extends string = string> {
+    value: T
+    label: string
+    description: string
+    type: string
+}
+
+/**系统任务静态枚举响应数据。*/
+export interface DatetaskEnumsResponse {
+    typeOptions: DatetaskEnumOption<DatetaskType>[]
+    statusOptions: DatetaskEnumOption<DatetaskStatus>[]
+    manageStatusOptions: DatetaskEnumOption<DatetaskManageStatus>[]
+    logStatusOptions: DatetaskEnumOption<DatetaskLogStatus>[]
 }
 
 /**系统任务分页响应数据。*/

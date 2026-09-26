@@ -11,7 +11,8 @@ export default defineComponent({
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseFinanceColumnCurrency(payload),
             keyName: 'chatbok:finance:deploy:currency',
-            chunkNames: { CHUNK_CURRENCY_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_CURRENCY_STATUS: true },
             formState: {
                 name: undefined, //币种名称
                 status: undefined //状态
@@ -86,7 +87,7 @@ export default defineComponent({
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
                             placeholder="请选择付款模式"
-                            options={chunkState.CHUNK_CURRENCY_STATUS}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -113,7 +114,7 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkState.CHUNK_CURRENCY_STATUS}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
                             ></common-database-table-chunk>
                         )
                     }}

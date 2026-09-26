@@ -12,7 +12,8 @@ export default defineComponent({
         const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseFinanceColumnBrand(payload),
             keyName: 'chatbok:finance:deploy:brand',
-            chunkNames: { CHUNK_BRAND_STATUS: true },
+            // 本地静态枚举已废弃，待切换为后端枚举接口
+            // chunkNames: { CHUNK_BRAND_STATUS: true },
             formState: {
                 /**品牌名称**/
                 name: undefined,
@@ -114,7 +115,7 @@ export default defineComponent({
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
                             placeholder="请选择付款模式"
-                            options={chunkState.CHUNK_BRAND_STATUS}
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -141,7 +142,7 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                options={chunkState.CHUNK_BRAND_STATUS}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
                             ></common-database-table-chunk>
                         ),
                         col_createBy: (data: Omix) => (

@@ -1,8 +1,8 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import { createDeployAccountQuery, mapDeployAccountUsers, mapDeployOrganizations } from '@/utils'
+import { fetchNormalizeTreeChildren } from '@/utils'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -12,25 +12,23 @@ export default defineComponent({
         /**部门树结构**/
         const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
             immediate: true,
-            transform: mapDeployOrganizations
+            transform: fetchNormalizeTreeChildren
+        })
+        /**账号静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
+            immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, setForm, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
-            transform: data => mapDeployAccountUsers(data.list),
+        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+            request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:user',
             formState: {
-                /**名称工号**/
-                name: undefined,
-                /**手机号**/
-                phone: undefined,
-                /**邮箱**/
-                email: undefined,
+                /**工号/姓名/手机号/邮箱**/
+                vague: undefined,
                 /**状态**/
                 status: undefined,
                 /**归属部门**/
-                depts: []
+                organizationKeyIds: []
             },
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
@@ -40,35 +38,33 @@ export default defineComponent({
                 { title: '邮箱', key: 'email', width: 200 },
                 { title: '职级', key: 'ranks', width: 100 },
                 { title: '职位', key: 'positions', width: 160 },
-                { title: '归属部门', key: 'depts', minWidth: 200 },
+                { title: '归属部门', key: 'organizations', minWidth: 200 },
                 { title: '关联角色', key: 'roles', minWidth: 160 },
                 { title: '入职时间', key: 'createTime', width: 160 }
             ]
         })
+
         /**新增账号**/
-        async function fetchDeployAccountCreate() {
-            return await feedback.fetchDeploySystemAccount({
+        async function fetchCreateDeploySystemUser() {
+            return await feedback.fetchDeploySystemUser({
                 title: '新增账号',
                 command: 'CREATE',
-                async onSubmit() {
-                    return await fetchRefresh()
-                }
+                onSubmit: () => fetchRefresh()
             })
         }
+
         /**编辑账号**/
-        async function fetchDeployAccountUpdate() {
-            return await feedback.fetchDeploySystemAccount({
+        async function fetchUpdateDeploySystemUser(node: Omix) {
+            return await feedback.fetchDeploySystemUser({
                 title: '编辑账号',
                 command: 'UPDATE',
-                node: state.select[0],
-                async onSubmit() {
-                    return await fetchRefresh()
-                }
+                node,
+                onSubmit: () => fetchRefresh()
             })
         }
+
         /**禁用账号**/
-        async function fetchDeployAccountDelete() {
-            const node = state.select[0]
+        async function fetchBaseAccountUpdateUser(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -77,19 +73,22 @@ export default defineComponent({
                     return await done({ loading: true }).then(async () => {
                         try {
                             await Service.httpBaseAccountUpdateUser({ uid: node.uid, status: 'disabled' })
-                            await fetchRefresh()
-                            return await done({ visible: false })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
             })
         }
+
         /**重置密码**/
-        async function fetchDeployAccountResetPassword() {
-            const node = state.select[0]
+        async function fetchBaseAccountResetUserPassword(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -102,8 +101,9 @@ export default defineComponent({
                                 return await fetchNotifyService({ title: '密码重置成功' })
                             })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
@@ -126,62 +126,63 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchDeployAccountCreate}>
+                        <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
                             新增
                         </common-base-button>
-                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployAccountUpdate}>
+                        <common-base-button
+                            dashed
+                            type="primary"
+                            disabled={instState.value.isUpdate}
+                            onClick={() => fetchUpdateDeploySystemUser(state.select[0])}
+                        >
                             编辑
                         </common-base-button>
-                        <common-base-button dashed type="error" disabled={instState.value.isDelete} onClick={fetchDeployAccountDelete}>
+                        <common-base-button
+                            dashed
+                            type="error"
+                            disabled={instState.value.isDelete}
+                            onClick={() => fetchBaseAccountUpdateUser(state.select[0])}
+                        >
                             禁用
                         </common-base-button>
                         <common-base-button
                             dashed
                             type="warning"
                             disabled={instState.value.isUpdate}
-                            onClick={fetchDeployAccountResetPassword}
+                            onClick={() => fetchBaseAccountResetUserPassword(state.select[0])}
                         >
                             重置密码
                         </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="名称/工号">
+                    <common-database-search-column disabled prop="vague" label="关键词">
                         <form-base-input
                             clearable
-                            placeholder="请输入名称或工号"
-                            v-model:value={formState.value.name}
+                            placeholder="工号/姓名/手机号/邮箱"
+                            v-model:value={formState.value.vague}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="depts" label="归属部门">
-                        <form-base-cascader
+                    <common-database-search-column prop="organizationKeyIds" label="归属部门">
+                        <form-base-tree-select
                             multiple
+                            checkable
                             clearable
+                            cascade={false}
+                            label-field="name"
+                            label-value="keyId"
+                            children-field="children"
                             placeholder="请选择归属部门"
-                            v-model:value={formState.value.depts}
+                            v-model:value={formState.value.organizationKeyIds}
+                            loading={deptOptions.loading.value}
                             options={deptOptions.dataSource.value}
-                        ></form-base-cascader>
-                    </common-database-search-column>
-                    <common-database-search-column prop="phone" label="手机号">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入手机号"
-                            v-model:value={formState.value.phone}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
-                    <common-database-search-column prop="email" label="邮箱">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入邮箱"
-                            v-model:value={formState.value.email}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
+                        ></form-base-tree-select>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                             on-change:value={fetchRefresh}
                         ></form-base-select>
@@ -206,41 +207,25 @@ export default defineComponent({
                 >
                     {{
                         col_name: (data: Omix) => {
-                            return <common-database-table-user element="text" data={data}></common-database-table-user>
+                            return <common-base-user element="text" data={data}></common-base-user>
                         },
                         col_avatar: (data: Omix) => {
-                            return <common-database-table-user element="avatar" data={data}></common-database-table-user>
+                            return <common-base-user element="avatar" data={data}></common-base-user>
                         },
-                        col_depts: (data: Omix) => {
-                            return (
-                                <common-database-table-content
-                                    value={(data.depts ?? []).map((item: Omix) => item.name)}
-                                ></common-database-table-content>
-                            )
+                        col_organizations: (data: Omix) => {
+                            return <common-base-content value={data.organizations}></common-base-content>
                         },
-                        col_positions: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.positions ?? []).map((item: Omix) => item.name)}
-                            ></common-database-table-content>
-                        ),
-                        col_ranks: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.ranks ?? []).map((item: Omix) => item.name)}
-                            ></common-database-table-content>
-                        ),
+                        col_positions: (data: Omix) => {
+                            return <common-base-content value={data.positions}></common-base-content>
+                        },
+                        col_ranks: (data: Omix) => {
+                            return <common-base-content value={data.ranks}></common-base-content>
+                        },
                         col_roles: (data: Omix) => {
-                            return (
-                                <common-database-table-content
-                                    value={(data.roles ?? []).map((item: Omix) => item.name)}
-                                ></common-database-table-content>
-                            )
+                            return <common-base-content value={data.roles}></common-base-content>
                         },
                         col_status: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                //options={chunkOptions.CHUNK_ACCOUNT_STATUS.value}
-                            ></common-database-table-chunk>
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>
