@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { Delete, Edit } from '@vicons/carbon'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -16,7 +17,6 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        console.log(props.node)
         /**表格实例**/
         const { state, instOptions, setState, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
@@ -49,15 +49,17 @@ export default defineComponent({
             <common-dialog-provider
                 title={props.title}
                 width={1440}
+                scrollbar={false}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
-                <common-base-element class="h-90vh max-h-640 flex flex-col overflow-hidden">
-                    <common-database-table
+                <common-base-element>
+                    {/* <common-database-table
                         pagination-class="p-bs-14!"
-                        bordered={false}
+                        show-command
+                        bordered={false} class="h-90vh max-h-640 flex flex-col overflow-hidden"
                         limit={state.limit}
                         total={state.total}
                         columns={state.columns}
@@ -78,9 +80,31 @@ export default defineComponent({
                                     value={data.status}
                                     items={props.chunkOptions.statusOptions}
                                 ></common-base-chunk>
-                            )
+                            ),
+                            col_command: () => {
+                                return (
+                                    <common-base-authorize>
+                                        <common-base-button
+                                            class="p-inline-6"
+                                            title="修改定时规则"
+                                            type="primary"
+                                            text
+                                            icon-size={20}
+                                            icon={Edit}
+                                        ></common-base-button>
+                                        <common-base-button
+                                            class="p-inline-6"
+                                            title="修改定时规则"
+                                            type="error"
+                                            text
+                                            icon-size={20}
+                                            icon={Delete}
+                                        ></common-base-button>
+                                    </common-base-authorize>
+                                )
+                            }
                         }}
-                    </common-database-table>
+                    </common-database-table> */}
                 </common-base-element>
             </common-dialog-provider>
         )
