@@ -2,7 +2,6 @@
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { Delete, Edit } from '@vicons/carbon'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -11,6 +10,8 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
+        /**页面权限标识**/
+        keyName: { type: String, required: true },
         /**系统枚举静态枚举**/
         chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**编辑操作详情数据**/
@@ -18,9 +19,9 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**表格实例**/
-        const { state, instOptions, setState, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
-            limit: 0,
+
             formState: {
                 /**枚举模块**/
                 module: props.node.module,
@@ -31,11 +32,15 @@ export default defineComponent({
                 /**状态**/
                 status: undefined
             },
+            actions: [
+                { title: '编辑', key: 'update', type: 'primary', field: 'allowUpdate' },
+                { title: '删除', key: 'delete', type: 'error', field: 'allowDelete' }
+            ],
             columns: [
                 { title: 'ID', key: 'keyId', width: 100, disabled: true },
                 { title: 'PID', key: 'pid', width: 100, disabled: true },
-                { title: '名称', key: 'name', minWidth: 120, disabled: true },
-                { title: '业务值', key: 'value', minWidth: 120 },
+                { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
+                { title: '枚举值', key: 'value', minWidth: 120 },
                 { title: '排序号', key: 'sort', width: 100 },
                 { title: '状态', key: 'status', width: 100 },
                 { title: '创建人', key: 'createBy', width: 120 },
@@ -51,15 +56,41 @@ export default defineComponent({
                 width={1440}
                 action={false}
                 scrollbar={false}
-                class-element="p-inline-20 p-be-20"
-                class-name="h-90vh max-h-750 p-in"
+                class-element="p-inline-8 p-be-8"
+                class-name="h-90vh max-h-750"
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
             >
+                <common-database-search
+                    class="p-bs-0!"
+                    function-class="justify-end"
+                    function={['search', 'restore', 'collapse', 'abstract']}
+                    ref={formRef}
+                    limit={state.limit}
+                    v-model:loading={state.loading}
+                    v-model:when={state.when}
+                    v-model:database={state.database}
+                    v-model:formState={formState.value}
+                    on-update:database={instOptions.fetchUpdateDatabase}
+                    on-restore={fetchRestore}
+                    on-submit={fetchRefresh}
+                >
+                    <common-database-search-function abstract class="flex gap-col-10">
+                        <common-base-button type="primary">新增</common-base-button>
+                    </common-database-search-function>
+                    <common-database-search-column disabled prop="name" label="分类名称">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入分类名称"
+                            v-model:value={formState.value.name}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                </common-database-search>
                 <common-database-table
-                    pagination-class="p-bs-14!"
+                    class="p-inline-0! p-block-0!"
                     show-command
                     bordered={false}
                     limit={state.limit}
@@ -79,28 +110,22 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
                         ),
-                        col_command: () => {
-                            return (
-                                <common-base-authorize>
-                                    <common-base-button
-                                        class="p-inline-6"
-                                        title="修改定时规则"
-                                        type="primary"
-                                        text
-                                        icon-size={20}
-                                        icon={Edit}
-                                    ></common-base-button>
-                                    <common-base-button
-                                        class="p-inline-6"
-                                        title="修改定时规则"
-                                        type="error"
-                                        text
-                                        icon-size={20}
-                                        icon={Delete}
-                                    ></common-base-button>
-                                </common-base-authorize>
-                            )
-                        }
+                        col_command: (data: Omix) => (
+                            <common-base-authorize
+                                element
+                                empty="-"
+                                class="flex items-center gap-x-10"
+                                value={state.actions.map(e => `${props.keyName}:${e.key}`)}
+                            >
+                                {state.actions.map(item => (
+                                    <common-base-authorize value={`${props.keyName}:${item.key}`}>
+                                        <common-base-button text type={item.type} disabled={data[item.field]}>
+                                            {item.title}
+                                        </common-base-button>
+                                    </common-base-authorize>
+                                ))}
+                            </common-base-authorize>
+                        )
                     }}
                 </common-database-table>
             </common-dialog-provider>

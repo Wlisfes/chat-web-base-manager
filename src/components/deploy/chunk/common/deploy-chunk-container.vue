@@ -8,6 +8,8 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeployChunkContainer',
     props: {
+        /**页面权限标识**/
+        keyName: { type: String, required: true },
         /**枚举模块**/
         module: { type: String as PropType<ChunkModule>, required: true }
     },
@@ -19,7 +21,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSkylineColumnChunkModule({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:chunk:system',
+            keyName: props.keyName,
             formState: {
                 module: props.module,
                 /**分类名称**/
@@ -44,6 +46,7 @@ export default defineComponent({
             return feedback.fetchDeployChunkManager({
                 node,
                 title: node.name,
+                keyName: props.keyName,
                 chunkOptions: chunkOptions.value
             })
         }
