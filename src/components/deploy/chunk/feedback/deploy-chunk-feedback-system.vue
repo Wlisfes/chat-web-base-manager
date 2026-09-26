@@ -77,7 +77,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 }
                 try {
-                    return await Service.httpBaseSkylineResolverChunk({ keyId: props.node.keyId }).then(async ({ data }) => {
+                    return await Service.httpBaseSkylineChunkResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                         originJson.value = { ...(data.json ?? {}) }
                         return await setForm(
                             fetchReste({

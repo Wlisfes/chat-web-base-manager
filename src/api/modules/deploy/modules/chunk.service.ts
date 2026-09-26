@@ -28,7 +28,7 @@ export function httpBaseSkylineColumnChunk(data: Chunk.ChunkColumnRequest) {
 }
 
 /**获取枚举字典详情**/
-export function httpBaseSkylineResolverChunk(params: Chunk.ChunkKeyRequest) {
+export function httpBaseSkylineChunkResolver(params: Chunk.ChunkKeyRequest) {
     return request<Chunk.ChunkItem>({
         url: '/api/skyline/deploy/chunk/resolve',
         method: 'GET',

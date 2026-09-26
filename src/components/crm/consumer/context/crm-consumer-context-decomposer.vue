@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props) {
         const { faseNode, faseState, chunkState, setState } = useBaseService({
-            request: () => Service.httpBaseAccountResolverConsumer({ keyId: props.keyId }),
+            request: () => Service.httpBaseAccountConsumerResolver({ keyId: props.keyId }),
             immediate: true,
             // 本地静态枚举已废弃，待切换为后端枚举接口
             // chunkNames: {
