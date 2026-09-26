@@ -27,6 +27,15 @@ export function httpBaseSkylineColumnChunk(data: Chunk.ChunkColumnRequest) {
     })
 }
 
+/**按枚举类型编码批量获取启用状态的枚举字典选项**/
+export function httpBaseSkylineColumnChunkOption(data: Chunk.ChunkOptionColumnRequest) {
+    return request<Chunk.ChunkOptionGroup[]>({
+        url: '/api/skyline/deploy/chunk/column/option',
+        method: 'POST',
+        data
+    })
+}
+
 /**获取枚举字典详情**/
 export function httpBaseSkylineChunkResolver(params: Chunk.ChunkKeyRequest) {
     return request<Chunk.ChunkItem>({

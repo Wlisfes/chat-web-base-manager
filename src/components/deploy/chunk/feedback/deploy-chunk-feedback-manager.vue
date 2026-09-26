@@ -194,7 +194,7 @@ export default defineComponent({
                                         <common-base-button
                                             text
                                             type={item.type}
-                                            //disabled={!Boolean(data[item.field])}
+                                            disabled={!Boolean(data[item.field])}
                                             onClick={() => fetchClick(item, data)}
                                         >
                                             {item.title}

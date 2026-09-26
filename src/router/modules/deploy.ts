@@ -46,11 +46,5 @@ export default [
         name: 'DeploySystemDepartment',
         meta: { title: '部门组织', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/deploy/system/dept/index.vue')
-    },
-    {
-        path: '/deploy/system/position',
-        name: 'DeploySystemPosition',
-        meta: { title: '职位管理', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/deploy/system/position/index.vue')
     }
 ]

@@ -4,7 +4,7 @@ Vue 3、TypeScript 和 Vite 管理端。开发环境默认把 `/api` 转发到�
 
 外部客户新增、查询和状态管理使用 Account `/api/account/consumer/**`；品牌、币种、汇率和基础价格继续使用 Finance `/api/finance/**`。CRM 页面使用 `/crm/consumer`、`/crm/partner`、`/crm/sms/quote/create` 和 `/crm/sms/quote` 路由。
 
-系统职位页面位于 `/deploy/system/position`，通过 Account `/api/account/position/**` 管理职位；账号表单使用职位多选并提交 `positionKeyIds` 数组。Account 职位接口部署并健康后再发布 Manager。
+职位已迁移为 Skyline 枚举字典 `CHUNK_ACCOUNT_POSITION`，在 `/deploy/chunk/system` 中维护；账号表单通过 Skyline `POST /api/skyline/deploy/chunk/column/option` 获取职位选项，并提交 `positionKeyIds` 数组（值为枚举 value）。
 
 系统任务页面位于 `/deploy/datetask/system`，通过 Skyline `/api/skyline/deploy/datetask/**` 查询初始化任务、切换任务状态、修改 Cron、手动触发任务和查看执行日志；系统任务不支持在页面新增或删除。
 

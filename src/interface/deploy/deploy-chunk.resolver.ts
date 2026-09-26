@@ -91,6 +91,30 @@ export interface ChunkColumnResponse {
     list: ChunkItem[]
 }
 
+/**按枚举类型编码批量获取枚举选项请求体。*/
+export interface ChunkOptionColumnRequest {
+    module?: ChunkModule
+    types: string[]
+}
+
+/**枚举字典选项（树形）。*/
+export interface ChunkOptionItem {
+    keyId: number
+    pid?: number | null
+    value: string
+    label: string
+    sort: number
+    json: Record<string, unknown>
+    children: ChunkOptionItem[]
+}
+
+/**按枚举类型编码分组的枚举字典选项。*/
+export interface ChunkOptionGroup {
+    type: string
+    count: number
+    options: ChunkOptionItem[]
+}
+
 /**系统枚举主键请求体。*/
 export interface ChunkKeyRequest {
     keyId: number

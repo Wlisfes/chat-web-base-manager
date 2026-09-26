@@ -22,10 +22,14 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
-        /**职位选项**/
-        const positionOptions = useSelectService(() => Service.httpBaseAccountSelectPosition(), {
-            immediate: false
-        })
+        /**职位选项：Skyline 枚举 CHUNK_ACCOUNT_POSITION，value 即职位主键**/
+        const positionOptions = useSelectService(
+            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_ACCOUNT_POSITION'] }),
+            {
+                immediate: false,
+                transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
+            }
+        )
         /**账号静态枚举**/
         const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
             immediate: false
