@@ -178,7 +178,7 @@ export default defineComponent({
                     }
                     return item
                 })
-            } else if (props.showSettings && props.showCommand) {
+            } else if (props.showCommand) {
                 columns.push({
                     key: 'command',
                     fixed: 'right',
@@ -190,12 +190,14 @@ export default defineComponent({
                             <div class="flex-1 p-[var(--n-th-padding)] overflow-hidden">
                                 <n-ellipsis tooltip={false}>操作</n-ellipsis>
                             </div>
-                            <common-database-table-settings
-                                class-name="p-[var(--n-th-padding)]"
-                                columns={props.columns}
-                                v-model:customize={customize.value}
-                                on-update:customize={(...args: Array<any>) => emit('-update:customize', ...args)}
-                            ></common-database-table-settings>
+                            {props.showSettings && (
+                                <common-database-table-settings
+                                    class-name="p-[var(--n-th-padding)]"
+                                    columns={props.columns}
+                                    v-model:customize={customize.value}
+                                    on-update:customize={(...args: Array<any>) => emit('-update:customize', ...args)}
+                                ></common-database-table-settings>
+                            )}
                         </div>
                     )
                 })

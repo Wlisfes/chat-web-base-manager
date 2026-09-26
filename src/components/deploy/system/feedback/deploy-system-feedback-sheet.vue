@@ -2,6 +2,7 @@
 import { defineComponent, PropType, Fragment } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { fetchNormalizeTreeChildren } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -18,6 +19,7 @@ export default defineComponent({
     setup(props, { emit }) {
         /**菜单资源树结构表**/
         const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTree(), {
+            transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**菜单静态枚举**/
@@ -166,8 +168,11 @@ export default defineComponent({
                     >
                         <form-base-cascader
                             clearable
-                            expand-trigger="click"
+                            label-field="name"
+                            label-value="keyId"
+                            children-field="children"
                             placeholder="请选择父级菜单/按钮"
+                            expand-trigger="click"
                             v-model:value={formState.value.parentKeyId}
                             options={sheetOptions.dataSource.value}
                         ></form-base-cascader>
