@@ -1,8 +1,9 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
-import { fetchNotifyService } from '@/plugins'
+import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
+import * as feedback from '@/components/deploy/hooks'
 
 export default defineComponent({
     name: 'DeployChunkFeedbackManager',
@@ -21,7 +22,6 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
-
             formState: {
                 /**枚举模块**/
                 module: props.node.module,
@@ -49,6 +49,62 @@ export default defineComponent({
                 { title: '更新时间', key: 'modifyTime', width: 160 }
             ]
         })
+
+        /**新增枚举**/
+        async function fetchCreateDeployChunkResolver() {
+            return feedback.fetchDeployChunkResolver({
+                command: 'CREATE',
+                title: '新增',
+                chunkNode: props.node,
+                chunkOptions: props.chunkOptions,
+                onSubmit: () => fetchRefresh()
+            })
+        }
+
+        /**编辑枚举**/
+        async function fetchUpdateDeployChunkResolver(node: Omix) {
+            return feedback.fetchDeployChunkResolver({
+                command: 'UPDATE',
+                title: '编辑',
+                node,
+                chunkNode: props.node,
+                chunkOptions: props.chunkOptions,
+                onSubmit: () => fetchRefresh()
+            })
+        }
+
+        /**删除枚举**/
+        async function fetchDeleteDeployChunk(node: Omix) {
+            return await fetchDialogService({
+                title: '提示',
+                type: 'warning',
+                content: `确认删除枚举【${node.name}】吗？删除后无法恢复！`,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            await Service.httpBaseSkylineDeleteChunk({ keyId: node.keyId })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
+                    })
+                }
+            })
+        }
+
+        /**操作栏事件**/
+        async function fetchClick(item: Omix, node: Omix) {
+            if (['update'].includes(item.key)) {
+                return await fetchUpdateDeployChunkResolver(node)
+            } else if (['delete'].includes(item.key)) {
+                return await fetchDeleteDeployChunk(node)
+            }
+        }
 
         return () => (
             <common-dialog-provider
@@ -78,15 +134,26 @@ export default defineComponent({
                     on-submit={fetchRefresh}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary">新增</common-base-button>
+                        <common-base-button type="primary" onClick={fetchCreateDeployChunkResolver}>
+                            新增
+                        </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="分类名称">
+                    <common-database-search-column disabled prop="name" label="枚举名称">
                         <form-base-input
                             clearable
-                            placeholder="请输入分类名称"
+                            placeholder="请输入枚举名称"
                             v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
                         ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column prop="status" label="状态">
+                        <form-base-select
+                            clearable
+                            placeholder="请选择状态"
+                            options={props.chunkOptions.statusOptions}
+                            v-model:value={formState.value.status}
+                            on-change:value={fetchRefresh}
+                        ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
@@ -119,7 +186,12 @@ export default defineComponent({
                             >
                                 {state.actions.map(item => (
                                     <common-base-authorize value={`${props.keyName}:${item.key}`}>
-                                        <common-base-button text type={item.type} disabled={data[item.field]}>
+                                        <common-base-button
+                                            text
+                                            type={item.type}
+                                            disabled={!Boolean(data[item.field])}
+                                            onClick={() => fetchClick(item, data)}
+                                        >
                                             {item.title}
                                         </common-base-button>
                                     </common-base-authorize>

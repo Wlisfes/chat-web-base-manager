@@ -6,7 +6,7 @@ export default defineComponent({
     setup(props, ctx) {
         return () => (
             <layout-common-container>
-                <deploy-chunk-container module="CHUNK_SRM"></deploy-chunk-container>
+                <deploy-chunk-container module="CHUNK_SRM" key-name="chat:deploy:chunk:srm"></deploy-chunk-container>
             </layout-common-container>
         )
     }
