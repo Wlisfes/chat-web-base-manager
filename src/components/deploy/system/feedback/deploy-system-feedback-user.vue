@@ -22,9 +22,9 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
-        /**职位选项：Skyline 枚举 CHUNK_ACCOUNT_POSITION，value 即职位主键**/
-        const positionOptions = useSelectService(
-            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_ACCOUNT_POSITION'] }),
+        /**岗位选项：Skyline 枚举 CHUNK_SYSTEM_ACCOUNT_USER_POST，value 即岗位主键**/
+        const postOptions = useSelectService(
+            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_SYSTEM_ACCOUNT_USER_POST'] }),
             {
                 immediate: false,
                 transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
@@ -39,7 +39,7 @@ export default defineComponent({
             callback: fetchBaseSystemAccountResolver,
             formState: {
                 organizationKeyIds: props.node.organizationKeyIds ?? [], //归属部门
-                positionKeyIds: props.node.positionKeyIds ?? [], //职位
+                postKeyIds: props.node.postKeyIds ?? [], //岗位
                 name: props.node.name, //姓名
                 number: props.node.number, //工号
                 phone: props.node.phone, //手机号
@@ -76,7 +76,7 @@ export default defineComponent({
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), positionOptions.fetchRequest()]
+            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), postOptions.fetchRequest()]
             return await Promise.all(taskNames).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await fetchInstState().then(async formData => {
@@ -158,16 +158,16 @@ export default defineComponent({
                                 options={deptOptions.dataSource.value}
                             ></form-base-tree-select>
                         </form-base-column>
-                        <form-base-column label="职位" path="positionKeyIds">
+                        <form-base-column label="岗位" path="postKeyIds">
                             <form-base-select
                                 multiple
                                 filterable
                                 label-field="name"
                                 label-value="keyId"
-                                placeholder="请选择职位"
-                                loading={positionOptions.loading.value}
-                                options={positionOptions.dataSource.value}
-                                v-model:value={formState.value.positionKeyIds}
+                                placeholder="请选择岗位"
+                                loading={postOptions.loading.value}
+                                options={postOptions.dataSource.value}
+                                v-model:value={formState.value.postKeyIds}
                             ></form-base-select>
                         </form-base-column>
                         <form-base-column label="姓名" path="name">

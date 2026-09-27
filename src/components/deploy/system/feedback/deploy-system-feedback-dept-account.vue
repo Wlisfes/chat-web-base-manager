@@ -29,7 +29,7 @@ export default defineComponent({
                 { title: '头像', key: 'avatar', width: 60, align: 'center', disabled: true },
                 { title: '名称', key: 'name', width: 120, disabled: true },
                 { title: '职级', key: 'ranks', width: 100, check: true },
-                { title: '职位', key: 'positions', width: 160, check: true },
+                { title: '岗位', key: 'posts', width: 160, check: true },
                 { title: '状态', key: 'status', width: 100, align: 'center', check: true },
                 { title: '手机号', key: 'phone', width: 160, check: true },
                 { title: '邮箱', key: 'email', width: 220, check: true },
@@ -70,9 +70,9 @@ export default defineComponent({
                             col_avatar: (data: Omix) => {
                                 return <common-database-table-user element="avatar" data={data}></common-database-table-user>
                             },
-                            col_positions: (data: Omix) => (
+                            col_posts: (data: Omix) => (
                                 <common-database-table-content
-                                    value={(data.positions ?? []).map((item: Omix) => item.name)}
+                                    value={(data.posts ?? []).map((item: Omix) => item.name)}
                                 ></common-database-table-content>
                             ),
                             col_ranks: (data: Omix) => (
