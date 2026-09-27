@@ -86,20 +86,22 @@ export default defineComponent({
                         />
                     </common-base-wrapper>
                 </common-base-element>
-                <common-base-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
-                    <common-base-button
-                        class="min-w-80"
-                        type="primary"
-                        loading={faseState.loading}
-                        disabled={faseState.loading || faseState.initialize}
-                        onClick={fetchSubmit}
-                    >
-                        保存
-                    </common-base-button>
-                    <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
-                        重置
-                    </common-base-button>
-                </common-base-element>
+                <common-base-authorize key-name="chat:deploy:system:role:update">
+                    <common-base-element is-white class="b-rd-[var(--border-radius)] p-14 flex gap-12 overflow-hidden">
+                        <common-base-button
+                            class="min-w-80"
+                            type="primary"
+                            loading={faseState.loading}
+                            disabled={faseState.loading || faseState.initialize}
+                            onClick={fetchSubmit}
+                        >
+                            保存
+                        </common-base-button>
+                        <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
+                            重置
+                        </common-base-button>
+                    </common-base-element>
+                </common-base-authorize>
             </common-base-element>
         )
     }

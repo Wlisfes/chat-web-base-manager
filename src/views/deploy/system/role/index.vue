@@ -23,7 +23,8 @@ export default defineComponent({
             options: {
                 tabName: 'user',
                 selectedKeys: [] as Array<number>,
-                expandedKeys: [] as Array<number>
+                expandedKeys: [] as Array<number>,
+                actions: [{ keyName: 'chat:deploy:system:role:update' }, { keyName: 'chat:deploy:system:role:delete' }]
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
@@ -123,13 +124,15 @@ export default defineComponent({
                                 <div class="flex flex-col p-inline-14 overflow-hidden">
                                     <div class="flex items-center justify-between p-block-12 overflow-hidden">
                                         <n-h4 class="line-height-21 m-0">通用角色</n-h4>
-                                        <common-base-button
-                                            text
-                                            type="primary"
-                                            onClick={(event: MouseEvent) => fetchDeployUpdateSystemRole(event)}
-                                        >
-                                            新增角色
-                                        </common-base-button>
+                                        <common-base-authorize key-name="chat:deploy:system:role:create">
+                                            <common-base-button
+                                                text
+                                                type="primary"
+                                                onClick={(event: MouseEvent) => fetchDeployUpdateSystemRole(event)}
+                                            >
+                                                新增角色
+                                            </common-base-button>
+                                        </common-base-authorize>
                                     </div>
                                     {(faseNode.value.list ?? []).length > 0 && (
                                         <n-radio-group
@@ -154,24 +157,32 @@ export default defineComponent({
                                                         <n-ellipsis tooltip={false} class="flex-1 overflow-hidden">
                                                             <n-text>{item.name}</n-text>
                                                         </n-ellipsis>
-                                                        <div class="flex items-center p-inline-7 gap-x-7 overflow-hidden">
-                                                            <common-base-button
-                                                                title="编辑角色"
-                                                                type="info"
-                                                                text
-                                                                icon-size={16}
-                                                                icon={Edit}
-                                                                onClick={(e: MouseEvent) => fetchDeployUpdateSystemRole(e, item)}
-                                                            ></common-base-button>
-                                                            <common-base-button
-                                                                title="删除角色"
-                                                                type="error"
-                                                                text
-                                                                icon-size={16}
-                                                                icon={Delete}
-                                                                onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
-                                                            ></common-base-button>
-                                                        </div>
+                                                        <common-base-authorize
+                                                            element
+                                                            key-name={faseState.actions.map(e => e.keyName)}
+                                                            class="flex items-center p-inline-7 gap-x-7 overflow-hidden"
+                                                        >
+                                                            <common-base-authorize key-name="chat:deploy:system:role:update">
+                                                                <common-base-button
+                                                                    title="编辑角色"
+                                                                    type="info"
+                                                                    text
+                                                                    icon-size={16}
+                                                                    icon={Edit}
+                                                                    onClick={(e: MouseEvent) => fetchDeployUpdateSystemRole(e, item)}
+                                                                ></common-base-button>
+                                                            </common-base-authorize>
+                                                            <common-base-authorize key-name="chat:deploy:system:role:delete">
+                                                                <common-base-button
+                                                                    title="删除角色"
+                                                                    type="error"
+                                                                    text
+                                                                    icon-size={16}
+                                                                    icon={Delete}
+                                                                    onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
+                                                                ></common-base-button>
+                                                            </common-base-authorize>
+                                                        </common-base-authorize>
                                                     </n-radio>
                                                 ))}
                                             </common-base-draggable>

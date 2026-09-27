@@ -15,7 +15,7 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chatbok:deploy:system:role:user',
+            keyName: 'chat:deploy:system:role:user',
             immediate: true,
             formState: { roleKeyId: props.roleId, vague: undefined },
             columns: [
