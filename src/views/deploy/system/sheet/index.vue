@@ -24,9 +24,14 @@ export default defineComponent({
             }
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, setForm, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
+            actions: [
+                { title: '新增', key: 'chat:deploy:system:sheet:create' },
+                { title: '编辑', key: 'chat:deploy:system:sheet:update' },
+                { title: '删除', key: 'chat:deploy:system:sheet:delete' }
+            ],
             formState: {
                 /**父级ID**/
                 parentKeyId: undefined as unknown as number,
@@ -66,7 +71,7 @@ export default defineComponent({
         }
 
         /**新增菜单/按钮**/
-        async function fetchDeploySheetCreate() {
+        async function fetchCreateDeploySheet() {
             return await feedback.fetchDeploySystemSheet({
                 title: '新增菜单/按钮',
                 command: 'CREATE',
@@ -77,11 +82,11 @@ export default defineComponent({
         }
 
         /**编辑菜单、按钮**/
-        async function fetchDeploySheetUpdate() {
+        async function fetchUpdateDeploySheet(node: Omix) {
             return await feedback.fetchDeploySystemSheet({
                 title: '编辑菜单/按钮',
                 command: 'UPDATE',
-                node: state.select[0],
+                node,
                 async onSubmit() {
                     return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                 }
@@ -89,11 +94,11 @@ export default defineComponent({
         }
 
         /**克隆菜单、按钮**/
-        async function fetchDeploySheetClone() {
+        async function fetchCloneDeploySheet(node: Omix) {
             return await feedback.fetchDeploySystemSheet({
                 title: '克隆菜单/按钮',
                 command: 'CLONE',
-                node: state.select[0],
+                node,
                 async onSubmit() {
                     return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                 }
@@ -101,8 +106,7 @@ export default defineComponent({
         }
 
         /**删除菜单/按钮**/
-        async function fetchDeploySheetDelete() {
-            const node = state.select[0]
+        async function fetchDeleteDeploySheet(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -174,33 +178,11 @@ export default defineComponent({
                             on-submit={instOptions.fetchRequest}
                         >
                             <common-database-search-function abstract class="flex gap-col-10">
-                                <common-base-button type="primary" onClick={fetchDeploySheetCreate}>
-                                    新增
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="primary"
-                                    disabled={instState.value.isUpdate}
-                                    onClick={fetchDeploySheetUpdate}
-                                >
-                                    编辑
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="primary"
-                                    disabled={instState.value.isClone}
-                                    onClick={fetchDeploySheetClone}
-                                >
-                                    克隆
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="error"
-                                    disabled={instState.value.isDelete}
-                                    onClick={fetchDeploySheetDelete}
-                                >
-                                    删除
-                                </common-base-button>
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    <common-base-button type="primary" onClick={fetchCreateDeploySheet}>
+                                        新增
+                                    </common-base-button>
+                                </common-base-authorize>
                             </common-database-search-function>
                             <common-database-search-column disabled prop="name" label="菜单名称">
                                 <form-base-input
@@ -231,7 +213,7 @@ export default defineComponent({
                     <n-layout-content class="flex flex-col flex-1 bg-transparent" content-class="flex flex-col flex-1">
                         <common-database-table
                             class="p-0!"
-                            show-select
+                            show-command
                             show-settings
                             page-sizes={[20, 30, 50, 100]}
                             limit={state.limit}
@@ -282,9 +264,40 @@ export default defineComponent({
                                     <common-base-authorize
                                         element
                                         empty="-"
-                                        key-name="chat:deploy:system:role:unlink:user"
+                                        key-name={state.actions.map(item => item.key)}
                                         class-name="flex items-center gap-x-10 overflow-hidden"
-                                    ></common-base-authorize>
+                                    >
+                                        <common-base-authorize key-name={state.actions[0].key}>
+                                            <common-base-button
+                                                text
+                                                title="克隆"
+                                                type="primary"
+                                                onClick={(e: MouseEvent) => fetchCloneDeploySheet(data)}
+                                            >
+                                                克隆
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[1].key}>
+                                            <common-base-button
+                                                text
+                                                title="编辑"
+                                                type="info"
+                                                onClick={(e: MouseEvent) => fetchUpdateDeploySheet(data)}
+                                            >
+                                                编辑
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[2].key}>
+                                            <common-base-button
+                                                text
+                                                title="删除"
+                                                type="error"
+                                                onClick={(e: MouseEvent) => fetchDeleteDeploySheet(data)}
+                                            >
+                                                删除
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                    </common-base-authorize>
                                 )
                             }}
                         </common-database-table>

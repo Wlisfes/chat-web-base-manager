@@ -19,7 +19,7 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:user',
             formState: {
@@ -31,8 +31,9 @@ export default defineComponent({
                 organizationKeyIds: []
             },
             actions: [
-                { title: '编辑', key: 'update', type: 'primary', field: 'allowUpdate' },
-                { title: '删除', key: 'delete', type: 'error', field: 'allowDelete' }
+                { title: '新增', key: 'chat:deploy:system:user:create' },
+                { title: '编辑', key: 'chat:deploy:system:user:update' },
+                { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
             ],
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
@@ -130,33 +131,11 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
-                            新增
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate}
-                            onClick={() => fetchUpdateDeploySystemUser(state.select[0])}
-                        >
-                            编辑
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="error"
-                            disabled={instState.value.isDelete}
-                            onClick={() => fetchBaseAccountUpdateUser(state.select[0])}
-                        >
-                            禁用
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate}
-                            onClick={() => fetchBaseAccountResetUserPassword(state.select[0])}
-                        >
-                            重置密码
-                        </common-base-button>
+                        <common-base-authorize key-name={state.actions[0].key}>
+                            <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
+                                新增
+                            </common-base-button>
+                        </common-base-authorize>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="vague" label="关键词">
                         <form-base-input
@@ -193,7 +172,7 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-select
+                    show-command
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -233,6 +212,45 @@ export default defineComponent({
                         },
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                        ),
+                        col_command: (data: Omix) => (
+                            <common-base-authorize
+                                element
+                                empty="-"
+                                key-name={[state.actions[1].key, state.actions[2].key]}
+                                class-name="flex items-center gap-x-10 overflow-hidden"
+                            >
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    <common-base-button
+                                        text
+                                        title="编辑"
+                                        type="info"
+                                        onClick={(e: MouseEvent) => fetchUpdateDeploySystemUser(data)}
+                                    >
+                                        编辑
+                                    </common-base-button>
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    <common-base-button
+                                        text
+                                        title="禁用"
+                                        type="error"
+                                        onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data)}
+                                    >
+                                        禁用
+                                    </common-base-button>
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[2].key}>
+                                    <common-base-button
+                                        text
+                                        title="重置密码"
+                                        type="warning"
+                                        onClick={(e: MouseEvent) => fetchBaseAccountResetUserPassword(data)}
+                                    >
+                                        重置密码
+                                    </common-base-button>
+                                </common-base-authorize>
+                            </common-base-authorize>
                         )
                     }}
                 </common-database-table>

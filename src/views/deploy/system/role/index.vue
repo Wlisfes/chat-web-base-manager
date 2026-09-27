@@ -30,7 +30,7 @@ export default defineComponent({
                 ]
             }
         })
-        /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
+        /**结构角色ID*/
         const roleKeyId = computed(() => faseState.selectedKeys[0])
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
         const treeRoles = computed(() => fetchNormalizeTreeChildren(faseNode.value.tree ?? []))

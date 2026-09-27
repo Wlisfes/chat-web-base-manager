@@ -83,7 +83,7 @@ export default defineComponent({
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
                         <common-base-authorize key-name="chat:deploy:system:role:link:user">
-                            <common-base-button dashed type="primary" onClick={fetchDeployRoleUser}>
+                            <common-base-button type="primary" onClick={fetchDeployRoleUser}>
                                 关联用户
                             </common-base-button>
                         </common-base-authorize>

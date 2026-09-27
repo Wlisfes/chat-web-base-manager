@@ -22,6 +22,10 @@ export default defineComponent({
         /**表格实例**/
         const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
+            actions: [
+                { title: '编辑', key: `${props.keyName}:update` },
+                { title: '删除', key: `${props.keyName}:delete` }
+            ],
             formState: {
                 /**枚举模块**/
                 module: props.node.module,
@@ -32,10 +36,6 @@ export default defineComponent({
                 /**状态**/
                 status: undefined
             },
-            actions: [
-                { title: '编辑', key: 'update', type: 'primary', field: 'allowUpdate' },
-                { title: '删除', key: 'delete', type: 'error', field: 'allowDelete' }
-            ],
             columns: [
                 { title: 'ID', key: 'keyId', width: 100, disabled: true },
                 { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
@@ -94,15 +94,6 @@ export default defineComponent({
                     })
                 }
             })
-        }
-
-        /**操作栏事件**/
-        async function fetchClick(item: Omix, node: Omix) {
-            if (['update'].includes(item.key)) {
-                return await fetchUpdateDeployChunkResolver(node)
-            } else if (['delete'].includes(item.key)) {
-                return await fetchDeleteDeployChunk(node)
-            }
         }
 
         return () => (
@@ -186,21 +177,31 @@ export default defineComponent({
                             <common-base-authorize
                                 element
                                 empty="-"
-                                class="flex items-center gap-x-10"
-                                value={state.actions.map(e => `${props.keyName}:${e.key}`)}
+                                class-name="flex items-center gap-x-10"
+                                key-name={[state.actions[0].key, state.actions[1].key]}
                             >
-                                {state.actions.map(item => (
-                                    <common-base-authorize key-name={`${props.keyName}:${item.key}`}>
-                                        <common-base-button
-                                            text
-                                            type={item.type}
-                                            disabled={!Boolean(data[item.field])}
-                                            onClick={() => fetchClick(item, data)}
-                                        >
-                                            {item.title}
-                                        </common-base-button>
-                                    </common-base-authorize>
-                                ))}
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    <common-base-button
+                                        text
+                                        title="编辑"
+                                        type="info"
+                                        disabled={!data.allowUpdate}
+                                        onClick={(e: MouseEvent) => fetchUpdateDeployChunkResolver(data)}
+                                    >
+                                        编辑
+                                    </common-base-button>
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    <common-base-button
+                                        text
+                                        title="删除"
+                                        type="error"
+                                        disabled={!data.allowDelete}
+                                        onClick={(e: MouseEvent) => fetchDeleteDeployChunk(data)}
+                                    >
+                                        删除
+                                    </common-base-button>
+                                </common-base-authorize>
                             </common-base-authorize>
                         )
                     }}
