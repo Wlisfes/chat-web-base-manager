@@ -97,7 +97,13 @@ export default defineComponent({
                         >
                             保存
                         </common-base-button>
-                        <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
+                        <common-base-button
+                            class="min-w-80"
+                            type="warning"
+                            secondary
+                            disabled={faseState.loading || faseState.initialize}
+                            onClick={() => fetchSheetCallback(faseNode.value)}
+                        >
                             重置
                         </common-base-button>
                     </common-base-element>

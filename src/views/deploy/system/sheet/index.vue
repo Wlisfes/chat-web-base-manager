@@ -136,7 +136,7 @@ export default defineComponent({
                     collapsed-width={0}
                     show-collapsed-content={false}
                     class="flex flex-col bg-transparent"
-                    content-class="flex flex-col flex-1 overflow-hidden! p-block-14 p-is-14"
+                    content-class="flex flex-col flex-1 overflow-hidden! p-block-12 p-is-12"
                 >
                     <n-card class="flex-1 overflow-hidden" content-class="flex flex-col flex-1 p-inline-0! p-block-14! overflow-hidden">
                         <common-base-wrapper opacity={0} loading={sheetOptions.state.loading}>
@@ -161,7 +161,7 @@ export default defineComponent({
                         </common-base-wrapper>
                     </n-card>
                 </n-layout-sider>
-                <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-14 gap-14 overflow-hidden">
+                <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-12 gap-12 overflow-hidden">
                     <n-layout-header class="bg-transparent">
                         <common-database-search
                             class="p-0!"
