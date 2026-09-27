@@ -37,7 +37,7 @@ export default defineComponent({
                 { title: '手机号', key: 'phone', width: 140 },
                 { title: '邮箱', key: 'email', width: 200 },
                 { title: '职级', key: 'ranks', width: 100 },
-                { title: '职位', key: 'positions', width: 160 },
+                { title: '岗位', key: 'posts', width: 160 },
                 { title: '归属部门', key: 'organizations', minWidth: 200 },
                 { title: '关联角色', key: 'roles', minWidth: 160 },
                 { title: '入职时间', key: 'createTime', width: 160 }
@@ -215,8 +215,8 @@ export default defineComponent({
                         col_organizations: (data: Omix) => {
                             return <common-base-content value={data.organizations}></common-base-content>
                         },
-                        col_positions: (data: Omix) => {
-                            return <common-base-content value={data.positions}></common-base-content>
+                        col_posts: (data: Omix) => {
+                            return <common-base-content value={data.posts}></common-base-content>
                         },
                         col_ranks: (data: Omix) => {
                             return <common-base-content value={data.ranks}></common-base-content>
