@@ -5,7 +5,7 @@ export function mapDeployAccountUser(user: Omix): Omix {
         ...user,
         depts: organizations,
         posts:
-            user.posts ?? organizations.filter((item: Omix) => item.positionName).map((item: Omix) => ({ name: item.positionName })),
+            user.posts ?? organizations.filter((item: Omix) => item.postName).map((item: Omix) => ({ name: item.postName })),
         ranks: user.ranks ?? [],
         roles: user.roles ?? []
     }
