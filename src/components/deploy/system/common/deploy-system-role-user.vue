@@ -1,12 +1,13 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
-import { createDeployAccountQuery, createDeployAccountRoleIds, stop, EventType } from '@/utils'
+import { stop, EventType } from '@/utils'
+import { Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'DeploySystemRoleAccount',
+    name: 'DeploySystemRoleUser',
     props: {
         /**通讯实例**/
         observer: { type: Object as PropType<EventType>, required: true },
@@ -14,15 +15,13 @@ export default defineComponent({
         roleId: { type: Number as PropType<number> }
     },
     setup(props, ctx) {
+        console.log(props)
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setState, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseAccountColumnUser(
-                    createDeployAccountQuery({ ...payload, page: base.page, size: base.size, roleKeyId: props.roleId })
-                ),
-            keyName: 'chatbok:deploy:system:role:account',
+            request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            keyName: 'chatbok:deploy:system:role:user',
             immediate: false,
-            formState: { vague: undefined, phone: undefined, email: undefined },
+            formState: { roleKeyId: props.roleId, vague: undefined },
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                 { title: '姓名', key: 'name', width: 120, disabled: true },
@@ -32,8 +31,7 @@ export default defineComponent({
                 { title: '创建人', key: 'createBy', width: 120, check: true },
                 { title: '创建时间', key: 'createTime', width: 160, check: true },
                 { title: '更新人', key: 'modifyBy', width: 120, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true },
-                { title: '操作', key: 'action', width: 80, align: 'center' }
+                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
             ]
         })
 
@@ -63,7 +61,7 @@ export default defineComponent({
                 return await Promise.all(
                     uids.map(async uid => {
                         const detail = await Service.httpBaseAccountUserResolver({ uid })
-                        const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId!, false)
+                        const roleKeyIds = (detail.data?.roleKeyIds ?? []).filter((keyId: number) => keyId !== props.roleId)
                         return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
                     })
                 ).then(() => {
@@ -73,7 +71,7 @@ export default defineComponent({
         }
 
         return () => (
-            <n-element class="deploy-system-role-account h-full flex flex-col gap-14 overflow-hidden">
+            <n-element class="deploy-system-role-user h-full flex flex-col gap-14 overflow-hidden">
                 <common-database-search
                     class="p-0!"
                     function-class="justify-end"
@@ -94,27 +92,11 @@ export default defineComponent({
                             关联员工
                         </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column prop="vague" label="姓名/工号">
+                    <common-database-search-column prop="vague" label="关键字">
                         <form-base-input
                             clearable
-                            placeholder="请输入姓名/工号"
+                            placeholder="请输入姓名/工号/手机号/邮箱"
                             v-model:value={formState.value.vague}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
-                    <common-database-search-column prop="phone" label="手机号">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入手机号"
-                            v-model:value={formState.value.phone}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
-                    <common-database-search-column prop="email" label="邮箱">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入邮箱"
-                            v-model:value={formState.value.email}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
@@ -153,6 +135,18 @@ export default defineComponent({
                                 {...{ text: true, iconSize: 14, icon: 'nest-delete', type: 'error' }}
                                 onClick={(e: MouseEvent) => fetchDeleteAccountRole(e, [data.uid])}
                             ></common-base-button>
+                        ),
+                        col_command: (data: Omix) => (
+                            <common-base-authorize>
+                                <common-base-button
+                                    title="移除关联"
+                                    type="error"
+                                    text
+                                    icon-size={16}
+                                    icon={Delete}
+                                    //onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
+                                ></common-base-button>
+                            </common-base-authorize>
                         )
                     }}
                 </common-database-table>

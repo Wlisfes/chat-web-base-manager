@@ -18,7 +18,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**菜单资源树结构表**/
-        const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTree(), {
+        const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTreeStructure(), {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })

@@ -2,7 +2,6 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { createDeployAccountRoleIds, mapDeployAccountOptions } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -17,8 +16,7 @@ export default defineComponent({
     setup(props, { emit }) {
         /**账号下拉列表**/
         const accountOptions = useSelectService(() => Service.httpBaseAccountColumnUser({ page: 1, size: 100, status: 'enabled' }), {
-            immediate: false,
-            transform: mapDeployAccountOptions
+            immediate: false
         })
         /**表单实例**/
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
@@ -46,7 +44,7 @@ export default defineComponent({
                     await Promise.all(
                         formState.value.uids.map(async (uid: string) => {
                             const detail = await Service.httpBaseAccountUserResolver({ uid })
-                            const roleKeyIds = createDeployAccountRoleIds(detail.data?.roleKeyIds ?? [], props.roleId, true)
+                            const roleKeyIds = [...new Set([...(detail.data?.roleKeyIds ?? []), props.roleId])]
                             return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
                         })
                     )
@@ -86,6 +84,8 @@ export default defineComponent({
                             multiple
                             filterable
                             clearable
+                            label-field="name"
+                            label-value="uid"
                             placeholder="请选择关联账号"
                             loading={accountOptions.loading.value}
                             options={accountOptions.dataSource.value}

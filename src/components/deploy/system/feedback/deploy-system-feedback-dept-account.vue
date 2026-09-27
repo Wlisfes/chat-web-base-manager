@@ -2,7 +2,6 @@
 import { defineComponent, PropType } from 'vue'
 import { useColumnService } from '@/hooks'
 import { isNotEmpty } from 'class-validator'
-import { createDeployAccountQuery, mapDeployAccountUsers } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -20,15 +19,14 @@ export default defineComponent({
         /**表格实例**/
         const { state, instOptions, setState, fetchRefresh } = useColumnService({
             request: (base, payload) =>
-                Service.httpBaseAccountColumnUser(createDeployAccountQuery({ ...payload, page: base.page, size: base.size })),
-            transform: data => mapDeployAccountUsers(data.list),
-            formState: { depts: [props.node.keyId].filter(isNotEmpty) },
+                Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            formState: { organizationKeyIds: [props.node.keyId].filter(isNotEmpty) },
             limit: 0,
             size: 100,
             columns: [
                 { title: '头像', key: 'avatar', width: 60, align: 'center', disabled: true },
                 { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '职级', key: 'ranks', width: 100, check: true },
+                { title: '职级', key: 'levels', width: 100, check: true },
                 { title: '岗位', key: 'posts', width: 160, check: true },
                 { title: '状态', key: 'status', width: 100, align: 'center', check: true },
                 { title: '手机号', key: 'phone', width: 160, check: true },
@@ -75,9 +73,9 @@ export default defineComponent({
                                     value={(data.posts ?? []).map((item: Omix) => item.name)}
                                 ></common-database-table-content>
                             ),
-                            col_ranks: (data: Omix) => (
+                            col_levels: (data: Omix) => (
                                 <common-database-table-content
-                                    value={(data.ranks ?? []).map((item: Omix) => item.name)}
+                                    value={(data.levels ?? []).map((item: Omix) => item.name)}
                                 ></common-database-table-content>
                             ),
                             col_status: (data: Omix) => (

@@ -37,7 +37,7 @@ export function httpBaseAccountSheetEnums() {
 }
 
 /**获取完整菜单树**/
-export function httpBaseAccountSheetTree() {
+export function httpBaseAccountSheetTreeStructure() {
     return request<Array<env.SheetNode>>({
         url: '/api/account/sheet/tree/structure',
         method: 'GET'

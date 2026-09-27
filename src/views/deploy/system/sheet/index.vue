@@ -11,7 +11,7 @@ export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单树结构**/
-        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTree(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
             immediate: true,
             options: {
                 selectedKeys: [] as Array<number>,

@@ -8,10 +8,10 @@ export function httpBaseAccountRoleEnums() {
     })
 }
 
-/**获取角色列表**/
-export function httpBaseAccountSelectRole() {
+/**获取通用角色列表和岗位角色树**/
+export function httpBaseAccountRoleConfiger() {
     return request({
-        url: '/api/account/role/select',
+        url: '/api/account/role/configer',
         method: 'GET'
     })
 }

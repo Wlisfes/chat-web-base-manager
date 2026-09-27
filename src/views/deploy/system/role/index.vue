@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
-import { createDeployRoleView, isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
+import { isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid, Edit, Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -12,31 +12,23 @@ export default defineComponent({
     setup(props, ctx) {
         /**菜单树数据**/
         const treeOptions = useBaseService({
-            request: () => Service.httpBaseAccountSheetTree(),
+            request: () => Service.httpBaseAccountSheetTreeStructure(),
             immediate: true
         })
         /**角色列表**/
         const { faseNode, faseState, observer, setState, fetchRefresh } = useBaseService({
-            request: async () => {
-                const [roleResponse, organizationResponse] = await Promise.all([
-                    Service.httpBaseAccountSelectRole(),
-                    Service.httpBaseAccountOrganizationTreeStructure()
-                ])
-                return {
-                    ...roleResponse,
-                    data: createDeployRoleView(roleResponse.data ?? [], organizationResponse.data ?? [])
-                } as any
-            },
+            request: Service.httpBaseAccountRoleConfiger,
             callback: fetchReadyCallback,
             immediate: true,
             options: {
-                tabName: 'account',
+                tabName: 'user',
                 selectedKeys: [] as Array<number>,
                 expandedKeys: [] as Array<number>
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
-        const departmentRoleTreeData = computed(() => fetchNormalizeTreeChildren(faseNode.value.dept ?? []))
+        const treeRoles = computed(() => fetchNormalizeTreeChildren(faseNode.value.tree ?? []))
+
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
             if ((data.list ?? []).length === 0 || faseState.selectedKeys.length > 0) {
@@ -46,16 +38,19 @@ export default defineComponent({
                 return observer.value.emit('refresh', { roleId: state.selectedKeys[0] })
             })
         }
+
         /**左侧树展开变更回调**/
         async function fetchUpdateExpanded(keys: Array<number>) {
             return await setState({ expandedKeys: keys })
         }
+
         /**左侧树选中变更回调**/
         async function fetchUpdateSelected(keys: Array<number>) {
             return await setState({ selectedKeys: keys }).then(async state => {
                 return observer.value.emit('refresh', { roleId: state.selectedKeys[0] })
             })
         }
+
         /**拖拽排序更新**/
         async function fetchUpdateRoleSort() {
             try {
@@ -69,6 +64,7 @@ export default defineComponent({
                 return await fetchNotifyService({ type: 'error', title: err.message })
             }
         }
+
         /**新增、编辑岗位角色**/
         async function fetchDeployUpdateSystemRole(event: MouseEvent, node: Omix = {}) {
             return await stop(event).then(async () => {
@@ -76,17 +72,18 @@ export default defineComponent({
                     return await feedback.fetchDeploySystemRole({
                         title: '新增岗位角色',
                         command: 'CREATE',
-                        onSubmit: fetchRefresh
+                        onSubmit: () => fetchRefresh()
                     })
                 }
                 return await feedback.fetchDeploySystemRole({
                     node,
                     title: '编辑岗位角色',
                     command: 'UPDATE',
-                    onSubmit: fetchRefresh
+                    onSubmit: () => fetchRefresh()
                 })
             })
         }
+
         /**删除岗位角色**/
         async function fetchDeployDeleteSystemRole(event: MouseEvent, node: Omix) {
             return await stop(event).then(async () => {
@@ -98,11 +95,14 @@ export default defineComponent({
                         return await done({ loading: true }).then(async () => {
                             try {
                                 await Service.httpBaseAccountDeleteRole({ keyId: node.keyId })
-                                await fetchRefresh()
-                                return await done({ visible: false })
+                                return await done({ visible: false }).then(async () => {
+                                    await fetchNotifyService({ title: '操作成功' })
+                                    return await fetchRefresh()
+                                })
                             } catch (err) {
-                                await done({ loading: false })
-                                return await fetchNotifyService({ type: 'error', title: err.message })
+                                return await done({ loading: false }).then(async () => {
+                                    return await fetchNotifyService({ type: 'error', title: err.message })
+                                })
                             }
                         })
                     }
@@ -190,7 +190,7 @@ export default defineComponent({
                                         children-field="children"
                                         selected-keys={faseState.selectedKeys}
                                         expanded-keys={faseState.expandedKeys}
-                                        data={departmentRoleTreeData.value}
+                                        data={treeRoles.value}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}
@@ -204,17 +204,17 @@ export default defineComponent({
                     <n-tabs
                         animated
                         type="line"
-                        default-value="account"
+                        default-value="user"
                         tab-class="p-block-12!"
                         tabs-padding={14}
                         class="common-base-tabser inset-absolute h-full overflow-hidden "
                         v-model:value={faseState.tabName}
                     >
-                        <n-tab-pane name="account" tab="关联账号" display-directive="show">
-                            <deploy-system-role-account
+                        <n-tab-pane name="user" tab="关联用户" display-directive="show">
+                            <deploy-system-role-user
                                 observer={observer.value}
                                 role-id={faseState.selectedKeys[0]}
-                            ></deploy-system-role-account>
+                            ></deploy-system-role-user>
                         </n-tab-pane>
                         <n-tab-pane name="sheet" tab="关联权限" display-directive="show:lazy">
                             <deploy-system-role-sheet
