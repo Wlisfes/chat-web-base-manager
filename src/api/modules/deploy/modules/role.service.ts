@@ -52,19 +52,28 @@ export function httpBaseAccountDeleteRole(data: Omix) {
     })
 }
 
-/**替换角色的全部菜单和按钮权限**/
-export function httpBaseAccountUpdateRoleMenu(data: Omix) {
+/**批量关联角色用户**/
+export function httpBaseAccountRoleLinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/update/menu',
+        url: '/api/account/role/link/user',
         method: 'POST',
         data
     })
 }
 
-/**替换角色的全部资源数据范围**/
-export function httpBaseAccountUpdateRoleDataScope(data: Omix) {
+/**批量移除角色用户**/
+export function httpBaseAccountRoleUnlinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/update/data/scope',
+        url: '/api/account/role/unlink/user',
+        method: 'POST',
+        data
+    })
+}
+
+/**替换角色的全部菜单和按钮权限**/
+export function httpBaseAccountUpdateRoleSheet(data: Omix) {
+    return request({
+        url: '/api/account/role/update/sheet',
         method: 'POST',
         data
     })

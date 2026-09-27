@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
-import { useBaseService } from '@/hooks'
+import { useBaseService, useSelectService } from '@/hooks'
 import { isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid, Edit, Delete } from '@vicons/carbon'
@@ -11,13 +11,13 @@ export default defineComponent({
     name: 'DeploySystemRole',
     setup(props, ctx) {
         /**菜单树数据**/
-        const treeOptions = useBaseService({
-            request: () => Service.httpBaseAccountSheetTreeStructure(),
-            immediate: true
+        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
+            immediate: true,
+            transform: fetchNormalizeTreeChildren
         })
         /**角色列表**/
-        const { faseNode, faseState, observer, setState, fetchRefresh } = useBaseService({
-            request: Service.httpBaseAccountRoleConfiger,
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
+            request: () => Service.httpBaseAccountRoleConfiger(),
             callback: fetchReadyCallback,
             immediate: true,
             options: {
@@ -27,16 +27,16 @@ export default defineComponent({
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
+        const roleKeyId = computed(() => faseState.selectedKeys[0])
+        /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
         const treeRoles = computed(() => fetchNormalizeTreeChildren(faseNode.value.tree ?? []))
 
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
             if ((data.list ?? []).length === 0 || faseState.selectedKeys.length > 0) {
-                return observer.value.emit('finish', {})
+                return await setState({ expandedKeys: [], selectedKeys: undefined })
             }
-            return await setState({ expandedKeys: [], selectedKeys: [data.list[0].keyId] }).then(async state => {
-                return observer.value.emit('refresh', { roleId: state.selectedKeys[0] })
-            })
+            return await setState({ expandedKeys: [], selectedKeys: [data.list[0].keyId] })
         }
 
         /**左侧树展开变更回调**/
@@ -46,9 +46,7 @@ export default defineComponent({
 
         /**左侧树选中变更回调**/
         async function fetchUpdateSelected(keys: Array<number>) {
-            return await setState({ selectedKeys: keys }).then(async state => {
-                return observer.value.emit('refresh', { roleId: state.selectedKeys[0] })
-            })
+            return await setState({ selectedKeys: keys })
         }
 
         /**拖拽排序更新**/
@@ -211,16 +209,13 @@ export default defineComponent({
                         v-model:value={faseState.tabName}
                     >
                         <n-tab-pane name="user" tab="关联用户" display-directive="show">
-                            <deploy-system-role-user
-                                observer={observer.value}
-                                role-id={faseState.selectedKeys[0]}
-                            ></deploy-system-role-user>
+                            <deploy-system-role-user key={roleKeyId.value} role-id={roleKeyId.value}></deploy-system-role-user>
                         </n-tab-pane>
                         <n-tab-pane name="sheet" tab="关联权限" display-directive="show:lazy">
                             <deploy-system-role-sheet
-                                observer={observer.value}
-                                fase-node={treeOptions.faseNode.value}
-                                role-id={faseState.selectedKeys[0]}
+                                key={roleKeyId.value}
+                                sheet-options={sheetOptions.dataSource.value}
+                                role-id={roleKeyId.value}
                             ></deploy-system-role-sheet>
                         </n-tab-pane>
                     </n-tabs>

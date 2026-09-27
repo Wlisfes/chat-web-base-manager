@@ -68,7 +68,7 @@ export const useGlobal = defineStore('APP_STORE_GLOBAL', () => {
     /**登录账户菜单、按钮和角色权限**/
     async function fetchAuthAccountPermissions() {
         return await Service.httpAuthAccountPermissions().then(async ({ data }) => {
-            const menuOptions = fetchMenuOptions(data.menuTree ?? [])
+            const menuOptions = fetchMenuOptions(data.sheetTree ?? [])
             if (!fetchHasMenu(menuOptions, '/manager')) {
                 menuOptions.unshift({ name: '工作台', router: '/manager', iconName: 'nest-compass' })
             }

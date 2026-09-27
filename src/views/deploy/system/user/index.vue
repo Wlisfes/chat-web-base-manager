@@ -38,8 +38,8 @@ export default defineComponent({
                 { title: '邮箱', key: 'email', width: 200 },
                 { title: '职级', key: 'levels', width: 100 },
                 { title: '岗位', key: 'posts', width: 160 },
-                { title: '归属部门', key: 'organizations', minWidth: 200 },
-                { title: '关联角色', key: 'roles', minWidth: 160 },
+                { title: '归属部门', key: 'organizations', minWidth: 160 },
+                { title: '关联角色', key: 'roles', minWidth: 200 },
                 { title: '入职时间', key: 'createTime', width: 160 }
             ]
         })

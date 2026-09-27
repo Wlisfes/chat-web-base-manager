@@ -1,24 +1,22 @@
 <script lang="tsx">
-import { computed, defineComponent, PropType, h } from 'vue'
-import { useBaseService } from '@/hooks'
-import { EventType, fetchParentKeyIds, fetchNormalizeTreeChildren } from '@/utils'
-import { SendFilled } from '@vicons/carbon'
+import { defineComponent, PropType, h } from 'vue'
 import { fetchNotifyService } from '@/plugins'
+import { SendFilled } from '@vicons/carbon'
+import { fetchParentKeyIds } from '@/utils'
+import { useBaseService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemRoleSheet',
     props: {
-        /**通讯实例**/
-        observer: { type: Object as PropType<EventType>, required: true },
         /**角色ID**/
         roleId: { type: Number as PropType<number> },
         /**菜单树数据。接口直接返回数组，不是分页结果包装对象。*/
-        faseNode: { type: Array as PropType<Array<Omix>>, default: () => [] }
+        sheetOptions: { type: Array as PropType<Array<Omix>>, default: () => [] }
     },
     setup(props, ctx) {
         /**角色关联菜单数据**/
-        const { faseNode, faseState, setState, fetchInitialize, fetchRefresh } = useBaseService({
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
             request: () => Service.httpBaseAccountRoleResolver({ keyId: props.roleId }),
             callback: fetchSheetCallback,
             immediate: true,
@@ -28,23 +26,11 @@ export default defineComponent({
                 expandedKeys: [] as Array<number>
             }
         })
-        /**权限树移除叶子节点的空 children，避免显示无效展开图标。*/
-        const menuTreeData = computed(() => fetchNormalizeTreeChildren(props.faseNode ?? []))
-        /**监听结束事件**/
-        props.observer.on('finish', async () => {
-            return await setState({ loading: false, initialize: false })
-        })
-        /**监听刷新事件**/
-        props.observer.on('refresh', async () => {
-            return await setState({ initialize: true }).then(async () => {
-                return await fetchInitialize()
-            })
-        })
 
         /**角色关联菜单回调：过滤非叶子节点，仅设置叶子节点为checked**/
         async function fetchSheetCallback(data: Omix) {
-            const parentIds = fetchParentKeyIds(props.faseNode ?? [])
-            const checkedKeys = (data.menuKeyIds ?? []).filter((id: number) => !parentIds.has(id))
+            const parentIds = fetchParentKeyIds(props.sheetOptions ?? [])
+            const checkedKeys = (data.sheetKeyIds ?? []).filter((id: number) => !parentIds.has(id))
             return await setState({ checkedKeys })
         }
 
@@ -52,9 +38,9 @@ export default defineComponent({
         async function fetchSubmit() {
             return await setState({ loading: true }).then(async () => {
                 try {
-                    await Service.httpBaseAccountUpdateRoleMenu({
+                    await Service.httpBaseAccountUpdateRoleSheet({
                         keyId: props.roleId,
-                        menuKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
+                        sheetKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
                     return await setState({ loading: false }).then(async () => {
                         await fetchNotifyService({ title: '操作成功' })
@@ -92,7 +78,7 @@ export default defineComponent({
                             children-field="children"
                             checked-keys={faseState.checkedKeys}
                             expanded-keys={faseState.expandedKeys}
-                            data={menuTreeData.value}
+                            data={props.sheetOptions}
                             render-switcher-icon={() => h(SendFilled)}
                             on-update:checked-keys={(checkedKeys: Array<number>) => setState({ checkedKeys })}
                             on-update:indeterminate-keys={(indeterminateKeys: Array<number>) => setState({ indeterminateKeys })}

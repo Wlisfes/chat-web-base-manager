@@ -64,6 +64,14 @@ export default defineComponent({
                 }
             })
         }
+        /**更新数据权限类型，非自定义范围清空组织**/
+        function fetchUpdateScopeType(scopeType: string) {
+            const [dataScope] = formState.value.dataScopes
+            dataScope.scopeType = scopeType
+            if (scopeType !== 'custom') {
+                dataScope.organizations = []
+            }
+        }
         /**更新自定义数据权限组织**/
         function fetchUpdateOrganizations(keyIds: Array<number>) {
             const [dataScope] = formState.value.dataScopes
@@ -79,19 +87,10 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const { dataScopes, ...payload } = formState.value
-                    const rules = dataScopes.map(({ resourceCode, scopeType, status, organizations }: Omix) => ({
-                        resourceCode,
-                        scopeType,
-                        status,
-                        organizations: scopeType === 'custom' ? organizations : []
-                    }))
                     if (['CREATE'].includes(props.command)) {
-                        const { data } = await Service.httpBaseAccountCreateRole(payload)
-                        await Service.httpBaseAccountUpdateRoleDataScope({ keyId: data.keyId, rules })
+                        await Service.httpBaseAccountCreateRole(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseAccountUpdateRole({ keyId: props.node.keyId, ...payload })
-                        await Service.httpBaseAccountUpdateRoleDataScope({ keyId: props.node.keyId, rules })
+                        await Service.httpBaseAccountUpdateRole({ keyId: props.node.keyId, ...formState.value })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -143,7 +142,8 @@ export default defineComponent({
                         <form-base-select
                             placeholder="请选择数据权限"
                             options={chunkOptions.value.scopeTypeOptions}
-                            v-model:value={formState.value.dataScopes[0].scopeType}
+                            value={formState.value.dataScopes[0].scopeType}
+                            onUpdate:value={fetchUpdateScopeType}
                         ></form-base-select>
                     </form-base-column>
                     {formState.value.dataScopes[0].scopeType === 'custom' && (

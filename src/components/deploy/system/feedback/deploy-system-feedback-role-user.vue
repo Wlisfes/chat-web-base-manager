@@ -5,7 +5,7 @@ import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'DeploySystemFeedbackRoleAccount',
+    name: 'DeploySystemFeedbackRoleUser',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**账号下拉列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseAccountColumnUser({ page: 1, size: 100, status: 'enabled' }), {
+        const accountOptions = useSelectService(() => Service.httpBaseAccountSelectUser(), {
             immediate: false
         })
         /**表单实例**/
@@ -23,7 +23,7 @@ export default defineComponent({
             callback: fetchInitialize,
             formState: { uids: [] },
             rules: {
-                uids: { required: true, type: 'array', message: '请选择关联账号', trigger: 'change' }
+                uids: { required: true, type: 'array', message: '请选择关联用户', trigger: 'blur' }
             }
         })
 
@@ -41,13 +41,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Promise.all(
-                        formState.value.uids.map(async (uid: string) => {
-                            const detail = await Service.httpBaseAccountUserResolver({ uid })
-                            const roleKeyIds = [...new Set([...(detail.data?.roleKeyIds ?? []), props.roleId])]
-                            return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
-                        })
-                    )
+                    await Service.httpBaseAccountRoleLinkUser({ keyId: props.roleId, uids: formState.value.uids })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })
@@ -63,7 +57,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={640}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -79,14 +73,15 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-base-column label="关联账号" path="uids">
+                    <form-base-column label="关联用户" path="uids">
                         <form-base-select
                             multiple
                             filterable
                             clearable
-                            label-field="name"
+                            max-tag-count={999}
                             label-value="uid"
-                            placeholder="请选择关联账号"
+                            label-field="showName"
+                            placeholder="请选择关联用户"
                             loading={accountOptions.loading.value}
                             options={accountOptions.dataSource.value}
                             v-model:value={formState.value.uids}

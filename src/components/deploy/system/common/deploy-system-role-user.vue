@@ -1,72 +1,66 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
+import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { useColumnService } from '@/hooks'
-import { stop, EventType } from '@/utils'
-import { Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'DeploySystemRoleUser',
     props: {
-        /**通讯实例**/
-        observer: { type: Object as PropType<EventType>, required: true },
         /**角色ID**/
         roleId: { type: Number as PropType<number> }
     },
     setup(props, ctx) {
-        console.log(props)
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, setState, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chatbok:deploy:system:role:user',
-            immediate: false,
+            immediate: true,
             formState: { roleKeyId: props.roleId, vague: undefined },
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
-                { title: '姓名', key: 'name', width: 120, disabled: true },
-                { title: '工号', key: 'number', width: 100, check: true },
-                { title: '手机号', key: 'phone', minWidth: 140, check: true },
-                { title: '邮箱', key: 'email', minWidth: 200, check: true },
-                { title: '创建人', key: 'createBy', width: 120, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新人', key: 'modifyBy', width: 120, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                { title: '名称', key: 'name', width: 120, disabled: true },
+                { title: '手机号', key: 'phone', width: 140 },
+                { title: '邮箱', key: 'email', width: 200 },
+                { title: '职级', key: 'levels', width: 100 },
+                { title: '岗位', key: 'posts', width: 160 },
+                { title: '归属部门', key: 'organizations', minWidth: 160 },
+                { title: '关联角色', key: 'roles', minWidth: 200 },
+                { title: '入职时间', key: 'createTime', width: 160 }
             ]
         })
 
-        /**监听结束事件**/
-        props.observer.on('finish', async () => {
-            return await setState({ loading: false, initialize: false })
-        })
-        /**监听刷新事件**/
-        props.observer.on('refresh', async () => {
-            return await fetchRestore().then(async () => {
-                return await fetchRefresh({ page: 1, size: 50 })
-            })
-        })
-
         /**添加关联用户弹窗**/
-        async function fetchDeployRoleAccount(event: MouseEvent) {
-            return await feedback.fetchDeploySystemRoleAccount({
+        async function fetchDeployRoleUser(event: MouseEvent) {
+            return await feedback.fetchDeploySystemRoleUser({
                 title: '添加关联用户',
                 roleId: props.roleId,
-                onSubmit: fetchRefresh
+                onSubmit: () => fetchRefresh()
             })
         }
 
         /**移除关联用户**/
-        async function fetchDeleteAccountRole(event: MouseEvent, uids: Array<string>) {
-            return await stop(event).then(async () => {
-                return await Promise.all(
-                    uids.map(async uid => {
-                        const detail = await Service.httpBaseAccountUserResolver({ uid })
-                        const roleKeyIds = (detail.data?.roleKeyIds ?? []).filter((keyId: number) => keyId !== props.roleId)
-                        return Service.httpBaseAccountUpdateUserRole({ uid, roleKeyIds })
+        async function fetchBaseAccountRoleUnlinkUser(node: Omix) {
+            return await fetchDialogService({
+                title: '提示',
+                type: 'warning',
+                content: `确认移除【${node.name}】账号角色吗？`,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.roleId, uids: [node.uid] })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh({ page: 1 })
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
                     })
-                ).then(() => {
-                    return fetchRefresh({ page: 1 })
-                })
+                }
             })
         }
 
@@ -88,9 +82,11 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button dashed type="primary" onClick={fetchDeployRoleAccount}>
-                            关联员工
-                        </common-base-button>
+                        <common-base-authorize key-name="chat:deploy:system:role:link:user">
+                            <common-base-button dashed type="primary" onClick={fetchDeployRoleUser}>
+                                关联用户
+                            </common-base-button>
+                        </common-base-authorize>
                     </common-database-search-function>
                     <common-database-search-column prop="vague" label="关键字">
                         <form-base-input
@@ -103,7 +99,7 @@ export default defineComponent({
                 </common-database-search>
                 <common-database-table
                     class="p-0!"
-                    show-select
+                    show-command
                     show-settings
                     bordered={false}
                     limit={state.limit}
@@ -121,31 +117,42 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_avatar: (data: Omix) => {
-                            return <common-database-table-user element="avatar" data={data}></common-database-table-user>
+                        col_name: (data: Omix) => {
+                            return <common-base-user element="text" data={data}></common-base-user>
                         },
-                        col_createBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.createByOptions}></common-database-table-user>
-                        ),
-                        col_modifyBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
-                        ),
-                        col_action: (data: Omix) => (
-                            <common-base-button
-                                {...{ text: true, iconSize: 14, icon: 'nest-delete', type: 'error' }}
-                                onClick={(e: MouseEvent) => fetchDeleteAccountRole(e, [data.uid])}
-                            ></common-base-button>
-                        ),
+                        col_avatar: (data: Omix) => {
+                            return <common-base-user element="avatar" data={data}></common-base-user>
+                        },
+                        col_organizations: (data: Omix) => {
+                            return <common-base-content value={data.organizations}></common-base-content>
+                        },
+                        col_levels: (data: Omix) => {
+                            return <common-base-content bit="/" value={data.levels}></common-base-content>
+                        },
+                        col_posts: (data: Omix) => {
+                            return <common-base-content value={data.posts}></common-base-content>
+                        },
+                        col_ranks: (data: Omix) => {
+                            return <common-base-content value={data.ranks}></common-base-content>
+                        },
+                        col_roles: (data: Omix) => {
+                            return <common-base-content value={data.roles}></common-base-content>
+                        },
                         col_command: (data: Omix) => (
-                            <common-base-authorize>
+                            <common-base-authorize
+                                element
+                                empty="-"
+                                key-name="chat:deploy:system:role:unlink:user"
+                                class="flex items-center gap-x-10 overflow-hidden"
+                            >
                                 <common-base-button
-                                    title="移除关联"
-                                    type="error"
                                     text
-                                    icon-size={16}
-                                    icon={Delete}
-                                    //onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
-                                ></common-base-button>
+                                    type="error"
+                                    title="移除用户关联角色"
+                                    onClick={(e: MouseEvent) => fetchBaseAccountRoleUnlinkUser(data)}
+                                >
+                                    移除用户
+                                </common-base-button>
                             </common-base-authorize>
                         )
                     }}
