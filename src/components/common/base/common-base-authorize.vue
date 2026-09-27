@@ -4,6 +4,7 @@ import { useGlobal, useStore } from '@/store'
 
 export default defineComponent({
     name: 'CommonBaseAuthorize',
+    inheritAttrs: false,
     props: {
         /**空节点内容**/
         empty: { type: [Number, String, Object] as PropType<string | number | VNode> },
