@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { computed, defineComponent, h } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { defineComponent, h } from 'vue'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
 import { isEmpty, fetchNormalizeTreeChildren } from '@/utils'
@@ -10,6 +10,10 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
+        /**菜单静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseAccountSheetEnums(), {
+            immediate: true
+        })
         /**菜单树结构**/
         const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
             transform: fetchNormalizeTreeChildren,
@@ -20,14 +24,18 @@ export default defineComponent({
             }
         })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
+        const { formRef, formState, state, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
             formState: {
-                parentKeyId: undefined as number | undefined, //父级ID
-                name: undefined, //菜单名称
-                permissionCode: undefined, //权限标识
-                path: undefined //菜单地址
+                /**父级ID**/
+                parentKeyId: undefined as unknown as number,
+                /**菜单名称**/
+                name: undefined,
+                /**权限标识**/
+                permissionCode: undefined,
+                /**菜单地址**/
+                path: undefined
             },
             columns: [
                 { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
@@ -35,6 +43,7 @@ export default defineComponent({
                 { title: '类型', key: 'type', width: 100 },
                 { title: '排序号', key: 'sort', width: 100 },
                 { title: '状态', key: 'status', width: 100 },
+                { title: '显示状态', key: 'visible', width: 100 },
                 { title: '权限标识', key: 'permissionCode', minWidth: 200 },
                 { title: '路由地址', key: 'path', minWidth: 200 },
                 { title: '创建时间', key: 'createTime', width: 160 },
@@ -102,11 +111,14 @@ export default defineComponent({
                     return await done({ loading: true }).then(async () => {
                         try {
                             await Service.httpBaseAccountDeleteSheet({ keyId: node.keyId })
-                            await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
-                            return await done({ visible: false })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
+                            })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
@@ -246,18 +258,33 @@ export default defineComponent({
                                     </div>
                                 ),
                                 col_type: (data: Omix) => (
-                                    <common-database-table-chunk
-                                        element="chunk"
+                                    <common-base-chunk
+                                        bordered
                                         value={data.type}
-                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_CHUNK}
-                                    ></common-database-table-chunk>
+                                        items={chunkOptions.value.typeOptions}
+                                    ></common-base-chunk>
                                 ),
                                 col_status: (data: Omix) => (
-                                    <common-database-table-chunk
-                                        element="chunk"
+                                    <common-base-chunk
+                                        bordered
                                         value={data.status}
-                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_STATUS}
-                                    ></common-database-table-chunk>
+                                        items={chunkOptions.value.statusOptions}
+                                    ></common-base-chunk>
+                                ),
+                                col_visible: (data: Omix) => (
+                                    <common-base-chunk
+                                        bordered
+                                        value={data.visible}
+                                        items={chunkOptions.value.visibleOptions}
+                                    ></common-base-chunk>
+                                ),
+                                col_command: (data: Omix) => (
+                                    <common-base-authorize
+                                        element
+                                        empty="-"
+                                        key-name="chat:deploy:system:role:unlink:user"
+                                        class-name="flex items-center gap-x-10 overflow-hidden"
+                                    ></common-base-authorize>
                                 )
                             }}
                         </common-database-table>

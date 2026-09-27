@@ -30,6 +30,10 @@ export default defineComponent({
                 /**归属部门**/
                 organizationKeyIds: []
             },
+            actions: [
+                { title: '编辑', key: 'update', type: 'primary', field: 'allowUpdate' },
+                { title: '删除', key: 'delete', type: 'error', field: 'allowDelete' }
+            ],
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                 { title: '名称', key: 'name', width: 120, disabled: true },

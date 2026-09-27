@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
 import { useBaseService, useSelectService } from '@/hooks'
-import { isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
+import { fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid, Edit, Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -24,7 +24,10 @@ export default defineComponent({
                 tabName: 'user',
                 selectedKeys: [] as Array<number>,
                 expandedKeys: [] as Array<number>,
-                actions: [{ keyName: 'chat:deploy:system:role:update' }, { keyName: 'chat:deploy:system:role:delete' }]
+                actions: [
+                    { title: '编辑角色', key: 'chat:deploy:system:role:update' },
+                    { title: '删除角色', key: 'chat:deploy:system:role:delete' }
+                ]
             }
         })
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
@@ -64,16 +67,18 @@ export default defineComponent({
             }
         }
 
-        /**新增、编辑岗位角色**/
-        async function fetchDeployUpdateSystemRole(event: MouseEvent, node: Omix = {}) {
+        /**新增岗位角色**/
+        async function fetchCreateDeploySystemRole() {
+            return await feedback.fetchDeploySystemRole({
+                title: '新增岗位角色',
+                command: 'CREATE',
+                onSubmit: () => fetchRefresh()
+            })
+        }
+
+        /**编辑岗位角色**/
+        async function fetchUpdateDeploySystemRole(event: MouseEvent, node: Omix = {}) {
             return await stop(event).then(async () => {
-                if (isEmpty(node.keyId)) {
-                    return await feedback.fetchDeploySystemRole({
-                        title: '新增岗位角色',
-                        command: 'CREATE',
-                        onSubmit: () => fetchRefresh()
-                    })
-                }
                 return await feedback.fetchDeploySystemRole({
                     node,
                     title: '编辑岗位角色',
@@ -84,7 +89,7 @@ export default defineComponent({
         }
 
         /**删除岗位角色**/
-        async function fetchDeployDeleteSystemRole(event: MouseEvent, node: Omix) {
+        async function fetchDeleteDeploySystemRole(event: MouseEvent, node: Omix) {
             return await stop(event).then(async () => {
                 return await fetchDialogService({
                     title: '提示',
@@ -125,11 +130,7 @@ export default defineComponent({
                                     <div class="flex items-center justify-between p-block-12 overflow-hidden">
                                         <n-h4 class="line-height-21 m-0">通用角色</n-h4>
                                         <common-base-authorize key-name="chat:deploy:system:role:create">
-                                            <common-base-button
-                                                text
-                                                type="primary"
-                                                onClick={(event: MouseEvent) => fetchDeployUpdateSystemRole(event)}
-                                            >
+                                            <common-base-button text type="primary" onClick={fetchCreateDeploySystemRole}>
                                                 新增角色
                                             </common-base-button>
                                         </common-base-authorize>
@@ -159,27 +160,27 @@ export default defineComponent({
                                                         </n-ellipsis>
                                                         <common-base-authorize
                                                             element
-                                                            key-name={faseState.actions.map(e => e.keyName)}
-                                                            class="flex items-center p-inline-7 gap-x-7 overflow-hidden"
+                                                            key-name={faseState.actions.map(item => item.key)}
+                                                            class-name="flex items-center p-inline-7 gap-x-7 overflow-hidden"
                                                         >
-                                                            <common-base-authorize key-name="chat:deploy:system:role:update">
+                                                            <common-base-authorize key-name={faseState.actions[0].key}>
                                                                 <common-base-button
-                                                                    title="编辑角色"
+                                                                    title={faseState.actions[0].title}
                                                                     type="info"
                                                                     text
                                                                     icon-size={16}
                                                                     icon={Edit}
-                                                                    onClick={(e: MouseEvent) => fetchDeployUpdateSystemRole(e, item)}
+                                                                    onClick={(e: MouseEvent) => fetchUpdateDeploySystemRole(e, item)}
                                                                 ></common-base-button>
                                                             </common-base-authorize>
-                                                            <common-base-authorize key-name="chat:deploy:system:role:delete">
+                                                            <common-base-authorize key-name={faseState.actions[1].key}>
                                                                 <common-base-button
-                                                                    title="删除角色"
+                                                                    title={faseState.actions[1].title}
                                                                     type="error"
                                                                     text
                                                                     icon-size={16}
                                                                     icon={Delete}
-                                                                    onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
+                                                                    onClick={(e: MouseEvent) => fetchDeleteDeploySystemRole(e, item)}
                                                                 ></common-base-button>
                                                             </common-base-authorize>
                                                         </common-base-authorize>

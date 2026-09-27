@@ -6,6 +6,8 @@ export default defineComponent({
     name: 'CommonBaseAuthorize',
     inheritAttrs: false,
     props: {
+        /**根节点样式**/
+        className: { type: String, default: '' },
         /**空节点内容**/
         empty: { type: [Number, String, Object] as PropType<string | number | VNode> },
         /**是否开启根节点**/
@@ -20,7 +22,7 @@ export default defineComponent({
             const allowed = superAdmin.value || required.length === 0 || required.every(code => sheetOptions.value.includes(code))
 
             if (allowed && props.element) {
-                return <div class="common-base-authorize">{slots.default && slots.default()}</div>
+                return <div class={`common-base-authorize ${props.className}`}>{slots.default && slots.default()}</div>
             } else if (allowed) {
                 return <Fragment>{slots.default && slots.default()}</Fragment>
             }
