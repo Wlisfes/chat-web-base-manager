@@ -58,7 +58,7 @@ export async function createComponent<T extends Omix>(
     }
 
     setupStore(app)
-    setupRouter(app, { interceptor: true })
+    setupRouter(app, { interceptor: false })
     nextTick(async () => {
         await mounte()
     })

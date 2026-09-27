@@ -1,5 +1,13 @@
 import { request } from '@/utils'
 
+/**获取角色状态、数据范围类型和数据范围状态枚举**/
+export function httpBaseAccountRoleEnums() {
+    return request({
+        url: '/api/account/role/enums',
+        method: 'GET'
+    })
+}
+
 /**获取角色列表**/
 export function httpBaseAccountSelectRole() {
     return request({

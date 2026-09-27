@@ -122,48 +122,6 @@ export function mapDeployOrganizationChartNodes<T extends Omix>(nodes: Array<T> 
     return result as Array<T>
 }
 
-/**将角色表单转换为账号服务角色字段。*/
-export function createDeployRolePayload(data: Omix): Omix {
-    return {
-        code: data.code ?? `role_${Date.now()}`,
-        name: data.name,
-        description: data.description ?? data.comment,
-        sort: data.sort ?? 10,
-        status: data.status ?? 'enabled'
-    }
-}
-
-/**生成角色数据范围请求字段。*/
-export function createDeployRoleDataScopePayload(data: Omix): Omix {
-    if (!data.model) return { rules: [] }
-    const organizations = (data.organizationKeyIds ?? []).map((organizationKeyId: number) => ({
-        organizationKeyId,
-        includeChildren: true
-    }))
-    return {
-        rules: [
-            {
-                resourceCode: 'account:user',
-                scopeType: data.model,
-                status: 'enabled',
-                ...(data.model === 'custom' ? { organizations } : {})
-            }
-        ]
-    }
-}
-
-/**将账号服务角色转换为管理端字段。*/
-export function mapDeployRole(role: Omix): Omix {
-    const dataScope = (role.dataScopes ?? []).find((item: Omix) => item.resourceCode === 'account:user') ?? role.dataScopes?.[0]
-    return {
-        ...role,
-        comment: role.description,
-        chunk: role.builtin ? 'builtin' : 'custom',
-        model: dataScope?.scopeType,
-        organizationKeyIds: (dataScope?.organizations ?? []).map((item: Omix) => item.organizationKeyId)
-    }
-}
-
 /**获取只关联一个组织的部门角色。*/
 export function getDeploySingleOrganizationKeyId(role: Omix): number | undefined {
     const organizationKeyIds = [
@@ -200,8 +158,7 @@ export function getDeployDepartmentRoleTreeRoots(nodes: Array<Omix>): Array<Omix
 }
 
 /**构建角色页面展示数据。*/
-export function createDeployRoleView(rolesData: Array<Omix>, organizations: Array<Omix>): Omix {
-    const roles = rolesData.map(mapDeployRole)
+export function createDeployRoleView(roles: Array<Omix>, organizations: Array<Omix>): Omix {
     const rolesByOrganization = new Map<number, Omix>()
     const departmentRoleKeyIds = new Set<number>()
     for (const role of roles) {

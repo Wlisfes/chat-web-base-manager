@@ -3,7 +3,7 @@ import { computed, defineComponent, h } from 'vue'
 import { useBaseService } from '@/hooks'
 import { createDeployRoleView, isEmpty, fetchNormalizeTreeChildren, stop } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import { SendFilled, Grid } from '@vicons/carbon'
+import { SendFilled, Grid, Edit, Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -156,20 +156,21 @@ export default defineComponent({
                                                         <n-ellipsis tooltip={false} class="flex-1 overflow-hidden">
                                                             <n-text>{item.name}</n-text>
                                                         </n-ellipsis>
-                                                        <div class="flex items-center p-inline-7 overflow-hidden" title="编辑角色">
+                                                        <div class="flex items-center p-inline-7 gap-x-7 overflow-hidden">
                                                             <common-base-button
+                                                                title="编辑角色"
+                                                                type="info"
                                                                 text
                                                                 icon-size={16}
-                                                                icon="nest-settings"
+                                                                icon={Edit}
                                                                 onClick={(e: MouseEvent) => fetchDeployUpdateSystemRole(e, item)}
                                                             ></common-base-button>
-                                                        </div>
-                                                        <div class="flex items-center p-inline-7 overflow-hidden" title="删除角色">
                                                             <common-base-button
+                                                                title="删除角色"
+                                                                type="error"
                                                                 text
                                                                 icon-size={16}
-                                                                type="error"
-                                                                icon="nest-delete"
+                                                                icon={Delete}
                                                                 onClick={(e: MouseEvent) => fetchDeployDeleteSystemRole(e, item)}
                                                             ></common-base-button>
                                                         </div>
