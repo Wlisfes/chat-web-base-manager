@@ -190,7 +190,7 @@ export default defineComponent({
                                 value={state.actions.map(e => `${props.keyName}:${e.key}`)}
                             >
                                 {state.actions.map(item => (
-                                    <common-base-authorize value={`${props.keyName}:${item.key}`}>
+                                    <common-base-authorize key-name={`${props.keyName}:${item.key}`}>
                                         <common-base-button
                                             text
                                             type={item.type}

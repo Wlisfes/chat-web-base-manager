@@ -1,9 +1,17 @@
 import { request } from '@/utils'
 
-/**获取角色列表**/
-export function httpBaseAccountSelectRole() {
+/**获取角色状态、数据范围类型和数据范围状态枚举**/
+export function httpBaseAccountRoleEnums() {
     return request({
-        url: '/api/account/role/select',
+        url: '/api/account/role/enums',
+        method: 'GET'
+    })
+}
+
+/**获取通用角色列表和岗位角色树**/
+export function httpBaseAccountRoleConfiger() {
+    return request({
+        url: '/api/account/role/configer',
         method: 'GET'
     })
 }
@@ -44,19 +52,28 @@ export function httpBaseAccountDeleteRole(data: Omix) {
     })
 }
 
-/**替换角色的全部菜单和按钮权限**/
-export function httpBaseAccountUpdateRoleMenu(data: Omix) {
+/**批量关联角色用户**/
+export function httpBaseAccountRoleLinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/update/menu',
+        url: '/api/account/role/link/user',
         method: 'POST',
         data
     })
 }
 
-/**替换角色的全部资源数据范围**/
-export function httpBaseAccountUpdateRoleDataScope(data: Omix) {
+/**批量移除角色用户**/
+export function httpBaseAccountRoleUnlinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/update/data/scope',
+        url: '/api/account/role/unlink/user',
+        method: 'POST',
+        data
+    })
+}
+
+/**替换角色的全部菜单和按钮权限**/
+export function httpBaseAccountUpdateRoleSheet(data: Omix) {
+    return request({
+        url: '/api/account/role/update/sheet',
         method: 'POST',
         data
     })

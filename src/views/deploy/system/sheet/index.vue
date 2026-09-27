@@ -11,23 +11,18 @@ export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单树结构**/
-        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTree(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
+            transform: fetchNormalizeTreeChildren,
             immediate: true,
             options: {
                 selectedKeys: [] as Array<number>,
                 expandedKeys: [] as Array<number>
             }
         })
-        const sheetTreeData = computed(() => fetchNormalizeTreeChildren(sheetOptions.dataSource.value))
         /**表格实例**/
         const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
             request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:sheet',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {
-            // CHUNK_SHEET_STATUS: true,
-            // CHUNK_SHEET_CHUNK: true
-            // },
             formState: {
                 parentKeyId: undefined as number | undefined, //父级ID
                 name: undefined, //菜单名称
@@ -139,7 +134,7 @@ export default defineComponent({
                                         pattern={sheetOptions.state.pattern}
                                         selected-keys={sheetOptions.state.selectedKeys}
                                         expanded-keys={sheetOptions.state.expandedKeys}
-                                        data={sheetTreeData.value}
+                                        data={sheetOptions.dataSource.value}
                                         render-switcher-icon={() => h(SendFilled)}
                                         on-update:selected-keys={fetchUpdateSelected}
                                         on-update:expanded-keys={fetchUpdateExpanded}
