@@ -69,15 +69,15 @@ export default defineComponent({
         }
 
         /**禁用账号**/
-        async function fetchBaseAccountUpdateUser(node: Omix) {
+        async function fetchBaseAccountUpdateUser(node: Omix, status: string) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认禁用账号【${node.name}】吗？禁用后该账号将无法登录。`,
+                content: `确认${['enabled'].includes(status) ? '启用' : '禁用'}账号【${node.name}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status: 'disabled' })
+                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()
@@ -231,14 +231,25 @@ export default defineComponent({
                                     </common-base-button>
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[1].key}>
-                                    <common-base-button
-                                        text
-                                        title="禁用"
-                                        type="error"
-                                        onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data)}
-                                    >
-                                        禁用
-                                    </common-base-button>
+                                    {['enabled'].includes(data.status) ? (
+                                        <common-base-button
+                                            text
+                                            title="禁用"
+                                            type="error"
+                                            onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data, 'disabled')}
+                                        >
+                                            禁用
+                                        </common-base-button>
+                                    ) : (
+                                        <common-base-button
+                                            text
+                                            title="启用"
+                                            type="success"
+                                            onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data, 'enabled')}
+                                        >
+                                            启用
+                                        </common-base-button>
+                                    )}
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[2].key}>
                                     <common-base-button
