@@ -30,6 +30,14 @@ export default defineComponent({
                 transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
             }
         )
+        /**职级选项：Skyline 枚举 CHUNK_SYSTEM_ACCOUNT_USER_LEVEL，value 即职级主键**/
+        const levelOptions = useSelectService(
+            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_SYSTEM_ACCOUNT_USER_LEVEL'] }),
+            {
+                immediate: false,
+                transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
+            }
+        )
         /**账号静态枚举**/
         const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
             immediate: false
@@ -40,6 +48,7 @@ export default defineComponent({
             formState: {
                 organizationKeyIds: props.node.organizationKeyIds ?? [], //归属部门
                 postKeyIds: props.node.postKeyIds ?? [], //岗位
+                levelKeyIds: props.node.levelKeyIds ?? [], //职级
                 name: props.node.name, //姓名
                 number: props.node.number, //工号
                 phone: props.node.phone, //手机号
@@ -76,7 +85,7 @@ export default defineComponent({
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), postOptions.fetchRequest()]
+            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), postOptions.fetchRequest(), levelOptions.fetchRequest()]
             return await Promise.all(taskNames).then(async () => {
                 if (['CREATE'].includes(props.command)) {
                     return await fetchInstState().then(async formData => {
@@ -168,6 +177,19 @@ export default defineComponent({
                                 loading={postOptions.loading.value}
                                 options={postOptions.dataSource.value}
                                 v-model:value={formState.value.postKeyIds}
+                            ></form-base-select>
+                        </form-base-column>
+                        <form-base-column label="职级" path="levelKeyIds">
+                            <form-base-select
+                                clearable
+                                filterable
+                                label-field="name"
+                                label-value="keyId"
+                                placeholder="请选择职级"
+                                loading={levelOptions.loading.value}
+                                options={levelOptions.dataSource.value}
+                                value={formState.value.levelKeyIds[0] ?? null}
+                                onUpdate:value={(value: number | null) => (formState.value.levelKeyIds = value ? [value] : [])}
                             ></form-base-select>
                         </form-base-column>
                         <form-base-column label="姓名" path="name">
