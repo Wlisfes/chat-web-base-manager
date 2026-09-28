@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, ref, computed, nextTick, Fragment, PropType, CSSProperties } from 'vue'
+import { defineComponent, ref, computed, nextTick, Fragment, Comment, PropType, CSSProperties } from 'vue'
 import { useVModels, useCurrentElement, useElementSize } from '@vueuse/core'
 import { Search, DownToBottom, UpToTop } from '@vicons/carbon'
 import { fetchWherer, isObject } from '@/utils'
@@ -89,12 +89,10 @@ export default defineComponent({
                 return (aIndex === -1 ? Infinity : aIndex) - (bIndex === -1 ? Infinity : bIndex)
             })
         }
-        /**操作功能节点判断过滤**/
+        /**操作功能节点判断过滤：只去掉条件渲染为假时产生的注释节点；组件最终是否渲染出内容由 DOM :empty 判断**/
         function fetchColumnCheckFunctions<T extends Omix>(vnode: Array<T>): Array<T> {
             if (isObject<Omix>(vnode[0]?.props) && vnode[0]?.props.abstract) {
-                return (vnode[0]?.children?.default?.() ?? []).flat(1).map((node: Omix) => {
-                    return node
-                })
+                return (vnode[0]?.children?.default?.() ?? []).flat(1).filter((node: Omix) => node.type !== Comment)
             }
             return vnode
         }
@@ -112,7 +110,6 @@ export default defineComponent({
 
         return () => {
             const { columns, functions } = fetchColumnTransaction((slots.default?.() ?? []) as Array<Omix>)
-
             return (
                 <div class="common-database-search flex flex-col overflow-hidden" style={{ [`--common-limit-width`]: `${props.limit}px` }}>
                     <n-card
@@ -138,7 +135,7 @@ export default defineComponent({
                             <n-element class={`flex flex-wrap gap-10 ${props.functionClass}`}>
                                 {functions.length > 0 && (
                                     <Fragment>
-                                        {functions}
+                                        <div class="common-database-search-actions">{functions}</div>
                                         {props.function.includes('abstract') && (
                                             <n-divider vertical class="h-[var(--height-medium)]! m-0!" />
                                         )}
@@ -194,6 +191,12 @@ export default defineComponent({
     padding-inline-start: var(--common-limit-width);
     padding-inline-end: var(--common-limit-width);
     padding-block-start: var(--common-limit-width);
+}
+.common-database-search-actions {
+    display: contents;
+    &:empty + :deep(.n-divider) {
+        display: none;
+    }
 }
 .common-database-formstate {
     gap: 10px;

@@ -18,9 +18,9 @@ export default defineComponent({
     setup(props, { slots }) {
         const { sheetOptions, superAdmin } = useStore(useGlobal)
         return () => {
-            const required = [props.keyName ?? []].flat()
-            const allowed = superAdmin.value || required.length === 0 || required.every(code => sheetOptions.value.includes(code))
-
+            const keys = [props.keyName ?? []].flat()
+            // 未配置权限码视为无权限，只有超级管理员放行，避免漏写 key-name 时按钮对所有人可见。
+            const allowed = superAdmin.value || (keys.length > 0 && keys.every(code => sheetOptions.value.includes(code)))
             if (allowed && props.element) {
                 return <div class={`common-base-authorize ${props.className}`}>{slots.default && slots.default()}</div>
             } else if (allowed) {
