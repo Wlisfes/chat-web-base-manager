@@ -1,52 +1,57 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'FinanceBaseCurrency',
     setup(props, ctx) {
+        /**币种静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseFinanceCurrencyEnums(), {
+            immediate: true
+        })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnCurrency(payload),
+            (base, payload) => Service.httpBaseFinanceColumnCurrency({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:currency',
-                // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: { CHUNK_CURRENCY_STATUS: true },
                 formState: {
-                    name: undefined, //币种名称
-                    status: undefined //状态
+                    /**币种名称**/
+                    name: undefined,
+                    /**状态**/
+                    status: undefined
                 },
+                actions: [{ title: '编辑', key: 'chat:finance:base:currency:update' }],
                 columns: [
                     { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
                     { title: '币种名称', key: 'name', minWidth: 160, disabled: true },
-                    { title: '币种符号', key: 'symbol', minWidth: 100, check: true },
-                    { title: '状态', key: 'status', minWidth: 120, check: true },
-                    { title: '创建时间', key: 'createTime', width: 160, check: true },
-                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                    { title: '币种符号', key: 'symbol', minWidth: 100 },
+                    { title: '状态', key: 'status', width: 120 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
         )
 
         /**切换状态**/
-        async function fetchBaseFinanceUpdateCurrencyStatus() {
-            const node = state.select[0]
-            const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
-            const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
+        async function fetchBaseFinanceUpdateCurrencyStatus(node: Omix, status: string) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认将币种【${node.name}】状态变更为【${nextLabel}】吗？`,
+                content: `确认${['enable'].includes(status) ? '启用' : '禁用'}币种【${node.name}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateCurrencyStatus({ keyId: node.keyId, status: nextStatus })
-                            await fetchRefresh()
-                            return await done({ visible: false })
+                            await Service.httpBaseFinanceUpdateCurrencyStatus({ keyId: node.keyId, status })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
@@ -57,7 +62,7 @@ export default defineComponent({
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
                     function-class="justify-end"
-                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
+                    function={['search', 'restore', 'collapse', 'deploy']}
                     ref={formRef}
                     limit={state.limit}
                     v-model:loading={state.loading}
@@ -68,11 +73,6 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseFinanceUpdateCurrencyStatus}>
-                            切换状态
-                        </common-base-button>
-                    </common-database-search-function>
                     <common-database-search-column disabled prop="name" label="币种名称">
                         <form-base-input
                             clearable
@@ -83,15 +83,18 @@ export default defineComponent({
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
-                            placeholder="请选择付款模式"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
+                            clearable
+                            placeholder="请选择状态"
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
+                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-select
                     show-settings
+                    show-command={instState.value.showCommand}
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
@@ -108,11 +111,32 @@ export default defineComponent({
                 >
                     {{
                         col_status: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
-                            ></common-database-table-chunk>
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                        ),
+                        col_command: (data: Omix) => (
+                            <common-base-element class-name="flex items-center gap-x-10 overflow-hidden">
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    {['enable'].includes(data.status) ? (
+                                        <common-base-button
+                                            text
+                                            title="禁用"
+                                            type="error"
+                                            onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCurrencyStatus(data, 'disable')}
+                                        >
+                                            禁用
+                                        </common-base-button>
+                                    ) : (
+                                        <common-base-button
+                                            text
+                                            title="启用"
+                                            type="success"
+                                            onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCurrencyStatus(data, 'enable')}
+                                        >
+                                            启用
+                                        </common-base-button>
+                                    )}
+                                </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>

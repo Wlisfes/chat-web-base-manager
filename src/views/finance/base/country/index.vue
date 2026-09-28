@@ -1,53 +1,58 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'FinanceBaseCountry',
     setup(props, ctx) {
+        /**国家/地区静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseFinanceCountryEnums(), {
+            immediate: true
+        })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnCountry(payload),
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnCountry({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:country',
-                // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: { CHUNK_COUNTRY_STATUS: true },
                 formState: {
-                    cnName: undefined, //国家/地区名称
-                    status: undefined //状态
+                    /**国家/地区名称、编码**/
+                    cnName: undefined,
+                    /**状态**/
+                    status: undefined
                 },
+                actions: [{ title: '编辑', key: 'chat:finance:base:country:update' }],
                 columns: [
                     { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
                     { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
-                    { title: '英文名称', key: 'enName', minWidth: 140, check: true },
-                    { title: 'MCC', key: 'mcc', minWidth: 140, check: true },
-                    { title: '状态', key: 'status', minWidth: 140, check: true },
-                    { title: '创建时间', key: 'createTime', width: 160, check: true },
-                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                    { title: '英文名称', key: 'enName', minWidth: 140 },
+                    { title: 'MCC', key: 'mcc', minWidth: 140 },
+                    { title: '状态', key: 'status', width: 120 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
         )
 
         /**切换状态**/
-        async function fetchBaseFinanceUpdateCountryStatus() {
-            const node = state.select[0]
-            const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
-            const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
+        async function fetchBaseFinanceUpdateCountryStatus(node: Omix, status: string) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认将国家/地区【${node.cnName}】状态变更为【${nextLabel}】吗？`,
+                content: `确认${['enable'].includes(status) ? '启用' : '禁用'}国家/地区【${node.cnName}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateCountryStatus({ keyId: node.keyId, status: nextStatus })
-                            await fetchRefresh()
-                            return await done({ visible: false })
+                            await Service.httpBaseFinanceUpdateCountryStatus({ keyId: node.keyId, status })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
@@ -69,11 +74,6 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseFinanceUpdateCountryStatus}>
-                            切换状态
-                        </common-base-button>
-                    </common-database-search-function>
                     <common-database-search-column disabled prop="cnName" label="名称">
                         <form-base-input
                             clearable
@@ -84,14 +84,17 @@ export default defineComponent({
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
+                            clearable
                             placeholder="请选择状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
+                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-select
+                    show-command
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -109,11 +112,37 @@ export default defineComponent({
                 >
                     {{
                         col_status: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
-                            ></common-database-table-chunk>
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                        ),
+                        col_command: (data: Omix) => (
+                            <common-base-authorize
+                                element
+                                empty="-"
+                                key-name={[state.actions[0].key]}
+                                class-name="flex items-center gap-x-10 overflow-hidden"
+                            >
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    {['enable'].includes(data.status) ? (
+                                        <common-base-button
+                                            text
+                                            title="禁用"
+                                            type="error"
+                                            onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCountryStatus(data, 'disable')}
+                                        >
+                                            禁用
+                                        </common-base-button>
+                                    ) : (
+                                        <common-base-button
+                                            text
+                                            title="启用"
+                                            type="success"
+                                            onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCountryStatus(data, 'enable')}
+                                        >
+                                            启用
+                                        </common-base-button>
+                                    )}
+                                </common-base-authorize>
+                            </common-base-authorize>
                         )
                     }}
                 </common-database-table>

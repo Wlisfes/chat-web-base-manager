@@ -3,6 +3,7 @@ import { FormInst, DataTableColumn } from 'naive-ui'
 import { Observer, fetchExclude, fetchHandler, isNotEmpty } from '@/utils'
 import { ResultResolver, ResultColumn } from '@/interface/instance.resolver'
 import { fetchNotifyService } from '@/plugins'
+import { useGlobal, useStore } from '@/store'
 import { cloneDeep, pick } from 'lodash-es'
 import { useState } from '@/hooks'
 import * as Service from '@/api/instance.service'
@@ -62,6 +63,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
     const observer = ref(Observer<Record<string, Omix>>())
+    const { sheetOptions, superAdmin } = useStore(useGlobal)
     const { state, setState } = useState({
         when: options.when ?? true,
         limit: options.limit ?? 12,
@@ -188,14 +190,18 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     }
 
     /**通用配置聚合**/
-    const instState = computed(() => ({
-        /**克隆按钮禁用状态**/
-        isClone: state.select.length !== 1,
-        /**编辑按钮禁用状态**/
-        isUpdate: state.select.length !== 1,
-        /**删除按钮禁用状态**/
-        isDelete: state.select.length === 0
-    }))
+    const instState = computed(() => {
+        const keyNames = state.actions.map((item: Omix) => item.key)
+        return {
+            showCommand: superAdmin.value || (keyNames.length > 0 && keyNames.every((code: string) => sheetOptions.value.includes(code))),
+            /**克隆按钮禁用状态**/
+            isClone: state.select.length !== 1,
+            /**编辑按钮禁用状态**/
+            isUpdate: state.select.length !== 1,
+            /**删除按钮禁用状态**/
+            isDelete: state.select.length === 0
+        }
+    })
 
     /**函数聚合**/
     const instOptions = {
