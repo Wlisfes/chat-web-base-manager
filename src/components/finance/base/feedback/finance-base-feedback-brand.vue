@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService } from '@/hooks'
+import { useFormService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -16,37 +16,49 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
+        /**品牌静态枚举**/
+        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseFinanceBrandEnums(), {
+            immediate: false
+        })
         /**表单实例**/
-        const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
+        const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseFinanceBrandResolver,
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_BRAND_STATUS: true },
             formState: {
-                name: props.node.name, //品牌名称
-                document: props.node.document, //品牌描述
-                status: props.node.status ?? 'enable' //状态
+                /**品牌名称**/
+                name: props.node.name,
+                /**品牌描述**/
+                document: props.node.document,
+                /**状态**/
+                status: props.node.status ?? 'enable'
             },
             rules: {
                 name: { required: true, message: '请输入品牌名称', trigger: 'blur' },
                 document: { required: true, message: '请输入品牌描述', trigger: 'blur' },
-                status: { required: true, message: '请选择状态', trigger: 'change' }
+                status: { required: true, message: '请选择状态', trigger: 'blur' }
             }
         })
 
         /**品牌详情**/
         async function fetchBaseFinanceBrandResolver() {
-            try {
-                if (['CREATE'].includes(props.command)) {
-                    return await setState({ initialize: false })
-                }
-                return await setForm(fetchReste(props.node)).then(async () => {
+            const taskNames = [fetchChunkService()]
+            if (['CREATE'].includes(props.command)) {
+                return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
                 })
-            } catch (err) {
-                return await setState({ initialize: false }).then(async () => {
-                    return await fetchNotifyService({ type: 'error', title: err.message })
-                })
+            } else {
+                taskNames.unshift(Service.httpBaseFinanceBrandResolver({ keyId: props.node.keyId }))
             }
+            return await Promise.all(taskNames).then(async ([{ data }]) => {
+                try {
+                    return await setForm(fetchReste(data)).then(async () => {
+                        return await setState({ initialize: false })
+                    })
+                } catch (err) {
+                    return await setState({ initialize: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
+            })
         }
 
         /**确定提交表单**/
@@ -76,7 +88,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={640}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -93,28 +105,25 @@ export default defineComponent({
                     disabled={state.loading}
                 >
                     <form-base-column label="品牌名称" path="name">
-                        <form-base-input
-                            maxlength={64}
-                            placeholder="请输入品牌名称"
-                            v-model:value={formState.value.name}
-                        ></form-base-input>
+                        <form-base-input maxlength={64} placeholder="请输入品牌名称" v-model:value={formState.value.name}></form-base-input>
                     </form-base-column>
                     <form-base-column label="状态" path="status">
                         <form-base-select
                             placeholder="请选择状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="品牌描述" path="document">
-                        <n-input
+                        <form-base-input
+                            show-count
                             type="textarea"
                             maxlength={1024}
-                            show-count
                             placeholder="请输入品牌描述"
-                            v-model:value={formState.value.document}
                             autosize={{ minRows: 3, maxRows: 6 }}
-                        />
+                            v-model:value={formState.value.document}
+                        ></form-base-input>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>

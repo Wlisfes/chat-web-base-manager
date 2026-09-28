@@ -8,6 +8,15 @@ export function httpBaseFinanceBrandEnums() {
     })
 }
 
+/**品牌详情**/
+export function httpBaseFinanceBrandResolver(params: Omix) {
+    return request({
+        url: '/api/finance/brand/resolve',
+        method: 'GET',
+        params
+    })
+}
+
 /**新增品牌**/
 export function httpBaseFinanceCreateBrand(data: Omix) {
     return request({
