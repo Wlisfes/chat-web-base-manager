@@ -10,7 +10,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnBasicSmsRate(payload),
+            (base, payload) => Service.httpBaseFinanceColumnFrozenSms(payload),
             {
                 keyName: 'chat:finance:rates:sms',
                 formState: {

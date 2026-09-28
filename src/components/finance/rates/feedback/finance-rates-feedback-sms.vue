@@ -69,9 +69,9 @@ export default defineComponent({
                     }
 
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceCreateBasicSmsRate(submitData)
+                        await Service.httpBaseFinanceCreateFrozenSms(submitData)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceUpdateBasicSmsRate({ ...submitData, keyId: props.node.keyId })
+                        await Service.httpBaseFinanceUpdateFrozenSms({ ...submitData, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
