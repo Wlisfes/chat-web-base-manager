@@ -57,7 +57,8 @@ interface BaseServiceOptions<T, U, R, C> extends Partial<BaseServiceState<T, C>>
 
 /**列表包装hook**/
 export function useColumnService<T extends Omix, U extends Omix, R extends Omix, C extends Partial<Omix> = {}>(
-    options: BaseServiceOptions<T, U, R, C>
+    request: BaseServiceOptions<T, U, R, C>['request'],
+    options: Omit<BaseServiceOptions<T, U, R, C>, 'request'>
 ) {
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
@@ -174,7 +175,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         return await setState({ loading: true } as never).then(async () => {
             try {
                 const body = fetchExclude<U>(formState.value, pick(state, ['page', 'size']))
-                return await options.request(state as BaseServiceState<T & Omix<R>, C>, body, opts).then(async ({ data }) => {
+                return await request(state as BaseServiceState<T & Omix<R>, C>, body, opts).then(async ({ data }) => {
                     if (options.transform && typeof options.transform === 'function') {
                         data.list = ((await options.transform(data)) ?? []) as Array<Omix<T>>
                     }
@@ -189,14 +190,18 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     }
 
     /**通用配置聚合**/
-    const instState = computed(() => ({
-        /**克隆按钮禁用状态**/
-        isClone: state.select.length !== 1,
-        /**编辑按钮禁用状态**/
-        isUpdate: state.select.length !== 1,
-        /**删除按钮禁用状态**/
-        isDelete: state.select.length === 0
-    }))
+    const instState = computed(() => {
+        const keyNames = state.actions.map((item: Omix) => item.key)
+        return {
+            showCommand: superAdmin.value || (keyNames.length > 0 && keyNames.every((code: string) => sheetOptions.value.includes(code))),
+            /**克隆按钮禁用状态**/
+            isClone: state.select.length !== 1,
+            /**编辑按钮禁用状态**/
+            isUpdate: state.select.length !== 1,
+            /**删除按钮禁用状态**/
+            isDelete: state.select.length === 0
+        }
+    })
 
     /**函数聚合**/
     const instOptions = {

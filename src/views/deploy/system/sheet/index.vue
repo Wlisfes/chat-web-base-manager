@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { computed, defineComponent, h } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { defineComponent, h } from 'vue'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled } from '@vicons/carbon'
 import { isEmpty, fetchNormalizeTreeChildren } from '@/utils'
@@ -10,6 +10,10 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
+        /**菜单静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseAccountSheetEnums(), {
+            immediate: true
+        })
         /**菜单树结构**/
         const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
             transform: fetchNormalizeTreeChildren,
@@ -20,27 +24,39 @@ export default defineComponent({
             }
         })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:system:sheet',
-            formState: {
-                parentKeyId: undefined as number | undefined, //父级ID
-                name: undefined, //菜单名称
-                permissionCode: undefined, //权限标识
-                path: undefined //菜单地址
-            },
-            columns: [
-                { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
-                { title: '菜单名称', key: 'name', width: 150, disabled: true },
-                { title: '类型', key: 'type', width: 100 },
-                { title: '排序号', key: 'sort', width: 100 },
-                { title: '状态', key: 'status', width: 100 },
-                { title: '权限标识', key: 'permissionCode', minWidth: 200 },
-                { title: '路由地址', key: 'path', minWidth: 200 },
-                { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新时间', key: 'modifyTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, setForm, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:system:sheet',
+                actions: [
+                    { title: '新增', key: 'chat:deploy:system:sheet:create' },
+                    { title: '编辑', key: 'chat:deploy:system:sheet:update' },
+                    { title: '删除', key: 'chat:deploy:system:sheet:delete' }
+                ],
+                formState: {
+                    /**父级ID**/
+                    parentKeyId: undefined as unknown as number,
+                    /**菜单名称**/
+                    name: undefined,
+                    /**权限标识**/
+                    permissionCode: undefined,
+                    /**菜单地址**/
+                    path: undefined
+                },
+                columns: [
+                    { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
+                    { title: '菜单名称', key: 'name', width: 150, disabled: true },
+                    { title: '类型', key: 'type', width: 100 },
+                    { title: '排序号', key: 'sort', width: 100 },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '显示状态', key: 'visible', width: 100 },
+                    { title: '权限标识', key: 'permissionCode', minWidth: 200 },
+                    { title: '路由地址', key: 'path', minWidth: 200 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         /**左侧树展开变更回调**/
         async function fetchUpdateExpanded(keys: Array<number>) {
@@ -57,7 +73,7 @@ export default defineComponent({
         }
 
         /**新增菜单/按钮**/
-        async function fetchDeploySheetCreate() {
+        async function fetchCreateDeploySheet() {
             return await feedback.fetchDeploySystemSheet({
                 title: '新增菜单/按钮',
                 command: 'CREATE',
@@ -68,11 +84,11 @@ export default defineComponent({
         }
 
         /**编辑菜单、按钮**/
-        async function fetchDeploySheetUpdate() {
+        async function fetchUpdateDeploySheet(node: Omix) {
             return await feedback.fetchDeploySystemSheet({
                 title: '编辑菜单/按钮',
                 command: 'UPDATE',
-                node: state.select[0],
+                node,
                 async onSubmit() {
                     return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                 }
@@ -80,11 +96,11 @@ export default defineComponent({
         }
 
         /**克隆菜单、按钮**/
-        async function fetchDeploySheetClone() {
+        async function fetchCloneDeploySheet(node: Omix) {
             return await feedback.fetchDeploySystemSheet({
                 title: '克隆菜单/按钮',
                 command: 'CLONE',
-                node: state.select[0],
+                node,
                 async onSubmit() {
                     return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
                 }
@@ -92,8 +108,7 @@ export default defineComponent({
         }
 
         /**删除菜单/按钮**/
-        async function fetchDeploySheetDelete() {
-            const node = state.select[0]
+        async function fetchDeleteDeploySheet(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -102,11 +117,14 @@ export default defineComponent({
                     return await done({ loading: true }).then(async () => {
                         try {
                             await Service.httpBaseAccountDeleteSheet({ keyId: node.keyId })
-                            await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
-                            return await done({ visible: false })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])
+                            })
                         } catch (err) {
-                            await done({ loading: false })
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
                         }
                     })
                 }
@@ -120,7 +138,7 @@ export default defineComponent({
                     collapsed-width={0}
                     show-collapsed-content={false}
                     class="flex flex-col bg-transparent"
-                    content-class="flex flex-col flex-1 overflow-hidden! p-block-14 p-is-14"
+                    content-class="flex flex-col flex-1 overflow-hidden! p-block-12 p-is-12"
                 >
                     <n-card class="flex-1 overflow-hidden" content-class="flex flex-col flex-1 p-inline-0! p-block-14! overflow-hidden">
                         <common-base-wrapper opacity={0} loading={sheetOptions.state.loading}>
@@ -145,7 +163,7 @@ export default defineComponent({
                         </common-base-wrapper>
                     </n-card>
                 </n-layout-sider>
-                <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-14 gap-14 overflow-hidden">
+                <n-layout class="bg-transparent" content-class="flex flex-col flex-1 p-12 gap-12 overflow-hidden">
                     <n-layout-header class="bg-transparent">
                         <common-database-search
                             class="p-0!"
@@ -162,33 +180,11 @@ export default defineComponent({
                             on-submit={instOptions.fetchRequest}
                         >
                             <common-database-search-function abstract class="flex gap-col-10">
-                                <common-base-button type="primary" onClick={fetchDeploySheetCreate}>
-                                    新增
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="primary"
-                                    disabled={instState.value.isUpdate}
-                                    onClick={fetchDeploySheetUpdate}
-                                >
-                                    编辑
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="primary"
-                                    disabled={instState.value.isClone}
-                                    onClick={fetchDeploySheetClone}
-                                >
-                                    克隆
-                                </common-base-button>
-                                <common-base-button
-                                    dashed
-                                    type="error"
-                                    disabled={instState.value.isDelete}
-                                    onClick={fetchDeploySheetDelete}
-                                >
-                                    删除
-                                </common-base-button>
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    <common-base-button type="primary" onClick={fetchCreateDeploySheet}>
+                                        新增
+                                    </common-base-button>
+                                </common-base-authorize>
                             </common-database-search-function>
                             <common-database-search-column disabled prop="name" label="菜单名称">
                                 <form-base-input
@@ -219,7 +215,7 @@ export default defineComponent({
                     <n-layout-content class="flex flex-col flex-1 bg-transparent" content-class="flex flex-col flex-1">
                         <common-database-table
                             class="p-0!"
-                            show-select
+                            show-command
                             show-settings
                             page-sizes={[20, 30, 50, 100]}
                             limit={state.limit}
@@ -246,18 +242,64 @@ export default defineComponent({
                                     </div>
                                 ),
                                 col_type: (data: Omix) => (
-                                    <common-database-table-chunk
-                                        element="chunk"
+                                    <common-base-chunk
+                                        bordered
                                         value={data.type}
-                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_CHUNK}
-                                    ></common-database-table-chunk>
+                                        items={chunkOptions.value.typeOptions}
+                                    ></common-base-chunk>
                                 ),
                                 col_status: (data: Omix) => (
-                                    <common-database-table-chunk
-                                        element="chunk"
+                                    <common-base-chunk
+                                        bordered
                                         value={data.status}
-                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_SHEET_STATUS}
-                                    ></common-database-table-chunk>
+                                        items={chunkOptions.value.statusOptions}
+                                    ></common-base-chunk>
+                                ),
+                                col_visible: (data: Omix) => (
+                                    <common-base-chunk
+                                        bordered
+                                        value={data.visible}
+                                        items={chunkOptions.value.visibleOptions}
+                                    ></common-base-chunk>
+                                ),
+                                col_command: (data: Omix) => (
+                                    <common-base-authorize
+                                        element
+                                        empty="-"
+                                        key-name={state.actions.map((item: Omix) => item.key)}
+                                        class-name="flex items-center gap-x-10 overflow-hidden"
+                                    >
+                                        <common-base-authorize key-name={state.actions[0].key}>
+                                            <common-base-button
+                                                text
+                                                title="克隆"
+                                                type="primary"
+                                                onClick={(e: MouseEvent) => fetchCloneDeploySheet(data)}
+                                            >
+                                                克隆
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[1].key}>
+                                            <common-base-button
+                                                text
+                                                title="编辑"
+                                                type="info"
+                                                onClick={(e: MouseEvent) => fetchUpdateDeploySheet(data)}
+                                            >
+                                                编辑
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[2].key}>
+                                            <common-base-button
+                                                text
+                                                title="删除"
+                                                type="error"
+                                                onClick={(e: MouseEvent) => fetchDeleteDeploySheet(data)}
+                                            >
+                                                删除
+                                            </common-base-button>
+                                        </common-base-authorize>
+                                    </common-base-authorize>
                                 )
                             }}
                         </common-database-table>

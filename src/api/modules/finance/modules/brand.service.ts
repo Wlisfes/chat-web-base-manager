@@ -1,5 +1,22 @@
 import { request } from '@/utils'
 
+/**品牌静态枚举**/
+export function httpBaseFinanceBrandEnums() {
+    return request({
+        url: '/api/finance/brand/enums',
+        method: 'GET'
+    })
+}
+
+/**品牌详情**/
+export function httpBaseFinanceBrandResolver(params: Omix) {
+    return request({
+        url: '/api/finance/brand/resolve',
+        method: 'GET',
+        params
+    })
+}
+
 /**新增品牌**/
 export function httpBaseFinanceCreateBrand(data: Omix) {
     return request({
@@ -30,7 +47,16 @@ export function httpBaseFinanceColumnBrand(data: Omix) {
 /**品牌状态修改**/
 export function httpBaseFinanceUpdateBrandStatus(data: Omix) {
     return request({
-        url: `/api/finance/brand/update/status`,
+        url: `/api/finance/brand/status/update`,
+        method: 'POST',
+        data
+    })
+}
+
+/**删除品牌**/
+export function httpBaseFinanceDeleteBrand(data: Omix) {
+    return request({
+        url: '/api/finance/brand/delete',
         method: 'POST',
         data
     })

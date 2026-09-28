@@ -15,37 +15,39 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, statuses: [props.status] }),
-            formState: {
-                consumerKeyId: undefined,
-                consumerAlias: undefined,
-                appId: undefined,
-                appAlias: undefined,
-                countryKeyIds: [] as number[],
-                mcc: undefined
-            },
-            columns: [
-                { title: '客户ID', key: 'consumerKeyId', width: 100, disabled: true },
-                { title: '客户名称', key: 'consumerName', minWidth: 160, check: true },
-                { title: '客户别名', key: 'consumerAlias', width: 140, check: true },
-                { title: '应用ID', key: 'appId', width: 120, check: true },
-                { title: '应用别名', key: 'appAlias', minWidth: 160, check: true },
-                { title: 'MCC', key: 'mcc', width: 80, check: true },
-                { title: 'Code', key: 'code', width: 80, check: true },
-                { title: '国家/地区', key: 'countryName', minWidth: 180, check: true },
-                { title: '上行价格(USD)', key: 'upUsd', width: 140, check: true },
-                { title: '下行价格(USD)', key: 'downUsd', width: 140, check: true },
-                { title: '报价币种', key: 'currency', width: 100, check: true },
-                { title: '上行本币价格', key: 'upLocal', width: 140, check: true },
-                { title: '下行本币价格', key: 'downLocal', width: 140, check: true },
-                { title: '汇率', key: 'exchangeRate', width: 120, check: true },
-                { title: '汇率日期', key: 'exchangeDate', width: 120, check: true },
-                { title: '生效时间', key: 'effectiveTime', width: 170, check: true },
-                { title: '失效时间', key: 'expiryTime', width: 170, check: true },
-                { title: '创建时间', key: 'createTime', width: 170, check: true }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, statuses: [props.status] }),
+            {
+                formState: {
+                    consumerKeyId: undefined,
+                    consumerAlias: undefined,
+                    appId: undefined,
+                    appAlias: undefined,
+                    countryKeyIds: [] as number[],
+                    mcc: undefined
+                },
+                columns: [
+                    { title: '客户ID', key: 'consumerKeyId', width: 100, disabled: true },
+                    { title: '客户名称', key: 'consumerName', minWidth: 160, check: true },
+                    { title: '客户别名', key: 'consumerAlias', width: 140, check: true },
+                    { title: '应用ID', key: 'appId', width: 120, check: true },
+                    { title: '应用别名', key: 'appAlias', minWidth: 160, check: true },
+                    { title: 'MCC', key: 'mcc', width: 80, check: true },
+                    { title: 'Code', key: 'code', width: 80, check: true },
+                    { title: '国家/地区', key: 'countryName', minWidth: 180, check: true },
+                    { title: '上行价格(USD)', key: 'upUsd', width: 140, check: true },
+                    { title: '下行价格(USD)', key: 'downUsd', width: 140, check: true },
+                    { title: '报价币种', key: 'currency', width: 100, check: true },
+                    { title: '上行本币价格', key: 'upLocal', width: 140, check: true },
+                    { title: '下行本币价格', key: 'downLocal', width: 140, check: true },
+                    { title: '汇率', key: 'exchangeRate', width: 120, check: true },
+                    { title: '汇率日期', key: 'exchangeDate', width: 120, check: true },
+                    { title: '生效时间', key: 'effectiveTime', width: 170, check: true },
+                    { title: '失效时间', key: 'expiryTime', width: 170, check: true },
+                    { title: '创建时间', key: 'createTime', width: 170, check: true }
+                ]
+            }
+        )
 
         /**价格格式化**/
         function formatPrice(value: number) {

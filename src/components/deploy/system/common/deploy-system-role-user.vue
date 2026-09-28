@@ -8,34 +8,36 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemRoleUser',
     props: {
-        /**角色ID**/
-        roleId: { type: Number as PropType<number> }
+        /**角色信息**/
+        faseOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:system:role:user',
-            immediate: true,
-            formState: { roleKeyId: props.roleId, vague: undefined },
-            columns: [
-                { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
-                { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '手机号', key: 'phone', width: 140 },
-                { title: '邮箱', key: 'email', width: 200 },
-                { title: '职级', key: 'levels', width: 100 },
-                { title: '岗位', key: 'posts', width: 160 },
-                { title: '归属部门', key: 'organizations', minWidth: 160 },
-                { title: '关联角色', key: 'roles', minWidth: 200 },
-                { title: '入职时间', key: 'createTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:system:role:user',
+                immediate: true,
+                formState: { roleKeyId: props.faseOptions.keyId, vague: undefined },
+                columns: [
+                    { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
+                    { title: '名称', key: 'name', width: 120, disabled: true },
+                    { title: '手机号', key: 'phone', width: 140 },
+                    { title: '邮箱', key: 'email', width: 200 },
+                    { title: '职级', key: 'levels', width: 100 },
+                    { title: '岗位', key: 'posts', width: 160 },
+                    { title: '归属部门', key: 'organizations', minWidth: 160 },
+                    { title: '关联角色', key: 'roles', minWidth: 200 },
+                    { title: '入职时间', key: 'createTime', width: 160 }
+                ]
+            }
+        )
 
         /**添加关联用户弹窗**/
         async function fetchDeployRoleUser(event: MouseEvent) {
             return await feedback.fetchDeploySystemRoleUser({
                 title: '添加关联用户',
-                roleId: props.roleId,
+                roleId: props.faseOptions.keyId,
                 onSubmit: () => fetchRefresh()
             })
         }
@@ -49,7 +51,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.roleId, uids: [node.uid] })
+                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.faseOptions.keyId, uids: [node.uid] })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh({ page: 1 })
@@ -83,7 +85,7 @@ export default defineComponent({
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
                         <common-base-authorize key-name="chat:deploy:system:role:link:user">
-                            <common-base-button dashed type="primary" onClick={fetchDeployRoleUser}>
+                            <common-base-button type="primary" onClick={fetchDeployRoleUser}>
                                 关联用户
                             </common-base-button>
                         </common-base-authorize>

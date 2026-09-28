@@ -39,30 +39,31 @@ export default defineComponent({
             return fetchCurrent(props.appOptions?.dataSource?.value ?? [], (e: Omix) => e.appId === formState.value.appId)
         })
 
-        const { state, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
-            formState: { draftBatchId: undefined },
-            immediate: false,
-            size: 100,
-            transform: data =>
-                data.list.map((item: Omix, index: number) => ({
-                    ...item,
-                    index: index + 1,
-                    upUsd: Number(item.upUsd) / 1_000_000,
-                    downUsd: Number(item.downUsd) / 1_000_000
-                })),
-            columns: [
-                { title: '序号', key: 'index', width: 80 },
-                { title: 'MCC', key: 'mcc', width: 100 },
-                { title: '国家/地区', key: 'code', minWidth: 260 },
-                { title: '下行费率(USD)', key: 'downUsd', width: 320 },
-                { title: '上行费率(USD)', key: 'upUsd', width: 320 },
-                { title: '生效时间', key: 'effectiveTime', width: 250 },
-                { title: '下行变更状态', key: 'downStatus', width: 160 },
-                { title: '上行变更状态', key: 'upStatus', width: 160 }
-            ]
-        })
+        const { state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
+            {
+                formState: { draftBatchId: undefined },
+                immediate: false,
+                size: 100,
+                transform: (data: Omix) =>
+                    data.list.map((item: Omix, index: number) => ({
+                        ...item,
+                        index: index + 1,
+                        upUsd: Number(item.upUsd) / 1_000_000,
+                        downUsd: Number(item.downUsd) / 1_000_000
+                    })),
+                columns: [
+                    { title: '序号', key: 'index', width: 80 },
+                    { title: 'MCC', key: 'mcc', width: 100 },
+                    { title: '国家/地区', key: 'code', minWidth: 260 },
+                    { title: '下行费率(USD)', key: 'downUsd', width: 320 },
+                    { title: '上行费率(USD)', key: 'upUsd', width: 320 },
+                    { title: '生效时间', key: 'effectiveTime', width: 250 },
+                    { title: '下行变更状态', key: 'downStatus', width: 160 },
+                    { title: '上行变更状态', key: 'upStatus', width: 160 }
+                ]
+            }
+        )
 
         watch(
             () => props.state.current,
@@ -110,7 +111,9 @@ export default defineComponent({
                             <common-base-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-base-columns-wrapper>
                             <common-base-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-base-columns-wrapper>
                             <common-base-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-base-columns-wrapper>
-                            <common-base-columns-wrapper label="报价币种：">{consumerInfo.value.currency ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="报价币种：">
+                                {consumerInfo.value.currency ?? '-'}
+                            </common-base-columns-wrapper>
                         </common-base-columns-template>
                     </div>
                 </common-base-element>
@@ -140,22 +143,10 @@ export default defineComponent({
                                 return <span>{country ? `${country.cnName} - ${country.enName}` : data.code}</span>
                             },
                             col_downUsd: (data: Omix) => (
-                                <n-input-number
-                                    class="w-180!"
-                                    min={0}
-                                    step={0.000001}
-                                    precision={6}
-                                    v-model:value={data.downUsd}
-                                />
+                                <n-input-number class="w-180!" min={0} step={0.000001} precision={6} v-model:value={data.downUsd} />
                             ),
                             col_upUsd: (data: Omix) => (
-                                <n-input-number
-                                    class="w-180!"
-                                    min={0}
-                                    step={0.000001}
-                                    precision={6}
-                                    v-model:value={data.upUsd}
-                                />
+                                <n-input-number class="w-180!" min={0} step={0.000001} precision={6} v-model:value={data.upUsd} />
                             ),
                             col_downStatus: (data: Omix) => (
                                 <n-tag bordered={false} type={data.downStatus === 'addition' ? 'success' : 'default'}>

@@ -1,5 +1,13 @@
 import { request } from '@/utils'
 
+/**币种静态枚举**/
+export function httpBaseFinanceCurrencyEnums() {
+    return request({
+        url: '/api/finance/currency/enums',
+        method: 'GET'
+    })
+}
+
 /**币种分页列表**/
 export function httpBaseFinanceColumnCurrency(data: Omix) {
     return request({

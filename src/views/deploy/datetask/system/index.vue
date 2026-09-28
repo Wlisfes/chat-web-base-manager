@@ -14,18 +14,26 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSkylineColumnDatetask({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:datetask:system',
-            formState: {
-                /**任务类型**/
-                type: 'system',
-                /**任务名称**/
-                taskName: undefined,
-                /**任务状态**/
-                status: undefined
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSkylineColumnDatetask({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:datetask:system',
+                actions: [
+                    { title: '启用/停用', key: 'chat:deploy:datetask:system:status:update' },
+                    { title: '编辑', key: 'chat:deploy:datetask:system:update' },
+                    { title: '手动触发', key: 'chat:deploy:datetask:system:trigger' },
+                    { title: '任务日志', key: 'chat:deploy:datetask:system:logs' }
+                ],
+                formState: {
+                    /**任务类型**/
+                    type: 'system',
+                    /**任务名称**/
+                    taskName: undefined,
+                    /**任务状态**/
+                    status: undefined
+                }
             }
-        })
+        )
 
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle(node: Omix) {
@@ -143,7 +151,7 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
-                        {state.dataSource.map(item => (
+                        {state.dataSource.map((item: Omix) => (
                             <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-5">
                                 <n-h4 class="m-be-0">{item.taskName}</n-h4>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
@@ -166,56 +174,68 @@ export default defineComponent({
                                         value={item.status}
                                         items={chunkOptions.value.statusOptions}
                                     ></common-base-chunk>
-                                    <div class="flex items-center gap-x-12 overflow-hidden">
-                                        {['running', 'wait'].includes(item.status) ? (
+                                    <common-base-authorize
+                                        element
+                                        key-name={state.actions.map((item: Omix) => item.key)}
+                                        class-name="flex items-center gap-x-12 overflow-hidden"
+                                    >
+                                        <common-base-authorize key-name={state.actions[0].key}>
+                                            {['running', 'wait'].includes(item.status) ? (
+                                                <common-base-button
+                                                    class="p-inline-6"
+                                                    title="停用任务"
+                                                    type="warning"
+                                                    secondary
+                                                    icon-size={20}
+                                                    icon={Pause}
+                                                    onClick={() => fetchDatetaskStatusToggle(item)}
+                                                ></common-base-button>
+                                            ) : (
+                                                <common-base-button
+                                                    class="p-inline-6"
+                                                    title="启用任务"
+                                                    type="success"
+                                                    secondary
+                                                    icon-size={20}
+                                                    icon={Play}
+                                                    onClick={() => fetchDatetaskStatusToggle(item)}
+                                                ></common-base-button>
+                                            )}
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[1].key}>
                                             <common-base-button
                                                 class="p-inline-6"
-                                                title="停用任务"
-                                                type="warning"
+                                                title="修改定时规则"
+                                                type="primary"
                                                 secondary
                                                 icon-size={20}
-                                                icon={Pause}
-                                                onClick={() => fetchDatetaskStatusToggle(item)}
+                                                icon={Edit}
+                                                onClick={() => fetchDatetaskCronUpdate(item)}
                                             ></common-base-button>
-                                        ) : (
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[2].key}>
                                             <common-base-button
                                                 class="p-inline-6"
-                                                title="启用任务"
-                                                type="success"
+                                                title="手动触发"
+                                                type="info"
                                                 secondary
                                                 icon-size={20}
-                                                icon={Play}
-                                                onClick={() => fetchDatetaskStatusToggle(item)}
+                                                icon={Flash}
+                                                onClick={() => fetchDatetaskTrigger(item)}
                                             ></common-base-button>
-                                        )}
-                                        <common-base-button
-                                            class="p-inline-6"
-                                            title="修改定时规则"
-                                            type="primary"
-                                            secondary
-                                            icon-size={20}
-                                            icon={Edit}
-                                            onClick={() => fetchDatetaskCronUpdate(item)}
-                                        ></common-base-button>
-                                        <common-base-button
-                                            class="p-inline-6"
-                                            title="手动触发"
-                                            type="info"
-                                            secondary
-                                            icon-size={20}
-                                            icon={Flash}
-                                            onClick={() => fetchDatetaskTrigger(item)}
-                                        ></common-base-button>
-                                        <common-base-button
-                                            class="p-inline-6"
-                                            title="查看日志"
-                                            type="info"
-                                            secondary
-                                            icon-size={20}
-                                            icon={Document}
-                                            onClick={() => fetchDatetaskLog(item)}
-                                        ></common-base-button>
-                                    </div>
+                                        </common-base-authorize>
+                                        <common-base-authorize key-name={state.actions[3].key}>
+                                            <common-base-button
+                                                class="p-inline-6"
+                                                title="查看日志"
+                                                type="info"
+                                                secondary
+                                                icon-size={20}
+                                                icon={Document}
+                                                onClick={() => fetchDatetaskLog(item)}
+                                            ></common-base-button>
+                                        </common-base-authorize>
+                                    </common-base-authorize>
                                 </div>
                             </n-card>
                         ))}

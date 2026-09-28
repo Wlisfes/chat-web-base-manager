@@ -18,8 +18,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
         /**短信应用列表**/
-        const { state, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseCrmColumnSmsApplication(payload),
+        const { state, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsApplication(payload), {
             formState: { consumerKeyId: faseNode.value.keyId },
             immediate: true
         })
@@ -40,7 +39,7 @@ export default defineComponent({
                         <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
                             {state.total > 0 && (
                                 <Fragment>
-                                    {state.dataSource.map(item => (
+                                    {state.dataSource.map((item: Omix) => (
                                         <n-card key={item.keyId} content-class="flex flex-col p-0! overflow-hidden">
                                             <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
                                                 <common-base-alert-wrapper class="p-10" type="info">

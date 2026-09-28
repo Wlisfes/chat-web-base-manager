@@ -10,51 +10,53 @@ export default defineComponent({
     setup(props, ctx) {
         const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
-            keyName: 'chatbok:finance:account:consumer',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {
-            // CHUNK_CONSUMER_PAY_MODE: true,
-            // CHUNK_CONSUMER_AUTH_STATUS: true,
-            // CHUNK_CONSUMER_SOURCE: true,
-            // CHUNK_CONSUMER_STATUS: true,
-            // CHUNK_CONSUMER_CLASS: true,
-            // CHUNK_CONSUMER_STAGE: true
-            // },
-            formState: {
-                name: undefined,
-                status: undefined,
-                payMode: undefined,
-                authStatus: undefined,
-                source: undefined
-            },
-            columns: [
-                { title: '客户ID', key: 'keyId', width: 90, disabled: true },
-                { title: '客户名称', key: 'name', minWidth: 160, disabled: true },
-                { title: '客户别名', key: 'alias', minWidth: 120, check: true },
-                { title: '邮箱', key: 'email', minWidth: 180, ellipsis: { tooltip: true }, check: true },
-                { title: '电话号码', key: 'phone', width: 140, check: true },
-                { title: '归属人', key: 'accountOptions', width: 120, check: true },
-                { title: '归属部门', key: 'deptOptions', width: 120, check: true },
-                { title: '品牌', key: 'brandOptions', width: 100, check: true },
-                { title: '客户类型', key: 'classType', width: 100, check: true },
-                { title: '等级', key: 'level', width: 100, check: true },
-                { title: '阶段', key: 'stage', width: 100, check: true },
-                { title: '币种', key: 'currency', width: 100, check: true },
-                { title: '认证状态', key: 'authStatus', align: 'center', width: 100, check: true },
-                { title: '注册来源', key: 'source', align: 'center', width: 100, check: true },
-                { title: '状态', key: 'status', align: 'center', width: 100, check: true },
-                { title: '付款模式', key: 'payMode', align: 'center', width: 100, check: true },
-                { title: '余额', key: 'balance', width: 100, check: true },
-                { title: '信用额度', key: 'credit', width: 100, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
+            {
+                keyName: 'chatbok:finance:account:consumer',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: {
+                // CHUNK_CONSUMER_PAY_MODE: true,
+                // CHUNK_CONSUMER_AUTH_STATUS: true,
+                // CHUNK_CONSUMER_SOURCE: true,
+                // CHUNK_CONSUMER_STATUS: true,
+                // CHUNK_CONSUMER_CLASS: true,
+                // CHUNK_CONSUMER_STAGE: true
+                // },
+                formState: {
+                    name: undefined,
+                    status: undefined,
+                    payMode: undefined,
+                    authStatus: undefined,
+                    source: undefined
+                },
+                columns: [
+                    { title: '客户ID', key: 'keyId', width: 90, disabled: true },
+                    { title: '客户名称', key: 'name', minWidth: 160, disabled: true },
+                    { title: '客户别名', key: 'alias', minWidth: 120, check: true },
+                    { title: '邮箱', key: 'email', minWidth: 180, ellipsis: { tooltip: true }, check: true },
+                    { title: '电话号码', key: 'phone', width: 140, check: true },
+                    { title: '归属人', key: 'accountOptions', width: 120, check: true },
+                    { title: '归属部门', key: 'deptOptions', width: 120, check: true },
+                    { title: '品牌', key: 'brandOptions', width: 100, check: true },
+                    { title: '客户类型', key: 'classType', width: 100, check: true },
+                    { title: '等级', key: 'level', width: 100, check: true },
+                    { title: '阶段', key: 'stage', width: 100, check: true },
+                    { title: '币种', key: 'currency', width: 100, check: true },
+                    { title: '认证状态', key: 'authStatus', align: 'center', width: 100, check: true },
+                    { title: '注册来源', key: 'source', align: 'center', width: 100, check: true },
+                    { title: '状态', key: 'status', align: 'center', width: 100, check: true },
+                    { title: '付款模式', key: 'payMode', align: 'center', width: 100, check: true },
+                    { title: '余额', key: 'balance', width: 100, check: true },
+                    { title: '信用额度', key: 'credit', width: 100, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                ]
+            }
+        )
 
         /**新增客户**/
-        async function fetchAccountConsumerCreate() {
+        async function fetchCreateFinanceAccountConsumer() {
             return await feedback.fetchFinanceAccountConsumer({
                 title: '新增客户',
                 command: 'CREATE',
@@ -76,7 +78,7 @@ export default defineComponent({
         }
 
         /**编辑客户**/
-        async function fetchAccountConsumerUpdate() {
+        async function fetchUpdateFinanceAccountConsumer() {
             return await feedback.fetchFinanceAccountConsumer({
                 title: '编辑客户',
                 command: 'UPDATE',
@@ -88,7 +90,7 @@ export default defineComponent({
         }
 
         /**切换状态**/
-        async function fetchAccountConsumerStatus() {
+        async function fetchBaseAccountUpdateConsumerStatus() {
             const node = state.select[0]
             const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
             const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
@@ -127,23 +129,13 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchAccountConsumerCreate}>
+                        <common-base-button type="primary" onClick={fetchCreateFinanceAccountConsumer}>
                             新增
                         </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate}
-                            onClick={fetchAccountConsumerUpdate}
-                        >
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchUpdateFinanceAccountConsumer}>
                             编辑
                         </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate}
-                            onClick={fetchAccountConsumerStatus}
-                        >
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseAccountUpdateConsumerStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>

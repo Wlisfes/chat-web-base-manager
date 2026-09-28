@@ -99,7 +99,7 @@ export default defineComponent({
                 })
                 chart.onInit(() => {
                     const [left, top, right, bottom] = chart.getViewBox()
-                    chart.setViewBox([-150, top, right, bottom])
+                    chart.setViewBox([-300, top, right, bottom])
                 })
                 chart.onNodeClick(async (args: Omix<{ node: Omix; event: MouseEvent }>) => {
                     if (['company', 'department'].includes(chart.get(args.node.id).type)) {

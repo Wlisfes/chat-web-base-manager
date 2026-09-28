@@ -21,50 +21,52 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
-            keyName: 'chatbok:crm:consumer:common:list',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {
-            // CHUNK_CONSUMER_PAY_MODE: true,
-            // CHUNK_CONSUMER_AUTH_STATUS: true,
-            // CHUNK_CONSUMER_SOURCE: true,
-            // CHUNK_CONSUMER_STATUS: true,
-            // CHUNK_CONSUMER_CLASS: true,
-            // CHUNK_CONSUMER_STAGE: true
-            // },
-            formState: {
-                name: undefined,
-                status: undefined,
-                brandId: undefined,
-                currency: undefined,
-                payMode: undefined,
-                authStatus: undefined,
-                source: undefined
-            },
-            columns: [
-                { title: '客户ID', key: 'keyId', width: 90, disabled: true },
-                { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
-                { title: '客户别名', key: 'alias', width: 150, check: true },
-                { title: '邮箱', key: 'email', width: 160, check: true },
-                { title: '电话号码', key: 'phone', width: 120, check: true },
-                { title: '归属人', key: 'accountOptions', width: 120, check: true },
-                { title: '归属部门', key: 'deptOptions', width: 120, check: true },
-                { title: '品牌', key: 'brandOptions', width: 100, check: true },
-                { title: '客户类型', key: 'classType', width: 100, check: true },
-                { title: '等级', key: 'level', width: 100, check: true },
-                { title: '阶段', key: 'stage', width: 100, check: true },
-                { title: '币种', key: 'currency', width: 100, check: true },
-                { title: '认证状态', key: 'authStatus', width: 100, check: true },
-                { title: '注册来源', key: 'source', width: 100, check: true },
-                { title: '状态', key: 'status', width: 100, check: true },
-                { title: '付款模式', key: 'payMode', width: 100, check: true },
-                { title: '余额', key: 'balance', width: 100, check: true },
-                { title: '信用额度', key: 'credit', width: 100, check: true },
-                { title: '标签', key: 'tags', minWidth: 200, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
+            {
+                keyName: 'chatbok:crm:consumer:common:list',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: {
+                // CHUNK_CONSUMER_PAY_MODE: true,
+                // CHUNK_CONSUMER_AUTH_STATUS: true,
+                // CHUNK_CONSUMER_SOURCE: true,
+                // CHUNK_CONSUMER_STATUS: true,
+                // CHUNK_CONSUMER_CLASS: true,
+                // CHUNK_CONSUMER_STAGE: true
+                // },
+                formState: {
+                    name: undefined,
+                    status: undefined,
+                    brandId: undefined,
+                    currency: undefined,
+                    payMode: undefined,
+                    authStatus: undefined,
+                    source: undefined
+                },
+                columns: [
+                    { title: '客户ID', key: 'keyId', width: 90, disabled: true },
+                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
+                    { title: '客户别名', key: 'alias', width: 150, check: true },
+                    { title: '邮箱', key: 'email', width: 160, check: true },
+                    { title: '电话号码', key: 'phone', width: 120, check: true },
+                    { title: '归属人', key: 'accountOptions', width: 120, check: true },
+                    { title: '归属部门', key: 'deptOptions', width: 120, check: true },
+                    { title: '品牌', key: 'brandOptions', width: 100, check: true },
+                    { title: '客户类型', key: 'classType', width: 100, check: true },
+                    { title: '等级', key: 'level', width: 100, check: true },
+                    { title: '阶段', key: 'stage', width: 100, check: true },
+                    { title: '币种', key: 'currency', width: 100, check: true },
+                    { title: '认证状态', key: 'authStatus', width: 100, check: true },
+                    { title: '注册来源', key: 'source', width: 100, check: true },
+                    { title: '状态', key: 'status', width: 100, check: true },
+                    { title: '付款模式', key: 'payMode', width: 100, check: true },
+                    { title: '余额', key: 'balance', width: 100, check: true },
+                    { title: '信用额度', key: 'credit', width: 100, check: true },
+                    { title: '标签', key: 'tags', minWidth: 200, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true }
+                ]
+            }
+        )
 
         /**新增客户**/
         async function openConsumerCreate() {

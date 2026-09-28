@@ -4,32 +4,34 @@ import { useColumnService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceDeployExchange',
+    name: 'FinanceBaseExchange',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
-            keyName: 'chatbok:finance:deploy:exchange',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {},
-            formState: {
-                currency: undefined,
-                date: undefined
-            },
-            columns: [
-                { title: '币种编码', key: 'currency', minWidth: 120, check: true },
-                { title: '汇率(基于USD)', key: 'rate', minWidth: 160, check: true },
-                { title: '汇率日期', key: 'date', minWidth: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
+            {
+                keyName: 'chat:finance:base:exchange',
+                formState: {
+                    currency: undefined,
+                    date: undefined
+                },
+                columns: [
+                    { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
+                    { title: '汇率(基于USD)', key: 'rate', minWidth: 160, disabled: true },
+                    { title: '汇率日期', key: 'date', minWidth: 160 },
+                    { title: '创建人', key: 'createBy', width: 120 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         return () => (
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
                     function-class="justify-end"
-                    function={['search', 'restore', 'collapse', 'deploy']}
+                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
                     ref={formRef}
                     limit={state.limit}
                     v-model:loading={state.loading}
@@ -72,7 +74,16 @@ export default defineComponent({
                     on-update:customize={instOptions.fetchUpdateCustomize}
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                ></common-database-table>
+                >
+                    {{
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        }
+                    }}
+                </common-database-table>
             </layout-common-container>
         )
     }

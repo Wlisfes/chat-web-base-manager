@@ -9,23 +9,25 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemRoleSheet',
     props: {
-        /**角色ID**/
-        roleId: { type: Number as PropType<number> },
+        /**角色信息**/
+        faseOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**菜单树数据。接口直接返回数组，不是分页结果包装对象。*/
         sheetOptions: { type: Array as PropType<Array<Omix>>, default: () => [] }
     },
     setup(props, ctx) {
         /**角色关联菜单数据**/
-        const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.roleId }),
-            callback: fetchSheetCallback,
-            immediate: true,
-            options: {
-                checkedKeys: [] as Array<number>,
-                indeterminateKeys: [] as Array<number>,
-                expandedKeys: [] as Array<number>
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService(
+            () => Service.httpBaseAccountRoleResolver({ keyId: props.faseOptions.keyId }),
+            {
+                callback: fetchSheetCallback,
+                immediate: true,
+                options: {
+                    checkedKeys: [] as Array<number>,
+                    indeterminateKeys: [] as Array<number>,
+                    expandedKeys: [] as Array<number>
+                }
             }
-        })
+        )
 
         /**角色关联菜单回调：过滤非叶子节点，仅设置叶子节点为checked**/
         async function fetchSheetCallback(data: Omix) {
@@ -39,7 +41,7 @@ export default defineComponent({
             return await setState({ loading: true }).then(async () => {
                 try {
                     await Service.httpBaseAccountUpdateRoleSheet({
-                        keyId: props.roleId,
+                        keyId: props.faseOptions.keyId,
                         sheetKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
                     return await setState({ loading: false }).then(async () => {
@@ -97,7 +99,13 @@ export default defineComponent({
                         >
                             保存
                         </common-base-button>
-                        <common-base-button class="min-w-80" type="warning" secondary onClick={() => fetchSheetCallback(faseNode.value)}>
+                        <common-base-button
+                            class="min-w-80"
+                            type="warning"
+                            secondary
+                            disabled={faseState.loading || faseState.initialize}
+                            onClick={() => fetchSheetCallback(faseNode.value)}
+                        >
                             重置
                         </common-base-button>
                     </common-base-element>

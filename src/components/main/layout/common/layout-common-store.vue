@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useConfiger, useGlobal, useStore } from '@/store'
+import { useGlobal, useStore } from '@/store'
 import { BScroll } from '@/plugins'
 
 export default defineComponent({

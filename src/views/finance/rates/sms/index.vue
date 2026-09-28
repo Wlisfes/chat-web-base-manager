@@ -9,33 +9,35 @@ export default defineComponent({
     name: 'FinanceRatesSms',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnBasicSmsRate(payload),
-            keyName: 'chatbok:finance:rates:sms',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_BRAND_STATUS: true },
-            formState: {
-                code: undefined,
-                mcc: undefined
-            },
-            columns: [
-                { title: '国家/地区编码', key: 'code', width: 120, check: true },
-                { title: '中文名称', key: 'cnName', width: 160, disabled: true },
-                { title: '英文名称', key: 'enName', width: 160, check: true },
-                { title: 'MCC', key: 'mcc', width: 120, check: true },
-                { title: '上行费率(USD)', key: 'upUsd', width: 120, check: true },
-                { title: '下行费率(USD)', key: 'downUsd', width: 120, check: true },
-                { title: '备注', key: 'remark', minWidth: 200, ellipsis: { tooltip: true }, check: true },
-                { title: '创建人', key: 'createBy', width: 120, check: true },
-                { title: '更新人', key: 'modifyBy', width: 120, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnBasicSmsRate(payload),
+            {
+                keyName: 'chatbok:finance:rates:sms',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: { CHUNK_BRAND_STATUS: true },
+                formState: {
+                    code: undefined,
+                    mcc: undefined
+                },
+                columns: [
+                    { title: '国家/地区编码', key: 'code', width: 120, check: true },
+                    { title: '中文名称', key: 'cnName', width: 160, disabled: true },
+                    { title: '英文名称', key: 'enName', width: 160, check: true },
+                    { title: 'MCC', key: 'mcc', width: 120, check: true },
+                    { title: '上行费率(USD)', key: 'upUsd', width: 120, check: true },
+                    { title: '下行费率(USD)', key: 'downUsd', width: 120, check: true },
+                    { title: '备注', key: 'remark', minWidth: 200, ellipsis: { tooltip: true }, check: true },
+                    { title: '创建人', key: 'createBy', width: 120, check: true },
+                    { title: '更新人', key: 'modifyBy', width: 120, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                ]
+            }
+        )
 
         /**新增**/
-        async function fetchDeployRatesSmsCreate() {
-            return await feedback.fetchFinanceDeployRatesSms({
+        async function fetchCreateFinanceRatesSms() {
+            return await feedback.fetchFinanceRatesSms({
                 title: '新增基础价格',
                 command: 'CREATE',
                 async onSubmit() {
@@ -45,8 +47,8 @@ export default defineComponent({
         }
 
         /**编辑**/
-        async function fetchDeployRatesSmsUpdate() {
-            return await feedback.fetchFinanceDeployRatesSms({
+        async function fetchUpdateFinanceRatesSms() {
+            return await feedback.fetchFinanceRatesSms({
                 title: '编辑基础价格',
                 command: 'UPDATE',
                 node: state.select[0],
@@ -72,15 +74,10 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchDeployRatesSmsCreate}>
+                        <common-base-button type="primary" onClick={fetchCreateFinanceRatesSms}>
                             新增
                         </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate}
-                            onClick={fetchDeployRatesSmsUpdate}
-                        >
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchUpdateFinanceRatesSms}>
                             编辑
                         </common-base-button>
                     </common-database-search-function>

@@ -19,30 +19,37 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:system:user',
-            formState: {
-                /**工号/姓名/手机号/邮箱**/
-                vague: undefined,
-                /**状态**/
-                status: undefined,
-                /**归属部门**/
-                organizationKeyIds: []
-            },
-            columns: [
-                { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
-                { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '状态', key: 'status', width: 100 },
-                { title: '手机号', key: 'phone', width: 140 },
-                { title: '邮箱', key: 'email', width: 200 },
-                { title: '职级', key: 'levels', width: 100 },
-                { title: '岗位', key: 'posts', width: 160 },
-                { title: '归属部门', key: 'organizations', minWidth: 160 },
-                { title: '关联角色', key: 'roles', minWidth: 200 },
-                { title: '入职时间', key: 'createTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:system:user',
+                formState: {
+                    /**工号/姓名/手机号/邮箱**/
+                    vague: undefined,
+                    /**状态**/
+                    status: undefined,
+                    /**归属部门**/
+                    organizationKeyIds: []
+                },
+                actions: [
+                    { title: '新增', key: 'chat:deploy:system:user:create' },
+                    { title: '编辑', key: 'chat:deploy:system:user:update' },
+                    { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
+                ],
+                columns: [
+                    { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
+                    { title: '名称', key: 'name', width: 120, disabled: true },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '手机号', key: 'phone', width: 140 },
+                    { title: '邮箱', key: 'email', width: 200 },
+                    { title: '职级', key: 'levels', width: 100 },
+                    { title: '岗位', key: 'posts', width: 160 },
+                    { title: '归属部门', key: 'organizations', minWidth: 160 },
+                    { title: '关联角色', key: 'roles', minWidth: 200 },
+                    { title: '入职时间', key: 'createTime', width: 160 }
+                ]
+            }
+        )
 
         /**新增账号**/
         async function fetchCreateDeploySystemUser() {
@@ -64,15 +71,15 @@ export default defineComponent({
         }
 
         /**禁用账号**/
-        async function fetchBaseAccountUpdateUser(node: Omix) {
+        async function fetchBaseAccountUpdateUser(node: Omix, status: string) {
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认禁用账号【${node.name}】吗？禁用后该账号将无法登录。`,
+                content: `确认${['enabled'].includes(status) ? '启用' : '禁用'}账号【${node.name}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status: 'disabled' })
+                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()
@@ -126,33 +133,11 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
-                            新增
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="primary"
-                            disabled={instState.value.isUpdate}
-                            onClick={() => fetchUpdateDeploySystemUser(state.select[0])}
-                        >
-                            编辑
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="error"
-                            disabled={instState.value.isDelete}
-                            onClick={() => fetchBaseAccountUpdateUser(state.select[0])}
-                        >
-                            禁用
-                        </common-base-button>
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate}
-                            onClick={() => fetchBaseAccountResetUserPassword(state.select[0])}
-                        >
-                            重置密码
-                        </common-base-button>
+                        <common-base-authorize key-name={state.actions[0].key}>
+                            <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
+                                新增
+                            </common-base-button>
+                        </common-base-authorize>
                     </common-database-search-function>
                     <common-database-search-column disabled prop="vague" label="关键词">
                         <form-base-input
@@ -189,7 +174,7 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-select
+                    show-command
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -229,6 +214,56 @@ export default defineComponent({
                         },
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                        ),
+                        col_command: (data: Omix) => (
+                            <common-base-authorize
+                                element
+                                empty="-"
+                                key-name={[state.actions[1].key, state.actions[2].key]}
+                                class-name="flex items-center gap-x-10 overflow-hidden"
+                            >
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    <common-base-button
+                                        text
+                                        title="编辑"
+                                        type="info"
+                                        onClick={(e: MouseEvent) => fetchUpdateDeploySystemUser(data)}
+                                    >
+                                        编辑
+                                    </common-base-button>
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    {['enabled'].includes(data.status) ? (
+                                        <common-base-button
+                                            text
+                                            title="禁用"
+                                            type="error"
+                                            onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data, 'disabled')}
+                                        >
+                                            禁用
+                                        </common-base-button>
+                                    ) : (
+                                        <common-base-button
+                                            text
+                                            title="启用"
+                                            type="success"
+                                            onClick={(e: MouseEvent) => fetchBaseAccountUpdateUser(data, 'enabled')}
+                                        >
+                                            启用
+                                        </common-base-button>
+                                    )}
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[2].key}>
+                                    <common-base-button
+                                        text
+                                        title="重置密码"
+                                        type="warning"
+                                        onClick={(e: MouseEvent) => fetchBaseAccountResetUserPassword(data)}
+                                    >
+                                        重置密码
+                                    </common-base-button>
+                                </common-base-authorize>
+                            </common-base-authorize>
                         )
                     }}
                 </common-database-table>
