@@ -8,8 +8,8 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemRoleUser',
     props: {
-        /**角色ID**/
-        roleId: { type: Number as PropType<number> }
+        /**角色信息**/
+        faseOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, ctx) {
         /**表格实例**/
@@ -17,7 +17,7 @@ export default defineComponent({
             request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             keyName: 'chat:deploy:system:role:user',
             immediate: true,
-            formState: { roleKeyId: props.roleId, vague: undefined },
+            formState: { roleKeyId: props.faseOptions.keyId, vague: undefined },
             columns: [
                 { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                 { title: '名称', key: 'name', width: 120, disabled: true },
@@ -35,7 +35,7 @@ export default defineComponent({
         async function fetchDeployRoleUser(event: MouseEvent) {
             return await feedback.fetchDeploySystemRoleUser({
                 title: '添加关联用户',
-                roleId: props.roleId,
+                roleId: props.faseOptions.keyId,
                 onSubmit: () => fetchRefresh()
             })
         }
@@ -49,7 +49,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.roleId, uids: [node.uid] })
+                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.faseOptions.keyId, uids: [node.uid] })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh({ page: 1 })

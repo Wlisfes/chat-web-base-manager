@@ -9,15 +9,15 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemRoleSheet',
     props: {
-        /**角色ID**/
-        roleId: { type: Number as PropType<number> },
+        /**角色信息**/
+        faseOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**菜单树数据。接口直接返回数组，不是分页结果包装对象。*/
         sheetOptions: { type: Array as PropType<Array<Omix>>, default: () => [] }
     },
     setup(props, ctx) {
         /**角色关联菜单数据**/
         const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.roleId }),
+            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.faseOptions.keyId }),
             callback: fetchSheetCallback,
             immediate: true,
             options: {
@@ -39,7 +39,7 @@ export default defineComponent({
             return await setState({ loading: true }).then(async () => {
                 try {
                     await Service.httpBaseAccountUpdateRoleSheet({
-                        keyId: props.roleId,
+                        keyId: props.faseOptions.keyId,
                         sheetKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
                     })
                     return await setState({ loading: false }).then(async () => {

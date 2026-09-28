@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, h } from 'vue'
 import { useBaseService, useSelectService } from '@/hooks'
-import { fetchNormalizeTreeChildren, stop } from '@/utils'
+import { fetchNormalizeTreeChildren, tree, stop, isNotEmpty, fetchCurrent } from '@/utils'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { SendFilled, Grid, Edit, Delete } from '@vicons/carbon'
 import * as feedback from '@/components/deploy/hooks'
@@ -30,10 +30,17 @@ export default defineComponent({
                 ]
             }
         })
-        /**结构角色ID*/
-        const roleKeyId = computed(() => faseState.selectedKeys[0])
         /**岗位角色树数据，移除叶子节点的空 children，避免显示无效展开图标。*/
         const treeRoles = computed(() => fetchNormalizeTreeChildren(faseNode.value.tree ?? []))
+        /**当前选中的角色或岗位角色节点**/
+        const faseOptions = computed<Omix>(() => {
+            const selectedKey = faseState.selectedKeys[0]
+            const itemNode = fetchCurrent(faseNode.value.list ?? [], (e: Omix) => e.keyId == selectedKey)
+            if (isNotEmpty(itemNode.keyId)) {
+                return itemNode
+            }
+            return tree.findNode(treeRoles.value, (e: Omix) => e.keyId == selectedKey) ?? {}
+        })
 
         /**初始化回调**/
         async function fetchReadyCallback(data: Omix) {
@@ -221,13 +228,16 @@ export default defineComponent({
                         v-model:value={faseState.tabName}
                     >
                         <n-tab-pane name="user" tab="关联用户" display-directive="show">
-                            <deploy-system-role-user key={roleKeyId.value} role-id={roleKeyId.value}></deploy-system-role-user>
+                            <deploy-system-role-user
+                                key={faseOptions.value.keyId}
+                                fase-options={faseOptions.value}
+                            ></deploy-system-role-user>
                         </n-tab-pane>
                         <n-tab-pane name="sheet" tab="关联权限" display-directive="show:lazy">
                             <deploy-system-role-sheet
-                                key={roleKeyId.value}
+                                key={faseOptions.value.keyId}
                                 sheet-options={sheetOptions.dataSource.value}
-                                role-id={roleKeyId.value}
+                                fase-options={faseOptions.value}
                             ></deploy-system-role-sheet>
                         </n-tab-pane>
                     </n-tabs>
