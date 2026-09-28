@@ -10,6 +10,17 @@ export type DatetaskManageStatus = Extract<DatetaskStatus, 'stop' | 'running'>
 /**系统任务执行日志状态。*/
 export type DatetaskLogStatus = 'running' | 'success' | 'failed'
 
+/**系统任务执行触发方式：system=系统执行；manual=手动执行。*/
+export type DatetaskLogTrigger = 'system' | 'manual'
+
+/**操作人展示选项；系统账号 uid 为 0。*/
+export interface DatetaskOperatorOption {
+    uid: string
+    number?: string
+    name?: string
+    avatar?: string
+}
+
 /**系统任务列表项。*/
 export interface DatetaskItem {
     /**表主键，用于表格行标识和选择。*/
@@ -24,8 +35,14 @@ export interface DatetaskItem {
     body: Record<string, unknown> | null
     lastTime: string | null
     nextTime: string | null
+    createBy: string
+    modifyBy: string | null
     createTime: string
     modifyTime: string
+    /**创建人选项。*/
+    createByOptions?: DatetaskOperatorOption
+    /**更新人选项。*/
+    modifyByOptions?: DatetaskOperatorOption
 }
 
 /**系统任务分页查询请求体。*/
@@ -51,6 +68,7 @@ export interface DatetaskEnumsResponse {
     statusOptions: DatetaskEnumOption<DatetaskStatus>[]
     manageStatusOptions: DatetaskEnumOption<DatetaskManageStatus>[]
     logStatusOptions: DatetaskEnumOption<DatetaskLogStatus>[]
+    triggerTypeOptions: DatetaskEnumOption<DatetaskLogTrigger>[]
 }
 
 /**系统任务分页响应数据。*/
@@ -101,14 +119,26 @@ export interface DatetaskExecutionResult {
 
 /**系统任务执行日志项。*/
 export interface DatetaskLogItem {
-    /**执行记录唯一标识，用于表格行标识。*/
-    keyId: string
+    /**表主键，用于表格行标识。*/
+    keyId: number
+    /**单次执行唯一标识。*/
+    executionId: string
     taskId: string
+    taskName: string | null
     status: DatetaskLogStatus
+    /**触发方式。*/
+    triggerType: DatetaskLogTrigger
     duration: number
     startTime: string
     endTime?: string | null
     result?: DatetaskExecutionResult
+    /**触发人 UID，系统执行为 0。*/
+    createBy: string
+    modifyBy: string | null
+    createTime: string
+    modifyTime: string
+    /**触发人选项。*/
+    createByOptions?: DatetaskOperatorOption
 }
 
 /**系统任务执行日志分页请求体。*/

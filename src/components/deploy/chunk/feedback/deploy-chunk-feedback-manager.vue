@@ -126,7 +126,7 @@ export default defineComponent({
                     on-submit={fetchRefresh}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchCreateDeployChunkResolver}>
+                        <common-base-button class="min-w-80" type="primary" onClick={fetchCreateDeployChunkResolver}>
                             新增
                         </common-base-button>
                     </common-database-search-function>

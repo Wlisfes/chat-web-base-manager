@@ -58,7 +58,7 @@ interface BaseServiceOptions<T, U, R, C> extends Partial<BaseServiceState<T, C>>
 /**列表包装hook**/
 export function useColumnService<T extends Omix, U extends Omix, R extends Omix, C extends Partial<Omix> = {}>(
     request: BaseServiceOptions<T, U, R, C>['request'],
-    options: Omit<BaseServiceOptions<T, U, R, C>, 'request'>
+    options: Omit<BaseServiceOptions<T, U, R, C>, 'request'> & { formState: U }
 ) {
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))

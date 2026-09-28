@@ -181,7 +181,7 @@ export default defineComponent({
                         >
                             <common-database-search-function abstract class="flex gap-col-10">
                                 <common-base-authorize key-name={state.actions[0].key}>
-                                    <common-base-button type="primary" onClick={fetchCreateDeploySheet}>
+                                    <common-base-button class="min-w-80" type="primary" onClick={fetchCreateDeploySheet}>
                                         新增
                                     </common-base-button>
                                 </common-base-authorize>

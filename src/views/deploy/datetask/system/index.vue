@@ -152,7 +152,7 @@ export default defineComponent({
                 >
                     <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
                         {state.dataSource.map((item: Omix) => (
-                            <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-5">
+                            <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-10">
                                 <n-h4 class="m-be-0">{item.taskName}</n-h4>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
                                     {item.handler}
@@ -161,6 +161,14 @@ export default defineComponent({
                                     {item.cron}
                                 </common-base-columns-wrapper>
                                 <div class="grid-cols-2 gap-x-10 overflow-hidden">
+                                    <common-base-columns-wrapper vertical label="更新人" label-class="text-12">
+                                        <common-base-user element="text" data={item.modifyByOptions}></common-base-user>
+                                    </common-base-columns-wrapper>
+                                    <common-base-columns-wrapper vertical label="更新时间" label-class="text-12">
+                                        {item.modifyTime ?? '-'}
+                                    </common-base-columns-wrapper>
+                                </div>
+                                <div class="grid-cols-2 gap-x-10 overflow-hidden">
                                     <common-base-columns-wrapper vertical label="上次执行" label-class="text-12">
                                         {item.lastTime ?? '-'}
                                     </common-base-columns-wrapper>
@@ -168,6 +176,7 @@ export default defineComponent({
                                         {item.nextTime ?? '-'}
                                     </common-base-columns-wrapper>
                                 </div>
+
                                 <div class="flex items-end justify-between gap-x-12 p-bs-10 overflow-hidden">
                                     <common-base-chunk
                                         bordered

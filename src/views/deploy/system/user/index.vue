@@ -133,7 +133,7 @@ export default defineComponent({
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
                         <common-base-authorize key-name="chat:deploy:system:user:create">
-                            <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
+                            <common-base-button class="min-w-80" type="primary" onClick={fetchCreateDeploySystemUser}>
                                 新增
                             </common-base-button>
                         </common-base-authorize>
