@@ -1,11 +1,11 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService } from '@/hooks'
+import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceRatesFeedbackSms',
+    name: 'FinanceFrozenFeedbackSms',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
@@ -16,10 +16,15 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
+        /**国家/地区下拉数据**/
+        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+            immediate: true
+        })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
-            callback: fetchBaseFinanceRatesSmsResolver,
+            callback: fetchBaseFinanceFrozenSmsResolver,
             formState: {
+                countryKeyId: props.node.countryOptions?.keyId, // 国家/地区主键
                 code: props.node.code, // 国家/地区编码
                 mcc: props.node.mcc, // 移动国家代码
                 upUsd: props.node.upUsd !== undefined ? props.node.upUsd / 1000000 : undefined, // 上行短信价格
@@ -27,15 +32,14 @@ export default defineComponent({
                 remark: props.node.remark // 备注
             },
             rules: {
-                code: { required: true, message: '请输入国家/地区编码', trigger: 'blur' },
-                mcc: { required: true, message: '请输入移动国家代码', trigger: 'blur' },
+                countryKeyId: { type: 'number', required: true, message: '请选择国家/地区', trigger: 'blur' },
                 upUsd: { type: 'number', required: true, message: '请输入上行短信价格', trigger: 'blur' },
                 downUsd: { type: 'number', required: true, message: '请输入下行短信价格', trigger: 'blur' }
             }
         })
 
         /**详情**/
-        async function fetchBaseFinanceRatesSmsResolver() {
+        async function fetchBaseFinanceFrozenSmsResolver() {
             try {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
@@ -55,6 +59,11 @@ export default defineComponent({
             }
         }
 
+        /**选择国家/地区带出编码和MCC**/
+        async function fetchUpdateCountry(value: number, option: Omix) {
+            return await setForm({ code: option?.code, mcc: option?.mcc })
+        }
+
         /**确定提交表单**/
         async function fetchSubmit() {
             return await fetchValidater().then(async error => {
@@ -62,8 +71,9 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
+                    const { countryKeyId, ...body } = formState.value
                     const submitData = {
-                        ...formState.value,
+                        ...body,
                         upUsd: Math.round((formState.value.upUsd ?? 0) * 1000000),
                         downUsd: Math.round((formState.value.downUsd ?? 0) * 1000000)
                     }
@@ -88,7 +98,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={640}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -104,49 +114,52 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-base-column label="国家/地区编码" path="code">
-                        <form-base-input
-                            maxlength={10}
-                            placeholder="请输入国家/地区编码"
-                            v-model:value={formState.value.code}
-                        ></form-base-input>
+                    <form-base-column label="国家/地区" path="countryKeyId">
+                        <form-base-select
+                            filterable
+                            placeholder="请选择国家/地区"
+                            label-value="keyId"
+                            label-field="showName"
+                            loading={countryOptions.loading.value}
+                            options={countryOptions.dataSource.value}
+                            v-model:value={formState.value.countryKeyId}
+                            on-change:value={fetchUpdateCountry}
+                        ></form-base-select>
                     </form-base-column>
-                    <form-base-column label="移动国家代码" path="mcc">
+                    <form-base-column label="移动国家代码" path="mcc" required>
                         <form-base-input
-                            maxlength={4}
-                            placeholder="请输入移动国家代码 (MCC)"
+                            disabled
+                            placeholder="选择国家/地区后自动带出"
                             v-model:value={formState.value.mcc}
                         ></form-base-input>
                     </form-base-column>
                     <form-base-column label="上行短信价格" path="upUsd">
-                        <n-input-number
+                        <form-base-number-input
                             v-model:value={formState.value.upUsd}
                             placeholder="请输入上行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                            style={{ width: '100%' }}
-                        />
+                        ></form-base-number-input>
                     </form-base-column>
                     <form-base-column label="下行短信价格" path="downUsd">
-                        <n-input-number
+                        <form-base-number-input
                             v-model:value={formState.value.downUsd}
                             placeholder="请输入下行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                            style={{ width: '100%' }}
-                        />
+                        ></form-base-number-input>
                     </form-base-column>
                     <form-base-column label="备注" path="remark">
-                        <n-input
+                        <form-base-input
                             type="textarea"
                             maxlength={1024}
                             show-count
                             placeholder="请输入备注"
                             v-model:value={formState.value.remark}
                             autosize={{ minRows: 3, maxRows: 6 }}
-                        />
+                        ></form-base-input>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>
