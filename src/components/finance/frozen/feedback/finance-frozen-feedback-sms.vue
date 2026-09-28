@@ -2,6 +2,7 @@
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { cloneDeep } from 'lodash-es'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -18,18 +19,24 @@ export default defineComponent({
     setup(props, { emit }) {
         /**国家/地区下拉数据**/
         const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
-            immediate: true
+            immediate: false
         })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseFinanceFrozenSmsResolver,
             formState: {
-                countryKeyId: props.node.countryOptions?.keyId, // 国家/地区主键
-                code: props.node.code, // 国家/地区编码
-                mcc: props.node.mcc, // 移动国家代码
-                upUsd: props.node.upUsd !== undefined ? props.node.upUsd / 1000000 : undefined, // 上行短信价格
-                downUsd: props.node.downUsd !== undefined ? props.node.downUsd / 1000000 : undefined, // 下行短信价格
-                remark: props.node.remark // 备注
+                /**国家/地区主键**/
+                countryKeyId: props.node.countryKeyId,
+                /**国家/地区编码**/
+                code: undefined,
+                /**移动国家代码**/
+                mcc: undefined,
+                /**上行短信价格**/
+                upUsd: undefined,
+                /**下行短信价格**/
+                downUsd: undefined,
+                /**备注**/
+                remark: undefined
             },
             rules: {
                 countryKeyId: { type: 'number', required: true, message: '请选择国家/地区', trigger: 'blur' },
@@ -38,30 +45,29 @@ export default defineComponent({
             }
         })
 
-        /**详情**/
+        /**短信基础价格详情**/
         async function fetchBaseFinanceFrozenSmsResolver() {
-            try {
-                if (['CREATE'].includes(props.command)) {
-                    return await setState({ initialize: false })
-                }
-                const resetData = {
-                    ...fetchReste(props.node),
-                    upUsd: props.node.upUsd !== undefined ? props.node.upUsd / 1000000 : undefined,
-                    downUsd: props.node.downUsd !== undefined ? props.node.downUsd / 1000000 : undefined
-                }
-                return await setForm(resetData).then(async () => {
+            const taskNames: Array<Promise<Omix>> = [countryOptions.fetchRequest()]
+            if (['CREATE'].includes(props.command)) {
+                return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
                 })
-            } catch (err) {
-                return await setState({ initialize: false }).then(async () => {
-                    return await fetchNotifyService({ type: 'error', title: err.message })
-                })
+            } else {
+                taskNames.unshift(Service.httpBaseFinanceFrozenSmsResolver({ keyId: props.node.keyId }))
             }
-        }
-
-        /**选择国家/地区带出编码和MCC**/
-        async function fetchUpdateCountry(value: number, option: Omix) {
-            return await setForm({ code: option?.code, mcc: option?.mcc })
+            return await Promise.all(taskNames).then(async ([{ data }]) => {
+                try {
+                    const upUsd = data.upUsd / 1000000
+                    const downUsd = data.downUsd / 1000000
+                    return await setForm(fetchReste({ ...data, upUsd, downUsd })).then(async () => {
+                        return await setState({ initialize: false })
+                    })
+                } catch (err) {
+                    return await setState({ initialize: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
+            })
         }
 
         /**确定提交表单**/
@@ -71,17 +77,14 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const { countryKeyId, ...body } = formState.value
-                    const submitData = {
-                        ...body,
+                    const formOptions: Omix = Object.assign(cloneDeep(formState.value), {
                         upUsd: Math.round((formState.value.upUsd ?? 0) * 1000000),
                         downUsd: Math.round((formState.value.downUsd ?? 0) * 1000000)
-                    }
-
+                    })
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceCreateFrozenSms(submitData)
+                        await Service.httpBaseFinanceCreateFrozenSms(formOptions)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceUpdateFrozenSms({ ...submitData, keyId: props.node.keyId })
+                        await Service.httpBaseFinanceUpdateFrozenSms({ ...formOptions, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -123,7 +126,7 @@ export default defineComponent({
                             loading={countryOptions.loading.value}
                             options={countryOptions.dataSource.value}
                             v-model:value={formState.value.countryKeyId}
-                            on-change:value={fetchUpdateCountry}
+                            on-change:value={(keyId: string, e: Omix) => setForm({ code: e.code, mcc: e.mcc })}
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="移动国家代码" path="mcc" required>

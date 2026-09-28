@@ -1,5 +1,14 @@
 import { request } from '@/utils'
 
+/**短信基础价格详情**/
+export function httpBaseFinanceFrozenSmsResolver(params: Omix) {
+    return request({
+        url: '/api/finance/frozen/sms/resolve',
+        method: 'GET',
+        params
+    })
+}
+
 /**新增短信基础价格**/
 export function httpBaseFinanceCreateFrozenSms(data: Omix) {
     return request({
