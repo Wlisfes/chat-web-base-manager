@@ -28,9 +28,9 @@ export function httpBaseAccountColumnConsumer(data: Omix) {
 }
 
 /**修改外部客户状态**/
-export function httpBaseAccountUpdateConsumerStatus(data: Omix) {
+export function httpBaseAccountConsumerStatusUpdate(data: Omix) {
     return request({
-        url: '/api/account/consumer/update/status',
+        url: '/api/account/consumer/status/update',
         method: 'POST',
         data
     })

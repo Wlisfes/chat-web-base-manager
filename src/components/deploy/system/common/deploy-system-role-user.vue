@@ -13,11 +13,12 @@ export default defineComponent({
     },
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:role:user',
                 immediate: true,
+                actions: [{ title: '移除用户', key: 'chat:deploy:system:role:unlink:user' }],
                 formState: { roleKeyId: props.faseOptions.keyId, vague: undefined },
                 columns: [
                     { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
@@ -101,7 +102,7 @@ export default defineComponent({
                 </common-database-search>
                 <common-database-table
                     class="p-0!"
-                    show-command
+                    show-command={instState.value.showCommand}
                     show-settings
                     bordered={false}
                     limit={state.limit}
@@ -141,21 +142,18 @@ export default defineComponent({
                             return <common-base-content value={data.roles}></common-base-content>
                         },
                         col_command: (data: Omix) => (
-                            <common-base-authorize
-                                element
-                                empty="-"
-                                key-name="chat:deploy:system:role:unlink:user"
-                                class="flex items-center gap-x-10 overflow-hidden"
-                            >
-                                <common-base-button
-                                    text
-                                    type="error"
-                                    title="移除用户关联角色"
-                                    onClick={(e: MouseEvent) => fetchBaseAccountRoleUnlinkUser(data)}
-                                >
-                                    移除用户
-                                </common-base-button>
-                            </common-base-authorize>
+                            <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
+                                <common-base-authorize key-name={state.actions[0].key}>
+                                    <common-base-button
+                                        text
+                                        type="error"
+                                        title="移除用户关联角色"
+                                        onClick={(e: MouseEvent) => fetchBaseAccountRoleUnlinkUser(data)}
+                                    >
+                                        移除用户
+                                    </common-base-button>
+                                </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>

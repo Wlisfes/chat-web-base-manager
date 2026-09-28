@@ -19,7 +19,7 @@ export function httpBaseSkylineColumnDatetask(data: Omix) {
 }
 
 /**启用或停用系统任务**/
-export function httpBaseSkylineUpdateDatetaskStatus(data: Datetask.DatetaskStatusRequest) {
+export function httpBaseSkylineDatetaskStatusUpdate(data: Datetask.DatetaskStatusRequest) {
     return request<Datetask.DatetaskItem>({
         url: '/api/skyline/deploy/datetask/status/update',
         method: 'POST',

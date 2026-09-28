@@ -46,7 +46,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateCountryStatus({ keyId: node.keyId, status })
+                            await Service.httpBaseFinanceCountryStatusUpdate({ keyId: node.keyId, status })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()
@@ -123,7 +123,7 @@ export default defineComponent({
                             return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
                         },
                         col_command: (data: Omix) => (
-                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
+                            <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     {['enable'].includes(data.status) ? (
                                         <common-base-button

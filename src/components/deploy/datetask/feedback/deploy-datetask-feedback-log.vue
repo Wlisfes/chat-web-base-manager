@@ -18,13 +18,15 @@ export default defineComponent({
             immediate: true
         })
         const { state, instOptions, setState, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseSkylineColumnDatetaskLog({ ...payload, taskId: props.node.taskId, page: base.page, size: base.size }),
+            (base, payload) => Service.httpBaseSkylineColumnDatetaskLog({ ...payload, page: base.page, size: base.size }),
             {
                 formState: { taskId: props.node.taskId },
                 limit: 0,
                 columns: [
-                    { title: '任务ID', key: 'taskId', width: 180 },
+                    { title: '任务名称', key: 'taskName', width: 160 },
                     { title: '执行状态', key: 'status', width: 100 },
+                    { title: '触发方式', key: 'triggerType', width: 100 },
+                    { title: '触发人', key: 'createBy', width: 120 },
                     { title: '耗时(ms)', key: 'duration', width: 100 },
                     { title: '开始时间', key: 'startTime', width: 190 },
                     { title: '结束时间', key: 'endTime', width: 190 },
@@ -36,7 +38,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1280}
+                width={1440}
                 action={false}
                 scrollbar={false}
                 class-element="p-inline-20 p-be-20"
@@ -47,7 +49,7 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setState })}
             >
                 <common-database-table
-                    pagination-class="p-bs-14!"
+                    pagination-class="p-bs-12!"
                     bordered={false}
                     limit={state.limit}
                     total={state.total}
@@ -65,7 +67,17 @@ export default defineComponent({
                     {{
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.logStatusOptions}></common-base-chunk>
-                        )
+                        ),
+                        col_triggerType: (data: Omix) => (
+                            <common-base-chunk
+                                bordered
+                                value={data.triggerType}
+                                items={chunkOptions.value.triggerTypeOptions}
+                            ></common-base-chunk>
+                        ),
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        }
                     }}
                 </common-database-table>
             </common-dialog-provider>

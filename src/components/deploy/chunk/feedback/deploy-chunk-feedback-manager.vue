@@ -20,7 +20,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**表格实例**/
-        const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
             {
                 actions: [
@@ -126,7 +126,7 @@ export default defineComponent({
                     on-submit={fetchRefresh}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchCreateDeployChunkResolver}>
+                        <common-base-button class="min-w-80" type="primary" onClick={fetchCreateDeployChunkResolver}>
                             新增
                         </common-base-button>
                     </common-database-search-function>
@@ -150,7 +150,7 @@ export default defineComponent({
                 </common-database-search>
                 <common-database-table
                     class="p-inline-0! p-block-0!"
-                    show-command
+                    show-command={instState.value.showCommand}
                     bordered={false}
                     limit={state.limit}
                     total={state.total}
@@ -176,12 +176,7 @@ export default defineComponent({
                             return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
                         },
                         col_command: (data: Omix) => (
-                            <common-base-authorize
-                                element
-                                empty="-"
-                                class-name="flex items-center gap-x-10"
-                                key-name={[state.actions[0].key, state.actions[1].key]}
-                            >
+                            <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         text
@@ -204,7 +199,7 @@ export default defineComponent({
                                         删除
                                     </common-base-button>
                                 </common-base-authorize>
-                            </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>

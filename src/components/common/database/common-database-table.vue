@@ -75,7 +75,13 @@ export default defineComponent({
         const { data, page, size, initialize, loading, select, customize } = useVModels(props)
         const { state } = useState({
             width: 86,
-            TABLE_ELLIPSIS: { tooltip: { scrollable: true, style: { maxWidth: '640px', maxHeight: '640px' } } }
+            // 提示框最大 640px，同时按视口收缩，避免内容过长时顶出屏幕；超出部分在提示框内滚动。
+            TABLE_ELLIPSIS: {
+                tooltip: {
+                    scrollable: true,
+                    style: { maxWidth: 'min(640px, 90vw)', maxHeight: 'min(640px, 45vh)', wordBreak: 'break-all' }
+                }
+            }
         })
         const rowKey = (e: Omix) => e.keyId
         const scrollbarProps = { size: 100, trigger: 'none' as const }

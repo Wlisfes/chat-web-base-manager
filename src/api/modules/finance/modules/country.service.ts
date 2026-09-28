@@ -18,9 +18,9 @@ export function httpBaseFinanceColumnCountry(data: Omix) {
 }
 
 /**国家/地区状态修改**/
-export function httpBaseFinanceUpdateCountryStatus(data: Omix) {
+export function httpBaseFinanceCountryStatusUpdate(data: Omix) {
     return request({
-        url: `/api/finance/country/update/status`,
+        url: `/api/finance/country/status/update`,
         method: 'POST',
         data
     })

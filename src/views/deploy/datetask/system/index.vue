@@ -46,7 +46,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSkylineUpdateDatetaskStatus({ taskId: node.taskId, status: nextStatus })
+                            await Service.httpBaseSkylineDatetaskStatusUpdate({ taskId: node.taskId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -152,7 +152,7 @@ export default defineComponent({
                 >
                     <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
                         {state.dataSource.map((item: Omix) => (
-                            <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-5">
+                            <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-10">
                                 <n-h4 class="m-be-0">{item.taskName}</n-h4>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
                                     {item.handler}
@@ -160,6 +160,14 @@ export default defineComponent({
                                 <common-base-columns-wrapper vertical label="定时规则" label-class="text-12">
                                     {item.cron}
                                 </common-base-columns-wrapper>
+                                <div class="grid-cols-2 gap-x-10 overflow-hidden">
+                                    <common-base-columns-wrapper vertical label="更新人" label-class="text-12">
+                                        <common-base-user element="text" data={item.modifyByOptions}></common-base-user>
+                                    </common-base-columns-wrapper>
+                                    <common-base-columns-wrapper vertical label="更新时间" label-class="text-12">
+                                        {item.modifyTime ?? '-'}
+                                    </common-base-columns-wrapper>
+                                </div>
                                 <div class="grid-cols-2 gap-x-10 overflow-hidden">
                                     <common-base-columns-wrapper vertical label="上次执行" label-class="text-12">
                                         {item.lastTime ?? '-'}
@@ -174,11 +182,7 @@ export default defineComponent({
                                         value={item.status}
                                         items={chunkOptions.value.statusOptions}
                                     ></common-base-chunk>
-                                    <common-base-authorize
-                                        element
-                                        key-name={state.actions.map((item: Omix) => item.key)}
-                                        class-name="flex items-center gap-x-12 overflow-hidden"
-                                    >
+                                    <common-base-element abstract class="flex items-center gap-x-12 overflow-hidden">
                                         <common-base-authorize key-name={state.actions[0].key}>
                                             {['running', 'wait'].includes(item.status) ? (
                                                 <common-base-button
@@ -235,7 +239,7 @@ export default defineComponent({
                                                 onClick={() => fetchDatetaskLog(item)}
                                             ></common-base-button>
                                         </common-base-authorize>
-                                    </common-base-authorize>
+                                    </common-base-element>
                                 </div>
                             </n-card>
                         ))}
