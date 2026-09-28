@@ -24,15 +24,15 @@ export default [
         component: () => import('@/views/finance/base/country/index.vue')
     },
     {
+        path: '/finance/frozen/sms',
+        name: 'FinanceFrozenSmsManager',
+        meta: { title: '短信基础价格', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/finance/frozen/sms/index.vue')
+    },
+    {
         path: '/finance/account/consumer',
         name: 'FinanceAccountConsumer',
         meta: { title: '消费用户', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/finance/account/consumer/index.vue')
-    },
-    {
-        path: '/finance/rates/sms',
-        name: 'FinanceRatesSms',
-        meta: { title: '短信基础价格', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/finance/rates/sms/index.vue')
     }
 ]

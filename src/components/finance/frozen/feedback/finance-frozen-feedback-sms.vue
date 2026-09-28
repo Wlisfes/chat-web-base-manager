@@ -1,11 +1,12 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService } from '@/hooks'
+import { useFormService, useSelectService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
+import { cloneDeep } from 'lodash-es'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceRatesFeedbackSms',
+    name: 'FinanceFrozenFeedbackSms',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
@@ -16,43 +17,57 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
+        /**国家/地区下拉数据**/
+        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+            immediate: false
+        })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
-            callback: fetchBaseFinanceRatesSmsResolver,
+            callback: fetchBaseFinanceFrozenSmsResolver,
             formState: {
-                code: props.node.code, // 国家/地区编码
-                mcc: props.node.mcc, // 移动国家代码
-                upUsd: props.node.upUsd !== undefined ? props.node.upUsd / 1000000 : undefined, // 上行短信价格
-                downUsd: props.node.downUsd !== undefined ? props.node.downUsd / 1000000 : undefined, // 下行短信价格
-                remark: props.node.remark // 备注
+                /**国家/地区主键**/
+                countryKeyId: props.node.countryKeyId,
+                /**国家/地区编码**/
+                code: undefined,
+                /**移动国家代码**/
+                mcc: undefined,
+                /**上行短信价格**/
+                upUsd: undefined,
+                /**下行短信价格**/
+                downUsd: undefined,
+                /**备注**/
+                remark: undefined
             },
             rules: {
-                code: { required: true, message: '请输入国家/地区编码', trigger: 'blur' },
-                mcc: { required: true, message: '请输入移动国家代码', trigger: 'blur' },
+                countryKeyId: { type: 'number', required: true, message: '请选择国家/地区', trigger: 'blur' },
                 upUsd: { type: 'number', required: true, message: '请输入上行短信价格', trigger: 'blur' },
                 downUsd: { type: 'number', required: true, message: '请输入下行短信价格', trigger: 'blur' }
             }
         })
 
-        /**详情**/
-        async function fetchBaseFinanceRatesSmsResolver() {
-            try {
-                if (['CREATE'].includes(props.command)) {
-                    return await setState({ initialize: false })
-                }
-                const resetData = {
-                    ...fetchReste(props.node),
-                    upUsd: props.node.upUsd !== undefined ? props.node.upUsd / 1000000 : undefined,
-                    downUsd: props.node.downUsd !== undefined ? props.node.downUsd / 1000000 : undefined
-                }
-                return await setForm(resetData).then(async () => {
+        /**短信基础价格详情**/
+        async function fetchBaseFinanceFrozenSmsResolver() {
+            const taskNames: Array<Promise<Omix>> = [countryOptions.fetchRequest()]
+            if (['CREATE'].includes(props.command)) {
+                return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
                 })
-            } catch (err) {
-                return await setState({ initialize: false }).then(async () => {
-                    return await fetchNotifyService({ type: 'error', title: err.message })
-                })
+            } else {
+                taskNames.unshift(Service.httpBaseFinanceFrozenSmsResolver({ keyId: props.node.keyId }))
             }
+            return await Promise.all(taskNames).then(async ([{ data }]) => {
+                try {
+                    const upUsd = data.upUsd / 1000000
+                    const downUsd = data.downUsd / 1000000
+                    return await setForm(fetchReste({ ...data, upUsd, downUsd })).then(async () => {
+                        return await setState({ initialize: false })
+                    })
+                } catch (err) {
+                    return await setState({ initialize: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
+            })
         }
 
         /**确定提交表单**/
@@ -62,16 +77,14 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const submitData = {
-                        ...formState.value,
+                    const formOptions: Omix = Object.assign(cloneDeep(formState.value), {
                         upUsd: Math.round((formState.value.upUsd ?? 0) * 1000000),
                         downUsd: Math.round((formState.value.downUsd ?? 0) * 1000000)
-                    }
-
+                    })
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceCreateBasicSmsRate(submitData)
+                        await Service.httpBaseFinanceCreateFrozenSms(formOptions)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceUpdateBasicSmsRate({ ...submitData, keyId: props.node.keyId })
+                        await Service.httpBaseFinanceUpdateFrozenSms({ ...formOptions, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -88,7 +101,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={540}
+                width={640}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -104,49 +117,52 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
-                    <form-base-column label="国家/地区编码" path="code">
-                        <form-base-input
-                            maxlength={10}
-                            placeholder="请输入国家/地区编码"
-                            v-model:value={formState.value.code}
-                        ></form-base-input>
+                    <form-base-column label="国家/地区" path="countryKeyId">
+                        <form-base-select
+                            filterable
+                            placeholder="请选择国家/地区"
+                            label-value="keyId"
+                            label-field="showName"
+                            loading={countryOptions.loading.value}
+                            options={countryOptions.dataSource.value}
+                            v-model:value={formState.value.countryKeyId}
+                            on-change:value={(keyId: string, e: Omix) => setForm({ code: e.code, mcc: e.mcc })}
+                        ></form-base-select>
                     </form-base-column>
-                    <form-base-column label="移动国家代码" path="mcc">
+                    <form-base-column label="移动国家代码" path="mcc" required>
                         <form-base-input
-                            maxlength={4}
-                            placeholder="请输入移动国家代码 (MCC)"
+                            disabled
+                            placeholder="选择国家/地区后自动带出"
                             v-model:value={formState.value.mcc}
                         ></form-base-input>
                     </form-base-column>
                     <form-base-column label="上行短信价格" path="upUsd">
-                        <n-input-number
+                        <form-base-number-input
                             v-model:value={formState.value.upUsd}
                             placeholder="请输入上行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                            style={{ width: '100%' }}
-                        />
+                        ></form-base-number-input>
                     </form-base-column>
                     <form-base-column label="下行短信价格" path="downUsd">
-                        <n-input-number
+                        <form-base-number-input
                             v-model:value={formState.value.downUsd}
                             placeholder="请输入下行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                            style={{ width: '100%' }}
-                        />
+                        ></form-base-number-input>
                     </form-base-column>
                     <form-base-column label="备注" path="remark">
-                        <n-input
+                        <form-base-input
                             type="textarea"
                             maxlength={1024}
                             show-count
                             placeholder="请输入备注"
                             v-model:value={formState.value.remark}
                             autosize={{ minRows: 3, maxRows: 6 }}
-                        />
+                        ></form-base-input>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>
