@@ -142,7 +142,7 @@ export default defineComponent({
                             return <common-base-content value={data.roles}></common-base-content>
                         },
                         col_command: (data: Omix) => (
-                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
+                            <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         text

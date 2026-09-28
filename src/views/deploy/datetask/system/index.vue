@@ -176,18 +176,13 @@ export default defineComponent({
                                         {item.nextTime ?? '-'}
                                     </common-base-columns-wrapper>
                                 </div>
-
                                 <div class="flex items-end justify-between gap-x-12 p-bs-10 overflow-hidden">
                                     <common-base-chunk
                                         bordered
                                         value={item.status}
                                         items={chunkOptions.value.statusOptions}
                                     ></common-base-chunk>
-                                    <common-base-authorize
-                                        element
-                                        key-name={state.actions.map((item: Omix) => item.key)}
-                                        class-name="flex items-center gap-x-12 overflow-hidden"
-                                    >
+                                    <common-base-element abstract class="flex items-center gap-x-12 overflow-hidden">
                                         <common-base-authorize key-name={state.actions[0].key}>
                                             {['running', 'wait'].includes(item.status) ? (
                                                 <common-base-button
@@ -244,7 +239,7 @@ export default defineComponent({
                                                 onClick={() => fetchDatetaskLog(item)}
                                             ></common-base-button>
                                         </common-base-authorize>
-                                    </common-base-authorize>
+                                    </common-base-element>
                                 </div>
                             </n-card>
                         ))}

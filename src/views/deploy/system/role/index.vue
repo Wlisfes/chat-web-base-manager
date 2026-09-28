@@ -164,10 +164,9 @@ export default defineComponent({
                                                         <n-ellipsis tooltip={false} class="flex-1 overflow-hidden">
                                                             <n-text>{item.name}</n-text>
                                                         </n-ellipsis>
-                                                        <common-base-authorize
-                                                            element
-                                                            key-name={faseState.actions.map((item: Omix) => item.key)}
-                                                            class-name="flex items-center p-inline-7 gap-x-7 overflow-hidden"
+                                                        <common-base-element
+                                                            abstract
+                                                            class="flex items-center p-inline-7 gap-x-7 overflow-hidden"
                                                         >
                                                             <common-base-authorize key-name={faseState.actions[0].key}>
                                                                 <common-base-button
@@ -189,7 +188,7 @@ export default defineComponent({
                                                                     onClick={(e: MouseEvent) => fetchDeleteDeploySystemRole(e, item)}
                                                                 ></common-base-button>
                                                             </common-base-authorize>
-                                                        </common-base-authorize>
+                                                        </common-base-element>
                                                     </n-radio>
                                                 ))}
                                             </common-base-draggable>
