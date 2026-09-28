@@ -32,14 +32,14 @@ export default defineComponent({
                 bounce: false,
                 mouseWheel: true,
                 observeDOM: true,
-                scrollbar: true
+                scrollbar: { fade: true, interactive: true }
             })
         }
 
         return () => (
-            <n-layout-header class="layout-common-store flex gap-10 p-ie-12 p-be-8 overflow-hidden">
-                <div ref={element} class="flex-1 whitespace-nowrap relative cursor-pointer overflow-hidden">
-                    <div class="inline-flex gap-10 element-bscrollbar">
+            <n-layout-header class="layout-common-store flex overflow-hidden">
+                <div ref={element} class="element-wrapper flex-1 whitespace-nowrap p-be-8 cursor-pointer overflow-hidden">
+                    <div class="inline-flex gap-x-8 element-bscrollbar">
                         {tabOptions.value.map(item => (
                             <div key={item.fullPath} class="select-none inline-flex element-block">
                                 <common-base-button
@@ -64,7 +64,7 @@ export default defineComponent({
                         ))}
                     </div>
                 </div>
-                <div class="flex gap-10">
+                <div class="flex gap-x-8 p-is-8 p-ie-12 p-be-8 overflow-hidden">
                     <common-base-button secondary size="small" class="p-inline-4!">
                         <common-base-icon size={20} name="nest-double-left"></common-base-icon>
                     </common-base-button>
@@ -80,3 +80,22 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.element-wrapper {
+    position: relative;
+    &:hover :deep(.bscroll-horizontal-scrollbar) {
+        opacity: 1 !important;
+    }
+    &:hover :deep(.bscroll-horizontal-scrollbar .bscroll-indicator) {
+        pointer-events: auto !important;
+    }
+    :deep(.bscroll-horizontal-scrollbar) {
+        height: 6px !important;
+        bottom: 1px !important;
+    }
+    :deep(.bscroll-indicator) {
+        background-color: var(--scrollbar-color) !important;
+    }
+}
+</style>
