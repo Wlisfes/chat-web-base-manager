@@ -64,7 +64,7 @@ export default defineComponent({
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
                     function-class="justify-end"
-                    function={['search', 'restore', 'collapse', 'deploy']}
+                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
                     ref={formRef}
                     limit={state.limit}
                     v-model:loading={state.loading}

@@ -12,24 +12,26 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseFinanceColumnCountry({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:country',
+                actions: [{ title: '编辑', key: 'chat:finance:base:country:update' }],
                 formState: {
                     /**国家/地区名称、编码**/
                     cnName: undefined,
                     /**状态**/
                     status: undefined
                 },
-                actions: [{ title: '编辑', key: 'chat:finance:base:country:update' }],
                 columns: [
-                    { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
+                    { title: '国家/地区编码', key: 'code', minWidth: 120, disabled: true },
                     { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
                     { title: '英文名称', key: 'enName', minWidth: 140 },
-                    { title: 'MCC', key: 'mcc', minWidth: 140 },
+                    { title: 'MCC', key: 'mcc', width: 120 },
                     { title: '状态', key: 'status', width: 120 },
+                    { title: '创建人', key: 'createBy', width: 120 },
                     { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
                     { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
@@ -94,7 +96,6 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-command
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -106,6 +107,7 @@ export default defineComponent({
                     v-model:loading={state.loading}
                     v-model:initialize={state.initialize}
                     v-model:customize={state.customize}
+                    show-command={instState.value.showCommand}
                     on-update:customize={instOptions.fetchUpdateCustomize}
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
@@ -114,19 +116,20 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        },
                         col_command: (data: Omix) => (
-                            <common-base-authorize
-                                element
-                                empty="-"
-                                key-name={[state.actions[0].key]}
-                                class-name="flex items-center gap-x-10 overflow-hidden"
-                            >
+                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     {['enable'].includes(data.status) ? (
                                         <common-base-button
                                             text
                                             title="禁用"
-                                            type="error"
+                                            type="warning"
                                             onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCountryStatus(data, 'disable')}
                                         >
                                             禁用
@@ -142,7 +145,7 @@ export default defineComponent({
                                         </common-base-button>
                                     )}
                                 </common-base-authorize>
-                            </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>
