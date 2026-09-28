@@ -49,7 +49,7 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setState })}
             >
                 <common-database-table
-                    pagination-class="p-bs-14!"
+                    pagination-class="p-bs-12!"
                     bordered={false}
                     limit={state.limit}
                     total={state.total}
