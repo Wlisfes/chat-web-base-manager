@@ -45,7 +45,7 @@ export function httpBaseFinanceColumnBrand(data: Omix) {
 }
 
 /**品牌状态修改**/
-export function httpBaseFinanceUpdateBrandStatus(data: Omix) {
+export function httpBaseFinanceBrandStatusUpdate(data: Omix) {
     return request({
         url: `/api/finance/brand/status/update`,
         method: 'POST',

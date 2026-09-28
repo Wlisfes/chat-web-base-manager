@@ -101,7 +101,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountUpdateConsumerStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseAccountConsumerStatusUpdate({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {

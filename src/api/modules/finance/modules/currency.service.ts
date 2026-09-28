@@ -18,9 +18,9 @@ export function httpBaseFinanceColumnCurrency(data: Omix) {
 }
 
 /**币种状态修改**/
-export function httpBaseFinanceUpdateCurrencyStatus(data: Omix) {
+export function httpBaseFinanceCurrencyStatusUpdate(data: Omix) {
     return request({
-        url: `/api/finance/currency/update/status`,
+        url: `/api/finance/currency/status/update`,
         method: 'POST',
         data
     })

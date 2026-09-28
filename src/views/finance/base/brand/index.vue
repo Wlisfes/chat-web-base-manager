@@ -68,7 +68,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateBrandStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseFinanceBrandStatusUpdate({ keyId: node.keyId, status: nextStatus })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()
