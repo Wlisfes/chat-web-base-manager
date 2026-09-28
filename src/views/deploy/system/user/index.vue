@@ -19,10 +19,14 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:user',
+                actions: [
+                    { title: '编辑', key: 'chat:deploy:system:user:update' },
+                    { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
+                ],
                 formState: {
                     /**工号/姓名/手机号/邮箱**/
                     vague: undefined,
@@ -31,11 +35,6 @@ export default defineComponent({
                     /**归属部门**/
                     organizationKeyIds: []
                 },
-                actions: [
-                    { title: '新增', key: 'chat:deploy:system:user:create' },
-                    { title: '编辑', key: 'chat:deploy:system:user:update' },
-                    { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
-                ],
                 columns: [
                     { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
                     { title: '名称', key: 'name', width: 120, disabled: true },
@@ -133,7 +132,7 @@ export default defineComponent({
                     on-submit={fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-authorize key-name={state.actions[0].key}>
+                        <common-base-authorize key-name="chat:deploy:system:user:create">
                             <common-base-button type="primary" onClick={fetchCreateDeploySystemUser}>
                                 新增
                             </common-base-button>
@@ -174,7 +173,7 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-command
+                    show-command={instState.value.showCommand}
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -216,13 +215,8 @@ export default defineComponent({
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
                         col_command: (data: Omix) => (
-                            <common-base-authorize
-                                element
-                                empty="-"
-                                key-name={[state.actions[1].key, state.actions[2].key]}
-                                class-name="flex items-center gap-x-10 overflow-hidden"
-                            >
-                                <common-base-authorize key-name={state.actions[1].key}>
+                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
+                                <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         text
                                         title="编辑"
@@ -232,7 +226,7 @@ export default defineComponent({
                                         编辑
                                     </common-base-button>
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[1].key}>
+                                <common-base-authorize key-name={state.actions[0].key}>
                                     {['enabled'].includes(data.status) ? (
                                         <common-base-button
                                             text
@@ -253,7 +247,7 @@ export default defineComponent({
                                         </common-base-button>
                                     )}
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[2].key}>
+                                <common-base-authorize key-name={state.actions[1].key}>
                                     <common-base-button
                                         text
                                         title="重置密码"
@@ -263,7 +257,7 @@ export default defineComponent({
                                         重置密码
                                     </common-base-button>
                                 </common-base-authorize>
-                            </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>

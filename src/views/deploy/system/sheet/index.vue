@@ -24,7 +24,7 @@ export default defineComponent({
             }
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, setForm, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, setForm, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:sheet',
@@ -215,7 +215,7 @@ export default defineComponent({
                     <n-layout-content class="flex flex-col flex-1 bg-transparent" content-class="flex flex-col flex-1">
                         <common-database-table
                             class="p-0!"
-                            show-command
+                            show-command={instState.value.showCommand}
                             show-settings
                             page-sizes={[20, 30, 50, 100]}
                             limit={state.limit}
@@ -263,12 +263,7 @@ export default defineComponent({
                                     ></common-base-chunk>
                                 ),
                                 col_command: (data: Omix) => (
-                                    <common-base-authorize
-                                        element
-                                        empty="-"
-                                        key-name={state.actions.map((item: Omix) => item.key)}
-                                        class-name="flex items-center gap-x-10 overflow-hidden"
-                                    >
+                                    <common-base-element class="flex items-center gap-x-10 overflow-hidden">
                                         <common-base-authorize key-name={state.actions[0].key}>
                                             <common-base-button
                                                 text
@@ -299,7 +294,7 @@ export default defineComponent({
                                                 删除
                                             </common-base-button>
                                         </common-base-authorize>
-                                    </common-base-authorize>
+                                    </common-base-element>
                                 )
                             }}
                         </common-database-table>
