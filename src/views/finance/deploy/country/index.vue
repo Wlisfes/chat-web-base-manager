@@ -8,25 +8,27 @@ export default defineComponent({
     name: 'FinanceDeployCountry',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnCountry(payload),
-            keyName: 'chatbok:finance:deploy:country',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_COUNTRY_STATUS: true },
-            formState: {
-                cnName: undefined, //国家/地区名称
-                status: undefined //状态
-            },
-            columns: [
-                { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
-                { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
-                { title: '英文名称', key: 'enName', minWidth: 140, check: true },
-                { title: 'MCC', key: 'mcc', minWidth: 140, check: true },
-                { title: '状态', key: 'status', minWidth: 140, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnCountry(payload),
+            {
+                keyName: 'chatbok:finance:deploy:country',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: { CHUNK_COUNTRY_STATUS: true },
+                formState: {
+                    cnName: undefined, //国家/地区名称
+                    status: undefined //状态
+                },
+                columns: [
+                    { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
+                    { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
+                    { title: '英文名称', key: 'enName', minWidth: 140, check: true },
+                    { title: 'MCC', key: 'mcc', minWidth: 140, check: true },
+                    { title: '状态', key: 'status', minWidth: 140, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                ]
+            }
+        )
 
         /**切换状态**/
         async function fetchDeployCountryStatus() {

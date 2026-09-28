@@ -16,8 +16,7 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren
         })
         /**角色列表**/
-        const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseAccountRoleConfiger(),
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService(() => Service.httpBaseAccountRoleConfiger(), {
             callback: fetchReadyCallback,
             immediate: true,
             options: {
@@ -167,7 +166,7 @@ export default defineComponent({
                                                         </n-ellipsis>
                                                         <common-base-authorize
                                                             element
-                                                            key-name={faseState.actions.map(item => item.key)}
+                                                            key-name={faseState.actions.map((item: Omix) => item.key)}
                                                             class-name="flex items-center p-inline-7 gap-x-7 overflow-hidden"
                                                         >
                                                             <common-base-authorize key-name={faseState.actions[0].key}>

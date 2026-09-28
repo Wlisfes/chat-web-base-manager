@@ -28,7 +28,8 @@ interface BaseServiceOptions<T, R, C extends Partial<Record<ChunkName, true>> = 
 
 /**详情包装hook**/
 export function useBaseService<T extends Omix, R extends Omix, C extends Partial<Record<ChunkName, true>> = {}>(
-    options: BaseServiceOptions<T, R, C>
+    request: BaseServiceOptions<T, R, C>['request'],
+    options: Omit<BaseServiceOptions<T, R, C>, 'request'> = {}
 ) {
     const faseNode = ref<T>({} as T) as Ref<T>
     const observer = ref(Observer<Record<string, Omix>>())
@@ -73,7 +74,7 @@ export function useBaseService<T extends Omix, R extends Omix, C extends Partial
     async function fetchRequest(opt: Omix = {}) {
         return await setState({ loading: true } as never).then(async () => {
             try {
-                const { data } = await options.request(faseNode.value, faseState as never, opt)
+                const { data } = await request(faseNode.value, faseState as never, opt)
                 return await fetchUpdate(data ?? {}).then(async () => {
                     return await setState({ initialize: false, loading: false, message: '' } as never)
                 })

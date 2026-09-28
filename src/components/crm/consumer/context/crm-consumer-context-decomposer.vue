@@ -14,22 +14,24 @@ export default defineComponent({
         keyId: { type: [String, Number] }
     },
     setup(props) {
-        const { faseNode, faseState, chunkState, setState } = useBaseService({
-            request: () => Service.httpBaseAccountConsumerResolver({ keyId: props.keyId }),
-            immediate: true,
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {
-            // CHUNK_CONSUMER_SMS_TYPE: true,
-            // CHUNK_CONSUMER_SMS_STATUS: true,
-            // CHUNK_CONSUMER_PAY_MODE: true,
-            // CHUNK_CONSUMER_AUTH_STATUS: true,
-            // CHUNK_CONSUMER_SOURCE: true,
-            // CHUNK_CONSUMER_STATUS: true,
-            // CHUNK_CONSUMER_CLASS: true,
-            // CHUNK_CONSUMER_STAGE: true
-            // },
-            options: { tabName: 'sms' }
-        })
+        const { faseNode, faseState, setState } = useBaseService(
+            () => Service.httpBaseAccountConsumerResolver({ keyId: props.keyId }),
+            {
+                immediate: true,
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: {
+                // CHUNK_CONSUMER_SMS_TYPE: true,
+                // CHUNK_CONSUMER_SMS_STATUS: true,
+                // CHUNK_CONSUMER_PAY_MODE: true,
+                // CHUNK_CONSUMER_AUTH_STATUS: true,
+                // CHUNK_CONSUMER_SOURCE: true,
+                // CHUNK_CONSUMER_STATUS: true,
+                // CHUNK_CONSUMER_CLASS: true,
+                // CHUNK_CONSUMER_STAGE: true
+                // },
+                options: { tabName: 'sms' }
+            }
+        )
 
         return () => (
             <crm-consumer-context-skeleton initialize={faseState.initialize}>

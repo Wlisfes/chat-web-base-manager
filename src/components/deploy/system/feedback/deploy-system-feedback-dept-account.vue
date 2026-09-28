@@ -17,23 +17,24 @@ export default defineComponent({
         /**通用字典枚举**/
 
         /**表格实例**/
-        const { state, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
-            formState: { organizationKeyIds: [props.node.keyId].filter(isNotEmpty) },
-            limit: 0,
-            size: 100,
-            columns: [
-                { title: '头像', key: 'avatar', width: 60, align: 'center', disabled: true },
-                { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '职级', key: 'levels', width: 100, check: true },
-                { title: '岗位', key: 'posts', width: 160, check: true },
-                { title: '状态', key: 'status', width: 100, align: 'center', check: true },
-                { title: '手机号', key: 'phone', width: 160, check: true },
-                { title: '邮箱', key: 'email', width: 220, check: true },
-                { title: '入职时间', key: 'createTime', width: 160, check: true }
-            ]
-        })
+        const { state, instOptions, setState, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            {
+                formState: { organizationKeyIds: [props.node.keyId].filter(isNotEmpty) },
+                limit: 0,
+                size: 100,
+                columns: [
+                    { title: '头像', key: 'avatar', width: 60, align: 'center', disabled: true },
+                    { title: '名称', key: 'name', width: 120, disabled: true },
+                    { title: '职级', key: 'levels', width: 100, check: true },
+                    { title: '岗位', key: 'posts', width: 160, check: true },
+                    { title: '状态', key: 'status', width: 100, align: 'center', check: true },
+                    { title: '手机号', key: 'phone', width: 160, check: true },
+                    { title: '邮箱', key: 'email', width: 220, check: true },
+                    { title: '入职时间', key: 'createTime', width: 160, check: true }
+                ]
+            }
+        )
 
         return () => (
             <common-dialog-provider

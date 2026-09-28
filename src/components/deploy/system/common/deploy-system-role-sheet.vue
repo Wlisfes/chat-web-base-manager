@@ -16,16 +16,18 @@ export default defineComponent({
     },
     setup(props, ctx) {
         /**角色关联菜单数据**/
-        const { faseNode, faseState, setState, fetchRefresh } = useBaseService({
-            request: () => Service.httpBaseAccountRoleResolver({ keyId: props.faseOptions.keyId }),
-            callback: fetchSheetCallback,
-            immediate: true,
-            options: {
-                checkedKeys: [] as Array<number>,
-                indeterminateKeys: [] as Array<number>,
-                expandedKeys: [] as Array<number>
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService(
+            () => Service.httpBaseAccountRoleResolver({ keyId: props.faseOptions.keyId }),
+            {
+                callback: fetchSheetCallback,
+                immediate: true,
+                options: {
+                    checkedKeys: [] as Array<number>,
+                    indeterminateKeys: [] as Array<number>,
+                    expandedKeys: [] as Array<number>
+                }
             }
-        })
+        )
 
         /**角色关联菜单回调：过滤非叶子节点，仅设置叶子节点为checked**/
         async function fetchSheetCallback(data: Omix) {

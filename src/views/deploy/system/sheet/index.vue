@@ -24,37 +24,39 @@ export default defineComponent({
             }
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, setForm, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:system:sheet',
-            actions: [
-                { title: '新增', key: 'chat:deploy:system:sheet:create' },
-                { title: '编辑', key: 'chat:deploy:system:sheet:update' },
-                { title: '删除', key: 'chat:deploy:system:sheet:delete' }
-            ],
-            formState: {
-                /**父级ID**/
-                parentKeyId: undefined as unknown as number,
-                /**菜单名称**/
-                name: undefined,
-                /**权限标识**/
-                permissionCode: undefined,
-                /**菜单地址**/
-                path: undefined
-            },
-            columns: [
-                { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
-                { title: '菜单名称', key: 'name', width: 150, disabled: true },
-                { title: '类型', key: 'type', width: 100 },
-                { title: '排序号', key: 'sort', width: 100 },
-                { title: '状态', key: 'status', width: 100 },
-                { title: '显示状态', key: 'visible', width: 100 },
-                { title: '权限标识', key: 'permissionCode', minWidth: 200 },
-                { title: '路由地址', key: 'path', minWidth: 200 },
-                { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新时间', key: 'modifyTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, setForm, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:system:sheet',
+                actions: [
+                    { title: '新增', key: 'chat:deploy:system:sheet:create' },
+                    { title: '编辑', key: 'chat:deploy:system:sheet:update' },
+                    { title: '删除', key: 'chat:deploy:system:sheet:delete' }
+                ],
+                formState: {
+                    /**父级ID**/
+                    parentKeyId: undefined as unknown as number,
+                    /**菜单名称**/
+                    name: undefined,
+                    /**权限标识**/
+                    permissionCode: undefined,
+                    /**菜单地址**/
+                    path: undefined
+                },
+                columns: [
+                    { title: '图标', key: 'icon', width: 60, disabled: true, align: 'center', className: 'p-block-0!' },
+                    { title: '菜单名称', key: 'name', width: 150, disabled: true },
+                    { title: '类型', key: 'type', width: 100 },
+                    { title: '排序号', key: 'sort', width: 100 },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '显示状态', key: 'visible', width: 100 },
+                    { title: '权限标识', key: 'permissionCode', minWidth: 200 },
+                    { title: '路由地址', key: 'path', minWidth: 200 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         /**左侧树展开变更回调**/
         async function fetchUpdateExpanded(keys: Array<number>) {
@@ -264,7 +266,7 @@ export default defineComponent({
                                     <common-base-authorize
                                         element
                                         empty="-"
-                                        key-name={state.actions.map(item => item.key)}
+                                        key-name={state.actions.map((item: Omix) => item.key)}
                                         class-name="flex items-center gap-x-10 overflow-hidden"
                                     >
                                         <common-base-authorize key-name={state.actions[0].key}>

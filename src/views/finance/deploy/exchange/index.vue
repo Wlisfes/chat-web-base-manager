@@ -7,23 +7,25 @@ export default defineComponent({
     name: 'FinanceDeployExchange',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
-            keyName: 'chatbok:finance:deploy:exchange',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: {},
-            formState: {
-                currency: undefined,
-                date: undefined
-            },
-            columns: [
-                { title: '币种编码', key: 'currency', minWidth: 120, check: true },
-                { title: '汇率(基于USD)', key: 'rate', minWidth: 160, check: true },
-                { title: '汇率日期', key: 'date', minWidth: 160, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
+            {
+                keyName: 'chatbok:finance:deploy:exchange',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: {},
+                formState: {
+                    currency: undefined,
+                    date: undefined
+                },
+                columns: [
+                    { title: '币种编码', key: 'currency', minWidth: 120, check: true },
+                    { title: '汇率(基于USD)', key: 'rate', minWidth: 160, check: true },
+                    { title: '汇率日期', key: 'date', minWidth: 160, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                ]
+            }
+        )
 
         return () => (
             <layout-common-container initialize={state.initialize}>

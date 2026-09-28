@@ -20,34 +20,36 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**表格实例**/
-        const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
-            actions: [
-                { title: '编辑', key: `${props.keyName}:update` },
-                { title: '删除', key: `${props.keyName}:delete` }
-            ],
-            formState: {
-                /**枚举模块**/
-                module: props.node.module,
-                /**枚举类型**/
-                type: props.node.type,
-                /**枚举项名称**/
-                name: undefined,
-                /**状态**/
-                status: undefined
-            },
-            columns: [
-                { title: 'ID', key: 'keyId', width: 100, disabled: true },
-                { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
-                { title: '枚举值', key: 'value', minWidth: 120 },
-                { title: '排序号', key: 'sort', width: 100 },
-                { title: '状态', key: 'status', width: 100 },
-                { title: '创建人', key: 'createBy', width: 120 },
-                { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新人', key: 'modifyBy', width: 120 },
-                { title: '更新时间', key: 'modifyTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, setState, fetchRestore, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSkylineColumnChunk({ ...payload, page: base.page, size: base.size }),
+            {
+                actions: [
+                    { title: '编辑', key: `${props.keyName}:update` },
+                    { title: '删除', key: `${props.keyName}:delete` }
+                ],
+                formState: {
+                    /**枚举模块**/
+                    module: props.node.module,
+                    /**枚举类型**/
+                    type: props.node.type,
+                    /**枚举项名称**/
+                    name: undefined,
+                    /**状态**/
+                    status: undefined
+                },
+                columns: [
+                    { title: 'ID', key: 'keyId', width: 100, disabled: true },
+                    { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
+                    { title: '枚举值', key: 'value', minWidth: 120 },
+                    { title: '排序号', key: 'sort', width: 100 },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '创建人', key: 'createBy', width: 120 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         /**新增枚举**/
         async function fetchCreateDeployChunkResolver() {

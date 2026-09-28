@@ -14,24 +14,26 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSkylineColumnDatetask({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:datetask:system',
-            actions: [
-                { title: '启用/停用', key: 'chat:deploy:datetask:system:status:update' },
-                { title: '编辑', key: 'chat:deploy:datetask:system:update' },
-                { title: '手动触发', key: 'chat:deploy:datetask:system:trigger' },
-                { title: '任务日志', key: 'chat:deploy:datetask:system:logs' }
-            ],
-            formState: {
-                /**任务类型**/
-                type: 'system',
-                /**任务名称**/
-                taskName: undefined,
-                /**任务状态**/
-                status: undefined
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSkylineColumnDatetask({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:datetask:system',
+                actions: [
+                    { title: '启用/停用', key: 'chat:deploy:datetask:system:status:update' },
+                    { title: '编辑', key: 'chat:deploy:datetask:system:update' },
+                    { title: '手动触发', key: 'chat:deploy:datetask:system:trigger' },
+                    { title: '任务日志', key: 'chat:deploy:datetask:system:logs' }
+                ],
+                formState: {
+                    /**任务类型**/
+                    type: 'system',
+                    /**任务名称**/
+                    taskName: undefined,
+                    /**任务状态**/
+                    status: undefined
+                }
             }
-        })
+        )
 
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle(node: Omix) {
@@ -149,7 +151,7 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
-                        {state.dataSource.map(item => (
+                        {state.dataSource.map((item: Omix) => (
                             <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-5">
                                 <n-h4 class="m-be-0">{item.taskName}</n-h4>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
@@ -174,7 +176,7 @@ export default defineComponent({
                                     ></common-base-chunk>
                                     <common-base-authorize
                                         element
-                                        key-name={state.actions.map(item => item.key)}
+                                        key-name={state.actions.map((item: Omix) => item.key)}
                                         class-name="flex items-center gap-x-12 overflow-hidden"
                                     >
                                         <common-base-authorize key-name={state.actions[0].key}>

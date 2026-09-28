@@ -17,19 +17,21 @@ export default defineComponent({
         const { chunkOptions } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
             immediate: true
         })
-        const { state, instOptions, setState, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSkylineColumnDatetaskLog({ ...payload, page: base.page, size: base.size }),
-            formState: { taskId: props.node.taskId },
-            limit: 0,
-            columns: [
-                { title: '任务ID', key: 'taskId', width: 180 },
-                { title: '执行状态', key: 'status', width: 100 },
-                { title: '耗时(ms)', key: 'duration', width: 100 },
-                { title: '开始时间', key: 'startTime', width: 190 },
-                { title: '结束时间', key: 'endTime', width: 190 },
-                { title: '结果/错误', key: 'result', minWidth: 200 }
-            ]
-        })
+        const { state, instOptions, setState, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSkylineColumnDatetaskLog({ ...payload, taskId: props.node.taskId, page: base.page, size: base.size }),
+            {
+                formState: { taskId: props.node.taskId },
+                limit: 0,
+                columns: [
+                    { title: '任务ID', key: 'taskId', width: 180 },
+                    { title: '执行状态', key: 'status', width: 100 },
+                    { title: '耗时(ms)', key: 'duration', width: 100 },
+                    { title: '开始时间', key: 'startTime', width: 190 },
+                    { title: '结束时间', key: 'endTime', width: 190 },
+                    { title: '结果/错误', key: 'result', minWidth: 200 }
+                ]
+            }
+        )
 
         return () => (
             <common-dialog-provider

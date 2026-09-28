@@ -34,34 +34,36 @@ export default defineComponent({
         const appInfo = computed(() =>
             fetchCurrent(props.appOptions?.dataSource?.value ?? [], (item: Omix) => item.appId === formState.value.appId)
         )
-        const { state, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) =>
-                Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
-            formState: { draftBatchId: undefined },
-            immediate: false,
-            size: 100,
-            transform: data =>
-                data.list.map((item: Omix, index: number) => ({
-                    ...item,
-                    index: index + 1,
-                    upUsd: (Number(item.upUsd) / 1_000_000).toFixed(6),
-                    downUsd: (Number(item.downUsd) / 1_000_000).toFixed(6)
-                })),
-            columns: [
-                { title: '序号', key: 'index', width: 80 },
-                { title: 'MCC', key: 'mcc', width: 100 },
-                { title: '国家/地区', key: 'code', minWidth: 200 },
-                { title: '下行费率(USD)', key: 'downUsd', minWidth: 160 },
-                { title: '上行费率(USD)', key: 'upUsd', minWidth: 160 },
-                { title: '下行变更状态', key: 'downStatus', minWidth: 160 },
-                { title: '上行变更状态', key: 'upStatus', minWidth: 160 },
-                { title: '生效时间', key: 'effectiveTime', minWidth: 160 }
-            ]
-        })
+        const { state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
+            {
+                formState: { draftBatchId: undefined },
+                immediate: false,
+                size: 100,
+                transform: (data: Omix) =>
+                    data.list.map((item: Omix, index: number) => ({
+                        ...item,
+                        index: index + 1,
+                        upUsd: (Number(item.upUsd) / 1_000_000).toFixed(6),
+                        downUsd: (Number(item.downUsd) / 1_000_000).toFixed(6)
+                    })),
+                columns: [
+                    { title: '序号', key: 'index', width: 80 },
+                    { title: 'MCC', key: 'mcc', width: 100 },
+                    { title: '国家/地区', key: 'code', minWidth: 200 },
+                    { title: '下行费率(USD)', key: 'downUsd', minWidth: 160 },
+                    { title: '上行费率(USD)', key: 'upUsd', minWidth: 160 },
+                    { title: '下行变更状态', key: 'downStatus', minWidth: 160 },
+                    { title: '上行变更状态', key: 'upStatus', minWidth: 160 },
+                    { title: '生效时间', key: 'effectiveTime', minWidth: 160 }
+                ]
+            }
+        )
         const summary = computed(() => ({
             countries: new Set(state.dataSource.map((item: Omix) => item.countryKeyId)).size,
             additions: state.dataSource.filter((item: Omix) => item.upStatus === 'addition' || item.downStatus === 'addition').length,
-            scheduled: state.dataSource.filter((item: Omix) => item.effectiveTime && new Date(item.effectiveTime).getTime() > Date.now()).length
+            scheduled: state.dataSource.filter((item: Omix) => item.effectiveTime && new Date(item.effectiveTime).getTime() > Date.now())
+                .length
         }))
 
         watch(

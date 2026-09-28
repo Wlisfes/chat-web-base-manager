@@ -9,27 +9,29 @@ export default defineComponent({
     name: 'FinanceDeployBrand',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnBrand(payload),
-            keyName: 'chatbok:finance:deploy:brand',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_BRAND_STATUS: true },
-            formState: {
-                /**品牌名称**/
-                name: undefined,
-                /**状态**/
-                status: undefined
-            },
-            columns: [
-                { title: '品牌名称', key: 'name', width: 200, disabled: true },
-                { title: '状态', key: 'status', width: 120 },
-                { title: '创建人', key: 'createBy', width: 120 },
-                { title: '更新人', key: 'modifyBy', width: 120 },
-                { title: '品牌描述', key: 'document', minWidth: 200, ellipsis: true },
-                { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新时间', key: 'modifyTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnBrand(payload),
+            {
+                keyName: 'chatbok:finance:deploy:brand',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: { CHUNK_BRAND_STATUS: true },
+                formState: {
+                    /**品牌名称**/
+                    name: undefined,
+                    /**状态**/
+                    status: undefined
+                },
+                columns: [
+                    { title: '品牌名称', key: 'name', width: 200, disabled: true },
+                    { title: '状态', key: 'status', width: 120 },
+                    { title: '创建人', key: 'createBy', width: 120 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '品牌描述', key: 'document', minWidth: 200, ellipsis: true },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         /**新增品牌**/
         async function fetchDeployBrandCreate() {

@@ -8,24 +8,26 @@ export default defineComponent({
     name: 'FinanceDeployCurrency',
     setup(props, ctx) {
         /**表格实例**/
-        const { formRef, formState, state, chunkState, instState, instOptions, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseFinanceColumnCurrency(payload),
-            keyName: 'chatbok:finance:deploy:currency',
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_CURRENCY_STATUS: true },
-            formState: {
-                name: undefined, //币种名称
-                status: undefined //状态
-            },
-            columns: [
-                { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
-                { title: '币种名称', key: 'name', minWidth: 160, disabled: true },
-                { title: '币种符号', key: 'symbol', minWidth: 100, check: true },
-                { title: '状态', key: 'status', minWidth: 120, check: true },
-                { title: '创建时间', key: 'createTime', width: 160, check: true },
-                { title: '更新时间', key: 'modifyTime', width: 160, check: true }
-            ]
-        })
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseFinanceColumnCurrency(payload),
+            {
+                keyName: 'chatbok:finance:deploy:currency',
+                // 本地静态枚举已废弃，待切换为后端枚举接口
+                // chunkNames: { CHUNK_CURRENCY_STATUS: true },
+                formState: {
+                    name: undefined, //币种名称
+                    status: undefined //状态
+                },
+                columns: [
+                    { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
+                    { title: '币种名称', key: 'name', minWidth: 160, disabled: true },
+                    { title: '币种符号', key: 'symbol', minWidth: 100, check: true },
+                    { title: '状态', key: 'status', minWidth: 120, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
+                ]
+            }
+        )
 
         /**切换状态**/
         async function fetchDeployCurrencyStatus() {
@@ -67,12 +69,7 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button
-                            dashed
-                            type="warning"
-                            disabled={instState.value.isUpdate}
-                            onClick={fetchDeployCurrencyStatus}
-                        >
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployCurrencyStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>

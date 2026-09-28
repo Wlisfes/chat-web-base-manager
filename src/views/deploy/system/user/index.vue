@@ -19,35 +19,37 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
-            keyName: 'chat:deploy:system:user',
-            formState: {
-                /**工号/姓名/手机号/邮箱**/
-                vague: undefined,
-                /**状态**/
-                status: undefined,
-                /**归属部门**/
-                organizationKeyIds: []
-            },
-            actions: [
-                { title: '新增', key: 'chat:deploy:system:user:create' },
-                { title: '编辑', key: 'chat:deploy:system:user:update' },
-                { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
-            ],
-            columns: [
-                { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
-                { title: '名称', key: 'name', width: 120, disabled: true },
-                { title: '状态', key: 'status', width: 100 },
-                { title: '手机号', key: 'phone', width: 140 },
-                { title: '邮箱', key: 'email', width: 200 },
-                { title: '职级', key: 'levels', width: 100 },
-                { title: '岗位', key: 'posts', width: 160 },
-                { title: '归属部门', key: 'organizations', minWidth: 160 },
-                { title: '关联角色', key: 'roles', minWidth: 200 },
-                { title: '入职时间', key: 'createTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: 'chat:deploy:system:user',
+                formState: {
+                    /**工号/姓名/手机号/邮箱**/
+                    vague: undefined,
+                    /**状态**/
+                    status: undefined,
+                    /**归属部门**/
+                    organizationKeyIds: []
+                },
+                actions: [
+                    { title: '新增', key: 'chat:deploy:system:user:create' },
+                    { title: '编辑', key: 'chat:deploy:system:user:update' },
+                    { title: '重置密码', key: 'chat:deploy:system:user:password:reset' }
+                ],
+                columns: [
+                    { title: '头像', key: 'avatar', width: 50, align: 'center', disabled: true },
+                    { title: '名称', key: 'name', width: 120, disabled: true },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '手机号', key: 'phone', width: 140 },
+                    { title: '邮箱', key: 'email', width: 200 },
+                    { title: '职级', key: 'levels', width: 100 },
+                    { title: '岗位', key: 'posts', width: 160 },
+                    { title: '归属部门', key: 'organizations', minWidth: 160 },
+                    { title: '关联角色', key: 'roles', minWidth: 200 },
+                    { title: '入职时间', key: 'createTime', width: 160 }
+                ]
+            }
+        )
 
         /**新增账号**/
         async function fetchCreateDeploySystemUser() {

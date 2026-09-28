@@ -19,27 +19,29 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService({
-            request: (base, payload) => Service.httpBaseSkylineColumnChunkModule({ ...payload, page: base.page, size: base.size }),
-            keyName: props.keyName,
-            formState: {
-                module: props.module,
-                /**分类名称**/
-                name: undefined,
-                /**字段类型**/
-                kind: undefined
-            },
-            columns: [
-                { title: '分类名称', key: 'name', width: 200, disabled: true },
-                { title: '字段类型', key: 'kind', width: 120, disabled: true },
-                { title: '枚举数量', key: 'chunkCount', align: 'center', width: 120, disabled: true },
-                { title: '备注', key: 'remark', minWidth: 220 },
-                { title: '创建人', key: 'createBy', width: 120 },
-                { title: '创建时间', key: 'createTime', width: 160 },
-                { title: '更新人', key: 'modifyBy', width: 120 },
-                { title: '更新时间', key: 'modifyTime', width: 160 }
-            ]
-        })
+        const { formRef, formState, state, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSkylineColumnChunkModule({ ...payload, page: base.page, size: base.size }),
+            {
+                keyName: props.keyName,
+                formState: {
+                    module: props.module,
+                    /**分类名称**/
+                    name: undefined,
+                    /**字段类型**/
+                    kind: undefined
+                },
+                columns: [
+                    { title: '分类名称', key: 'name', width: 200, disabled: true },
+                    { title: '字段类型', key: 'kind', width: 120, disabled: true },
+                    { title: '枚举数量', key: 'chunkCount', align: 'center', width: 120, disabled: true },
+                    { title: '备注', key: 'remark', minWidth: 220 },
+                    { title: '创建人', key: 'createBy', width: 120 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                ]
+            }
+        )
 
         /**查看枚举列表**/
         async function fetchDeployChunkManager(node: Omix) {
