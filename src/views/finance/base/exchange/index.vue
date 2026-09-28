@@ -4,13 +4,13 @@ import { useColumnService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceDeployExchange',
+    name: 'FinanceBaseExchange',
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseFinanceColumnCurrencyExchange(payload),
             {
-                keyName: 'chatbok:finance:deploy:exchange',
+                keyName: 'chat:finance:base:exchange',
                 // 本地静态枚举已废弃，待切换为后端枚举接口
                 // chunkNames: {},
                 formState: {

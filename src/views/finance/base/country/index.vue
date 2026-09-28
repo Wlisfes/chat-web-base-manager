@@ -2,73 +2,47 @@
 import { defineComponent } from 'vue'
 import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceDeployBrand',
+    name: 'FinanceBaseCountry',
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnBrand(payload),
+            (base, payload) => Service.httpBaseFinanceColumnCountry(payload),
             {
-                keyName: 'chatbok:finance:deploy:brand',
+                keyName: 'chat:finance:base:country',
                 // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: { CHUNK_BRAND_STATUS: true },
+                // chunkNames: { CHUNK_COUNTRY_STATUS: true },
                 formState: {
-                    /**品牌名称**/
-                    name: undefined,
-                    /**状态**/
-                    status: undefined
+                    cnName: undefined, //国家/地区名称
+                    status: undefined //状态
                 },
                 columns: [
-                    { title: '品牌名称', key: 'name', width: 200, disabled: true },
-                    { title: '状态', key: 'status', width: 120 },
-                    { title: '创建人', key: 'createBy', width: 120 },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
-                    { title: '品牌描述', key: 'document', minWidth: 200, ellipsis: true },
-                    { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                    { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
+                    { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
+                    { title: '英文名称', key: 'enName', minWidth: 140, check: true },
+                    { title: 'MCC', key: 'mcc', minWidth: 140, check: true },
+                    { title: '状态', key: 'status', minWidth: 140, check: true },
+                    { title: '创建时间', key: 'createTime', width: 160, check: true },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: true }
                 ]
             }
         )
 
-        /**新增品牌**/
-        async function fetchDeployBrandCreate() {
-            return await feedback.fetchFinanceDeployBrand({
-                title: '新增品牌',
-                command: 'CREATE',
-                async onSubmit() {
-                    return await fetchRefresh()
-                }
-            })
-        }
-
-        /**编辑品牌**/
-        async function fetchDeployBrandUpdate() {
-            return await feedback.fetchFinanceDeployBrand({
-                title: '编辑品牌',
-                command: 'UPDATE',
-                node: state.select[0],
-                async onSubmit() {
-                    return await fetchRefresh()
-                }
-            })
-        }
-
         /**切换状态**/
-        async function fetchDeployBrandStatus() {
+        async function fetchBaseFinanceUpdateCountryStatus() {
             const node = state.select[0]
             const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
             const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认将品牌【${node.name}】状态变更为【${nextLabel}】吗？`,
+                content: `确认将国家/地区【${node.cnName}】状态变更为【${nextLabel}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateBrandStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseFinanceUpdateCountryStatus({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -96,28 +70,22 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchDeployBrandCreate}>
-                            新增
-                        </common-base-button>
-                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployBrandUpdate}>
-                            编辑
-                        </common-base-button>
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployBrandStatus}>
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseFinanceUpdateCountryStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="品牌名称">
+                    <common-database-search-column disabled prop="cnName" label="名称">
                         <form-base-input
                             clearable
-                            placeholder="请输入品牌名称"
-                            v-model:value={formState.value.name}
+                            placeholder="请输入国家/地区名称、编码"
+                            v-model:value={formState.value.cnName}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
-                            placeholder="请选择付款模式"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
+                            placeholder="请选择状态"
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -144,14 +112,8 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_BRAND_STATUS}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
                             ></common-database-table-chunk>
-                        ),
-                        col_createBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.createByOptions}></common-database-table-user>
-                        ),
-                        col_modifyBy: (data: Omix) => (
-                            <common-database-table-user element="text" data={data.modifyByOptions}></common-database-table-user>
                         )
                     }}
                 </common-database-table>

@@ -5,7 +5,7 @@ import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceDeployFeedbackRatesSms',
+    name: 'FinanceRatesFeedbackSms',
     emits: ['close', 'submit'],
     props: {
         /**标题**/

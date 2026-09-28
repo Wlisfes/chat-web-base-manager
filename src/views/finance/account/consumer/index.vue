@@ -56,7 +56,7 @@ export default defineComponent({
         )
 
         /**新增客户**/
-        async function fetchAccountConsumerCreate() {
+        async function fetchCreateFinanceAccountConsumer() {
             return await feedback.fetchFinanceAccountConsumer({
                 title: '新增客户',
                 command: 'CREATE',
@@ -78,7 +78,7 @@ export default defineComponent({
         }
 
         /**编辑客户**/
-        async function fetchAccountConsumerUpdate() {
+        async function fetchUpdateFinanceAccountConsumer() {
             return await feedback.fetchFinanceAccountConsumer({
                 title: '编辑客户',
                 command: 'UPDATE',
@@ -90,7 +90,7 @@ export default defineComponent({
         }
 
         /**切换状态**/
-        async function fetchAccountConsumerStatus() {
+        async function fetchBaseAccountUpdateConsumerStatus() {
             const node = state.select[0]
             const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
             const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
@@ -129,13 +129,13 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchAccountConsumerCreate}>
+                        <common-base-button type="primary" onClick={fetchCreateFinanceAccountConsumer}>
                             新增
                         </common-base-button>
-                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchAccountConsumerUpdate}>
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchUpdateFinanceAccountConsumer}>
                             编辑
                         </common-base-button>
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchAccountConsumerStatus}>
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseAccountUpdateConsumerStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>

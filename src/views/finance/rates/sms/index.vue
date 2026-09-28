@@ -36,8 +36,8 @@ export default defineComponent({
         )
 
         /**新增**/
-        async function fetchDeployRatesSmsCreate() {
-            return await feedback.fetchFinanceDeployRatesSms({
+        async function fetchCreateFinanceRatesSms() {
+            return await feedback.fetchFinanceRatesSms({
                 title: '新增基础价格',
                 command: 'CREATE',
                 async onSubmit() {
@@ -47,8 +47,8 @@ export default defineComponent({
         }
 
         /**编辑**/
-        async function fetchDeployRatesSmsUpdate() {
-            return await feedback.fetchFinanceDeployRatesSms({
+        async function fetchUpdateFinanceRatesSms() {
+            return await feedback.fetchFinanceRatesSms({
                 title: '编辑基础价格',
                 command: 'UPDATE',
                 node: state.select[0],
@@ -74,10 +74,10 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={fetchDeployRatesSmsCreate}>
+                        <common-base-button type="primary" onClick={fetchCreateFinanceRatesSms}>
                             新增
                         </common-base-button>
-                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchDeployRatesSmsUpdate}>
+                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchUpdateFinanceRatesSms}>
                             编辑
                         </common-base-button>
                     </common-database-search-function>

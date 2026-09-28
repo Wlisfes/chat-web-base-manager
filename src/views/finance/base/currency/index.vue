@@ -5,25 +5,24 @@ import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceDeployCountry',
+    name: 'FinanceBaseCurrency',
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnCountry(payload),
+            (base, payload) => Service.httpBaseFinanceColumnCurrency(payload),
             {
-                keyName: 'chatbok:finance:deploy:country',
+                keyName: 'chat:finance:base:currency',
                 // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: { CHUNK_COUNTRY_STATUS: true },
+                // chunkNames: { CHUNK_CURRENCY_STATUS: true },
                 formState: {
-                    cnName: undefined, //国家/地区名称
+                    name: undefined, //币种名称
                     status: undefined //状态
                 },
                 columns: [
-                    { title: '国家/地区编码', key: 'code', minWidth: 140, disabled: true },
-                    { title: '中文名称', key: 'cnName', minWidth: 140, disabled: true },
-                    { title: '英文名称', key: 'enName', minWidth: 140, check: true },
-                    { title: 'MCC', key: 'mcc', minWidth: 140, check: true },
-                    { title: '状态', key: 'status', minWidth: 140, check: true },
+                    { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
+                    { title: '币种名称', key: 'name', minWidth: 160, disabled: true },
+                    { title: '币种符号', key: 'symbol', minWidth: 100, check: true },
+                    { title: '状态', key: 'status', minWidth: 120, check: true },
                     { title: '创建时间', key: 'createTime', width: 160, check: true },
                     { title: '更新时间', key: 'modifyTime', width: 160, check: true }
                 ]
@@ -31,18 +30,18 @@ export default defineComponent({
         )
 
         /**切换状态**/
-        async function fetchDeployCountryStatus() {
+        async function fetchBaseFinanceUpdateCurrencyStatus() {
             const node = state.select[0]
             const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
             const nextLabel = nextStatus === 'enable' ? '启用' : '禁用'
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
-                content: `确认将国家/地区【${node.cnName}】状态变更为【${nextLabel}】吗？`,
+                content: `确认将币种【${node.name}】状态变更为【${nextLabel}】吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceUpdateCountryStatus({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseFinanceUpdateCurrencyStatus({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -70,22 +69,22 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchDeployCountryStatus}>
+                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseFinanceUpdateCurrencyStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="cnName" label="名称">
+                    <common-database-search-column disabled prop="name" label="币种名称">
                         <form-base-input
                             clearable
-                            placeholder="请输入国家/地区名称、编码"
-                            v-model:value={formState.value.cnName}
+                            placeholder="请输入币种名称"
+                            v-model:value={formState.value.name}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="状态">
                         <form-base-select
-                            placeholder="请选择状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
+                            placeholder="请选择付款模式"
+                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -112,7 +111,7 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_COUNTRY_STATUS}
+                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CURRENCY_STATUS}
                             ></common-database-table-chunk>
                         )
                     }}
