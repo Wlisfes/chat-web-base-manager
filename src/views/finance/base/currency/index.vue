@@ -16,19 +16,21 @@ export default defineComponent({
             (base, payload) => Service.httpBaseFinanceColumnCurrency({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:currency',
+                actions: [{ title: '编辑', key: 'chat:finance:base:currency:update' }],
                 formState: {
                     /**币种名称**/
                     name: undefined,
                     /**状态**/
                     status: undefined
                 },
-                actions: [{ title: '编辑', key: 'chat:finance:base:currency:update' }],
                 columns: [
                     { title: '币种编码', key: 'currency', minWidth: 120, disabled: true },
                     { title: '币种名称', key: 'name', minWidth: 160, disabled: true },
                     { title: '币种符号', key: 'symbol', minWidth: 100 },
                     { title: '状态', key: 'status', width: 120 },
+                    { title: '创建人', key: 'createBy', width: 120 },
                     { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新人', key: 'modifyBy', width: 120 },
                     { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
@@ -94,7 +96,6 @@ export default defineComponent({
                 </common-database-search>
                 <common-database-table
                     show-settings
-                    show-command={instState.value.showCommand}
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
@@ -103,8 +104,9 @@ export default defineComponent({
                     v-model:select={state.select}
                     v-model:data={state.dataSource}
                     v-model:loading={state.loading}
-                    v-model:initialize={state.initialize}
                     v-model:customize={state.customize}
+                    v-model:initialize={state.initialize}
+                    show-command={instState.value.showCommand}
                     on-update:customize={instOptions.fetchUpdateCustomize}
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
@@ -113,14 +115,20 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        },
                         col_command: (data: Omix) => (
-                            <common-base-element class-name="flex items-center gap-x-10 overflow-hidden">
+                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     {['enable'].includes(data.status) ? (
                                         <common-base-button
                                             text
                                             title="禁用"
-                                            type="error"
+                                            type="warning"
                                             onClick={(e: MouseEvent) => fetchBaseFinanceUpdateCurrencyStatus(data, 'disable')}
                                         >
                                             禁用

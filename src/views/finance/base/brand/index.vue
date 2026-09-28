@@ -13,23 +13,22 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseFinanceColumnBrand({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:brand',
+                actions: [
+                    { title: '编辑', key: 'chat:finance:base:brand:update' },
+                    { title: '删除', key: 'chat:finance:base:brand:delete' }
+                ],
                 formState: {
                     /**品牌名称**/
                     name: undefined,
                     /**状态**/
                     status: undefined
                 },
-                actions: [
-                    { title: '新增', key: 'chat:finance:base:brand:create' },
-                    { title: '编辑', key: 'chat:finance:base:brand:update' },
-                    { title: '删除', key: 'chat:finance:base:brand:delete' }
-                ],
                 columns: [
-                    { title: '品牌名称', key: 'name', width: 200, disabled: true },
+                    { title: '品牌名称', key: 'name', width: 160, disabled: true },
                     { title: '状态', key: 'status', width: 120 },
                     { title: '品牌描述', key: 'document', minWidth: 200 },
                     { title: '创建人', key: 'createBy', width: 120 },
@@ -88,7 +87,7 @@ export default defineComponent({
         async function fetchDeleteBaseFinanceBrand(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
-                type: 'warning',
+                type: 'error',
                 content: `确认删除品牌【${node.name}】吗？删除后无法恢复！`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
@@ -124,8 +123,8 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-authorize key-name={state.actions[0].key}>
-                            <common-base-button type="primary" onClick={fetchCreateFinanceBaseBrand}>
+                        <common-base-authorize key-name="chat:finance:base:brand:create">
+                            <common-base-button class="min-w-80" type="primary" onClick={fetchCreateFinanceBaseBrand}>
                                 新增
                             </common-base-button>
                         </common-base-authorize>
@@ -150,7 +149,6 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-command
                     show-settings
                     limit={state.limit}
                     total={state.total}
@@ -160,8 +158,9 @@ export default defineComponent({
                     v-model:select={state.select}
                     v-model:data={state.dataSource}
                     v-model:loading={state.loading}
-                    v-model:initialize={state.initialize}
                     v-model:customize={state.customize}
+                    v-model:initialize={state.initialize}
+                    show-command={instState.value.showCommand}
                     on-update:customize={instOptions.fetchUpdateCustomize}
                     on-update:page={(page: number) => fetchRefresh({ page })}
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
@@ -177,13 +176,8 @@ export default defineComponent({
                             return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
                         },
                         col_command: (data: Omix) => (
-                            <common-base-authorize
-                                element
-                                empty="-"
-                                key-name={[state.actions[1].key, state.actions[2].key]}
-                                class-name="flex items-center gap-x-10 overflow-hidden"
-                            >
-                                <common-base-authorize key-name={state.actions[1].key}>
+                            <common-base-element class="flex items-center gap-x-10 overflow-hidden">
+                                <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         text
                                         title="编辑"
@@ -193,12 +187,12 @@ export default defineComponent({
                                         编辑
                                     </common-base-button>
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[1].key}>
+                                <common-base-authorize key-name={state.actions[0].key}>
                                     {['enable'].includes(data.status) ? (
                                         <common-base-button
                                             text
                                             title="禁用"
-                                            type="error"
+                                            type="warning"
                                             onClick={(e: MouseEvent) => fetchBaseFinanceBrandStatusUpdate(data, 'disable')}
                                         >
                                             禁用
@@ -214,7 +208,7 @@ export default defineComponent({
                                         </common-base-button>
                                     )}
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[2].key}>
+                                <common-base-authorize key-name={state.actions[1].key}>
                                     <common-base-button
                                         text
                                         title="删除"
@@ -224,7 +218,7 @@ export default defineComponent({
                                         删除
                                     </common-base-button>
                                 </common-base-authorize>
-                            </common-base-authorize>
+                            </common-base-element>
                         )
                     }}
                 </common-database-table>
