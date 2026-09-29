@@ -32,7 +32,7 @@ export default defineComponent({
 
         /**当前客户信息**/
         const consumerInfo = computed(() => {
-            return fetchCurrent(props.consumerOptions?.dataSource?.value ?? [], (e: Omix) => e.keyId === formState.value.consumerKeyId)
+            return fetchCurrent(props.consumerOptions?.dataSource?.value ?? [], (e: Omix) => e.keyId === formState.value.userKeyId)
         })
         /**当前应用信息**/
         const appInfo = computed(() => {
