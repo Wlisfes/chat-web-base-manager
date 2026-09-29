@@ -27,6 +27,23 @@ export function httpBaseFinanceUpdateFrozenSms(data: Omix) {
     })
 }
 
+/**短信基础价格静态枚举**/
+export function httpBaseFinanceFrozenSmsEnums() {
+    return request({
+        url: '/api/finance/frozen/sms/enums',
+        method: 'GET'
+    })
+}
+
+/**批量上调、下调短信基础价格**/
+export function httpBaseFinanceFluctuateFrozenSms(data: Omix) {
+    return request({
+        url: '/api/finance/frozen/sms/fluctuate',
+        method: 'POST',
+        data
+    })
+}
+
 /**短信基础价格分页列表**/
 export function httpBaseFinanceColumnFrozenSms(data: Omix) {
     return request({
