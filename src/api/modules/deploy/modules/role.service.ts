@@ -43,6 +43,15 @@ export function httpBaseAccountUpdateRole(data: Omix) {
     })
 }
 
+/**批量更新角色排序**/
+export function httpBaseAccountUpdateRoleSort(data: Omix) {
+    return request({
+        url: '/api/account/role/sort/update',
+        method: 'POST',
+        data
+    })
+}
+
 /**删除未分配用户的非内置角色**/
 export function httpBaseAccountDeleteRole(data: Omix) {
     return request({
