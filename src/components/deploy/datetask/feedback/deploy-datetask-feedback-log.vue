@@ -42,7 +42,7 @@ export default defineComponent({
                 action={false}
                 scrollbar={false}
                 class-element="p-inline-20 p-be-20"
-                class-name="h-90vh max-h-750 p-in"
+                class-name="h-90vh max-h-750!"
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 onCancel={() => setState({ visible: false })}

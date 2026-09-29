@@ -132,10 +132,10 @@ export default defineComponent({
                         <common-base-button type="primary" onClick={fetchCreateFinanceAccountConsumer}>
                             新增
                         </common-base-button>
-                        <common-base-button dashed type="primary" disabled={instState.value.isUpdate} onClick={fetchUpdateFinanceAccountConsumer}>
+                        <common-base-button dashed type="primary" onClick={fetchUpdateFinanceAccountConsumer}>
                             编辑
                         </common-base-button>
-                        <common-base-button dashed type="warning" disabled={instState.value.isUpdate} onClick={fetchBaseAccountUpdateConsumerStatus}>
+                        <common-base-button dashed type="warning" onClick={fetchBaseAccountUpdateConsumerStatus}>
                             切换状态
                         </common-base-button>
                     </common-database-search-function>

@@ -1,7 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
 import { useColumnService, useSelectService } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -14,7 +13,7 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnFrozenSms(payload),
+            (base, payload) => Service.httpBaseFinanceColumnFrozenSms({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:frozen:sms',
                 actions: [{ title: '编辑', key: 'chat:finance:frozen:sms:update' }],
@@ -59,6 +58,15 @@ export default defineComponent({
             })
         }
 
+        /**批量上调、下调**/
+        async function fetchFluctuateFinanceFrozenSms() {
+            return await feedback.fetchFinanceFrozenFluctuate({
+                title: '批量调整基础价格',
+                items: state.select,
+                onSubmit: e => fetchRefresh()
+            })
+        }
+
         return () => (
             <layout-common-container initialize={state.initialize}>
                 <common-database-search
@@ -78,6 +86,11 @@ export default defineComponent({
                         <common-base-authorize key-name="chat:finance:frozen:sms:create">
                             <common-base-button class="min-w-80" type="primary" onClick={fetchCreateFinanceFrozenSms}>
                                 新增
+                            </common-base-button>
+                        </common-base-authorize>
+                        <common-base-authorize key-name="chat:finance:frozen:sms:fluctuate">
+                            <common-base-button class="min-w-80" secondary type="info" onClick={fetchFluctuateFinanceFrozenSms}>
+                                批量调价
                             </common-base-button>
                         </common-base-authorize>
                     </common-database-search-function>
@@ -104,6 +117,7 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
+                    show-select
                     show-settings
                     limit={state.limit}
                     total={state.total}

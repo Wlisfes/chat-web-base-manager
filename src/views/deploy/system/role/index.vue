@@ -66,8 +66,9 @@ export default defineComponent({
                     keyId: item.keyId,
                     sort: (index + 1) * 10
                 }))
-                await Promise.all(list.map((item: Omix) => Service.httpBaseAccountUpdateRole(item)))
-                return await fetchNotifyService({ title: '操作成功' })
+                return await Service.httpBaseAccountUpdateRoleSort({ list }).then(async () => {
+                    return await fetchNotifyService({ title: '操作成功' })
+                })
             } catch (err) {
                 return await fetchNotifyService({ type: 'error', title: err.message })
             }

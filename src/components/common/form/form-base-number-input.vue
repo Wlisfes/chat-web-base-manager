@@ -1,14 +1,18 @@
 <script lang="tsx">
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, h, nextTick, PropType, VNode } from 'vue'
+import { enter, fetchWherer, isNotEmpty } from '@/utils'
 import { useVModels } from '@vueuse/core'
-import { enter } from '@/utils'
 
 export default defineComponent({
     name: 'FormBaseNumberInput',
     emits: ['update:value', '-submit', '-change:value'],
     props: {
         /**绑定数据**/
-        value: { type: [Number, String] }
+        value: { type: [Number, String] },
+        /**输入框头部内容**/
+        prefix: { type: Object as PropType<VNode> },
+        /**输入框尾部内容**/
+        suffix: { type: Object as PropType<VNode> }
     },
     setup(props, { emit, slots }) {
         const { value } = useVModels(props, emit)
@@ -31,7 +35,16 @@ export default defineComponent({
                 v-model:value={value.value}
                 onUpdate:value={fetchUpdate}
                 onKeydown={fetchSubmit}
-            ></n-input-number>
+            >
+                {{
+                    prefix: fetchWherer(isNotEmpty(slots.prefix) || isNotEmpty(props.prefix), () => {
+                        return slots.prefix ? slots.prefix() : h(props.prefix as VNode)
+                    }),
+                    suffix: fetchWherer(isNotEmpty(slots.suffix) || isNotEmpty(props.suffix), () => {
+                        return slots.suffix ? slots.suffix() : h(props.suffix as VNode)
+                    })
+                }}
+            </n-input-number>
         )
     }
 })

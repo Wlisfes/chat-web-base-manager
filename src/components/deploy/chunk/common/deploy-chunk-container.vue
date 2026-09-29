@@ -89,7 +89,6 @@ export default defineComponent({
                 </common-database-search>
                 <common-database-table
                     show-settings
-                    //show-command
                     pagination={false}
                     limit={state.limit}
                     total={state.total}

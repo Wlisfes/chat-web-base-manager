@@ -57,9 +57,8 @@ export default defineComponent({
             }
             return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
-                    const upUsd = data.upUsd / 1000000
-                    const downUsd = data.downUsd / 1000000
-                    return await setForm(fetchReste({ ...data, upUsd, downUsd })).then(async () => {
+                    // 接口直接返回美元价格，百万倍换算由后端完成
+                    return await setForm(fetchReste(data)).then(async () => {
                         return await setState({ initialize: false })
                     })
                 } catch (err) {
@@ -77,10 +76,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const formOptions: Omix = Object.assign(cloneDeep(formState.value), {
-                        upUsd: Math.round((formState.value.upUsd ?? 0) * 1000000),
-                        downUsd: Math.round((formState.value.downUsd ?? 0) * 1000000)
-                    })
+                    const formOptions: Omix = cloneDeep(formState.value)
                     if (['CREATE'].includes(props.command)) {
                         await Service.httpBaseFinanceCreateFrozenSms(formOptions)
                     } else if (['UPDATE'].includes(props.command)) {

@@ -193,13 +193,11 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     const instState = computed(() => {
         const keyNames = state.actions.map((item: Omix) => item.key)
         return {
-            showCommand: superAdmin.value || (keyNames.length > 0 && keyNames.every((code: string) => sheetOptions.value.includes(code))),
-            /**克隆按钮禁用状态**/
-            isClone: state.select.length !== 1,
-            /**编辑按钮禁用状态**/
-            isUpdate: state.select.length !== 1,
-            /**删除按钮禁用状态**/
-            isDelete: state.select.length === 0
+            showCommand: superAdmin.value || (keyNames.length > 0 && keyNames.some((code: string) => sheetOptions.value.includes(code))),
+            /**单选按钮禁用**/
+            isSingle: state.select.length !== 1,
+            /**多选按钮禁用**/
+            isDouble: state.select.length === 0
         }
     })
 
