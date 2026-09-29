@@ -34,6 +34,7 @@ export default defineComponent({
         const { visible, initialize, loading } = useVModels(props, emit)
         const styleNodes = computed<CSSProperties>(() => ({
             width: utils.isString(props.width) ? props.width : props.width + 'px',
+            'max-height': '90vh',
             '--n-font-size': '15px',
             '--n-padding': '0',
             '--n-close-margin': '16px 16px 0 0',
