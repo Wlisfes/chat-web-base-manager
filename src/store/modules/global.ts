@@ -116,6 +116,9 @@ export const useGlobal = defineStore(
 
         /**缓存标签页**/
         async function fetchUpdateRouter(data: Omix) {
+            if (!state.tabOptions.some(item => item.fullPath === faseMeta.value.fullPath)) {
+                state.tabOptions.unshift(faseMeta.value)
+            }
             const index = state.tabOptions.findIndex(item => item.fullPath === data.fullPath)
             if (index === -1) {
                 return state.tabOptions.push(omit(data, ['matched']))
@@ -125,10 +128,17 @@ export const useGlobal = defineStore(
             return state.tabOptions
         }
 
+        /**标签页是否可关闭：默认工作台页面始终保留**/
+        function fetchClosable(data: Omix) {
+            return data.fullPath !== faseMeta.value.fullPath && data.meta?.showClose !== false
+        }
+
         /**删除标签页**/
         async function fetchRemoveRouter(data: Omix, router: any) {
             const index = state.tabOptions.findIndex(item => item.fullPath === data.fullPath)
-            if (index === -1) return
+            if (index === -1 || !fetchClosable(data)) {
+                return
+            }
             state.tabOptions.splice(index, 1)
             if (data.fullPath === router.currentRoute.value.fullPath) {
                 const next = state.tabOptions[index] || state.tabOptions[index - 1]
@@ -138,6 +148,34 @@ export const useGlobal = defineStore(
                     await router.push({ path: '/manager' })
                 }
             }
+        }
+
+        /**批量删除标签页：left-关闭左侧、right-关闭右侧、other-关闭其他、all-关闭全部**/
+        async function fetchRemoveRouters(type: 'left' | 'right' | 'other' | 'all', data: Omix, router: any) {
+            const index = state.tabOptions.findIndex(item => item.fullPath === data.fullPath)
+            if (index === -1 && type !== 'all') {
+                return
+            }
+            state.tabOptions = state.tabOptions.filter((item, current) => {
+                if (!fetchClosable(item)) {
+                    return true
+                } else if (type === 'left') {
+                    return current >= index
+                } else if (type === 'right') {
+                    return current <= index
+                } else if (type === 'other') {
+                    return current === index
+                }
+                return false
+            })
+            const fullPath = router.currentRoute.value.fullPath
+            if (state.tabOptions.some(item => item.fullPath === fullPath)) {
+                return
+            } else if (type === 'all') {
+                const next = state.tabOptions[state.tabOptions.length - 1]
+                return await router.push({ path: next?.fullPath ?? '/manager' })
+            }
+            return await router.push({ path: data.fullPath })
         }
 
         return {
@@ -152,6 +190,8 @@ export const useGlobal = defineStore(
             fetchAuthAccountTokenLogout,
             fetchUpdateRouter,
             fetchRemoveRouter,
+            fetchRemoveRouters,
+            fetchClosable,
             keepTabNemas
         }
     },
