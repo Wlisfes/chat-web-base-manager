@@ -22,7 +22,7 @@ export default defineComponent({
             // 本地静态枚举已废弃，待切换为后端枚举接口
             // chunkNames: { CHUNK_CONSUMER_SMS_TYPE: true },
             formState: {
-                consumerKeyId: props.node.consumerKeyId,
+                userKeyId: props.node.userKeyId,
                 type: props.node.type,
                 pushUrl: props.node.pushUrl,
                 remark: props.node.remark

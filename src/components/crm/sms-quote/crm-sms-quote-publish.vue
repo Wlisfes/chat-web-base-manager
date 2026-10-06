@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType, ref, watch } from 'vue'
 import { useVModels } from '@vueuse/core'
-import { httpBaseAccountConsumerResolver, httpBaseCrmPublishSmsQuote } from '@/api/instance.service'
+import { httpBaseCrmUserResolver, httpBaseCrmPublishSmsQuote } from '@/api/instance.service'
 import { fetchNotifyService } from '@/plugins'
 
 export default defineComponent({
@@ -33,9 +33,9 @@ export default defineComponent({
 
         async function fetchConsumer() {
             const f = formState.value
-            if (!f.consumerKeyId) return
+            if (!f.userKeyId) return
             try {
-                const consumerResponse = await httpBaseAccountConsumerResolver({ keyId: f.consumerKeyId })
+                const consumerResponse = await httpBaseCrmUserResolver({ keyId: f.userKeyId })
                 consumerInfo.value = consumerResponse.data || {}
             } catch (err: any) {
                 fetchNotifyService({ type: 'error', title: '加载客户信息失败', message: err.message })
@@ -53,7 +53,7 @@ export default defineComponent({
                 fetchNotifyService({ type: 'success', title: '报价发布成功' })
 
                 props.setForm({
-                    consumerKeyId: undefined,
+                    userKeyId: undefined,
                     appId: undefined,
                     countryKeyIds: [],
                     draftBatchId: undefined

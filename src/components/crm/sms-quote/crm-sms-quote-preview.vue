@@ -29,7 +29,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
         const consumerInfo = computed(() =>
-            fetchCurrent(props.consumerOptions?.dataSource?.value ?? [], (item: Omix) => item.keyId === formState.value.consumerKeyId)
+            fetchCurrent(props.consumerOptions?.dataSource?.value ?? [], (item: Omix) => item.keyId === formState.value.userKeyId)
         )
         const appInfo = computed(() =>
             fetchCurrent(props.appOptions?.dataSource?.value ?? [], (item: Omix) => item.appId === formState.value.appId)

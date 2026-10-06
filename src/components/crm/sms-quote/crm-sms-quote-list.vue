@@ -19,17 +19,17 @@ export default defineComponent({
             (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, statuses: [props.status] }),
             {
                 formState: {
-                    consumerKeyId: undefined,
-                    consumerAlias: undefined,
+                    userKeyId: undefined,
+                    userAlias: undefined,
                     appId: undefined,
                     appAlias: undefined,
                     countryKeyIds: [] as number[],
                     mcc: undefined
                 },
                 columns: [
-                    { title: '客户ID', key: 'consumerKeyId', width: 100, disabled: true },
+                    { title: '客户ID', key: 'userKeyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'consumerName', minWidth: 160, check: true },
-                    { title: '客户别名', key: 'consumerAlias', width: 140, check: true },
+                    { title: '客户别名', key: 'userAlias', width: 140, check: true },
                     { title: '应用ID', key: 'appId', width: 120, check: true },
                     { title: '应用别名', key: 'appAlias', minWidth: 160, check: true },
                     { title: 'MCC', key: 'mcc', width: 80, check: true },
@@ -72,19 +72,19 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-column prop="consumerKeyId" label="客户ID">
+                    <common-database-search-column prop="userKeyId" label="客户ID">
                         <form-base-input
                             clearable
                             placeholder="请输入客户ID"
-                            v-model:value={formState.value.consumerKeyId}
+                            v-model:value={formState.value.userKeyId}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="consumerAlias" label="客户别名">
+                    <common-database-search-column prop="userAlias" label="客户别名">
                         <form-base-input
                             clearable
                             placeholder="请输入客户别名"
-                            v-model:value={formState.value.consumerAlias}
+                            v-model:value={formState.value.userAlias}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
@@ -143,10 +143,10 @@ export default defineComponent({
                 >
                     {{
                         col_consumerName: (data: Omix) => (
-                            <common-database-table-content>{data.consumerOptions?.name}</common-database-table-content>
+                            <common-database-table-content>{data.userOptions?.name}</common-database-table-content>
                         ),
-                        col_consumerAlias: (data: Omix) => (
-                            <common-database-table-content>{data.consumerOptions?.alias}</common-database-table-content>
+                        col_userAlias: (data: Omix) => (
+                            <common-database-table-content>{data.userOptions?.alias}</common-database-table-content>
                         ),
                         col_countryName: (data: Omix) => (
                             <common-database-table-content>

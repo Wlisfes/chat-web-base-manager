@@ -19,7 +19,7 @@ export default defineComponent({
         const { faseNode } = useVModels(props, emit)
         /**短信应用列表**/
         const { state, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsApplication(payload), {
-            formState: { consumerKeyId: faseNode.value.keyId },
+            formState: { userKeyId: faseNode.value.keyId },
             immediate: true
         })
 
@@ -28,7 +28,7 @@ export default defineComponent({
             return await openCrmSmsApplicationCreate({
                 title: '添加短信应用',
                 command: 'CREATE',
-                node: { consumerKeyId: faseNode.value.keyId }
+                node: { userKeyId: faseNode.value.keyId }
             })
         }
 

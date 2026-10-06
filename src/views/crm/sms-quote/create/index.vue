@@ -10,7 +10,7 @@ export default defineComponent({
             options: { current: 1 },
             formState: {
                 /**客户ID**/
-                consumerKeyId: undefined,
+                userKeyId: undefined,
                 /**应用ID**/
                 appId: undefined,
                 /**报价国家/地区主键**/
@@ -20,12 +20,12 @@ export default defineComponent({
             }
         })
         /**客户下拉数据**/
-        const consumerOptions = useSelectService(() => Service.httpBaseAccountSelectConsumer({}), {
+        const consumerOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), {
             immediate: true,
             transform: data => data.map(item => ({ ...item, showName: `${item.alias} - ${item.name}` }))
         })
         /**应用下拉数据**/
-        const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApplication({ consumerKeyId: formState.value.consumerKeyId }), {
+        const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApplication({ userKeyId: formState.value.userKeyId }), {
             immediate: false
         })
         /**MCC下拉数据**/

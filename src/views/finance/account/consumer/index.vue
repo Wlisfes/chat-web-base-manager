@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
@@ -9,20 +9,26 @@ export default defineComponent({
     name: 'FinanceAccountConsumer',
     setup(props, ctx) {
         const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
+        /**客户静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            immediate: true
+        })
+        /**注册来源选项：Skyline 枚举 CHUNK_CRM_CRM_USER_SOURCE，value 即枚举项主键**/
+        const sourceOptions = useSelectService(
+            async () => {
+                const response = await Service.httpBaseSkylineChunkOptionColumn({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] })
+                return { ...response, data: response.data.CHUNK_CRM_CRM_USER_SOURCE?.options ?? [] }
+            },
+            {
+                immediate: true,
+                transform: options => options.map(item => ({ value: Number(item.value), label: item.label }))
+            }
+        )
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
+            (base, payload) => Service.httpBaseCrmColumnUser(payload),
             {
                 keyName: 'chatbok:finance:account:consumer',
-                // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: {
-                // CHUNK_CONSUMER_PAY_MODE: true,
-                // CHUNK_CONSUMER_AUTH_STATUS: true,
-                // CHUNK_CONSUMER_SOURCE: true,
-                // CHUNK_CONSUMER_STATUS: true,
-                // CHUNK_CONSUMER_CLASS: true,
-                // CHUNK_CONSUMER_STAGE: true
-                // },
                 formState: {
                     name: undefined,
                     status: undefined,
@@ -62,7 +68,7 @@ export default defineComponent({
                 command: 'CREATE',
                 node: {
                     name: '青萍科技股份有限公司',
-                    brandId: 1007,
+                    brandKeyId: 1007,
                     currency: 'USD',
                     email: 'limvcfast@gmail.com',
                     phone: '18676361342',
@@ -101,7 +107,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountConsumerStatusUpdate({ keyId: node.keyId, status: nextStatus })
+                            await Service.httpBaseCrmUserStatusUpdate({ keyId: node.keyId, status: nextStatus })
                             await fetchRefresh()
                             return await done({ visible: false })
                         } catch (err) {
@@ -151,7 +157,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -159,7 +166,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </common-database-search-column>
@@ -167,7 +175,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择认证状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.authStatusOptions}
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
                     </common-database-search-column>
@@ -175,7 +184,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择注册来源"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SOURCE}
+                            loading={sourceOptions.loading.value}
+                            options={sourceOptions.dataSource.value}
                             v-model:value={formState.value.source}
                         ></form-base-select>
                     </common-database-search-column>
@@ -209,47 +219,47 @@ export default defineComponent({
                             ></common-database-table-content>
                         ),
                         col_brandOptions: (data: Omix) => {
-                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
+                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
                             return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
                         },
                         col_classType: (data: Omix) => (
                             <common-database-table-chunk
                                 value={data.classType}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_CLASS}
+                                options={chunkOptions.value.classTypeOptions}
                             ></common-database-table-chunk>
                         ),
                         col_stage: (data: Omix) => (
                             <common-database-table-chunk
                                 value={data.stage}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STAGE}
+                                options={chunkOptions.value.stageOptions}
                             ></common-database-table-chunk>
                         ),
                         col_status: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STATUS}
+                                options={chunkOptions.value.statusOptions}
                             ></common-database-table-chunk>
                         ),
                         col_payMode: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.payMode}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                                options={chunkOptions.value.payModeOptions}
                             ></common-database-table-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.authStatus}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
+                                options={chunkOptions.value.authStatusOptions}
                             ></common-database-table-chunk>
                         ),
                         col_source: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.source}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SOURCE}
+                                options={sourceOptions.dataSource.value}
                             ></common-database-table-chunk>
                         )
                     }}

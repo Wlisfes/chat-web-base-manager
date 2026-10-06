@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props) {
         const { faseNode, faseState, setState } = useBaseService(
-            () => Service.httpBaseAccountConsumerResolver({ keyId: props.keyId }),
+            () => Service.httpBaseCrmUserResolver({ keyId: props.keyId }),
             {
                 immediate: true,
                 // 本地静态枚举已废弃，待切换为后端枚举接口

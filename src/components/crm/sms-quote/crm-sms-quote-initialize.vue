@@ -29,7 +29,7 @@ export default defineComponent({
         const { formState } = useVModels(props, emit)
 
         /**客户类型变更**/
-        async function fetchChangeConsumer(consumerKeyId: number, item: Omix) {
+        async function fetchChangeConsumer(userKeyId: number, item: Omix) {
             return await props.setForm({ appId: undefined }).then(async () => {
                 return await props.appOptions.fetchRequest()
             })
@@ -64,14 +64,14 @@ export default defineComponent({
                             <common-base-columns-template class="gap-x-24" type="auto-fit" number={450}>
                                 <form-base-column
                                     label="客户别名"
-                                    path="consumerKeyId"
+                                    path="userKeyId"
                                     rule={{ required: true, trigger: ['blur'], type: 'number', message: '请选择报价客户' }}
                                 >
                                     <form-base-select
                                         filterable
                                         label-field="showName"
                                         label-value="keyId"
-                                        v-model:value={formState.value.consumerKeyId}
+                                        v-model:value={formState.value.userKeyId}
                                         options={props.consumerOptions.dataSource.value}
                                         on-change:value={fetchChangeConsumer}
                                     ></form-base-select>

@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService } from '@/hooks'
+import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { faker } from '@/utils'
 import * as Service from '@/api/instance.service'
@@ -18,17 +18,23 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**品牌下拉列表**/
-        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand())
+        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), {
+            immediate: false
+        })
         /**币种下拉列表**/
-        const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency())
+        const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
+            immediate: false
+        })
+        /**客户静态枚举**/
+        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            immediate: false
+        })
         /**表单实例**/
-        const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
+        const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseCrmConsumerResolver,
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_CONSUMER_PAY_MODE: true },
             formState: {
                 name: props.node.name,
-                brandId: props.node.brandId,
+                brandKeyId: props.node.brandKeyId,
                 currency: props.node.currency,
                 email: props.node.email,
                 phone: props.node.phone,
@@ -37,16 +43,16 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入客户名称', trigger: 'blur' },
-                brandId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'change' },
-                currency: { required: true, message: '请选择币种', trigger: 'change' },
+                brandKeyId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'blur' },
+                currency: { required: true, message: '请选择币种', trigger: 'blur' },
                 email: { required: true, message: '请输入邮箱', trigger: 'blur' },
-                payMode: { required: true, message: '请选择付款模式', trigger: 'change' }
+                payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
             }
         })
 
         /**详情初始化**/
         async function fetchBaseCrmConsumerResolver() {
-            return await Promise.all([brandOptions.fetchRequest(), currencyOptions.fetchRequest()]).then(async () => {
+            return await Promise.all([brandOptions.fetchRequest(), currencyOptions.fetchRequest(), fetchChunkService()]).then(async () => {
                 try {
                     if (['CREATE'].includes(props.command)) {
                         const formOptions = {
@@ -82,7 +88,7 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseAccountCreateConsumer(formState.value)
+                        await Service.httpBaseCrmCreateUser(formState.value)
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -117,42 +123,36 @@ export default defineComponent({
                     disabled={state.loading}
                 >
                     <form-base-column label="客户名称" path="name">
-                        <form-base-input
-                            maxlength={64}
-                            placeholder="请输入客户名称"
-                            v-model:value={formState.value.name}
-                        ></form-base-input>
+                        <form-base-input maxlength={64} placeholder="请输入客户名称" v-model:value={formState.value.name}></form-base-input>
                     </form-base-column>
-                    <form-base-column label="归属品牌" path="brandId">
+                    <form-base-column label="归属品牌" path="brandKeyId">
                         <form-base-select
                             filterable
                             placeholder="请选择归属品牌"
-                            value-field="keyId"
+                            label-field="name"
+                            label-value="keyId"
                             options={brandOptions.dataSource.value}
-                            v-model:value={formState.value.brandId}
+                            v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="币种" path="currency">
                         <form-base-select
                             filterable
                             placeholder="请选择币种"
-                            value-field="currency"
+                            label-value="currency"
                             label-field="currency"
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="邮箱" path="email">
-                        <form-base-input
-                            maxlength={128}
-                            placeholder="请输入邮箱"
-                            v-model:value={formState.value.email}
-                        ></form-base-input>
+                        <form-base-input maxlength={128} placeholder="请输入邮箱" v-model:value={formState.value.email}></form-base-input>
                     </form-base-column>
                     <form-base-column label="付款模式" path="payMode">
                         <form-base-select
                             placeholder="请选择付款模式"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </form-base-column>
