@@ -1,8 +1,8 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
-import { fetchNotifyService } from '@/plugins'
 import { faker, fetchNormalizeTreeChildren } from '@/utils'
+import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -22,42 +22,43 @@ export default defineComponent({
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
-        /**岗位选项：Skyline 枚举 CHUNK_SYSTEM_ACCOUNT_USER_POST，value 即岗位主键**/
-        const postOptions = useSelectService(
-            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_SYSTEM_ACCOUNT_USER_POST'] }),
-            {
-                immediate: false,
-                transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
-            }
-        )
-        /**职级选项：Skyline 枚举 CHUNK_SYSTEM_ACCOUNT_USER_LEVEL，value 即职级主键**/
-        const levelOptions = useSelectService(
-            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_SYSTEM', types: ['CHUNK_SYSTEM_ACCOUNT_USER_LEVEL'] }),
-            {
-                immediate: false,
-                transform: groups => groups.flatMap(group => group.options).map(item => ({ keyId: Number(item.value), name: item.label }))
-            }
-        )
         /**账号静态枚举**/
         const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
             immediate: false
+        })
+        /**岗位选项、职级选项字典枚举**/
+        const { chunkState, fetchCommonService } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
+            immediate: false,
+            types: ['CHUNK_SYSTEM_ACCOUNT_USER_POST', 'CHUNK_SYSTEM_ACCOUNT_USER_LEVEL']
         })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSystemAccountResolver,
             formState: {
-                organizationKeyIds: props.node.organizationKeyIds ?? [], //归属部门
-                postKeyIds: props.node.postKeyIds ?? [], //岗位
-                levelKeyIds: props.node.levelKeyIds ?? [], //职级
-                name: props.node.name, //姓名
-                number: props.node.number, //工号
-                phone: props.node.phone, //手机号
-                email: props.node.email, //邮箱
-                password: props.node.password, //密码
-                avatar: props.node.avatar, //头像
-                status: props.node.status, //状态
-                employmentStatus: props.node.employmentStatus ?? 'employed', //员工状态
-                employmentTime: props.node.employmentTime ?? new Date() //入职时间
+                /**归属部门**/
+                organizationKeyIds: props.node.organizationKeyIds ?? [],
+                /**岗位**/
+                postKeyIds: props.node.postKeyIds ?? [],
+                /**职级**/
+                levelKeyIds: props.node.levelKeyIds ?? [],
+                /**姓名**/
+                name: props.node.name,
+                /**工号**/
+                number: props.node.number,
+                /**手机号**/
+                phone: props.node.phone,
+                /**邮箱**/
+                email: props.node.email,
+                /**密码**/
+                password: props.node.password,
+                /**头像**/
+                avatar: props.node.avatar,
+                /**状态**/
+                status: props.node.status,
+                /**员工状态**/
+                employmentStatus: props.node.employmentStatus ?? 'employed',
+                /**入职时间**/
+                employmentTime: props.node.employmentTime ?? new Date()
             },
             rules: {
                 organizationKeyIds: { required: true, type: 'array', message: '请选择归属部门', trigger: 'blur' },
@@ -85,20 +86,21 @@ export default defineComponent({
         }
         /**部门详情**/
         async function fetchBaseSystemAccountResolver() {
-            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), postOptions.fetchRequest(), levelOptions.fetchRequest()]
-            return await Promise.all(taskNames).then(async () => {
-                if (['CREATE'].includes(props.command)) {
+            const taskNames: Array<Promise<Omix>> = [fetchChunkService(), fetchCommonService(), deptOptions.fetchRequest()]
+            if (['CREATE'].includes(props.command)) {
+                return await Promise.all(taskNames).then(async () => {
                     return await fetchInstState().then(async formData => {
-                        return await setForm(formData).then(async () => {
-                            return await setState({ initialize: false })
-                        })
+                        await setForm(formData)
+                        return await setState({ initialize: false })
                     })
-                }
+                })
+            } else {
+                taskNames.unshift(Service.httpBaseAccountUserResolver({ uid: props.node.uid }))
+            }
+            return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
-                    return await Service.httpBaseAccountUserResolver({ uid: props.node.uid }).then(async ({ data }) => {
-                        return await setForm(fetchReste(data)).then(async () => {
-                            return await setState({ initialize: false })
-                        })
+                    return await setForm(fetchReste(data)).then(async () => {
+                        return await setState({ initialize: false })
                     })
                 } catch (err) {
                     return await setState({ initialize: false }).then(async () => {
@@ -174,8 +176,8 @@ export default defineComponent({
                                 label-field="name"
                                 label-value="keyId"
                                 placeholder="请选择岗位"
-                                loading={postOptions.loading.value}
-                                options={postOptions.dataSource.value}
+                                loading={chunkState.loading}
+                                options={chunkState.CHUNK_SYSTEM_ACCOUNT_USER_POST.options}
                                 v-model:value={formState.value.postKeyIds}
                             ></form-base-select>
                         </form-base-column>
@@ -186,8 +188,8 @@ export default defineComponent({
                                 label-field="name"
                                 label-value="keyId"
                                 placeholder="请选择职级"
-                                loading={levelOptions.loading.value}
-                                options={levelOptions.dataSource.value}
+                                loading={chunkState.loading}
+                                options={chunkState.CHUNK_SYSTEM_ACCOUNT_USER_LEVEL.options}
                                 value={formState.value.levelKeyIds[0] ?? null}
                                 onUpdate:value={(value: number | null) => (formState.value.levelKeyIds = value ? [value] : [])}
                             ></form-base-select>

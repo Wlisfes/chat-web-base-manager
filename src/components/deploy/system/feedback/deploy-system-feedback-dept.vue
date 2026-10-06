@@ -61,7 +61,7 @@ export default defineComponent({
 
         /**部门详情**/
         async function fetchBaseSystemDeptResolver() {
-            const taskNames = [fetchChunkService(), deptOptions.fetchRequest(), leaderOptions.fetchRequest()]
+            const taskNames: Array<Promise<Omix>> = [fetchChunkService(), deptOptions.fetchRequest(), leaderOptions.fetchRequest()]
             if (['CREATE'].includes(props.command)) {
                 return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })

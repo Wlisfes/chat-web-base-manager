@@ -98,7 +98,7 @@ export interface ChunkOptionColumnRequest {
 }
 
 /**枚举字典选项（树形）。*/
-export interface ChunkOptionItem {
+export interface ChunkOptionItem extends Omix {
     keyId: number
     pid?: number | null
     value: string
@@ -109,11 +109,14 @@ export interface ChunkOptionItem {
 }
 
 /**按枚举类型编码分组的枚举字典选项。*/
-export interface ChunkOptionGroup {
+export interface ChunkOptionGroup extends Omix {
     type: string
     count: number
     options: ChunkOptionItem[]
 }
+
+/**以请求枚举类型编码为 key 的枚举字典选项分组对象。*/
+export type ChunkOptionRecord = Record<string, ChunkOptionGroup>
 
 /**系统枚举主键请求体。*/
 export interface ChunkKeyRequest {

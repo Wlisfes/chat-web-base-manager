@@ -15,10 +15,13 @@ export default defineComponent({
         })
         /**注册来源选项：Skyline 枚举 CHUNK_CRM_CRM_USER_SOURCE，value 即枚举项主键**/
         const sourceOptions = useSelectService(
-            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] }),
+            async () => {
+                const response = await Service.httpBaseSkylineChunkOptionColumn({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] })
+                return { ...response, data: response.data.CHUNK_CRM_CRM_USER_SOURCE?.options ?? [] }
+            },
             {
                 immediate: true,
-                transform: groups => groups.flatMap(group => group.options).map(item => ({ value: Number(item.value), label: item.label }))
+                transform: options => options.map(item => ({ value: Number(item.value), label: item.label }))
             }
         )
         /**表格实例**/

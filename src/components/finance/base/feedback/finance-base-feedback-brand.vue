@@ -40,7 +40,7 @@ export default defineComponent({
 
         /**品牌详情**/
         async function fetchBaseFinanceBrandResolver() {
-            const taskNames = [fetchChunkService()]
+            const taskNames: Array<Promise<Omix>> = [fetchChunkService()]
             if (['CREATE'].includes(props.command)) {
                 return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
