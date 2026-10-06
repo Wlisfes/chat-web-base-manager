@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { useColumnService, useSelectService, useChunkService } from '@/hooks'
 import { EventType } from '@/utils'
 import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
@@ -20,20 +20,23 @@ export default defineComponent({
         const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
             immediate: true
         })
+        /**客户静态枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            immediate: true
+        })
+        /**注册来源选项：Skyline 枚举 CHUNK_CRM_CRM_USER_SOURCE，value 即枚举项主键**/
+        const sourceOptions = useSelectService(
+            () => Service.httpBaseSkylineColumnChunkOption({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] }),
+            {
+                immediate: true,
+                transform: groups => groups.flatMap(group => group.options).map(item => ({ value: Number(item.value), label: item.label }))
+            }
+        )
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseAccountColumnConsumer(payload),
+            (base, payload) => Service.httpBaseCrmColumnUser(payload),
             {
                 keyName: 'chatbok:crm:consumer:common:list',
-                // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: {
-                // CHUNK_CONSUMER_PAY_MODE: true,
-                // CHUNK_CONSUMER_AUTH_STATUS: true,
-                // CHUNK_CONSUMER_SOURCE: true,
-                // CHUNK_CONSUMER_STATUS: true,
-                // CHUNK_CONSUMER_CLASS: true,
-                // CHUNK_CONSUMER_STAGE: true
-                // },
                 formState: {
                     name: undefined,
                     status: undefined,
@@ -112,7 +115,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -121,7 +125,8 @@ export default defineComponent({
                             clearable
                             filterable
                             placeholder="请选择品牌"
-                            value-field="keyId"
+                            label-field="name"
+                            label-value="keyId"
                             options={brandOptions.dataSource.value}
                             v-model:value={formState.value.brandId}
                         ></form-base-select>
@@ -131,7 +136,7 @@ export default defineComponent({
                             clearable
                             filterable
                             placeholder="请选择币种"
-                            value-field="currency"
+                            label-value="currency"
                             label-field="currency"
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
@@ -141,7 +146,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </common-database-search-column>
@@ -149,7 +155,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择认证状态"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.authStatusOptions}
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
                     </common-database-search-column>
@@ -157,7 +164,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择注册来源"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SOURCE}
+                            loading={sourceOptions.loading.value}
+                            options={sourceOptions.dataSource.value}
                             v-model:value={formState.value.source}
                         ></form-base-select>
                     </common-database-search-column>
@@ -206,14 +214,14 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.classType}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_CLASS}
+                                options={chunkOptions.value.classTypeOptions}
                             ></common-database-table-chunk>
                         ),
                         col_stage: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.stage}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STAGE}
+                                options={chunkOptions.value.stageOptions}
                             ></common-database-table-chunk>
                         ),
                         col_tags: (data: Omix) => (
@@ -225,28 +233,28 @@ export default defineComponent({
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.status}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_STATUS}
+                                options={chunkOptions.value.statusOptions}
                             ></common-database-table-chunk>
                         ),
                         col_payMode: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.payMode}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_PAY_MODE}
+                                options={chunkOptions.value.payModeOptions}
                             ></common-database-table-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.authStatus}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_AUTH_STATUS}
+                                options={chunkOptions.value.authStatusOptions}
                             ></common-database-table-chunk>
                         ),
                         col_source: (data: Omix) => (
                             <common-database-table-chunk
                                 element="chunk"
                                 value={data.source}
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SOURCE}
+                                options={sourceOptions.dataSource.value}
                             ></common-database-table-chunk>
                         )
                     }}

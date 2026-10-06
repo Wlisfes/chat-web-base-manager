@@ -20,7 +20,7 @@ export default defineComponent({
             }
         })
         /**客户下拉数据**/
-        const consumerOptions = useSelectService(() => Service.httpBaseAccountSelectConsumer({}), {
+        const consumerOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), {
             immediate: true,
             transform: data => data.map(item => ({ ...item, showName: `${item.alias} - ${item.name}` }))
         })

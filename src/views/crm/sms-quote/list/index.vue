@@ -22,7 +22,10 @@ export default defineComponent({
                     <n-tab-pane name="pending" tab="待生效" display-directive="show:lazy">
                         <crm-sms-quote-list status="pending"></crm-sms-quote-list>
                     </n-tab-pane>
-                    <n-tab-pane name="deleted" tab="已删除" display-directive="show:lazy">
+                    <n-tab-pane name="expired" tab="已失效" display-directive="show:lazy">
+                        <crm-sms-quote-list status="expired"></crm-sms-quote-list>
+                    </n-tab-pane>
+                    <n-tab-pane name="deleted" tab="已作废" display-directive="show:lazy">
                         <crm-sms-quote-list status="deleted"></crm-sms-quote-list>
                     </n-tab-pane>
                 </n-tabs>

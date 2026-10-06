@@ -12,6 +12,12 @@ export const request: AxiosRequest = axios.create({
     withCredentials: true
 })
 
+/**拼接请求接口地址，格式与服务端错误响应的url字段一致：METHOD /api/...**/
+function fetchRequestUrl(config?: InternalAxiosRequestConfig) {
+    const method = (config?.method ?? 'get').toUpperCase()
+    return `${method} ${config?.url ?? ''}`
+}
+
 /**自定义错误处理**/
 async function fetchInizeNotice(response: AxiosResponse) {
     const data = response.data
@@ -21,7 +27,8 @@ async function fetchInizeNotice(response: AxiosResponse) {
         window.location.replace('/login')
     }
     if (data.code !== 200) {
-        return Promise.reject(data)
+        /**旧版本服务未返回url时使用请求配置兜底，便于直接定位报错接口**/
+        return Promise.reject({ ...data, url: data.url || fetchRequestUrl(response.config) })
     }
     return Promise.resolve(data)
 }
@@ -105,7 +112,8 @@ request.interceptors.response.use(
         }
         return Promise.reject({
             message: error.message || '网络连接异常',
-            code: 500
+            code: 500,
+            url: fetchRequestUrl(error.config)
         })
     }
 )
