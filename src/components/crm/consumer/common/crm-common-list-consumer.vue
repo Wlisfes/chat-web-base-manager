@@ -6,7 +6,7 @@ import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmConsumerCommonList',
+    name: 'CrmCommonListConsumer',
     props: {
         /**通讯实例**/
         observer: { type: Object as PropType<EventType>, required: true }
@@ -21,20 +21,14 @@ export default defineComponent({
             immediate: true
         })
         /**客户静态枚举**/
-        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+        const { chunkOptions, chunkState: crmChunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             immediate: true
         })
-        /**注册来源选项：Skyline 枚举 CHUNK_CRM_CRM_USER_SOURCE，value 即枚举项主键**/
-        const sourceOptions = useSelectService(
-            async () => {
-                const response = await Service.httpBaseSkylineChunkOptionColumn({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] })
-                return { ...response, data: response.data.CHUNK_CRM_CRM_USER_SOURCE?.options ?? [] }
-            },
-            {
-                immediate: true,
-                transform: options => options.map(item => ({ value: Number(item.value), label: item.label }))
-            }
-        )
+        /**注册来源字典枚举**/
+        const { chunkState: sourceChunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
+            immediate: true,
+            types: ['CHUNK_CRM_CRM_USER_SOURCE']
+        })
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUser(payload),
@@ -50,29 +44,38 @@ export default defineComponent({
                     source: undefined
                 },
                 columns: [
-                    { title: '客户ID', key: 'keyId', width: 90, disabled: true },
+                    { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
-                    { title: '客户别名', key: 'alias', width: 150, check: true },
-                    { title: '邮箱', key: 'email', width: 160, check: true },
-                    { title: '电话号码', key: 'phone', width: 120, check: true },
-                    { title: '归属人', key: 'accountOptions', width: 120, check: true },
-                    { title: '归属部门', key: 'deptOptions', width: 120, check: true },
-                    { title: '品牌', key: 'brandOptions', width: 100, check: true },
-                    { title: '客户类型', key: 'classType', width: 100, check: true },
-                    { title: '等级', key: 'level', width: 100, check: true },
-                    { title: '阶段', key: 'stage', width: 100, check: true },
-                    { title: '币种', key: 'currency', width: 100, check: true },
-                    { title: '认证状态', key: 'authStatus', width: 100, check: true },
-                    { title: '注册来源', key: 'source', width: 100, check: true },
-                    { title: '状态', key: 'status', width: 100, check: true },
-                    { title: '付款模式', key: 'payMode', width: 100, check: true },
-                    { title: '余额', key: 'balance', width: 100, check: true },
-                    { title: '信用额度', key: 'credit', width: 100, check: true },
-                    { title: '标签', key: 'tags', minWidth: 200, check: true },
-                    { title: '创建时间', key: 'createTime', width: 160, check: true }
+                    { title: '客户别名', key: 'alias', width: 150 },
+                    { title: '品牌', key: 'brandKeyId', width: 120 },
+                    { title: '阶段', key: 'stage', width: 100 },
+                    { title: '状态', key: 'status', width: 100 },
+                    { title: '认证状态', key: 'authStatus', width: 100 },
+                    { title: '客户类型', key: 'classType', width: 100 },
+                    { title: '付款模式', key: 'payMode', width: 100 },
+                    { title: '注册来源', key: 'source', width: 120 },
+                    { title: '归属人', key: 'ownerUserUid', width: 120 },
+                    { title: '归属部门', key: 'ownerOrganizations', minWidth: 140 },
+                    { title: '邮箱', key: 'email', width: 200 },
+                    { title: '电话号码', key: 'phone', width: 140 },
+                    { title: '等级', key: 'level', width: 100 },
+                    { title: '币种', key: 'currency', width: 100 },
+                    { title: '余额', key: 'balance', width: 120 },
+                    { title: '信用额度', key: 'credit', width: 120 },
+                    { title: '备注', key: 'remark', minWidth: 200 },
+                    { title: '创建时间', key: 'createTime', width: 160 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
         )
+
+        /**金额字段放大百万倍存储，列表按 6 位小数显示**/
+        function fetchAmountContent(value: number | string) {
+            if (value === undefined || value === null || value === '') {
+                return '-'
+            }
+            return (Number(value) / 1_000_000).toFixed(6)
+        }
 
         /**新增客户**/
         async function openConsumerCreate() {
@@ -102,11 +105,11 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button type="primary" onClick={openConsumerCreate}>
+                        <common-base-button class="min-w-80" type="primary" onClick={openConsumerCreate}>
                             新增
                         </common-base-button>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="客户名称/ID">
+                    <common-database-search-column disabled prop="name" label="客户名称">
                         <form-base-input
                             clearable
                             placeholder="请输入客户名称/ID"
@@ -118,7 +121,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            loading={chunkState.loading}
+                            loading={crmChunkState.loading}
                             options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
@@ -149,7 +152,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            loading={chunkState.loading}
+                            loading={crmChunkState.loading}
                             options={chunkOptions.value.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
@@ -158,7 +161,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择认证状态"
-                            loading={chunkState.loading}
+                            loading={crmChunkState.loading}
                             options={chunkOptions.value.authStatusOptions}
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
@@ -167,8 +170,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择注册来源"
-                            loading={sourceOptions.loading.value}
-                            options={sourceOptions.dataSource.value}
+                            loading={sourceChunkState.loading}
+                            options={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-select>
                     </common-database-search-column>
@@ -199,67 +202,52 @@ export default defineComponent({
                                 </router-link>
                             </n-ellipsis>
                         ),
-                        col_accountOptions: (data: Omix) => {
-                            return <common-database-table-user element="text" data={data.accountOptions}></common-database-table-user>
+                        col_ownerUserUid: (data: Omix) => {
+                            return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         },
-                        col_brandOptions: (data: Omix) => {
-                            const brand = data.brandOptions?.name
-                                ? data.brandOptions
-                                : brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
-                            return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
+                        col_ownerOrganizations: (data: Omix) => {
+                            return <common-base-content value={data.ownerUserUidOptions?.organizations}></common-base-content>
                         },
-                        col_deptOptions: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.deptOptions ?? []).map((item: Omix) => item.deptName)}
-                            ></common-database-table-content>
-                        ),
-                        col_classType: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.classType}
-                                options={chunkOptions.value.classTypeOptions}
-                            ></common-database-table-chunk>
-                        ),
+                        col_brandKeyId: (data: Omix) => {
+                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
+                            return <common-base-content value={brand?.name}></common-base-content>
+                        },
                         col_stage: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.stage}
-                                options={chunkOptions.value.stageOptions}
-                            ></common-database-table-chunk>
-                        ),
-                        col_tags: (data: Omix) => (
-                            <common-database-table-content
-                                value={(data.tags ?? []).map((item: Omix) => item.tagName)}
-                            ></common-database-table-content>
+                            <common-base-chunk bordered value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.status}
-                                options={chunkOptions.value.statusOptions}
-                            ></common-database-table-chunk>
-                        ),
-                        col_payMode: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
-                                value={data.payMode}
-                                options={chunkOptions.value.payModeOptions}
-                            ></common-database-table-chunk>
+                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
+                            <common-base-chunk
+                                bordered
                                 value={data.authStatus}
-                                options={chunkOptions.value.authStatusOptions}
-                            ></common-database-table-chunk>
+                                items={chunkOptions.value.authStatusOptions}
+                            ></common-base-chunk>
+                        ),
+                        col_classType: (data: Omix) => (
+                            <common-base-chunk
+                                bordered
+                                value={data.classType}
+                                items={chunkOptions.value.classTypeOptions}
+                            ></common-base-chunk>
+                        ),
+                        col_payMode: (data: Omix) => (
+                            <common-base-chunk bordered value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
                         ),
                         col_source: (data: Omix) => (
-                            <common-database-table-chunk
-                                element="chunk"
+                            <common-base-chunk
+                                bordered
                                 value={data.source}
-                                options={sourceOptions.dataSource.value}
-                            ></common-database-table-chunk>
-                        )
+                                items={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            ></common-base-chunk>
+                        ),
+                        col_balance: (data: Omix) => {
+                            return <common-base-content value={fetchAmountContent(data.balance)}></common-base-content>
+                        },
+                        col_credit: (data: Omix) => {
+                            return <common-base-content value={fetchAmountContent(data.credit)}></common-base-content>
+                        }
                     }}
                 </common-database-table>
             </n-element>

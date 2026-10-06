@@ -68,7 +68,7 @@ export default defineComponent({
                 command: 'CREATE',
                 node: {
                     name: '青萍科技股份有限公司',
-                    brandId: 1007,
+                    brandKeyId: 1007,
                     currency: 'USD',
                     email: 'limvcfast@gmail.com',
                     phone: '18676361342',
@@ -219,7 +219,7 @@ export default defineComponent({
                             ></common-database-table-content>
                         ),
                         col_brandOptions: (data: Omix) => {
-                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandId)
+                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
                             return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
                         },
                         col_classType: (data: Omix) => (

@@ -34,7 +34,7 @@ export default defineComponent({
             callback: fetchBaseCrmConsumerResolver,
             formState: {
                 name: props.node.name,
-                brandId: props.node.brandId,
+                brandKeyId: props.node.brandKeyId,
                 currency: props.node.currency,
                 email: props.node.email,
                 phone: props.node.phone,
@@ -43,7 +43,7 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入客户名称', trigger: 'blur' },
-                brandId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'blur' },
+                brandKeyId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'blur' },
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
                 email: { required: true, message: '请输入邮箱', trigger: 'blur' },
                 payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
@@ -125,14 +125,14 @@ export default defineComponent({
                     <form-base-column label="客户名称" path="name">
                         <form-base-input maxlength={64} placeholder="请输入客户名称" v-model:value={formState.value.name}></form-base-input>
                     </form-base-column>
-                    <form-base-column label="归属品牌" path="brandId">
+                    <form-base-column label="归属品牌" path="brandKeyId">
                         <form-base-select
                             filterable
                             placeholder="请选择归属品牌"
                             label-field="name"
                             label-value="keyId"
                             options={brandOptions.dataSource.value}
-                            v-model:value={formState.value.brandId}
+                            v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="币种" path="currency">
