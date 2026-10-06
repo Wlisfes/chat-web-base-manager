@@ -209,8 +209,7 @@ export default defineComponent({
                             return <common-base-content value={data.ownerUserUidOptions?.organizations}></common-base-content>
                         },
                         col_brandKeyId: (data: Omix) => {
-                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
-                            return <common-base-content value={brand?.name}></common-base-content>
+                            return <common-base-content value={data.brandKeyIdOptions?.name}></common-base-content>
                         },
                         col_stage: (data: Omix) => (
                             <common-base-chunk bordered value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
