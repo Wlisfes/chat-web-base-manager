@@ -38,7 +38,7 @@ export default defineComponent({
                                 type="primary"
                                 secondary={!(level.value >= index)}
                             >
-                                {item.name}
+                                {item.label}
                             </common-base-button>
                         ))}
                     </Fragment>

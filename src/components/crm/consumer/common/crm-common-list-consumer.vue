@@ -195,7 +195,7 @@ export default defineComponent({
                 >
                     {{
                         col_keyId: (data: Omix) => (
-                            <router-link to={{ path: '/crm/consumer/context', query: { keyId: data.keyId } }} class="decoration-none">
+                            <router-link to={`/crm/consumer/context/${data.keyId}`} class="decoration-none">
                                 <n-text type="info">{data.keyId}</n-text>
                             </router-link>
                         ),
