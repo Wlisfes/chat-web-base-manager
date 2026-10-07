@@ -1,7 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useVModels } from '@vueuse/core'
-import { fetchNumCurrency } from '@/utils'
 
 export default defineComponent({
     name: 'CrmConsumerContextWrapper',
@@ -11,8 +10,8 @@ export default defineComponent({
         initialize: { type: Boolean, default: true },
         /**客户详情信息**/
         faseNode: { type: Object as PropType<Omix>, default: () => ({}) },
-        /**枚举对象信息**/
-        chunkState: { type: Object as PropType<Omix>, default: () => ({}) }
+        /**客户静态枚举**/
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
@@ -34,13 +33,16 @@ export default defineComponent({
                         </div>
                     </div>
                     <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                        <n-text depth="3">{`归属人：${fetchNumCurrency(faseNode.value.user?.name, faseNode.value.user?.number)}`}</n-text>
+                        <n-text depth="3">
+                            <span>归属人：</span>
+                            <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
+                        </n-text>
                     </div>
                 </div>
                 <common-business-progressbar
                     initialize={props.initialize}
                     stage={faseNode.value.stage}
-                    // 本地静态枚举已废弃，待切换为后端枚举接口: items={props.chunkState.CHUNK_CONSUMER_STAGE}
+                    items={props.chunkOptions.stageOptions}
                 ></common-business-progressbar>
             </n-card>
         )

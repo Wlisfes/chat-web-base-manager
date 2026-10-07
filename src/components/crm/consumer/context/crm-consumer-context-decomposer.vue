@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useBaseService } from '@/hooks'
+import { useBaseService, useChunkService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { fetchDelay } from '@/utils'
 import * as feedback from '@/components/finance/hooks'
@@ -14,6 +14,15 @@ export default defineComponent({
         keyId: { type: [String, Number] }
     },
     setup(props) {
+        /**客户静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            immediate: true
+        })
+        /**注册来源字典枚举**/
+        const { chunkState: sourceChunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
+            immediate: true,
+            types: ['CHUNK_CRM_CRM_USER_SOURCE']
+        })
         const { faseNode, faseState, setState } = useBaseService(
             () => Service.httpBaseCrmUserResolver({ keyId: props.keyId }),
             {
@@ -38,7 +47,7 @@ export default defineComponent({
                 <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
                     <crm-consumer-context-wrapper
                         initialize={faseState.initialize}
-                        // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
+                        chunk-options={chunkOptions.value}
                         v-model:faseNode={faseNode.value}
                     ></crm-consumer-context-wrapper>
                     <n-tabs
@@ -50,7 +59,8 @@ export default defineComponent({
                     >
                         <n-tab-pane name="basic" tab="详情信息" display-directive="show">
                             <crm-consumer-context-basic-wrapper
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
+                                chunk-options={chunkOptions.value}
+                                source-options={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>

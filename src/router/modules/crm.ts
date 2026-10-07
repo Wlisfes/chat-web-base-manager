@@ -14,10 +14,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/crm/partner/index.vue')
     },
     {
-        path: '/crm/consumer/context',
-        name: 'CrmConsumerContext',
-        meta: { title: '客户详情', AUTH: 'AUTH' },
-        props: (route: Omix) => ({ keyId: route.query.keyId }),
+        path: '/crm/consumer/context/:keyId',
+        name: 'CrmConsumerContextDecomposer',
+        meta: { title: '客户详情', AUTH: 'AUTH', keepAlive: true },
+        props: (route: Omix) => ({ keyId: route.params.keyId }),
         component: () => import('@/components/crm/consumer/context/crm-consumer-context-decomposer.vue')
     },
     {
