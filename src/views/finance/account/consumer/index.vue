@@ -8,7 +8,6 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'FinanceAccountConsumer',
     setup(props, ctx) {
-        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), { immediate: true })
         /**客户静态枚举**/
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             immediate: true
@@ -44,7 +43,7 @@ export default defineComponent({
                     { title: '电话号码', key: 'phone', width: 140, check: true },
                     { title: '归属人', key: 'accountOptions', width: 120, check: true },
                     { title: '归属部门', key: 'deptOptions', width: 120, check: true },
-                    { title: '品牌', key: 'brandOptions', width: 100, check: true },
+                    { title: '品牌', key: 'brandKeyId', width: 100, check: true },
                     { title: '客户类型', key: 'classType', width: 100, check: true },
                     { title: '等级', key: 'level', width: 100, check: true },
                     { title: '阶段', key: 'stage', width: 100, check: true },
@@ -218,9 +217,8 @@ export default defineComponent({
                                 value={(data.deptOptions ?? []).map((item: Omix) => item.deptName)}
                             ></common-database-table-content>
                         ),
-                        col_brandOptions: (data: Omix) => {
-                            const brand = brandOptions.dataSource.value.find((item: Omix) => item.keyId === data.brandKeyId)
-                            return <common-database-table-content value={brand?.name ?? '-'}></common-database-table-content>
+                        col_brandKeyId: (data: Omix) => {
+                            return <common-database-table-content value={data.brandKeyIdOptions?.name ?? '-'}></common-database-table-content>
                         },
                         col_classType: (data: Omix) => (
                             <common-database-table-chunk

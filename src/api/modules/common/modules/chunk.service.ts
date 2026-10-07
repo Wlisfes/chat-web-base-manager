@@ -37,7 +37,7 @@ const LOCAL_CHUNKS: Record<ChunkName, Array<Omix<ChunkColumnOptions>>> = {
         option(4, '认证失败', 'rejected', 'error')
     ],
     CHUNK_CONSUMER_SOURCE: [option(1, '平台注册', 'platform', 'info'), option(2, '手动创建', 'manual', 'success')],
-    CHUNK_CONSUMER_CLASS: [option(1, '普通客户', 'common', 'info'), option(2, '推广客户', 'cooperate', 'info')],
+    CHUNK_CONSUMER_CLASS: [option(1, '普通客户', 'common', 'info'), option(2, '推广客户', 'conspire', 'info')],
     CHUNK_CONSUMER_STAGE: [
         option(1, '线索阶段', 'cluetrail', 'info'),
         option(2, '意向阶段', 'intention', 'info'),
