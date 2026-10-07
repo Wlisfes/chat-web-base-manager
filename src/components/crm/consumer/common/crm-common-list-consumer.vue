@@ -31,7 +31,7 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseCrmColumnUser(payload),
+            (base, payload) => Service.httpBaseCrmColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chatbok:crm:consumer:common:list',
                 formState: {
@@ -63,8 +63,7 @@ export default defineComponent({
                     { title: '余额', key: 'balance', width: 120 },
                     { title: '信用额度', key: 'credit', width: 120 },
                     { title: '备注', key: 'remark', minWidth: 200 },
-                    { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                    { title: '创建时间', key: 'createTime', width: 160 }
                 ]
             }
         )
@@ -195,12 +194,10 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_name: (data: Omix) => (
-                            <n-ellipsis title={data.name} tooltip={false}>
-                                <router-link to={{ path: '/crm/consumer/context', query: { keyId: data.keyId } }} class="decoration-none">
-                                    <n-text type="info">{data.name}</n-text>
-                                </router-link>
-                            </n-ellipsis>
+                        col_keyId: (data: Omix) => (
+                            <router-link to={{ path: '/crm/consumer/context', query: { keyId: data.keyId } }} class="decoration-none">
+                                <n-text type="info">{data.keyId}</n-text>
+                            </router-link>
                         ),
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
@@ -233,13 +230,6 @@ export default defineComponent({
                         ),
                         col_payMode: (data: Omix) => (
                             <common-base-chunk bordered value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
-                        ),
-                        col_source: (data: Omix) => (
-                            <common-base-chunk
-                                bordered
-                                value={data.source}
-                                items={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
-                            ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
                             return <common-base-content value={fetchAmountContent(data.balance)}></common-base-content>

@@ -23,10 +23,10 @@ export default defineComponent({
                     v-model:value={state.tabName}
                 >
                     <n-tab-pane name="common" tab="普通客户" display-directive="show">
-                        <crm-consumer-common-list observer={state.observer}></crm-consumer-common-list>
+                        <crm-common-list-consumer observer={state.observer}></crm-common-list-consumer>
                     </n-tab-pane>
                     <n-tab-pane name="conspire" tab="推广客户" display-directive="show">
-                        <crm-consumer-promotion-list observer={state.observer}></crm-consumer-promotion-list>
+                        <crm-conspire-list-consumer observer={state.observer}></crm-conspire-list-consumer>
                     </n-tab-pane>
                 </n-tabs>
             </layout-common-container>

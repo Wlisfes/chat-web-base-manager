@@ -6,13 +6,13 @@ import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmConsumerPromotionList',
+    name: 'CrmConspireListConsumer',
     props: {
         /**通讯实例**/
         observer: { type: Object as PropType<EventType>, required: true }
     },
     setup(props, ctx) {
-        return () => <n-element class="crm-consumer-promotion-list h-full flex flex-col gap-14 overflow-hidden"></n-element>
+        return () => <n-element class="crm-conspire-list-consumer h-full flex flex-col gap-14 overflow-hidden"></n-element>
     }
 })
 </script>
