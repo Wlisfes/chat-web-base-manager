@@ -122,7 +122,7 @@ export default defineComponent({
                                     onClick={() => fetchJumpRouter(item)}
                                 >
                                     <span class="flex items-center overflow-hidden">
-                                        {item.meta.title}
+                                        {item.tabTitle ?? item.meta.title}
                                         {global.fetchClosable(item) && (
                                             <div class="flex items-center p-7" onClick={(e: Event) => fetchCloseTab(e, item)}>
                                                 <n-icon size={14}>

@@ -119,9 +119,13 @@ export const useGlobal = defineStore(
             if (!state.tabOptions.some(item => item.fullPath === faseMeta.value.fullPath)) {
                 state.tabOptions.unshift(faseMeta.value)
             }
+            /**跳转时通过 history.state.tabTitle 传入的标签页标题，如列表进入详情时携带的名称**/
+            const tabTitle = window.history.state?.tabTitle
             const index = state.tabOptions.findIndex(item => item.fullPath === data.fullPath)
             if (index === -1) {
-                return state.tabOptions.push(omit(data, ['matched']))
+                return state.tabOptions.push(Object.assign(omit(data, ['matched']), { tabTitle }))
+            } else if (tabTitle) {
+                state.tabOptions[index] = Object.assign(state.tabOptions[index], { name: data.name, meta: data.meta, tabTitle })
             } else {
                 state.tabOptions[index] = Object.assign(state.tabOptions[index], { name: data.name, meta: data.meta })
             }
