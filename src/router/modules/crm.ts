@@ -15,8 +15,8 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/crm/consumer/context/:keyId',
-        name: 'CrmConsumerContext',
-        meta: { title: '客户详情', AUTH: 'AUTH' },
+        name: 'CrmConsumerContextDecomposer',
+        meta: { title: '客户详情', AUTH: 'AUTH', keepAlive: true },
         props: (route: Omix) => ({ keyId: route.params.keyId }),
         component: () => import('@/components/crm/consumer/context/crm-consumer-context-decomposer.vue')
     },

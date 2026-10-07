@@ -123,7 +123,7 @@ export const useGlobal = defineStore(
             if (index === -1) {
                 return state.tabOptions.push(omit(data, ['matched']))
             } else {
-                state.tabOptions[index].meta = data.meta
+                state.tabOptions[index] = Object.assign(state.tabOptions[index], { name: data.name, meta: data.meta })
             }
             return state.tabOptions
         }
