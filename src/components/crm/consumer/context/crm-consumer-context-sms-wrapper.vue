@@ -1,9 +1,9 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType } from 'vue'
 import { useVModels } from '@vueuse/core'
-import { useColumnService } from '@/hooks'
+import { useColumnService, useChunkService } from '@/hooks'
 import { Chat } from '@vicons/carbon'
-import { openCrmSmsApplicationCreate } from '@/components/crm/hooks'
+import { openCrmSmsAppCreate } from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -17,15 +17,19 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
+        /**短信应用静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseCrmSmsAppEnums(), {
+            immediate: true
+        })
         /**短信应用列表**/
-        const { state, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsApplication(payload), {
+        const { state, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsApp(payload), {
             formState: { userKeyId: faseNode.value.keyId },
             immediate: true
         })
 
         /**添加短信应用**/
-        async function fetchCreateSmsAppApplication() {
-            return await openCrmSmsApplicationCreate({
+        async function fetchCreateSmsApp() {
+            return await openCrmSmsAppCreate({
                 title: '添加短信应用',
                 command: 'CREATE',
                 node: { userKeyId: faseNode.value.keyId }
@@ -56,11 +60,11 @@ export default defineComponent({
                                                     </n-text>
                                                 </div>
                                                 <div class="m-be-auto flex items-center">
-                                                    <common-database-table-chunk
-                                                        element="chunk"
+                                                    <common-base-chunk
+                                                        bordered
                                                         value={item.type}
-                                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_SMS_TYPE}
-                                                    ></common-database-table-chunk>
+                                                        items={chunkOptions.value.typeOptions}
+                                                    ></common-base-chunk>
                                                 </div>
                                             </div>
                                             <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
@@ -71,11 +75,11 @@ export default defineComponent({
                                                     <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
                                                 <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用状态">
-                                                    <common-database-table-chunk
-                                                        element="chunk"
+                                                    <common-base-chunk
+                                                        bordered
                                                         value={item.status}
-                                                        // 本地静态枚举已废弃，待切换为后端枚举接口: options={props.chunkState.CHUNK_CONSUMER_SMS_STATUS}
-                                                    ></common-database-table-chunk>
+                                                        items={chunkOptions.value.statusOptions}
+                                                    ></common-base-chunk>
                                                 </common-base-columns-wrapper>
                                                 <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="备注">
                                                     <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
@@ -88,7 +92,7 @@ export default defineComponent({
                             <n-card content-class="flex flex-col p-0! overflow-hidden">
                                 <common-base-alert-wrapper bordered={false} type="default">
                                     <div class="h-208 box-border flex flex-col p-14 items-center justify-center">
-                                        <common-base-button class="p-10" text type="primary" onClick={fetchCreateSmsAppApplication}>
+                                        <common-base-button class="p-10" text type="primary" onClick={fetchCreateSmsApp}>
                                             <common-base-icon size={18}>
                                                 <local-nest-plus />
                                             </common-base-icon>

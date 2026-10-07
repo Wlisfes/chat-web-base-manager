@@ -1,11 +1,11 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService } from '@/hooks'
+import { useFormService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmSmsApplicationFeedback',
+    name: 'CrmSmsAppFeedback',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
@@ -16,11 +16,13 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
+        /**短信应用静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseCrmSmsAppEnums(), {
+            immediate: true
+        })
         /**表单实例**/
-        const { formState, formRef, state, chunkState, setState, setForm, fetchReste, fetchValidater } = useFormService({
-            callback: initializeSmsApplication,
-            // 本地静态枚举已废弃，待切换为后端枚举接口
-            // chunkNames: { CHUNK_CONSUMER_SMS_TYPE: true },
+        const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
+            callback: fetchInitialization,
             formState: {
                 userKeyId: props.node.userKeyId,
                 type: props.node.type,
@@ -33,7 +35,7 @@ export default defineComponent({
         })
 
         /**详情初始化**/
-        async function initializeSmsApplication() {
+        async function fetchInitialization() {
             try {
                 if (['CREATE'].includes(props.command)) {
                     return await setState({ initialize: false })
@@ -56,7 +58,7 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseCrmCreateSmsApplication(formState.value)
+                        await Service.httpBaseCrmCreateSmsApp(formState.value)
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -92,7 +94,7 @@ export default defineComponent({
                     <form-base-column label="应用类型" path="type">
                         <form-base-select
                             placeholder="请选择应用类型"
-                            // 本地静态枚举已废弃，待切换为后端枚举接口: options={chunkState.CHUNK_CONSUMER_SMS_TYPE}
+                            options={chunkOptions.value.typeOptions}
                             v-model:value={formState.value.type}
                         ></form-base-select>
                     </form-base-column>

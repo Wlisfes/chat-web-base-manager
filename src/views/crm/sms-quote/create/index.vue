@@ -25,7 +25,7 @@ export default defineComponent({
             transform: data => data.map(item => ({ ...item, showName: `${item.alias} - ${item.name}` }))
         })
         /**应用下拉数据**/
-        const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApplication({ userKeyId: formState.value.userKeyId }), {
+        const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApp({ userKeyId: formState.value.userKeyId }), {
             immediate: false
         })
         /**MCC下拉数据**/
