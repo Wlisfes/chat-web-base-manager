@@ -51,7 +51,6 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入部门名称', trigger: 'blur' },
-                code: { required: true, message: '请输入部门编码', trigger: 'blur' },
                 type: { required: true, message: '请选择部门类型', trigger: 'change' },
                 status: { required: true, message: '请选择部门状态', trigger: 'change' },
                 leaderUserUid: { required: true, message: '请选择负责人', trigger: 'change' },
@@ -150,7 +149,7 @@ export default defineComponent({
                         <form-base-column label="部门编码" path="code">
                             <form-base-input
                                 maxlength={64}
-                                placeholder="例如 RD 或 PRODUCT_TEAM"
+                                placeholder="选填，例如 RD 或 PRODUCT_TEAM"
                                 v-model:value={formState.value.code}
                             ></form-base-input>
                         </form-base-column>
