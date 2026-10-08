@@ -85,14 +85,6 @@ export default defineComponent({
             })
         }
 
-        /**金额字段放大百万倍存储，列表按 6 位小数显示**/
-        function fetchAmountContent(value: number | string) {
-            if (value === undefined || value === null || value === '') {
-                return '-'
-            }
-            return (Number(value) / 1_000_000).toFixed(6)
-        }
-
         /**新增客户**/
         async function openConsumerCreate() {
             return await feedback.openCrmConsumerCreate({
@@ -218,6 +210,12 @@ export default defineComponent({
                                 </n-text>
                             </common-base-content>
                         ),
+                        col_balance: (data: Omix) => {
+                            return <common-base-number value={data.balance}></common-base-number>
+                        },
+                        col_credit: (data: Omix) => {
+                            return <common-base-number value={data.credit}></common-base-number>
+                        },
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         },
@@ -249,13 +247,7 @@ export default defineComponent({
                         ),
                         col_payMode: (data: Omix) => (
                             <common-base-chunk bordered value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
-                        ),
-                        col_balance: (data: Omix) => {
-                            return <common-base-content value={fetchAmountContent(data.balance)}></common-base-content>
-                        },
-                        col_credit: (data: Omix) => {
-                            return <common-base-content value={fetchAmountContent(data.credit)}></common-base-content>
-                        }
+                        )
                     }}
                 </common-database-table>
             </n-element>
