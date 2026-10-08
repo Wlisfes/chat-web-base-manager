@@ -44,8 +44,8 @@ export default defineComponent({
                     source: undefined
                 },
                 columns: [
-                    { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
+                    { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户别名', key: 'alias', width: 150 },
                     { title: '品牌', key: 'brandKeyId', width: 120 },
                     { title: '阶段', key: 'stage', width: 100 },
@@ -194,12 +194,12 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_keyId: (data: Omix) => (
+                        col_name: (data: Omix) => (
                             <router-link
                                 to={{ path: `/crm/consumer/context/${data.keyId}`, state: { tabTitle: data.name } }}
                                 class="decoration-none"
                             >
-                                <n-text type="info">{data.keyId}</n-text>
+                                <n-text type="info">{data.name}</n-text>
                             </router-link>
                         ),
                         col_ownerUserUid: (data: Omix) => {
