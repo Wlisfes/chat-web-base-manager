@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService, useSelectService, useChunkService } from '@/hooks'
-import { EventType } from '@/utils'
+import { EventType, stop } from '@/utils'
 import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -30,7 +30,7 @@ export default defineComponent({
             types: ['CHUNK_CRM_CRM_USER_SOURCE']
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:crm:common:consumer',
@@ -74,6 +74,16 @@ export default defineComponent({
                 ]
             }
         )
+
+        /**跳转客户详情**/
+        async function fetchJumpContextConsumer(event: MouseEvent, data: Omix) {
+            return await stop(event, async () => {
+                return await router.push({
+                    path: `/crm/consumer/context/${data.keyId}`,
+                    state: { tabTitle: data.name }
+                })
+            })
+        }
 
         /**金额字段放大百万倍存储，列表按 6 位小数显示**/
         function fetchAmountContent(value: number | string) {
@@ -203,12 +213,9 @@ export default defineComponent({
                     {{
                         col_name: (data: Omix) => (
                             <common-base-content ellipsis value={data.name}>
-                                <router-link
-                                    to={{ path: `/crm/consumer/context/${data.keyId}`, state: { tabTitle: data.name } }}
-                                    class="decoration-none"
-                                >
-                                    <n-text type="info">{data.name}</n-text>
-                                </router-link>
+                                <n-text class="cursor-pointer" type="info" onClick={(e: MouseEvent) => fetchJumpContextConsumer(e, data)}>
+                                    {data.name}
+                                </n-text>
                             </common-base-content>
                         ),
                         col_ownerUserUid: (data: Omix) => {
