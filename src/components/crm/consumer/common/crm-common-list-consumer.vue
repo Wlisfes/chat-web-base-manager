@@ -33,18 +33,25 @@ export default defineComponent({
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUser({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chatbok:crm:consumer:common:list',
+                keyName: 'chat:crm:common:consumer',
                 formState: {
+                    /**客户名称**/
                     name: undefined,
+                    /**状态**/
                     status: undefined,
+                    /**品牌**/
                     brandKeyId: undefined,
+                    /**币种**/
                     currency: undefined,
+                    /**付款模式**/
                     payMode: undefined,
+                    /**认证状态**/
                     authStatus: undefined,
+                    /**注册来源**/
                     source: undefined
                 },
                 columns: [
-                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
+                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true, ellipsis: false },
                     { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户别名', key: 'alias', width: 150 },
                     { title: '品牌', key: 'brandKeyId', width: 120 },
@@ -195,12 +202,14 @@ export default defineComponent({
                 >
                     {{
                         col_name: (data: Omix) => (
-                            <router-link
-                                to={{ path: `/crm/consumer/context/${data.keyId}`, state: { tabTitle: data.name } }}
-                                class="decoration-none"
-                            >
-                                <n-text type="info">{data.name}</n-text>
-                            </router-link>
+                            <common-base-content ellipsis value={data.name}>
+                                <router-link
+                                    to={{ path: `/crm/consumer/context/${data.keyId}`, state: { tabTitle: data.name } }}
+                                    class="decoration-none"
+                                >
+                                    <n-text type="info">{data.name}</n-text>
+                                </router-link>
+                            </common-base-content>
                         ),
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
