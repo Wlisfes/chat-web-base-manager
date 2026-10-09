@@ -19,10 +19,14 @@ export default defineComponent({
         const { faseNode } = useVModels(props, emit)
 
         return () => (
-            <common-base-scrollbar class="crm-consumer-context-basic-wrapper">
-                <common-base-element is-white class="flex flex-col flex-1 p-14 overflow-hidden">
+            <common-base-scrollbar
+                element
+                class="crm-consumer-context-basic-wrapper"
+                element-props={{ isWhite: true, class: 'flex flex-col flex-1 p-14 overflow-hidden' }}
+            >
+                <div class="flex flex-col gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
-                    <common-base-columns-template class="gap-y-10 gap-x-20 p-inline-10 p-block-10" type="auto-fit" number={400}>
+                    <common-base-columns-template is-border class="gap-y-10 gap-x-20 p-inline-10 p-block-10" type="auto-fit" number={400}>
                         <common-base-columns-wrapper label-class={props.labelClass} label="客户名称：">
                             {faseNode.value.name ?? '-'}
                         </common-base-columns-wrapper>
@@ -85,7 +89,7 @@ export default defineComponent({
                             {faseNode.value.credit ?? '-'}
                         </common-base-columns-wrapper>
                     </common-base-columns-template>
-                </common-base-element>
+                </div>
             </common-base-scrollbar>
         )
     }
