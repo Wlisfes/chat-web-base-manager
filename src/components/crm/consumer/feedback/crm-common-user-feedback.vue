@@ -6,7 +6,7 @@ import { faker } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmConsumerFeedback',
+    name: 'CrmCommonUserFeedback',
     emits: ['close', 'submit'],
     props: {
         /**标题**/

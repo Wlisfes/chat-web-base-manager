@@ -86,8 +86,8 @@ export default defineComponent({
         }
 
         /**新增客户**/
-        async function openConsumerCreate() {
-            return await feedback.openCrmConsumerCreate({
+        async function fetchCreateCommonUser() {
+            return await feedback.fetchCrmCommonUser({
                 title: '新增客户',
                 command: 'CREATE',
                 onSubmit: fetchRefresh
@@ -113,7 +113,7 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button class="min-w-80" type="primary" onClick={openConsumerCreate}>
+                        <common-base-button class="min-w-80" type="primary" onClick={fetchCreateCommonUser}>
                             新增
                         </common-base-button>
                     </common-database-search-function>
