@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useState } from '@/hooks'
+import { isEmpty, isNotEmpty } from '@/utils'
 import { ResultResolver, ChunkOptionGroup } from '@/interface/instance.resolver'
 
 /**字典枚举基础状态**/
@@ -25,6 +26,8 @@ export interface ChunkServiceOptions<K extends string> {
     loading?: boolean
     /**枚举类型**/
     types?: Array<K>
+    /**字典请求函数**/
+    request?: (data: ChunkState<NoInfer<K>>) => Promise<ResultResolver<Omix>>
 }
 
 /**枚举下拉通用hooks**/
@@ -52,11 +55,20 @@ export function useChunkService<const K extends string = never>(
     async function fetchChunkService() {
         return await setState({ loading: true }).then(async () => {
             try {
-                return await request(state as ChunkState<NoInfer<K>>).then(async ({ data }) => {
-                    return await fetchUpdate(data ?? {}).then(async () => {
-                        return await setState(Object.assign(data ?? {}, { initialize: false, loading: false }))
+                if (isEmpty(options.request)) {
+                    return await request(state as ChunkState<NoInfer<K>>).then(async ({ data }) => {
+                        return await fetchUpdate(data ?? {}).then(async () => {
+                            return await setState(Object.assign(data ?? {}, { initialize: false, loading: false }))
+                        })
                     })
-                })
+                } else if (isNotEmpty(options.request) && options.request) {
+                    const taskNames = [request(state as ChunkState<NoInfer<K>>), options.request(state as ChunkState<NoInfer<K>>)]
+                    return await Promise.all(taskNames).then(async ([response, { data }]) => {
+                        return await fetchUpdate(response.data ?? {}).then(async () => {
+                            return await setState(Object.assign(data ?? {}, { initialize: false, loading: false }))
+                        })
+                    })
+                }
             } catch (err) {
                 return await setState({ loading: false, initialize: false })
             }

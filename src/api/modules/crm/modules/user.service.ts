@@ -8,6 +8,14 @@ export function httpBaseCrmUserEnums() {
     })
 }
 
+/**随机生成新增消费客户表单数据**/
+export function httpBaseCrmFakerUser() {
+    return request({
+        url: '/api/crm/user/faker',
+        method: 'GET'
+    })
+}
+
 /**新增消费客户**/
 export function httpBaseCrmCreateUser(data: Omix) {
     return request({
