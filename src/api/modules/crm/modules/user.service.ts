@@ -1,6 +1,6 @@
 import { request } from '@/utils'
 
-/**外部客户静态枚举**/
+/**消费客户静态枚举**/
 export function httpBaseCrmUserEnums() {
     return request({
         url: '/api/crm/user/enums',
@@ -8,7 +8,7 @@ export function httpBaseCrmUserEnums() {
     })
 }
 
-/**新增外部客户**/
+/**新增消费客户**/
 export function httpBaseCrmCreateUser(data: Omix) {
     return request({
         url: '/api/crm/user/create',
@@ -17,7 +17,7 @@ export function httpBaseCrmCreateUser(data: Omix) {
     })
 }
 
-/**编辑外部客户**/
+/**编辑消费客户**/
 export function httpBaseCrmUpdateUser(data: Omix) {
     return request({
         url: '/api/crm/user/update',
@@ -26,7 +26,7 @@ export function httpBaseCrmUpdateUser(data: Omix) {
     })
 }
 
-/**查询外部客户分页列表**/
+/**查询消费客户分页列表**/
 export function httpBaseCrmColumnUser(data: Omix) {
     return request({
         url: '/api/crm/user/column',
@@ -35,7 +35,7 @@ export function httpBaseCrmColumnUser(data: Omix) {
     })
 }
 
-/**修改外部客户状态**/
+/**修改消费客户状态**/
 export function httpBaseCrmUserStatusUpdate(data: Omix) {
     return request({
         url: '/api/crm/user/status/update',
@@ -44,7 +44,7 @@ export function httpBaseCrmUserStatusUpdate(data: Omix) {
     })
 }
 
-/**查询外部客户详情**/
+/**查询消费客户详情**/
 export function httpBaseCrmUserResolver(params: Omix) {
     return request({
         url: '/api/crm/user/resolve',
@@ -53,7 +53,7 @@ export function httpBaseCrmUserResolver(params: Omix) {
     })
 }
 
-/**查询可用外部客户下拉列表**/
+/**查询可用消费客户下拉列表**/
 export function httpBaseCrmSelectUser(params: Omix = {}) {
     return request({
         url: '/api/crm/user/select',
