@@ -2,7 +2,7 @@
 import { defineComponent, Fragment, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { faker } from '@/utils'
+import { faker, v4 } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -38,14 +38,31 @@ export default defineComponent({
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseCrmConsumerResolver,
             formState: {
+                /**客户名称**/
                 name: props.node.name,
+                /**归属品牌**/
                 brandKeyId: props.node.brandKeyId,
+                /**币种**/
                 currency: props.node.currency,
+                /**邮箱**/
                 email: props.node.email,
+                /**电话号码**/
                 phone: props.node.phone,
+                /**付款模式**/
                 payMode: props.node.payMode,
+                /**备注**/
                 remark: props.node.remark,
-                contact: { name: undefined, address: undefined, items: [], remark: undefined } as Omix
+                /**联系人信息：新增客户时必填**/
+                contact: {
+                    /**联系人名称**/
+                    name: undefined,
+                    /**地址**/
+                    address: undefined,
+                    /**联系方式列表：type 为联系方式类型枚举项主键，value 为联系方式内容**/
+                    items: [{ keyId: v4(), type: undefined, value: undefined }],
+                    /**联系人备注**/
+                    remark: undefined
+                }
             },
             rules: {
                 name: { required: true, message: '请输入客户名称', trigger: 'blur' },
@@ -56,7 +73,7 @@ export default defineComponent({
                 contact: {
                     name: { required: true, message: '请输入联系人名称', trigger: 'blur' },
                     items: {
-                        trigger: 'change',
+                        trigger: 'blur',
                         validator: (_rule: unknown, items: Array<Omix>) => {
                             return (items ?? []).every(item => item.type && item.value?.trim()) || new Error('请完善联系方式类型和内容')
                         }
@@ -75,7 +92,7 @@ export default defineComponent({
             ]).then(async () => {
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        const formOptions = {
+                        const formOptions: Omix = {
                             currency: 'USD',
                             payMode: 'prepaid',
                             email: faker.internet.email({
@@ -131,7 +148,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={750}
+                width={960}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -140,13 +157,14 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setState })}
             >
                 <form-base-container
-                    class="grid-auto-320 gap-x-20"
-                    require-mark-placement="left"
                     size="medium"
                     ref={formRef}
                     model={formState.value}
                     rules={state.rules}
                     disabled={state.loading}
+                    require-mark-placement="left"
+                    base-columns-template
+                    base-columns-template-props={{ class: 'gap-x-20', type: 'auto-fit', number: 260 }}
                 >
                     <form-base-column label="客户名称" path="name">
                         <form-base-input maxlength={64} placeholder="请输入客户名称" v-model:value={formState.value.name}></form-base-input>
@@ -189,20 +207,17 @@ export default defineComponent({
                             v-model:value={formState.value.phone}
                         ></form-base-input>
                     </form-base-column>
-                    <form-base-column class="grid-col-span-2" label="备注" path="remark">
+                    <form-base-column full label="备注" path="remark">
                         <n-input
                             type="textarea"
                             maxlength={1024}
-                            show-count
                             placeholder="请输入备注"
                             v-model:value={formState.value.remark}
-                            autosize={{ minRows: 3, maxRows: 6 }}
+                            autosize={{ minRows: 2, maxRows: 6 }}
                         />
                     </form-base-column>
-
                     {['CREATE'].includes(props.command) && (
                         <Fragment>
-                            <common-business-header bar title="联系人信息" class="grid-col-span-2 m-be-12"></common-business-header>
                             <form-base-column label="联系人名称" path="contact.name">
                                 <form-base-input
                                     maxlength={64}
@@ -210,14 +225,14 @@ export default defineComponent({
                                     v-model:value={formState.value.contact.name}
                                 ></form-base-input>
                             </form-base-column>
-                            <form-base-column label="地址" path="contact.address">
+                            <form-base-column span={2} label="联系人地址" path="contact.address">
                                 <form-base-input
                                     maxlength={512}
-                                    placeholder="请输入地址"
+                                    placeholder="请输入联系人地址"
                                     v-model:value={formState.value.contact.address}
                                 ></form-base-input>
                             </form-base-column>
-                            <form-base-column class="grid-col-span-2" label="联系方式" path="contact.items">
+                            <form-base-column full label="联系方式" path="contact.items">
                                 <n-dynamic-input
                                     v-model:value={formState.value.contact.items}
                                     max={50}
@@ -246,11 +261,10 @@ export default defineComponent({
                                     }}
                                 </n-dynamic-input>
                             </form-base-column>
-                            <form-base-column class="grid-col-span-2" label="联系人备注" path="contact.remark">
+                            <form-base-column full label="联系人备注" path="contact.remark">
                                 <n-input
                                     type="textarea"
                                     maxlength={1024}
-                                    show-count
                                     placeholder="请输入联系人备注"
                                     v-model:value={formState.value.contact.remark}
                                     autosize={{ minRows: 2, maxRows: 4 }}

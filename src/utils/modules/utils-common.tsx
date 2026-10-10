@@ -2,12 +2,14 @@ import { VNode } from 'vue'
 import { Faker, zh_CN, en } from '@faker-js/faker'
 import { cloneDeep, concat, omit, pick } from 'lodash-es'
 import { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean } from 'class-validator'
+import { v1, v3, v4, v5, v6, v7 } from 'uuid'
 import chineseLorem from '@easonliu1995/chinese-lorem'
 import OrgChart from 'balkan-orgchart-js'
 import tree from 'tree-tool'
 import dayjs from 'dayjs'
 
-export { tree, OrgChart, cloneDeep, concat, omit, pick, isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
+export { tree, OrgChart, v1, v3, v4, v5, v6, v7, cloneDeep, concat, omit, pick }
+export { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
 
 /**图标示例对象**/
 export const modules: Record<string, VNode> = import.meta.glob(`@/assets/icons/*.svg`, { query: '?component', eager: true })

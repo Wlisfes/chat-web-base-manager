@@ -23,7 +23,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
             }
         },
         optimizeDeps: {
-            include: ['balkan-orgchart-js']
+            include: ['balkan-orgchart-js', 'uuid']
         },
         plugins: [
             Vue(),

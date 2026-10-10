@@ -6,7 +6,12 @@ import { stop } from '@/utils'
 export default defineComponent({
     name: 'FormBaseContainer',
     props: {
-        formState: { type: Object as PropType<Omix>, default: () => ({}) }
+        /**表单对象**/
+        formState: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**是否开启栅格模板**/
+        baseColumnsTemplate: { type: Boolean as PropType<boolean>, default: false },
+        /**栅格模板配置**/
+        baseColumnsTemplateProps: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { slots, expose }) {
         const formOptions = ref({}) as Ref<Omix<FormInst>>
@@ -62,7 +67,13 @@ export default defineComponent({
 
         return () => (
             <n-form ref={formRef} class="form-base-container" onSubmit={stop}>
-                {slots.default && slots.default()}
+                {props.baseColumnsTemplate ? (
+                    <common-base-columns-template {...props.baseColumnsTemplateProps}>
+                        {slots.default && slots.default()}
+                    </common-base-columns-template>
+                ) : (
+                    slots.default && slots.default()
+                )}
             </n-form>
         )
     }
