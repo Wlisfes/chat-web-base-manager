@@ -19,19 +19,16 @@ export default defineComponent({
         const { faseNode } = useVModels(props, emit)
 
         return () => (
-            <common-base-scrollbar class="crm-consumer-context-basic-wrapper">
-                <common-base-element is-white class="flex flex-col flex-1 p-14 overflow-hidden">
+            <common-base-scrollbar
+                element
+                class="crm-consumer-context-basic-wrapper"
+                element-props={{ isWhite: true, class: 'flex flex-col flex-1 p-14 overflow-hidden' }}
+            >
+                <div class="flex flex-col gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
-                    <common-base-columns-template class="gap-y-10 gap-x-20 p-inline-10 p-block-10" type="auto-fit" number={400}>
+                    <common-base-columns-template is-border class="gap-y-10 gap-x-20 p-10" type="auto-fit" number={400}>
                         <common-base-columns-wrapper label-class={props.labelClass} label="客户名称：">
                             {faseNode.value.name ?? '-'}
-                        </common-base-columns-wrapper>
-                        <common-base-columns-wrapper label-class={props.labelClass} label="客户类型：">
-                            <common-base-chunk
-                                bordered
-                                value={faseNode.value.classType}
-                                items={props.chunkOptions.classTypeOptions}
-                            ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="品牌：">
                             <common-base-content value={faseNode.value.brandKeyIdOptions?.name}></common-base-content>
@@ -51,41 +48,38 @@ export default defineComponent({
                         <common-base-columns-wrapper label-class={props.labelClass} label="归属部门：">
                             <common-base-content value={faseNode.value.ownerUserUidOptions?.organizations}></common-base-content>
                         </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label-class={props.labelClass} label="币种：">
+                            {faseNode.value.currency ?? '-'}
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label-class={props.labelClass} label="信用额度：">
+                            {faseNode.value.credit ?? '-'}
+                        </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前等级：">
                             {faseNode.value.level ?? '-'}
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前阶段：">
-                            <common-base-chunk
-                                bordered
-                                value={faseNode.value.stage}
-                                items={props.chunkOptions.stageOptions}
-                            ></common-base-chunk>
+                            <common-base-chunk value={faseNode.value.stage} items={props.chunkOptions.stageOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
-                        <common-base-columns-wrapper label-class={props.labelClass} label="币种：">
-                            {faseNode.value.currency ?? '-'}
+                        <common-base-columns-wrapper label-class={props.labelClass} label="客户类型：">
+                            <common-base-chunk
+                                value={faseNode.value.classType}
+                                items={props.chunkOptions.classTypeOptions}
+                            ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="认证状态：">
                             <common-base-chunk
-                                bordered
                                 value={faseNode.value.authStatus}
                                 items={props.chunkOptions.authStatusOptions}
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="注册来源：">
-                            <common-base-chunk bordered value={faseNode.value.source} items={props.sourceOptions}></common-base-chunk>
+                            <common-base-chunk value={faseNode.value.source} items={props.sourceOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="付款模式：">
-                            <common-base-chunk
-                                bordered
-                                value={faseNode.value.payMode}
-                                items={props.chunkOptions.payModeOptions}
-                            ></common-base-chunk>
-                        </common-base-columns-wrapper>
-                        <common-base-columns-wrapper label-class={props.labelClass} label="信用额度：">
-                            {faseNode.value.credit ?? '-'}
+                            <common-base-chunk value={faseNode.value.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
                     </common-base-columns-template>
-                </common-base-element>
+                </div>
             </common-base-scrollbar>
         )
     }

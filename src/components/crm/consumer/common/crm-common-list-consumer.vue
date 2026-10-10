@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService, useSelectService, useChunkService } from '@/hooks'
-import { EventType } from '@/utils'
+import { EventType, stop } from '@/utils'
 import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -30,22 +30,29 @@ export default defineComponent({
             types: ['CHUNK_CRM_CRM_USER_SOURCE']
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUser({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chatbok:crm:consumer:common:list',
+                keyName: 'chat:crm:common:consumer',
                 formState: {
+                    /**客户名称**/
                     name: undefined,
+                    /**状态**/
                     status: undefined,
+                    /**品牌**/
                     brandKeyId: undefined,
+                    /**币种**/
                     currency: undefined,
+                    /**付款模式**/
                     payMode: undefined,
+                    /**认证状态**/
                     authStatus: undefined,
+                    /**注册来源**/
                     source: undefined
                 },
                 columns: [
                     { title: '客户ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true },
+                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true, ellipsis: false },
                     { title: '客户别名', key: 'alias', width: 150 },
                     { title: '品牌', key: 'brandKeyId', width: 120 },
                     { title: '阶段', key: 'stage', width: 100 },
@@ -68,17 +75,19 @@ export default defineComponent({
             }
         )
 
-        /**金额字段放大百万倍存储，列表按 6 位小数显示**/
-        function fetchAmountContent(value: number | string) {
-            if (value === undefined || value === null || value === '') {
-                return '-'
-            }
-            return (Number(value) / 1_000_000).toFixed(6)
+        /**跳转客户详情**/
+        async function fetchJumpContextConsumer(event: MouseEvent, data: Omix) {
+            return await stop(event, async () => {
+                return await router.push({
+                    path: `/crm/consumer/context/${data.keyId}`,
+                    state: { tabTitle: data.name }
+                })
+            })
         }
 
         /**新增客户**/
-        async function openConsumerCreate() {
-            return await feedback.openCrmConsumerCreate({
+        async function fetchCreateCommonUser() {
+            return await feedback.fetchCrmCommonUser({
                 title: '新增客户',
                 command: 'CREATE',
                 onSubmit: fetchRefresh
@@ -104,7 +113,7 @@ export default defineComponent({
                     on-submit={instOptions.fetchRequest}
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
-                        <common-base-button class="min-w-80" type="primary" onClick={openConsumerCreate}>
+                        <common-base-button class="min-w-80" type="primary" onClick={fetchCreateCommonUser}>
                             新增
                         </common-base-button>
                     </common-database-search-function>
@@ -194,14 +203,19 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_keyId: (data: Omix) => (
-                            <router-link
-                                to={{ path: `/crm/consumer/context/${data.keyId}`, state: { tabTitle: data.name } }}
-                                class="decoration-none"
-                            >
-                                <n-text type="info">{data.keyId}</n-text>
-                            </router-link>
+                        col_name: (data: Omix) => (
+                            <common-base-content ellipsis value={data.name}>
+                                <n-text class="cursor-pointer" type="info" onClick={(e: MouseEvent) => fetchJumpContextConsumer(e, data)}>
+                                    {data.name}
+                                </n-text>
+                            </common-base-content>
                         ),
+                        col_balance: (data: Omix) => {
+                            return <common-base-number value={data.balance}></common-base-number>
+                        },
+                        col_credit: (data: Omix) => {
+                            return <common-base-number value={data.credit}></common-base-number>
+                        },
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         },
@@ -233,13 +247,7 @@ export default defineComponent({
                         ),
                         col_payMode: (data: Omix) => (
                             <common-base-chunk bordered value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
-                        ),
-                        col_balance: (data: Omix) => {
-                            return <common-base-content value={fetchAmountContent(data.balance)}></common-base-content>
-                        },
-                        col_credit: (data: Omix) => {
-                            return <common-base-content value={fetchAmountContent(data.credit)}></common-base-content>
-                        }
+                        )
                     }}
                 </common-database-table>
             </n-element>

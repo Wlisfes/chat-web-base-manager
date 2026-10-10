@@ -1,11 +1,15 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
     name: 'CommonBaseScrollbar',
     props: {
         /**滚动容器类名**/
-        className: { type: String, default: '' }
+        className: { type: String, default: '' },
+        /**开启根节点容器**/
+        element: { type: Boolean, default: false },
+        /**滚动容器根节点属性**/
+        elementProps: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { slots }) {
         return () => (
@@ -14,7 +18,11 @@ export default defineComponent({
                 content-class={`min-h-full flex flex-col ${props.className}`}
                 trigger="none"
             >
-                {slots.default && slots.default()}
+                {props.element ? (
+                    <common-base-element {...props.elementProps}>{slots.default && slots.default()}</common-base-element>
+                ) : (
+                    slots.default && slots.default()
+                )}
             </n-scrollbar>
         )
     }

@@ -5,6 +5,8 @@ import { isArray, isEmpty, isNotEmpty, isObject } from '@/utils'
 export default defineComponent({
     name: 'CommonBaseContent',
     props: {
+        /**内容超长时是否显示tooltip**/
+        ellipsis: { type: Boolean, default: false },
         /**内容**/
         value: { type: [String, Number, Array] },
         /**列表字段取值**/
@@ -28,6 +30,22 @@ export default defineComponent({
         })
 
         return () => {
+            if (props.ellipsis) {
+                return (
+                    <n-performant-ellipsis
+                        tooltip={{
+                            scrollable: true,
+                            placement: 'top',
+                            style: { maxWidth: 'min(640px, 90vw)', maxHeight: 'min(640px, 45vh)', wordBreak: 'break-all' }
+                        }}
+                    >
+                        {{
+                            default: () => (slots.default ? slots.default(displayContent.value) : displayContent.value),
+                            tooltip: () => displayContent.value
+                        }}
+                    </n-performant-ellipsis>
+                )
+            }
             return slots.default ? slots.default(displayContent.value) : <span>{displayContent.value}</span>
         }
     }

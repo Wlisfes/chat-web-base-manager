@@ -1,4 +1,5 @@
 import { ref, Ref, toRefs, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { FormInst, DataTableColumn } from 'naive-ui'
 import { Observer, fetchExclude, fetchHandler, isNotEmpty } from '@/utils'
 import { ResultResolver, ResultColumn } from '@/interface/instance.resolver'
@@ -60,6 +61,8 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     request: BaseServiceOptions<T, U, R, C>['request'],
     options: Omit<BaseServiceOptions<T, U, R, C>, 'request'> & { formState: U }
 ) {
+    const route = useRoute()
+    const router = useRouter()
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
     const observer = ref(Observer<Record<string, Omix>>())
@@ -214,6 +217,8 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     }
 
     return {
+        route,
+        router,
         state,
         formRef,
         formState,
