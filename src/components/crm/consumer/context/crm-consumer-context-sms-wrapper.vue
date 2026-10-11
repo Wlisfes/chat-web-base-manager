@@ -2,8 +2,8 @@
 import { Component, defineComponent, Fragment, h, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
 import { Lightning, Chat, ChatBot } from '@vicons/carbon'
-import { openCrmSmsAppCreate } from '@/components/crm/hooks'
 import { useVModels } from '@vueuse/core'
+import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
 /**短信应用类型对应的图标；颜色统一使用枚举接口返回的 type。*/
@@ -35,11 +35,11 @@ export default defineComponent({
         })
 
         /**添加短信应用**/
-        async function fetchCreateSmsApp() {
-            return await openCrmSmsAppCreate({
+        async function fetchCrmSmsAppStore() {
+            return await feedback.fetchCrmSmsAppStore({
                 title: '添加短信应用',
-                command: 'CREATE',
-                node: { userKeyId: faseNode.value.keyId }
+                faseNode: faseNode.value,
+                onSubmit: () => fetchRefresh()
             })
         }
 
@@ -102,7 +102,7 @@ export default defineComponent({
                             <n-card content-class="flex flex-col p-0! overflow-hidden">
                                 <common-base-alert-wrapper bordered={false} type="default">
                                     <div class="h-208 box-border flex flex-col p-14 items-center justify-center">
-                                        <common-base-button class="p-10" text type="primary" onClick={fetchCreateSmsApp}>
+                                        <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
                                             <common-base-icon size={18}>
                                                 <local-nest-plus />
                                             </common-base-icon>

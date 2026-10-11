@@ -5,15 +5,13 @@ import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'CrmSmsAppFeedback',
+    name: 'CrmCommonSmsAppFeedback',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**操作指令**/
-        command: { type: String as PropType<'CREATE' | 'UPDATE'>, default: 'CREATE' },
         /**编辑操作详情数据**/
-        node: { type: Object as PropType<Omix>, default: () => ({}) }
+        faseNode: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         /**短信应用静态枚举**/
@@ -21,34 +19,22 @@ export default defineComponent({
             immediate: true
         })
         /**表单实例**/
-        const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
-            callback: fetchInitialization,
+        const { formState, formRef, state, setState, fetchValidater } = useFormService({
+            callback: () => setState({ initialize: false }),
             formState: {
-                userKeyId: props.node.userKeyId,
-                type: props.node.type,
-                pushUrl: props.node.pushUrl,
-                remark: props.node.remark
+                /**CRM 客户主键**/
+                userKeyId: props.faseNode.keyId,
+                /**短信应用类型：MRKT=营销短信，NTFY=通知短信，SOTP=验证码**/
+                type: undefined,
+                /**报告推送地址**/
+                pushUrl: undefined,
+                /**备注**/
+                remark: undefined
             },
             rules: {
-                type: { required: true, message: '请选择应用类型', trigger: 'change' }
+                type: { required: true, message: '请选择应用类型', trigger: 'blur' }
             }
         })
-
-        /**详情初始化**/
-        async function fetchInitialization() {
-            try {
-                if (['CREATE'].includes(props.command)) {
-                    return await setState({ initialize: false })
-                }
-                return await setForm(fetchReste(props.node)).then(async () => {
-                    return await setState({ initialize: false })
-                })
-            } catch (err) {
-                return await setState({ initialize: false }).then(async () => {
-                    return await fetchNotifyService({ type: 'error', title: err.message })
-                })
-            }
-        }
 
         /**确定提交表单**/
         async function fetchSubmit() {
@@ -57,9 +43,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseCrmCreateSmsApp(formState.value)
-                    }
+                    await Service.httpBaseCrmCreateSmsApp(formState.value)
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })

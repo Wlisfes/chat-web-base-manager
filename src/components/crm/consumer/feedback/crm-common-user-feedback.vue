@@ -113,7 +113,7 @@ export default defineComponent({
                         })
                     })
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseCrmCreateUser(formState.value)
+                        await Service.httpBaseCrmCreateUser(formOptions)
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
