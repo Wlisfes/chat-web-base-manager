@@ -32,6 +32,9 @@ body,
         transition:
             border-color 0.3s var(--n-bezier),
             background-color 0.3s var(--n-bezier);
+        .n-tabs-tab__label {
+            user-select: none;
+        }
     }
     > .n-tabs-pane-wrapper,
     > .n-tabs-pane-wrapper > .n-tab-pane {
