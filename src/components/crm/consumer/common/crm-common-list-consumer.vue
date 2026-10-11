@@ -20,14 +20,11 @@ export default defineComponent({
         const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
             immediate: true
         })
-        /**客户静态枚举**/
-        const { chunkOptions, chunkState: crmChunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+        /**客户静态枚举、字典枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
+            types: ['CHUNK_CRM_CRM_USER_SOURCE'],
             immediate: true
-        })
-        /**注册来源字典枚举**/
-        const { chunkState: sourceChunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
-            immediate: true,
-            types: ['CHUNK_CRM_CRM_USER_SOURCE']
         })
         /**表格实例**/
         const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
@@ -129,7 +126,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            loading={crmChunkState.loading}
+                            loading={chunkState.loading}
                             options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
@@ -141,6 +138,7 @@ export default defineComponent({
                             placeholder="请选择品牌"
                             label-field="name"
                             label-value="keyId"
+                            loading={brandOptions.loading.value}
                             options={brandOptions.dataSource.value}
                             v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
@@ -152,6 +150,7 @@ export default defineComponent({
                             placeholder="请选择币种"
                             label-value="currency"
                             label-field="currency"
+                            loading={currencyOptions.loading.value}
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
                         ></form-base-select>
@@ -160,7 +159,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            loading={crmChunkState.loading}
+                            loading={chunkState.loading}
                             options={chunkOptions.value.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
@@ -169,7 +168,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择认证状态"
-                            loading={crmChunkState.loading}
+                            loading={chunkState.loading}
                             options={chunkOptions.value.authStatusOptions}
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
@@ -178,8 +177,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择注册来源"
-                            loading={sourceChunkState.loading}
-                            options={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            loading={chunkState.loading}
+                            options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-select>
                     </common-database-search-column>
