@@ -52,8 +52,8 @@ export function useChunkService<const K extends string = never>(
         return (chunkOptions.value = data)
     }
 
-    async function fetchChunkService() {
-        return await setState({ loading: true }).then(async () => {
+    async function fetchChunkService(): Promise<ChunkState<K>> {
+        return (await setState({ loading: true }).then(async () => {
             try {
                 if (isEmpty(options.request)) {
                     return await request(state as ChunkState<NoInfer<K>>).then(async ({ data }) => {
@@ -69,10 +69,11 @@ export function useChunkService<const K extends string = never>(
                         })
                     })
                 }
+                return await setState({ loading: false, initialize: false })
             } catch (err) {
                 return await setState({ loading: false, initialize: false })
             }
-        })
+        })) as ChunkState<K>
     }
 
     return {

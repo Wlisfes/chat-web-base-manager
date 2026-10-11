@@ -2,7 +2,7 @@
 import { defineComponent, Fragment, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { v4 } from '@/utils'
+import { v4, pick, omit, fetchCloneByte } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -32,7 +32,7 @@ export default defineComponent({
             immediate: false
         })
         /**表单实例**/
-        const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
+        const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
                 /**客户名称**/
@@ -49,14 +49,14 @@ export default defineComponent({
                 payMode: props.node.payMode,
                 /**备注**/
                 remark: props.node.remark,
+                /**联系方式列表：type 为联系方式类型枚举项主键，value 为联系方式内容**/
+                items: [{ keyId: v4(), type: 1024188, value: undefined }],
                 /**联系人信息：新增客户时必填**/
                 contact: {
                     /**联系人名称**/
                     name: undefined,
                     /**地址**/
                     address: undefined,
-                    /**联系方式列表：type 为联系方式类型枚举项主键，value 为联系方式内容**/
-                    items: [{ keyId: v4(), type: 1024188, value: undefined }],
                     /**联系人备注**/
                     remark: undefined
                 }
@@ -81,21 +81,23 @@ export default defineComponent({
 
         /**详情初始化**/
         async function fetchInitialization() {
-            return await Promise.all([brandOptions.fetchRequest(), currencyOptions.fetchRequest(), fetchChunkService()]).then(async () => {
+            const taskNames: Array<Promise<Omix>> = [brandOptions.fetchRequest(), currencyOptions.fetchRequest(), fetchChunkService()]
+            if (['CREATE'].includes(props.command)) {
                 try {
-                    if (['CREATE'].includes(props.command)) {
-                        const { data } = await Service.httpBaseCrmFakerUser()
-                        return await setForm(data).then(async () => {
+                    return await Promise.all([Service.httpBaseCrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
+                        const contact = pick(data.contact, ['name', 'address', 'remark'])
+                        const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, keyId: v4() }))
+                        return await setForm({ ...data, items, contact }).then(async () => {
                             return await setState({ initialize: false })
                         })
-                    }
-                    return await setState({ initialize: false })
+                    })
                 } catch (err) {
                     return await setState({ initialize: false }).then(async () => {
                         return await fetchNotifyService({ type: 'error', title: err.message })
                     })
                 }
-            })
+            }
+            return await setState({ initialize: false })
         }
 
         /**确定提交表单**/
@@ -105,6 +107,11 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
+                    const formOptions = fetchCloneByte(omit(formState.value, ['items']), {
+                        contact: fetchCloneByte(formState.value.contact, {
+                            items: formState.value.items.map(e => pick(e, ['type', 'value']))
+                        })
+                    })
                     if (['CREATE'].includes(props.command)) {
                         await Service.httpBaseCrmCreateUser(formState.value)
                     }
@@ -206,34 +213,18 @@ export default defineComponent({
                                     v-model:value={formState.value.contact.address}
                                 ></form-base-input>
                             </form-base-column>
-                            <form-base-column full label="联系方式" path="contact.items"></form-base-column>
-                            <form-base-column full label="联系方式" path="contact.items">
-                                <n-dynamic-input
-                                    v-model:value={formState.value.contact.items}
-                                    max={50}
-                                    onCreate={() => ({ type: null, value: '' })}
-                                >
-                                    {{
-                                        default: ({ value }: { value: Omix }) => (
-                                            <div class="flex flex-1 gap-x-10">
-                                                <form-base-select
-                                                    class="w-160"
-                                                    placeholder="类型"
-                                                    label-field="label"
-                                                    label-value="keyId"
-                                                    options={chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
-                                                    v-model:value={value.type}
-                                                ></form-base-select>
-                                                <form-base-input
-                                                    class="flex-1"
-                                                    maxlength={128}
-                                                    placeholder="请输入联系方式"
-                                                    v-model:value={value.value}
-                                                ></form-base-input>
-                                            </div>
-                                        )
-                                    }}
-                                </n-dynamic-input>
+                            <form-base-column full required show-feedback={false} label="联系方式">
+                                <div class="flex flex-col flex-1">
+                                    {formState.value.items.map((item, index) => (
+                                        <common-business-contact-block
+                                            key={item.keyId}
+                                            index={index}
+                                            options={chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
+                                            v-model:list={formState.value.items}
+                                            v-model:node={item}
+                                        ></common-business-contact-block>
+                                    ))}
+                                </div>
                             </form-base-column>
                             <form-base-column full label="联系人备注" path="contact.remark">
                                 <n-input

@@ -9,7 +9,7 @@ export function httpBaseCrmUserEnums() {
 }
 
 /**随机生成新增消费客户表单数据**/
-export function httpBaseCrmFakerUser() {
+export function httpBaseCrmUserFaker() {
     return request({
         url: '/api/crm/user/faker',
         method: 'GET'
