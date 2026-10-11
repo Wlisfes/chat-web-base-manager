@@ -356,11 +356,6 @@
   resolved "https://registry.npmjs.org/@css-render/vue3-ssr/-/vue3-ssr-0.15.14.tgz#a2f4dedc3e86211a3ce1445555265095b7736491"
   integrity sha512-//8027GSbxE9n3QlD73xFY6z4ZbHbvrOVB7AO6hsmrEzGbg+h2A09HboUyDgu+xsmj7JnvJD39Irt+2D0+iV8g==
 
-"@easonliu1995/chinese-lorem@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/@easonliu1995/chinese-lorem/-/chinese-lorem-1.1.1.tgz#106262494d9d589b101ba3ba7d4c7768b31a830e"
-  integrity sha512-DSakuQi+KV/bCRY8cMyMiKlMJqgT1wEXzu4UNjmDLUL7le6z6iHmQ/CSl3ODJfdmIgIGyeh1tuBBRDLJQ7tGCA==
-
 "@emotion/hash@~0.8.0":
   version "0.8.0"
   resolved "https://registry.npmjs.org/@emotion/hash/-/hash-0.8.0.tgz#bbbff68978fefdbe68ccb533bc8cbe1d1afb5413"
@@ -2697,6 +2692,11 @@ update-browserslist-db@^1.3.0:
   dependencies:
     escalade "^3.2.0"
     picocolors "^1.1.1"
+
+uuid@^14.0.3:
+  version "14.0.3"
+  resolved "https://registry.npmmirror.com/uuid/-/uuid-14.0.3.tgz#48c9b0dcf5a42d983c23162399eeb9af8b2cc617"
+  integrity sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==
 
 validator@^13.15.22:
   version "13.15.35"

@@ -1,10 +1,17 @@
 <script lang="tsx">
-import { defineComponent, Fragment, PropType } from 'vue'
-import { useVModels } from '@vueuse/core'
+import { Component, defineComponent, Fragment, h, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
-import { Chat } from '@vicons/carbon'
+import { Lightning, Chat, ChatBot } from '@vicons/carbon'
 import { openCrmSmsAppCreate } from '@/components/crm/hooks'
+import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
+
+/**短信应用类型对应的图标；颜色统一使用枚举接口返回的 type。*/
+const SMS_APP_ICONS: Record<string, Component> = {
+    MRKT: ChatBot,
+    NTFY: Chat,
+    SOTP: Lightning
+}
 
 export default defineComponent({
     name: 'CrmConsumerContextSmsWrapper',
@@ -46,9 +53,14 @@ export default defineComponent({
                                     {state.dataSource.map((item: Omix) => (
                                         <n-card key={item.keyId} content-class="flex flex-col p-0! overflow-hidden">
                                             <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
-                                                <common-base-alert-wrapper class="p-10" type="info">
+                                                <common-base-alert-wrapper
+                                                    class="p-10"
+                                                    type="info"
+                                                    value={item.type}
+                                                    items={chunkOptions.value.typeOptions}
+                                                >
                                                     <n-icon size={28} color="var(--n-icon-color)">
-                                                        <Chat />
+                                                        {h(SMS_APP_ICONS[item.type] ?? Chat)}
                                                     </n-icon>
                                                 </common-base-alert-wrapper>
                                                 <div class="flex flex-col flex-1 gap-y-2 overflow-hidden">

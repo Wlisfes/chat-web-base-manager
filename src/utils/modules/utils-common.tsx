@@ -2,12 +2,13 @@ import { VNode } from 'vue'
 import { Faker, zh_CN, en } from '@faker-js/faker'
 import { cloneDeep, concat, omit, pick } from 'lodash-es'
 import { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean } from 'class-validator'
-import chineseLorem from '@easonliu1995/chinese-lorem'
+import { v1, v3, v4, v5, v6, v7 } from 'uuid'
 import OrgChart from 'balkan-orgchart-js'
 import tree from 'tree-tool'
 import dayjs from 'dayjs'
 
-export { tree, OrgChart, cloneDeep, concat, omit, pick, isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
+export { tree, OrgChart, v1, v3, v4, v5, v6, v7, cloneDeep, concat, omit, pick }
+export { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean }
 
 /**图标示例对象**/
 export const modules: Record<string, VNode> = import.meta.glob(`@/assets/icons/*.svg`, { query: '?component', eager: true })
@@ -29,9 +30,6 @@ export const iconSvgs = Object.keys(svgModules).reduce((icons: Record<string, st
 
 /**虚拟数据实例**/
 export const faker = new Faker({ locale: [zh_CN, en] })
-faker.lorem.paragraph = (count?: number) => {
-    return Array.from({ length: count ?? 3 }, () => chineseLorem({ min: 10, max: 25, usePunctuation: true, useSimplified: true })).join('')
-}
 
 /**dayjs实例**/
 export const moment = dayjs
@@ -176,4 +174,21 @@ export function fetchLeafKeyIds(nodes: Array<Omix>, result: Set<number> = new Se
         }
     }
     return result
+}
+
+/**将带成员的组织树展平为组织图节点。*/
+export function fetchOrganizationChartNodes<T extends Omix>(nodes: Array<T> = []): Array<T> {
+    const result: Array<Omix> = []
+    function walk(list: Array<Omix>, parentId?: number | string) {
+        for (const node of list) {
+            const id = node.keyId ?? node.id
+            result.push({ ...node, id, pid: parentId, name: node.name, tags: [node.type] })
+            for (const item of node.members ?? []) {
+                result.push({ ...item, pid: id, tags: ['user'], id: `user:${id}:${item.uid}`, name: `${item.name} ${item.number}` })
+            }
+            walk(node.children ?? [], id)
+        }
+    }
+    walk(nodes)
+    return result as Array<T>
 }
