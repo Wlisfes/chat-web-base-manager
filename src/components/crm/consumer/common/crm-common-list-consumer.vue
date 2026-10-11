@@ -52,7 +52,7 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '客户ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '客户名称', key: 'name', minWidth: 200, disabled: true, ellipsis: false },
+                    { title: '客户名称', key: 'name', minWidth: 240, disabled: true, ellipsis: false },
                     { title: '客户别名', key: 'alias', width: 150 },
                     { title: '品牌', key: 'brandKeyId', width: 120 },
                     { title: '阶段', key: 'stage', width: 100 },
@@ -226,27 +226,19 @@ export default defineComponent({
                             return <common-base-content value={data.brandKeyIdOptions?.name}></common-base-content>
                         },
                         col_stage: (data: Omix) => (
-                            <common-base-chunk bordered value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
+                            <common-base-chunk value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
-                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
-                            <common-base-chunk
-                                bordered
-                                value={data.authStatus}
-                                items={chunkOptions.value.authStatusOptions}
-                            ></common-base-chunk>
+                            <common-base-chunk value={data.authStatus} items={chunkOptions.value.authStatusOptions}></common-base-chunk>
                         ),
                         col_classType: (data: Omix) => (
-                            <common-base-chunk
-                                bordered
-                                value={data.classType}
-                                items={chunkOptions.value.classTypeOptions}
-                            ></common-base-chunk>
+                            <common-base-chunk value={data.classType} items={chunkOptions.value.classTypeOptions}></common-base-chunk>
                         ),
                         col_payMode: (data: Omix) => (
-                            <common-base-chunk bordered value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
+                            <common-base-chunk value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>

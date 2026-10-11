@@ -73,27 +73,25 @@ export default defineComponent({
                                                 </div>
                                                 <div class="m-be-auto flex items-center">
                                                     <common-base-chunk
-                                                        bordered
                                                         value={item.type}
                                                         items={chunkOptions.value.typeOptions}
                                                     ></common-base-chunk>
                                                 </div>
                                             </div>
                                             <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用ID">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用ID">
                                                     <n-ellipsis tooltip={false}>{item.appId ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用名称">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用名称">
                                                     <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用状态">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用状态">
                                                     <common-base-chunk
-                                                        bordered
                                                         value={item.status}
                                                         items={chunkOptions.value.statusOptions}
                                                     ></common-base-chunk>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="备注">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="备注">
                                                     <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
                                             </div>
