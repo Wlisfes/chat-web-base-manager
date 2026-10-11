@@ -356,11 +356,6 @@
   resolved "https://registry.npmjs.org/@css-render/vue3-ssr/-/vue3-ssr-0.15.14.tgz#a2f4dedc3e86211a3ce1445555265095b7736491"
   integrity sha512-//8027GSbxE9n3QlD73xFY6z4ZbHbvrOVB7AO6hsmrEzGbg+h2A09HboUyDgu+xsmj7JnvJD39Irt+2D0+iV8g==
 
-"@easonliu1995/chinese-lorem@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/@easonliu1995/chinese-lorem/-/chinese-lorem-1.1.1.tgz#106262494d9d589b101ba3ba7d4c7768b31a830e"
-  integrity sha512-DSakuQi+KV/bCRY8cMyMiKlMJqgT1wEXzu4UNjmDLUL7le6z6iHmQ/CSl3ODJfdmIgIGyeh1tuBBRDLJQ7tGCA==
-
 "@emotion/hash@~0.8.0":
   version "0.8.0"
   resolved "https://registry.npmjs.org/@emotion/hash/-/hash-0.8.0.tgz#bbbff68978fefdbe68ccb533bc8cbe1d1afb5413"

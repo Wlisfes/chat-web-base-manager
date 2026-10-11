@@ -3,7 +3,6 @@ import { Faker, zh_CN, en } from '@faker-js/faker'
 import { cloneDeep, concat, omit, pick } from 'lodash-es'
 import { isNotEmpty, isEmpty, isArray, isEmail, isString, isObject, isBoolean } from 'class-validator'
 import { v1, v3, v4, v5, v6, v7 } from 'uuid'
-import chineseLorem from '@easonliu1995/chinese-lorem'
 import OrgChart from 'balkan-orgchart-js'
 import tree from 'tree-tool'
 import dayjs from 'dayjs'
@@ -31,9 +30,6 @@ export const iconSvgs = Object.keys(svgModules).reduce((icons: Record<string, st
 
 /**虚拟数据实例**/
 export const faker = new Faker({ locale: [zh_CN, en] })
-faker.lorem.paragraph = (count?: number) => {
-    return Array.from({ length: count ?? 3 }, () => chineseLorem({ min: 10, max: 25, usePunctuation: true, useSimplified: true })).join('')
-}
 
 /**dayjs实例**/
 export const moment = dayjs

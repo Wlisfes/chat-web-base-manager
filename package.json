@@ -16,7 +16,6 @@
         "@better-scroll/observe-dom": "^2.5.1",
         "@better-scroll/observe-image": "^2.5.1",
         "@better-scroll/scroll-bar": "^2.5.1",
-        "@easonliu1995/chinese-lorem": "^1.1.1",
         "@faker-js/faker": "^8.4.1",
         "@vicons/carbon": "^0.13.0",
         "@vueuse/components": "^11.0.3",
