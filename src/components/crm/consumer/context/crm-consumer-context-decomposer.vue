@@ -1,9 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
 import { useBaseService, useChunkService } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import { fetchDelay } from '@/utils'
-import * as feedback from '@/components/finance/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -14,33 +11,18 @@ export default defineComponent({
         keyId: { type: [String, Number] }
     },
     setup(props) {
-        /**客户静态枚举**/
-        const { chunkOptions } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+        /**客户静态枚举、注册来源字典枚举**/
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
+            request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
+            types: ['CHUNK_CRM_CRM_USER_SOURCE'],
             immediate: true
         })
-        /**注册来源字典枚举**/
-        const { chunkState: sourceChunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
+        const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            types: ['CHUNK_CRM_CRM_USER_SOURCE']
-        })
-        const { faseNode, faseState, setState } = useBaseService(
-            () => Service.httpBaseCrmUserResolver({ keyId: props.keyId }),
-            {
-                immediate: true,
-                // 本地静态枚举已废弃，待切换为后端枚举接口
-                // chunkNames: {
-                // CHUNK_CONSUMER_SMS_TYPE: true,
-                // CHUNK_CONSUMER_SMS_STATUS: true,
-                // CHUNK_CONSUMER_PAY_MODE: true,
-                // CHUNK_CONSUMER_AUTH_STATUS: true,
-                // CHUNK_CONSUMER_SOURCE: true,
-                // CHUNK_CONSUMER_STATUS: true,
-                // CHUNK_CONSUMER_CLASS: true,
-                // CHUNK_CONSUMER_STAGE: true
-                // },
-                options: { tabName: 'sms' }
+            options: {
+                tabName: 'sms'
             }
-        )
+        })
 
         return () => (
             <crm-consumer-context-skeleton initialize={faseState.initialize}>
@@ -60,15 +42,12 @@ export default defineComponent({
                         <n-tab-pane name="basic" tab="详情信息" display-directive="show">
                             <crm-consumer-context-basic-wrapper
                                 chunk-options={chunkOptions.value}
-                                source-options={sourceChunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                                source-options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
                         <n-tab-pane name="sms" tab="短信应用" display-directive="show">
-                            <crm-consumer-context-sms-wrapper
-                                // 本地静态枚举已废弃，待切换为后端枚举接口: chunk-state={chunkState}
-                                v-model:faseNode={faseNode.value}
-                            ></crm-consumer-context-sms-wrapper>
+                            <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
                         </n-tab-pane>
                         <n-tab-pane name="mail" tab="邮件应用" display-directive="show">
                             <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
