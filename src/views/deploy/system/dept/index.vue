@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, onMounted } from 'vue'
-import { mapDeployOrganizationChartNodes } from '@/utils'
+import { fetchOrganizationChartNodes } from '@/utils'
 import { useSelectService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -9,7 +9,7 @@ export default defineComponent({
     setup(props) {
         const organOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeUser(), {
             immediate: false,
-            transform: mapDeployOrganizationChartNodes
+            transform: fetchOrganizationChartNodes
         })
         onMounted(() => organOptions.fetchRequest())
 
