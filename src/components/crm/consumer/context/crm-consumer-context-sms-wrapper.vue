@@ -2,8 +2,8 @@
 import { Component, defineComponent, Fragment, h, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
 import { Lightning, Chat, ChatBot } from '@vicons/carbon'
-import { openCrmSmsAppCreate } from '@/components/crm/hooks'
 import { useVModels } from '@vueuse/core'
+import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
 /**短信应用类型对应的图标；颜色统一使用枚举接口返回的 type。*/
@@ -35,11 +35,11 @@ export default defineComponent({
         })
 
         /**添加短信应用**/
-        async function fetchCreateSmsApp() {
-            return await openCrmSmsAppCreate({
+        async function fetchCrmSmsAppStore() {
+            return await feedback.fetchCrmSmsAppStore({
                 title: '添加短信应用',
-                command: 'CREATE',
-                node: { userKeyId: faseNode.value.keyId }
+                faseNode: faseNode.value,
+                onSubmit: () => fetchRefresh()
             })
         }
 
@@ -73,27 +73,25 @@ export default defineComponent({
                                                 </div>
                                                 <div class="m-be-auto flex items-center">
                                                     <common-base-chunk
-                                                        bordered
                                                         value={item.type}
                                                         items={chunkOptions.value.typeOptions}
                                                     ></common-base-chunk>
                                                 </div>
                                             </div>
                                             <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用ID">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用ID">
                                                     <n-ellipsis tooltip={false}>{item.appId ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用名称">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用名称">
                                                     <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="应用状态">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用状态">
                                                     <common-base-chunk
-                                                        bordered
                                                         value={item.status}
                                                         items={chunkOptions.value.statusOptions}
                                                     ></common-base-chunk>
                                                 </common-base-columns-wrapper>
-                                                <common-base-columns-wrapper label-class="w-5.2em m-ie-10" label="备注">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="备注">
                                                     <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
                                                 </common-base-columns-wrapper>
                                             </div>
@@ -104,13 +102,13 @@ export default defineComponent({
                             <n-card content-class="flex flex-col p-0! overflow-hidden">
                                 <common-base-alert-wrapper bordered={false} type="default">
                                     <div class="h-208 box-border flex flex-col p-14 items-center justify-center">
-                                        <common-base-button class="p-10" text type="primary" onClick={fetchCreateSmsApp}>
+                                        <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
                                             <common-base-icon size={18}>
                                                 <local-nest-plus />
                                             </common-base-icon>
                                             <span class="text-16 p-is-5">添加应用</span>
                                         </common-base-button>
-                                        <n-text depth="3">已添加应用数：0，还可添加应用数：1</n-text>
+                                        <n-text depth="3">{`已添加应用数：${state.total}，还可添加应用数：${(faseNode.value.config?.smsAppLimit ?? 0) - state.total}`}</n-text>
                                     </div>
                                 </common-base-alert-wrapper>
                             </n-card>

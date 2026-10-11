@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, Fragment, PropType } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import { v4, pick, omit, fetchCloneByte } from '@/utils'
@@ -11,8 +11,6 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**操作指令**/
-        command: { type: String as PropType<'CREATE' | 'UPDATE'>, default: 'CREATE' },
         /**编辑操作详情数据**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
@@ -82,22 +80,19 @@ export default defineComponent({
         /**详情初始化**/
         async function fetchInitialization() {
             const taskNames: Array<Promise<Omix>> = [brandOptions.fetchRequest(), currencyOptions.fetchRequest(), fetchChunkService()]
-            if (['CREATE'].includes(props.command)) {
-                try {
-                    return await Promise.all([Service.httpBaseCrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
-                        const contact = pick(data.contact, ['name', 'address', 'remark'])
-                        const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, keyId: v4() }))
-                        return await setForm({ ...data, items, contact }).then(async () => {
-                            return await setState({ initialize: false })
-                        })
+            try {
+                return await Promise.all([Service.httpBaseCrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
+                    const contact = pick(data.contact, ['name', 'address', 'remark'])
+                    const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, keyId: v4() }))
+                    return await setForm({ ...data, items, contact }).then(async () => {
+                        return await setState({ initialize: false })
                     })
-                } catch (err) {
-                    return await setState({ initialize: false }).then(async () => {
-                        return await fetchNotifyService({ type: 'error', title: err.message })
-                    })
-                }
+                })
+            } catch (err) {
+                return await setState({ initialize: false }).then(async () => {
+                    return await fetchNotifyService({ type: 'error', title: err.message })
+                })
             }
-            return await setState({ initialize: false })
         }
 
         /**确定提交表单**/
@@ -112,9 +107,9 @@ export default defineComponent({
                             items: formState.value.items.map(e => pick(e, ['type', 'value']))
                         })
                     })
-                    if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseCrmCreateUser(formState.value)
-                    }
+
+                    await Service.httpBaseCrmCreateUser(formOptions)
+
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })
@@ -197,46 +192,43 @@ export default defineComponent({
                             autosize={{ minRows: 2, maxRows: 6 }}
                         />
                     </form-base-column>
-                    {['CREATE'].includes(props.command) && (
-                        <Fragment>
-                            <form-base-column label="联系人名称" path="contact.name">
-                                <form-base-input
-                                    maxlength={64}
-                                    placeholder="请输入联系人名称"
-                                    v-model:value={formState.value.contact.name}
-                                ></form-base-input>
-                            </form-base-column>
-                            <form-base-column span={2} label="联系人地址" path="contact.address">
-                                <form-base-input
-                                    maxlength={512}
-                                    placeholder="请输入联系人地址"
-                                    v-model:value={formState.value.contact.address}
-                                ></form-base-input>
-                            </form-base-column>
-                            <form-base-column full required show-feedback={false} label="联系方式">
-                                <div class="flex flex-col flex-1">
-                                    {formState.value.items.map((item, index) => (
-                                        <common-business-contact-block
-                                            key={item.keyId}
-                                            index={index}
-                                            options={chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
-                                            v-model:list={formState.value.items}
-                                            v-model:node={item}
-                                        ></common-business-contact-block>
-                                    ))}
-                                </div>
-                            </form-base-column>
-                            <form-base-column full label="联系人备注" path="contact.remark">
-                                <n-input
-                                    type="textarea"
-                                    maxlength={1024}
-                                    placeholder="请输入联系人备注"
-                                    v-model:value={formState.value.contact.remark}
-                                    autosize={{ minRows: 2, maxRows: 4 }}
-                                />
-                            </form-base-column>
-                        </Fragment>
-                    )}
+
+                    <form-base-column label="联系人名称" path="contact.name">
+                        <form-base-input
+                            maxlength={64}
+                            placeholder="请输入联系人名称"
+                            v-model:value={formState.value.contact.name}
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column span={2} label="联系人地址" path="contact.address">
+                        <form-base-input
+                            maxlength={512}
+                            placeholder="请输入联系人地址"
+                            v-model:value={formState.value.contact.address}
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column full required show-feedback={false} label="联系方式">
+                        <div class="flex flex-col flex-1">
+                            {formState.value.items.map((item, index) => (
+                                <common-business-contact-block
+                                    key={item.keyId}
+                                    index={index}
+                                    options={chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
+                                    v-model:list={formState.value.items}
+                                    v-model:node={item}
+                                ></common-business-contact-block>
+                            ))}
+                        </div>
+                    </form-base-column>
+                    <form-base-column full label="联系人备注" path="contact.remark">
+                        <n-input
+                            type="textarea"
+                            maxlength={1024}
+                            placeholder="请输入联系人备注"
+                            v-model:value={formState.value.contact.remark}
+                            autosize={{ minRows: 2, maxRows: 4 }}
+                        />
+                    </form-base-column>
                 </form-base-container>
             </common-dialog-provider>
         )

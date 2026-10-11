@@ -40,26 +40,29 @@ interface BaseServiceState<T, C> extends Omix {
     /**权限标识**/
     actions: Array<Omix<C>>
 }
-/**列表包装配置**/
-interface BaseServiceOptions<T, U, R, C> extends Partial<BaseServiceState<T, C>> {
+/**列表包装配置（不含列表接口）；不能用 Omit 从 BaseServiceOptions 派生，Omix 的索引签名会让 Omit 后所有字段退化为 any。**/
+interface BaseServiceConfig<T, U, R, C> extends Partial<BaseServiceState<T, C>> {
     /**立即执行**/
     immediate?: boolean
     /**额外字段**/
     options?: Omix<R>
     /**筛选条件表单**/
     formState: Omix<U>
-    /**列表接口**/
-    request: (base: BaseServiceState<T & Omix<R>, C>, body: Omix<U>, options: Omix) => Promise<ResultResolver<ResultColumn<T>>>
     /**列表数据转换函数**/
     transform?: (data: ResultColumn<T>) => Array<Omix> | Promise<Array<Omix>>
     /**回调函数**/
     callback?: (formState: Omix<U>, base: BaseServiceState<T & Omix<R>, C>) => void | any | Promise<any>
 }
+/**列表包装配置**/
+interface BaseServiceOptions<T, U, R, C> extends BaseServiceConfig<T, U, R, C> {
+    /**列表接口**/
+    request: (base: BaseServiceState<T & Omix<R>, C>, body: Omix<U>, options: Omix) => Promise<ResultResolver<ResultColumn<T>>>
+}
 
 /**列表包装hook**/
 export function useColumnService<T extends Omix, U extends Omix, R extends Omix, C extends Partial<Omix> = {}>(
     request: BaseServiceOptions<T, U, R, C>['request'],
-    options: Omit<BaseServiceOptions<T, U, R, C>, 'request'> & { formState: U }
+    options: BaseServiceConfig<T, U, R, C> & { formState: U }
 ) {
     const route = useRoute()
     const router = useRouter()
@@ -83,7 +86,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         database: options.database ?? [],
         actions: options.actions ?? [],
         ...(options.options ?? {})
-    } as BaseServiceState<T, C> & typeof options.options)
+    } as BaseServiceState<T, C> & Omix<R>)
 
     /**初始化**/
     onMounted(fetchInitialize)
@@ -153,7 +156,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     }
 
     /**刷新**/
-    async function fetchRefresh(data: Partial<BaseServiceState<T, C> & typeof options.options> = {}, opt: Omix = {}) {
+    async function fetchRefresh(data: Partial<BaseServiceState<T, C> & Omix<R>> = {}, opt: Omix = {}) {
         return await setState(pick(data, ['size', 'page']) as typeof state).then(async () => {
             return await fetchRequest(opt)
         })
@@ -161,15 +164,10 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
 
     /**列表接口请求回调执行**/
     async function fetchCallbackRequest(opts: Omix = {}) {
-        return await setState({
-            initialize: false,
-            loading: false,
-            select: [],
-            ...opts
-        } as never).then(async () => {
+        return await setState({ initialize: false, loading: false, select: [], ...opts } as never).then(async () => {
             return await fetchHandler(isNotEmpty(options.callback), async () => {
                 return await options.callback!(formState.value, state as never)
-            }).then(() => state as BaseServiceState<T, C> & typeof options.options)
+            }).then(() => state as BaseServiceState<T, C> & Omix<R>)
         })
     }
 

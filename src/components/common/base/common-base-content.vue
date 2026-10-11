@@ -40,8 +40,8 @@ export default defineComponent({
                         }}
                     >
                         {{
-                            default: () => (slots.default ? slots.default(displayContent.value) : displayContent.value),
-                            tooltip: () => displayContent.value
+                            tooltip: () => displayContent.value,
+                            default: () => (slots.default ? slots.default(displayContent.value) : displayContent.value)
                         }}
                     </n-performant-ellipsis>
                 )
