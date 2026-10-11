@@ -108,7 +108,7 @@ export default defineComponent({
                                             </common-base-icon>
                                             <span class="text-16 p-is-5">添加应用</span>
                                         </common-base-button>
-                                        <n-text depth="3">已添加应用数：0，还可添加应用数：1</n-text>
+                                        <n-text depth="3">{`已添加应用数：${state.total}，还可添加应用数：${(faseNode.value.config?.smsAppLimit ?? 0) - state.total}`}</n-text>
                                     </div>
                                 </common-base-alert-wrapper>
                             </n-card>
