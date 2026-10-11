@@ -86,7 +86,6 @@ export default defineComponent({
         async function fetchCreateCommonUser() {
             return await feedback.fetchCrmCommonUser({
                 title: '新增客户',
-                command: 'CREATE',
                 onSubmit: fetchRefresh
             })
         }
