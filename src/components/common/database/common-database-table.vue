@@ -134,7 +134,7 @@ export default defineComponent({
                 }
             }
             if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
-                base.render = (data: Omix) => slots[`col_${key}`]?.(data, base) ?? <span>-</span>
+                base.render = (data: Omix, index: number) => slots[`col_${key}`]?.(data, base, index) ?? <span>-</span>
             }
             return base
         }

@@ -69,3 +69,12 @@ export function httpBaseCrmSelectUser(params: Omix = {}) {
         params
     })
 }
+
+/**查询消费客户联系人列表**/
+export function httpBaseCrmColumnUserContact(data: Omix) {
+    return request({
+        url: '/api/crm/user/contact/column',
+        method: 'POST',
+        data
+    })
+}
