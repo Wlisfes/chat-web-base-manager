@@ -118,6 +118,26 @@ export interface ChunkOptionGroup extends Omix {
 /**以请求枚举类型编码为 key 的枚举字典选项分组对象。*/
 export type ChunkOptionRecord = Record<string, ChunkOptionGroup>
 
+/**枚举字典父级树结构请求参数。*/
+export interface ChunkTreeStructureRequest extends Omix {
+    module: ChunkModule
+    type: string
+    keyId?: number
+}
+
+/**枚举字典父级树节点。*/
+export interface ChunkTreeNode extends Omix {
+    keyId: number
+    pid: number | null
+    module: ChunkModule
+    type: string
+    name: string
+    value: string
+    sort: number
+    status: ChunkStatus
+    children: ChunkTreeNode[]
+}
+
 /**系统枚举主键请求体。*/
 export interface ChunkKeyRequest {
     keyId: number

@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useChunkService } from '@/hooks'
+import { useFormService, useSelectService } from '@/hooks'
+import { fetchNormalizeTreeChildren } from '@/utils'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -20,6 +21,20 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
+        /**父级枚举树结构**/
+        const chunkTreeOptions = useSelectService(
+            e => {
+                return Service.httpBaseSkylineChunkTreeStructure({
+                    module: props.chunkNode.module,
+                    type: props.chunkNode.type,
+                    keyId: ['UPDATE'].includes(props.command) ? props.node.keyId : undefined
+                })
+            },
+            {
+                transform: fetchNormalizeTreeChildren,
+                immediate: false
+            }
+        )
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSkylineChunkResolver,
@@ -52,9 +67,12 @@ export default defineComponent({
             }
         })
 
-        /**部门详情**/
+        /**枚举详情**/
         async function fetchBaseSkylineChunkResolver() {
-            const taskNames: Array<any> = []
+            const taskNames: Array<Promise<Omix>> = []
+            if (['tree'].includes(props.chunkNode.kind)) {
+                taskNames.push(chunkTreeOptions.fetchRequest())
+            }
             if (['CREATE'].includes(props.command)) {
                 return await Promise.all(taskNames).then(async () => {
                     return await setState({ initialize: false })
@@ -133,7 +151,19 @@ export default defineComponent({
                                 v-model:value={formState.value.value}
                             ></form-base-input>
                         </form-base-column>
-                        {['tree'].includes(props.chunkNode.kind) && <form-base-column label="父级主键" path="pid"></form-base-column>}
+                        {['tree'].includes(props.chunkNode.kind) && (
+                            <form-base-column label="父级主键" path="pid">
+                                <form-base-cascader
+                                    label-field="name"
+                                    label-value="keyId"
+                                    children-field="children"
+                                    placeholder="请选择父级主键，为空表示顶级"
+                                    expand-trigger="click"
+                                    options={chunkTreeOptions.dataSource.value}
+                                    v-model:value={formState.value.pid}
+                                ></form-base-cascader>
+                            </form-base-column>
+                        )}
                         <form-base-column label="状态" path="status">
                             <form-base-select
                                 placeholder="请选择状态"

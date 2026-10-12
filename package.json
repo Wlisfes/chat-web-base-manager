@@ -1,7 +1,7 @@
 {
     "name": "chat-web-base-manager",
     "private": true,
-    "version": "1.0.22",
+    "version": "1.0.23",
     "type": "module",
     "scripts": {
         "install": "yarn install --ignore-scripts --ignore-engines",
