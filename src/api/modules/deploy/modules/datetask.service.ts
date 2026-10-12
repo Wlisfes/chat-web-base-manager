@@ -1,7 +1,7 @@
 import { request } from '@/utils'
 import type * as Datetask from '@/interface/deploy/deploy-datetask.resolver'
 
-/**获取系统任务类型、任务状态和执行日志状态枚举**/
+/**获取任务所属模块、任务状态、执行状态和触发方式枚举**/
 export function httpBaseSkylineDatetaskEnums() {
     return request<Datetask.DatetaskEnumsResponse>({
         url: '/api/skyline/deploy/datetask/enums',
@@ -51,5 +51,14 @@ export function httpBaseSkylineColumnDatetaskLog(data: Datetask.DatetaskLogColum
         url: '/api/skyline/deploy/datetask/log/column',
         method: 'POST',
         data
+    })
+}
+
+/**系统任务单条执行日志，用于手动触发后轮询结果**/
+export function httpBaseSkylineResolverDatetaskLog(params: Datetask.DatetaskLogResolveRequest) {
+    return request<Datetask.DatetaskLogItem>({
+        url: '/api/skyline/deploy/datetask/log/resolve',
+        method: 'GET',
+        params
     })
 }

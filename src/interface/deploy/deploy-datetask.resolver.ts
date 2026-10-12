@@ -1,16 +1,13 @@
-/**系统任务类型。*/
-export type DatetaskType = 'system' | 'cron' | 'manual'
+/**任务所属模块。*/
+export type DatetaskModule = 'TASK_SYSTEM' | 'TASK_FINANCE' | 'TASK_CRM'
 
-/**系统任务状态。*/
-export type DatetaskStatus = 'stop' | 'wait' | 'running' | 'finish'
+/**周期任务状态：enable=启用；disable=停用。*/
+export type DatetaskStatus = 'enable' | 'disable'
 
-/**系统任务可通过管理接口切换的状态。*/
-export type DatetaskManageStatus = Extract<DatetaskStatus, 'stop' | 'running'>
+/**执行状态：pending=待执行；running=执行中；retrying=等待重试；success=执行成功；failed=执行失败。*/
+export type DatetaskLogStatus = 'pending' | 'running' | 'retrying' | 'success' | 'failed'
 
-/**系统任务执行日志状态。*/
-export type DatetaskLogStatus = 'running' | 'success' | 'failed'
-
-/**系统任务执行触发方式：system=系统执行；manual=手动执行。*/
+/**执行触发方式：system=系统执行；manual=手动执行。*/
 export type DatetaskLogTrigger = 'system' | 'manual'
 
 /**操作人展示选项；系统账号 uid 为 0。*/
@@ -21,18 +18,20 @@ export interface DatetaskOperatorOption {
     avatar?: string
 }
 
-/**系统任务列表项。*/
+/**周期任务列表项；任务由 chat-web-task-service 调度，Skyline 转发。*/
 export interface DatetaskItem {
     /**表主键，用于表格行标识和选择。*/
     keyId: number
     taskId: string
     taskName: string
+    module: DatetaskModule
     handler: string
     comment: string | null
-    cron: string | null
-    type: DatetaskType
+    cron: string
     status: DatetaskStatus
     body: Record<string, unknown> | null
+    /**单次执行最大尝试次数（含首次）。*/
+    maxAttempts: number
     lastTime: string | null
     nextTime: string | null
     createBy: string
@@ -45,12 +44,12 @@ export interface DatetaskItem {
     modifyByOptions?: DatetaskOperatorOption
 }
 
-/**系统任务分页查询请求体。*/
+/**周期任务分页查询请求体。*/
 export interface DatetaskColumnRequest extends Omix {
     page: number
     size: number
-    type?: DatetaskType
     taskName?: string
+    module?: DatetaskModule
     status?: DatetaskStatus
 }
 
@@ -64,14 +63,13 @@ export interface DatetaskEnumOption<T extends string = string> {
 
 /**系统任务静态枚举响应数据。*/
 export interface DatetaskEnumsResponse {
-    typeOptions: DatetaskEnumOption<DatetaskType>[]
+    moduleOptions: DatetaskEnumOption<DatetaskModule>[]
     statusOptions: DatetaskEnumOption<DatetaskStatus>[]
-    manageStatusOptions: DatetaskEnumOption<DatetaskManageStatus>[]
     logStatusOptions: DatetaskEnumOption<DatetaskLogStatus>[]
     triggerTypeOptions: DatetaskEnumOption<DatetaskLogTrigger>[]
 }
 
-/**系统任务分页响应数据。*/
+/**周期任务分页响应数据。*/
 export interface DatetaskColumnResponse {
     page: number
     size: number
@@ -79,59 +77,50 @@ export interface DatetaskColumnResponse {
     list: DatetaskItem[]
 }
 
-/**系统任务主键请求体。*/
+/**周期任务主键请求体。*/
 export interface DatetaskKeyRequest {
     taskId: string
 }
 
-/**系统任务状态更新请求体。*/
+/**周期任务状态更新请求体。*/
 export interface DatetaskStatusRequest extends DatetaskKeyRequest {
-    status: DatetaskManageStatus
+    status: DatetaskStatus
 }
 
-/**系统任务 Cron 更新请求体。*/
+/**周期任务 Cron 更新请求体。*/
 export interface DatetaskCronRequest extends DatetaskKeyRequest {
     cron: string
 }
 
-/**系统任务触发响应数据。*/
-export interface DatetaskTriggerResponse {
-    success: boolean
-    result?: DatetaskExecutionResult
-}
-
-/**汇率同步结果明细。*/
-export interface DatetaskExchangeRateItem {
-    currency: string
-    rate: number
-    date: string
-}
-
-/**任务执行结果；同时覆盖汇率同步成功结果和跳过/错误结果。*/
-export interface DatetaskExecutionResult {
-    date?: string
-    count?: number
-    list?: DatetaskExchangeRateItem[]
-    skipped?: boolean
-    reason?: string
-    message?: string
-}
-
-/**系统任务执行日志项。*/
+/**执行记录（执行日志）项；一次触发一条，重试只累加尝试次数。*/
 export interface DatetaskLogItem {
     /**表主键，用于表格行标识。*/
     keyId: number
-    /**单次执行唯一标识。*/
+    /**执行记录ID。*/
     executionId: string
     taskId: string
-    taskName: string | null
-    status: DatetaskLogStatus
-    /**触发方式。*/
+    taskName: string
+    handler: string
+    /**业务幂等键。*/
+    bizKey: string
     triggerType: DatetaskLogTrigger
-    duration: number
-    startTime: string
+    status: DatetaskLogStatus
+    /**已尝试次数。*/
+    attempts: number
+    /**最大尝试次数。*/
+    maxAttempts: number
+    /**计划执行时间。*/
+    scheduledTime: string
+    /**下次重试时间。*/
+    nextRetryTime?: string | null
+    startTime?: string | null
     endTime?: string | null
-    result?: DatetaskExecutionResult
+    /**最后一次尝试耗时（毫秒）。*/
+    duration: number
+    /**执行结果摘要。*/
+    result?: Record<string, unknown> | null
+    /**最后一次失败原因。*/
+    error?: string | null
     /**触发人 UID，系统执行为 0。*/
     createBy: string
     modifyBy: string | null
@@ -141,14 +130,26 @@ export interface DatetaskLogItem {
     createByOptions?: DatetaskOperatorOption
 }
 
-/**系统任务执行日志分页请求体。*/
+/**手动触发响应：finished 为 false 时按 executionId 轮询执行日志详情。*/
+export interface DatetaskTriggerResponse {
+    executionId: string
+    finished: boolean
+    execution: DatetaskLogItem
+}
+
+/**执行日志分页请求体。*/
 export interface DatetaskLogColumnRequest extends DatetaskKeyRequest {
     page: number
     size: number
     status?: DatetaskLogStatus
 }
 
-/**系统任务执行日志分页响应数据。*/
+/**单条执行日志请求参数。*/
+export interface DatetaskLogResolveRequest {
+    executionId: string
+}
+
+/**执行日志分页响应数据。*/
 export interface DatetaskLogColumnResponse {
     page: number
     size: number
