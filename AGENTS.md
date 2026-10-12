@@ -38,9 +38,9 @@
 - 类、接口、类型、枚举和装饰器使用 PascalCase。
 - 变量、函数、方法、参数和实例属性使用 camelCase。
 - 常量和注入 Token 使用 UPPER_SNAKE_CASE。
-- 环境变量使用 UPPER_SNAKE_CASE，并优先添加所属服务或模块前缀，例如 `ACCOUNT_*`、`GATEWAY_*`。
-- NestJS 类使用明确职责后缀，例如 `AccountService`、`GatewayController`、`NacosModule`。
-- 禁止无意义的导出别名，例如 `export { TbAccountUser as tbAccountUser }`。
+- 环境变量使用 UPPER_SNAKE_CASE，并优先添加所属服务或模块前缀，例如 `SKYLINE_*`、`GATEWAY_*`。
+- NestJS 类使用明确职责后缀，例如 `SkylineService`、`GatewayController`、`NacosModule`。
+- 禁止无意义的导出别名，例如 `export { TbSkylineUser as tbSkylineUser }`。
 - 从同一 interface、dto、schema 或类型定义模块具名导入的标识符超过 3 个时，一律改为 `import * as XxxDto from ...` 命名空间导入（仅类型用途时使用 `import type * as XxxTypes from ...`）；`vue`、`naive-ui`、`vue-router` 等框架和组件库无论数量多少一律保持具名导入，禁止写成 `Vue.defineComponent()`、`NaiveUI.NButton` 这类命名空间调用。
 - 日志、校验消息、Swagger 描述和面向维护者的错误信息使用中文；代码标识符使用英文。
 
@@ -62,7 +62,7 @@
 - 多选配置必须使用数组字段并通过 `POST` `body` 传输，禁止逗号分隔字符串。
 - 分页接口统一使用 `page`（从 1 开始）和 `size`（默认 50、最大 100），响应统一使用 `page`、`size`、`total`、`list`；禁止使用 `pageSize`、`items`、`records` 或 `rows` 作为同义字段。
 - 路由使用单数业务模块和动作式后缀，例如 `user/resolver`、`user/column`、`role/update/menu`；Controller 方法使用与 `nest-platform-service` 一致的 `httpBase<Service><Action><Resource>` 风格。
-- 服务间 Feign 查询接口必须同时提供单条和多条两个版本：单条命名为 `httpBase<Service><Resource>Resolver`，路由 `/<resource>/resolve`，入参使用单个主键（如 `{ keyId }`、`{ uid }`），返回单个对象，记录不存在时抛 `NotFoundException`；多条命名为 `httpBase<Service>Column<Resource>Resolver`，路由 `/<resource>/column/resolve`，入参使用主键数组（如 `{ keyIds }`、`{ uids }`），单次上限 100 个，返回数组，不存在的主键直接忽略。两个接口返回同一个摘要类型，并在 Schema 的 Feign 契约、客户端、服务端实现和测试中同步补齐；列表回显统一通过 Schema `feign-<service>.utils.ts` 中的 `append<Service><Resource>Options` 工具调用多条接口。基准为 `httpBaseAccountUserResolver`/`httpBaseAccountColumnUserResolver`、`httpBaseFinanceBrandResolver`/`httpBaseFinanceColumnBrandResolver`。
+- 服务间 Feign 查询接口必须同时提供单条和多条两个版本：单条命名为 `httpBase<Service><Resource>Resolver`，路由 `/<resource>/resolve`，入参使用单个主键（如 `{ keyId }`、`{ uid }`），返回单个对象，记录不存在时抛 `NotFoundException`；多条命名为 `httpBase<Service>Column<Resource>Resolver`，路由 `/<resource>/column/resolve`，入参使用主键数组（如 `{ keyIds }`、`{ uids }`），单次上限 100 个，返回数组，不存在的主键直接忽略。两个接口返回同一个摘要类型，并在 Schema 的 Feign 契约、客户端、服务端实现和测试中同步补齐；列表回显统一通过 Schema `feign-<service>.utils.ts` 中的 `append<Service><Resource>Options` 工具调用多条接口。基准为 `httpBaseSkylineUserResolver`/`httpBaseSkylineColumnUserResolver`、`httpBaseFinanceBrandResolver`/`httpBaseFinanceColumnBrandResolver`。
 - 管理端 `src/api/**/modules/*.service.ts` 必须保持为干净的传输层：接口函数接收与后端协议一致的类型，只负责发起请求并原样传递 `query`/`body`，禁止在 API 层做参数归一化、字段改名、默认值注入、类型转换、响应映射或响应包装。
 - 管理端页面字段与接口字段不一致时，转换、兼容和业务默认值必须放在页面/业务域层（如 composable、store 或业务 service）；不得在 API 文件中增加私有转换函数、Adapter 或隐式适配逻辑。服务端协议转换应放在 DTO/业务层。
 - HTTP 服务统一接入 `chat-web-base-schema` 的请求上下文和请求日志中间件；日志必须包含请求 ID、方法、URL、状态码、来源、入参和耗时，并隐藏密码、Token 等敏感字段。
