@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
+import { useColumnService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 import * as feedback from '@/components/deploy/hooks'
 
@@ -38,6 +38,11 @@ export default defineComponent({
                     status: undefined
                 },
                 columns: [
+                    {
+                        type: 'expand',
+                        expandable: (row: Omix) => (row.items ?? []).length > 0,
+                        renderExpand: rowData => <deploy-chunk-common-block></deploy-chunk-common-block>
+                    },
                     { title: 'ID', key: 'keyId', width: 100, disabled: true },
                     { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
                     { title: '枚举值', key: 'value', minWidth: 120 },
@@ -167,7 +172,7 @@ export default defineComponent({
                 >
                     {{
                         col_status: (data: Omix) => (
-                            <common-base-chunk bordered value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
                         ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>

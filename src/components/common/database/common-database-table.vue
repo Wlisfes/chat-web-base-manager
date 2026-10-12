@@ -123,6 +123,10 @@ export default defineComponent({
         /**绑定自定义列并配置原生轻量省略渲染**/
         function fetchColumnRender(base: Omix<DataTableColumn>) {
             const key = String(base.key ?? '')
+            // 展开列、选择列由 naive-ui 渲染固定 40px，未声明宽度时补齐，避免弹性列宽计算漏算 40px 后出现横向溢出
+            if (['selection', 'expand'].includes(String(base.type ?? '')) && isEmpty(base.width)) {
+                base.width = 40
+            }
             if (props.virtualScrollX && isEmpty(base.width)) {
                 base.width = base.minWidth ?? 120
             }

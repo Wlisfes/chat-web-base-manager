@@ -22,19 +22,10 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**父级枚举树结构**/
-        const chunkTreeOptions = useSelectService(
-            e => {
-                return Service.httpBaseSkylineChunkTreeStructure({
-                    module: props.chunkNode.module,
-                    type: props.chunkNode.type,
-                    keyId: ['UPDATE'].includes(props.command) ? props.node.keyId : undefined
-                })
-            },
-            {
-                transform: fetchNormalizeTreeChildren,
-                immediate: false
-            }
-        )
+        const chunkTreeOptions = useSelectService(e => fetchBaseSkylineChunkTreeStructure(props.chunkNode), {
+            transform: fetchNormalizeTreeChildren,
+            immediate: ['tree'].includes(props.chunkNode.kind)
+        })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchBaseSkylineChunkResolver,
@@ -67,20 +58,20 @@ export default defineComponent({
             }
         })
 
+        /**父级枚举树结构**/
+        async function fetchBaseSkylineChunkTreeStructure(node: Omix) {
+            return await Service.httpBaseSkylineChunkTreeStructure({
+                module: node.module,
+                type: node.type
+            })
+        }
+
         /**枚举详情**/
         async function fetchBaseSkylineChunkResolver() {
-            const taskNames: Array<Promise<Omix>> = []
-            if (['tree'].includes(props.chunkNode.kind)) {
-                taskNames.push(chunkTreeOptions.fetchRequest())
-            }
             if (['CREATE'].includes(props.command)) {
-                return await Promise.all(taskNames).then(async () => {
-                    return await setState({ initialize: false })
-                })
-            } else {
-                taskNames.unshift(Service.httpBaseSkylineChunkResolver({ keyId: props.node.keyId }))
+                return await setState({ initialize: false })
             }
-            return await Promise.all(taskNames).then(async ([{ data }]) => {
+            return await Service.httpBaseSkylineChunkResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                 try {
                     return await setForm(fetchReste(data)).then(async () => {
                         return await setState({ initialize: false })
@@ -154,11 +145,14 @@ export default defineComponent({
                         {['tree'].includes(props.chunkNode.kind) && (
                             <form-base-column label="父级主键" path="pid">
                                 <form-base-cascader
+                                    show-path
+                                    filterable
+                                    expand-trigger="click"
                                     label-field="name"
                                     label-value="keyId"
                                     children-field="children"
                                     placeholder="请选择父级主键，为空表示顶级"
-                                    expand-trigger="click"
+                                    disabled={chunkTreeOptions.loading.value}
                                     options={chunkTreeOptions.dataSource.value}
                                     v-model:value={formState.value.pid}
                                 ></form-base-cascader>
