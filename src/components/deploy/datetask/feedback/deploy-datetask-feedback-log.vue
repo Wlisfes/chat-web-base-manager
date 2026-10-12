@@ -23,14 +23,15 @@ export default defineComponent({
                 formState: { taskId: props.node.taskId },
                 limit: 0,
                 columns: [
-                    { title: '任务名称', key: 'taskName', width: 160 },
                     { title: '执行状态', key: 'status', width: 100 },
                     { title: '触发方式', key: 'triggerType', width: 100 },
                     { title: '触发人', key: 'createBy', width: 120 },
-                    { title: '耗时(ms)', key: 'duration', width: 100 },
-                    { title: '开始时间', key: 'startTime', width: 190 },
+                    { title: '尝试次数', key: 'attempts', width: 100 },
+                    { title: '计划时间', key: 'scheduledTime', width: 190 },
+                    { title: '下次重试', key: 'nextRetryTime', width: 190 },
                     { title: '结束时间', key: 'endTime', width: 190 },
-                    { title: '结果/错误', key: 'result', minWidth: 200 }
+                    { title: '耗时(ms)', key: 'duration', width: 100 },
+                    { title: '结果/失败原因', key: 'result', minWidth: 220 }
                 ]
             }
         )
@@ -77,6 +78,15 @@ export default defineComponent({
                         ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_attempts: (data: Omix) => `${data.attempts ?? 0} / ${data.maxAttempts ?? '-'}`,
+                        col_nextRetryTime: (data: Omix) => data.nextRetryTime ?? '-',
+                        col_endTime: (data: Omix) => data.endTime ?? '-',
+                        col_result: (data: Omix) => {
+                            if (data.error && data.status !== 'success') {
+                                return <n-text type="error">{data.error}</n-text>
+                            }
+                            return data.result ? JSON.stringify(data.result) : '-'
                         }
                     }}
                 </common-database-table>

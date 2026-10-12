@@ -25,8 +25,8 @@ export default defineComponent({
                     { title: '任务日志', key: 'chat:deploy:datetask:system:logs' }
                 ],
                 formState: {
-                    /**任务类型**/
-                    type: 'system',
+                    /**任务所属模块**/
+                    module: undefined,
                     /**任务名称**/
                     taskName: undefined,
                     /**任务状态**/
@@ -37,8 +37,8 @@ export default defineComponent({
 
         /**启用/停用任务**/
         async function fetchDatetaskStatusToggle(node: Omix) {
-            const nextStatus = ['running', 'wait'].includes(node.status) ? 'stop' : 'running'
-            const nextLabel = nextStatus === 'running' ? '启用' : '停用'
+            const nextStatus = node.status === 'enable' ? 'disable' : 'enable'
+            const nextLabel = nextStatus === 'enable' ? '启用' : '停用'
             return await fetchDialogService({
                 title: '提示',
                 type: 'warning',
@@ -75,7 +75,34 @@ export default defineComponent({
             })
         }
 
-        /**手动触发任务**/
+        /**手动触发后最多轮询的时长，超时提示到执行日志中查看**/
+        const TRIGGER_POLL_TIMEOUT = 60_000
+        /**手动触发后轮询执行结果的间隔**/
+        const TRIGGER_POLL_INTERVAL = 2_000
+
+        /**轮询执行记录直到结束或超时；返回 undefined 表示超时仍未结束**/
+        async function fetchDatetaskExecutionWait(executionId: string): Promise<Omix | undefined> {
+            const deadline = Date.now() + TRIGGER_POLL_TIMEOUT
+            while (Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, TRIGGER_POLL_INTERVAL))
+                const { data } = await Service.httpBaseSkylineResolverDatetaskLog({ executionId })
+                if (['success', 'failed'].includes(data.status)) return data
+            }
+            return undefined
+        }
+
+        /**按执行记录的最终状态提示结果**/
+        async function fetchDatetaskExecutionNotify(execution?: Omix) {
+            if (!execution) {
+                return await fetchNotifyService({ type: 'warning', title: '任务仍在执行', message: '请稍后在执行日志中查看结果' })
+            }
+            if (execution.status === 'success') {
+                return await fetchNotifyService({ title: '任务执行成功' })
+            }
+            return await fetchNotifyService({ type: 'error', title: '任务执行失败', message: execution.error ?? '请在执行日志中查看原因' })
+        }
+
+        /**手动触发任务：服务端最多等待数秒，未结束时转为轮询执行记录**/
         async function fetchDatetaskTrigger(node: Omix) {
             return await fetchDialogService({
                 title: '提示',
@@ -84,18 +111,16 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            const response = await Service.httpBaseSkylineTriggerDatetask({ taskId: node.taskId })
-                            await fetchRefresh()
+                            const { data } = await Service.httpBaseSkylineTriggerDatetask({ taskId: node.taskId })
                             await done({ visible: false })
-                            const result = response.data?.result
-                            if (result?.skipped) {
-                                return await fetchNotifyService({
-                                    type: 'warning',
-                                    title: '任务未执行',
-                                    message: result.reason ?? '任务被跳过'
-                                })
+                            if (data.finished) {
+                                await fetchRefresh()
+                                return await fetchDatetaskExecutionNotify(data.execution)
                             }
-                            return await fetchNotifyService({ title: '任务执行成功' })
+                            await fetchNotifyService({ type: 'info', title: '任务已提交执行', message: '正在等待执行结果' })
+                            const execution = await fetchDatetaskExecutionWait(data.executionId)
+                            await fetchRefresh()
+                            return await fetchDatetaskExecutionNotify(execution)
                         } catch (err) {
                             await done({ loading: false })
                             return await fetchNotifyService({ type: 'error', title: err.message })
@@ -128,6 +153,16 @@ export default defineComponent({
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
+                    <common-database-search-column prop="module" label="所属模块">
+                        <form-base-select
+                            clearable
+                            placeholder="请选择所属模块"
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.moduleOptions}
+                            v-model:value={formState.value.module}
+                            on-change:value={fetchRefresh}
+                        ></form-base-select>
+                    </common-database-search-column>
                     <common-database-search-column prop="status" label="任务状态">
                         <form-base-select
                             clearable
@@ -153,7 +188,10 @@ export default defineComponent({
                     <common-base-columns-template class="gap-[var(--common-limit-width)]" type="auto-fill" number={320}>
                         {state.dataSource.map((item: Omix) => (
                             <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-10">
-                                <n-h4 class="m-be-0">{item.taskName}</n-h4>
+                                <div class="flex items-center justify-between gap-x-10 overflow-hidden">
+                                    <n-h4 class="m-be-0">{item.taskName}</n-h4>
+                                    <common-base-chunk bordered value={item.module} items={chunkOptions.value.moduleOptions}></common-base-chunk>
+                                </div>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
                                     {item.handler}
                                 </common-base-columns-wrapper>
@@ -184,7 +222,7 @@ export default defineComponent({
                                     ></common-base-chunk>
                                     <common-base-element abstract class="flex items-center gap-x-12 overflow-hidden">
                                         <common-base-authorize key-name={state.actions[0].key}>
-                                            {['running', 'wait'].includes(item.status) ? (
+                                            {item.status === 'enable' ? (
                                                 <common-base-button
                                                     class="p-inline-6"
                                                     title="停用任务"
