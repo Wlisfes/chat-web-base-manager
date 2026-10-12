@@ -36,6 +36,15 @@ export function httpBaseSkylineChunkOptionColumn(data: Chunk.ChunkOptionColumnRe
     })
 }
 
+/**获取枚举字典父级树结构**/
+export function httpBaseSkylineChunkTreeStructure(params: Chunk.ChunkTreeStructureRequest) {
+    return request<Chunk.ChunkTreeNode[]>({
+        url: '/api/skyline/deploy/chunk/tree/structure',
+        method: 'GET',
+        params
+    })
+}
+
 /**获取枚举字典详情**/
 export function httpBaseSkylineChunkResolver(params: Chunk.ChunkKeyRequest) {
     return request<Chunk.ChunkItem>({
