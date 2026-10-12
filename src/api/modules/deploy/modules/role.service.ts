@@ -1,88 +1,88 @@
 import { request } from '@/utils'
 
 /**获取角色状态、数据范围类型和数据范围状态枚举**/
-export function httpBaseAccountRoleEnums() {
+export function httpBaseSkylineRoleEnums() {
     return request({
-        url: '/api/account/role/enums',
+        url: '/api/skyline/deploy/role/enums',
         method: 'GET'
     })
 }
 
 /**获取通用角色列表和岗位角色树**/
-export function httpBaseAccountRoleConfiger() {
+export function httpBaseSkylineRoleConfiger() {
     return request({
-        url: '/api/account/role/configer',
+        url: '/api/skyline/deploy/role/configer',
         method: 'GET'
     })
 }
 
 /**获取角色、菜单和数据范围详情**/
-export function httpBaseAccountRoleResolver(params: Omix) {
+export function httpBaseSkylineRoleResolver(params: Omix) {
     return request({
-        url: '/api/account/role/resolve',
+        url: '/api/skyline/deploy/role/resolve',
         method: 'GET',
         params
     })
 }
 
 /**创建角色**/
-export function httpBaseAccountCreateRole(data: Omix) {
+export function httpBaseSkylineCreateRole(data: Omix) {
     return request({
-        url: '/api/account/role/create',
+        url: '/api/skyline/deploy/role/create',
         method: 'POST',
         data
     })
 }
 
 /**更新角色**/
-export function httpBaseAccountUpdateRole(data: Omix) {
+export function httpBaseSkylineUpdateRole(data: Omix) {
     return request({
-        url: '/api/account/role/update',
+        url: '/api/skyline/deploy/role/update',
         method: 'POST',
         data
     })
 }
 
 /**批量更新角色排序**/
-export function httpBaseAccountUpdateRoleSort(data: Omix) {
+export function httpBaseSkylineUpdateRoleSort(data: Omix) {
     return request({
-        url: '/api/account/role/sort/update',
+        url: '/api/skyline/deploy/role/sort/update',
         method: 'POST',
         data
     })
 }
 
 /**删除未分配用户的非内置角色**/
-export function httpBaseAccountDeleteRole(data: Omix) {
+export function httpBaseSkylineDeleteRole(data: Omix) {
     return request({
-        url: '/api/account/role/delete',
+        url: '/api/skyline/deploy/role/delete',
         method: 'POST',
         data
     })
 }
 
 /**批量关联角色用户**/
-export function httpBaseAccountRoleLinkUser(data: Omix) {
+export function httpBaseSkylineRoleLinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/link/user',
+        url: '/api/skyline/deploy/role/link/user',
         method: 'POST',
         data
     })
 }
 
 /**批量移除角色用户**/
-export function httpBaseAccountRoleUnlinkUser(data: Omix) {
+export function httpBaseSkylineRoleUnlinkUser(data: Omix) {
     return request({
-        url: '/api/account/role/unlink/user',
+        url: '/api/skyline/deploy/role/unlink/user',
         method: 'POST',
         data
     })
 }
 
 /**替换角色的全部菜单和按钮权限**/
-export function httpBaseAccountUpdateRoleSheet(data: Omix) {
+export function httpBaseSkylineUpdateRoleSheet(data: Omix) {
     return request({
-        url: '/api/account/role/update/sheet',
+        url: '/api/skyline/deploy/role/update/sheet',
         method: 'POST',
         data
     })

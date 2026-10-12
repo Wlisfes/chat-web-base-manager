@@ -11,12 +11,12 @@ export default defineComponent({
     name: 'DeploySystemRole',
     setup(props, ctx) {
         /**菜单树数据**/
-        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseSkylineSheetTreeStructure(), {
             immediate: true,
             transform: fetchNormalizeTreeChildren
         })
         /**角色列表**/
-        const { faseNode, faseState, setState, fetchRefresh } = useBaseService(() => Service.httpBaseAccountRoleConfiger(), {
+        const { faseNode, faseState, setState, fetchRefresh } = useBaseService(() => Service.httpBaseSkylineRoleConfiger(), {
             callback: fetchReadyCallback,
             immediate: true,
             options: {
@@ -66,7 +66,7 @@ export default defineComponent({
                     keyId: item.keyId,
                     sort: (index + 1) * 10
                 }))
-                return await Service.httpBaseAccountUpdateRoleSort({ list }).then(async () => {
+                return await Service.httpBaseSkylineUpdateRoleSort({ list }).then(async () => {
                     return await fetchNotifyService({ title: '操作成功' })
                 })
             } catch (err) {
@@ -105,7 +105,7 @@ export default defineComponent({
                     async onSubmit(done: Function) {
                         return await done({ loading: true }).then(async () => {
                             try {
-                                await Service.httpBaseAccountDeleteRole({ keyId: node.keyId })
+                                await Service.httpBaseSkylineDeleteRole({ keyId: node.keyId })
                                 return await done({ visible: false }).then(async () => {
                                     await fetchNotifyService({ title: '操作成功' })
                                     return await fetchRefresh()

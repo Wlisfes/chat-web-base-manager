@@ -10,17 +10,17 @@ export default defineComponent({
     name: 'DeploySystemUser',
     setup(props, ctx) {
         /**部门树结构**/
-        const deptOptions = useSelectService(e => Service.httpBaseAccountOrganizationTreeStructure(), {
+        const deptOptions = useSelectService(e => Service.httpBaseSkylineOrganizationTreeStructure(), {
             immediate: true,
             transform: fetchNormalizeTreeChildren
         })
         /**账号静态枚举**/
-        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineUserEnums(), {
             immediate: true
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            (base, payload) => Service.httpBaseSkylineColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:user',
                 actions: [
@@ -78,7 +78,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountUpdateUser({ uid: node.uid, status })
+                            await Service.httpBaseSkylineUpdateUser({ uid: node.uid, status })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()
@@ -102,7 +102,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountResetUserPassword({ uid: node.uid, password: '123456' })
+                            await Service.httpBaseSkylineResetUserPassword({ uid: node.uid, password: '123456' })
                             return await done({ visible: false }).then(async () => {
                                 return await fetchNotifyService({ title: '密码重置成功' })
                             })

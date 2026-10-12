@@ -14,7 +14,7 @@ export default defineComponent({
     setup(props, ctx) {
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRequest, fetchRestore, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseAccountColumnUser({ ...payload, page: base.page, size: base.size }),
+            (base, payload) => Service.httpBaseSkylineColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:role:user',
                 immediate: true,
@@ -52,7 +52,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountRoleUnlinkUser({ keyId: props.faseOptions.keyId, uids: [node.uid] })
+                            await Service.httpBaseSkylineRoleUnlinkUser({ keyId: props.faseOptions.keyId, uids: [node.uid] })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh({ page: 1 })
