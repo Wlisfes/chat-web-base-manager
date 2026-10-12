@@ -16,12 +16,12 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure({ keyId: 1124100 }), {
+        const deptOptions = useSelectService(() => Service.httpBaseSkylineOrganizationTreeStructure({ keyId: 1124100 }), {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**账号下拉列表**/
-        const accountOptions = useSelectService(Service.httpBaseAccountSelectUser, {
+        const accountOptions = useSelectService(Service.httpBaseSkylineSelectUser, {
             immediate: false
         })
         /**表单实例**/
@@ -43,7 +43,7 @@ export default defineComponent({
             if (isEmpty(keyId)) {
                 return await setForm({ uids: [] })
             }
-            return await Service.httpBaseAccountOrganizationColumnUser({
+            return await Service.httpBaseSkylineOrganizationColumnUser({
                 keyId: keyId
             }).then(async ({ data }) => {
                 return await setForm({ uids: (data ?? []).map((item: Omix) => item.uid) })
@@ -78,7 +78,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    return await Service.httpBaseAccountUpdateOrganizationUser({
+                    return await Service.httpBaseSkylineUpdateOrganizationUser({
                         organizationKeyId: formState.value.organizationKeyId,
                         uids: formState.value.uids
                     }).then(async () => {

@@ -7,7 +7,7 @@ import * as Service from '@/api/instance.service'
 export default defineComponent({
     name: 'DeploySystemDepartment',
     setup(props) {
-        const organOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeUser(), {
+        const organOptions = useSelectService(() => Service.httpBaseSkylineOrganizationTreeUser(), {
             immediate: false,
             transform: fetchOrganizationChartNodes
         })

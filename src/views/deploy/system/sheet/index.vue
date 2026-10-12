@@ -11,11 +11,11 @@ export default defineComponent({
     name: 'DeploySystemSheet',
     setup(props, ctx) {
         /**菜单静态枚举**/
-        const { chunkOptions } = useChunkService(e => Service.httpBaseAccountSheetEnums(), {
+        const { chunkOptions } = useChunkService(e => Service.httpBaseSkylineSheetEnums(), {
             immediate: true
         })
         /**菜单树结构**/
-        const sheetOptions = useSelectService(e => Service.httpBaseAccountSheetTreeStructure(), {
+        const sheetOptions = useSelectService(e => Service.httpBaseSkylineSheetTreeStructure(), {
             transform: fetchNormalizeTreeChildren,
             immediate: true,
             options: {
@@ -25,7 +25,7 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, setForm, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseAccountColumnSheet({ ...payload, page: base.page, size: base.size }),
+            (base, payload) => Service.httpBaseSkylineColumnSheet({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:deploy:system:sheet',
                 actions: [
@@ -116,7 +116,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseAccountDeleteSheet({ keyId: node.keyId })
+                            await Service.httpBaseSkylineDeleteSheet({ keyId: node.keyId })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await Promise.all([sheetOptions.fetchRequest(), fetchRefresh()])

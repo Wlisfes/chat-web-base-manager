@@ -1,5 +1,13 @@
 # 部署变更记录
 
+## 2026-10-12：系统管理接口切换到 Skyline 服务
+
+- 影响机器：`chat-home-server`。
+- 变更内容：账号、菜单、角色、组织架构页面接口由 `/api/account/{user,sheet,role,dept}/**` 切换为 `/api/skyline/deploy/{user,sheet,role,organization}/**`，前端请求函数统一改名为 `httpBaseSkyline*`；请求与响应结构不变。
+- 机器侧操作：无，需确保 Gateway `/api/skyline` 路由可用。
+- 验证命令：`yarn build`；部署后登录管理端，依次打开账号、菜单、角色、组织架构页面，确认列表与树结构正常加载。
+- 回滚方法：恢复上一完整 Git SHA 镜像（Account 服务下线前可回滚）。
+
 ## 2026-09-18：修复 CI 安装依赖被 yarn install 生命周期脚本拦住
 
 - 影响机器：云服务器 `47.119.21.228`。

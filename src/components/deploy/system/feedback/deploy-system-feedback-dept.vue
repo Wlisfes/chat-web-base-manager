@@ -18,16 +18,16 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(Service.httpBaseAccountOrganizationTreeStructure, {
+        const deptOptions = useSelectService(Service.httpBaseSkylineOrganizationTreeStructure, {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**负责人账号列表**/
-        const leaderOptions = useSelectService(Service.httpBaseAccountSelectUser, {
+        const leaderOptions = useSelectService(Service.httpBaseSkylineSelectUser, {
             immediate: false
         })
         /**后端部门枚举**/
-        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountOrganizationEnums(), {
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseSkylineOrganizationEnums(), {
             immediate: false
         })
         /**表单实例**/
@@ -66,7 +66,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 })
             } else {
-                taskNames.unshift(Service.httpBaseAccountOrganizationResolver({ keyId: props.node.keyId }))
+                taskNames.unshift(Service.httpBaseSkylineOrganizationResolver({ keyId: props.node.keyId }))
             }
             return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
@@ -89,9 +89,9 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseAccountCreateOrganization(formState.value)
+                        await Service.httpBaseSkylineCreateOrganization(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseAccountUpdateOrganization({
+                        await Service.httpBaseSkylineUpdateOrganization({
                             ...formState.value,
                             keyId: props.node.keyId
                         })

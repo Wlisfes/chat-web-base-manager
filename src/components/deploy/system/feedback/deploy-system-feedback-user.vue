@@ -18,12 +18,12 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**部门树结构**/
-        const deptOptions = useSelectService(() => Service.httpBaseAccountOrganizationTreeStructure({ keyId: 1124100 }), {
+        const deptOptions = useSelectService(() => Service.httpBaseSkylineOrganizationTreeStructure({ keyId: 1124100 }), {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**账号静态枚举**/
-        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountUserEnums(), {
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseSkylineUserEnums(), {
             immediate: false
         })
         /**岗位选项、职级选项字典枚举**/
@@ -95,7 +95,7 @@ export default defineComponent({
                     })
                 })
             } else {
-                taskNames.unshift(Service.httpBaseAccountUserResolver({ uid: props.node.uid }))
+                taskNames.unshift(Service.httpBaseSkylineUserResolver({ uid: props.node.uid }))
             }
             return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
@@ -118,11 +118,11 @@ export default defineComponent({
                 }
                 try {
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseAccountCreateUser(formState.value)
+                        await Service.httpBaseSkylineCreateUser(formState.value)
                     } else if (['UPDATE'].includes(props.command)) {
                         const uid = props.node.uid
-                        await Service.httpBaseAccountUpdateUser({ ...formState.value, uid })
-                        await Service.httpBaseAccountUpdateUserOrganization({ ...formState.value, uid })
+                        await Service.httpBaseSkylineUpdateUser({ ...formState.value, uid })
+                        await Service.httpBaseSkylineUpdateUserOrganization({ ...formState.value, uid })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })

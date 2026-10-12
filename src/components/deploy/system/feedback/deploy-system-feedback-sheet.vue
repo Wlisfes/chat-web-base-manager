@@ -18,12 +18,12 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**菜单资源树结构表**/
-        const sheetOptions = useSelectService(() => Service.httpBaseAccountSheetTreeStructure(), {
+        const sheetOptions = useSelectService(() => Service.httpBaseSkylineSheetTreeStructure(), {
             transform: fetchNormalizeTreeChildren,
             immediate: false
         })
         /**菜单静态枚举**/
-        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseAccountSheetEnums(), {
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseSkylineSheetEnums(), {
             immediate: false
         })
         /**表单实例**/
@@ -73,7 +73,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 }
                 try {
-                    return await Service.httpBaseAccountSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
+                    return await Service.httpBaseSkylineSheetResolver({ keyId: props.node.keyId }).then(async ({ data }) => {
                         return await setForm({ ...fetchReste(data), parentKeyId: data.parentKeyId }).then(async () => {
                             return await setState({ initialize: false })
                         })
@@ -94,15 +94,15 @@ export default defineComponent({
                 try {
                     if (['menu', 'directory'].includes(formState.value.type)) {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseAccountCreateSheet(formState.value)
+                            await Service.httpBaseSkylineCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseSkylineUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     } else {
                         if (['CREATE', 'CLONE'].includes(props.command)) {
-                            await Service.httpBaseAccountCreateSheet(formState.value)
+                            await Service.httpBaseSkylineCreateSheet(formState.value)
                         } else if (['UPDATE'].includes(props.command)) {
-                            await Service.httpBaseAccountUpdateSheet({ ...formState.value, keyId: props.node.keyId })
+                            await Service.httpBaseSkylineUpdateSheet({ ...formState.value, keyId: props.node.keyId })
                         }
                     }
                     return await setState({ visible: false }).then(async () => {

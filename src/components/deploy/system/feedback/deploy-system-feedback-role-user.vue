@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**账号下拉列表**/
-        const accountOptions = useSelectService(() => Service.httpBaseAccountSelectUser(), {
+        const accountOptions = useSelectService(() => Service.httpBaseSkylineSelectUser(), {
             immediate: false
         })
         /**表单实例**/
@@ -41,7 +41,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Service.httpBaseAccountRoleLinkUser({ keyId: props.roleId, uids: formState.value.uids })
+                    await Service.httpBaseSkylineRoleLinkUser({ keyId: props.roleId, uids: formState.value.uids })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: '操作成功' })

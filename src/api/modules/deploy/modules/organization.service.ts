@@ -1,80 +1,80 @@
 import { request } from '@/utils'
 
 /**创建组织节点**/
-export function httpBaseAccountCreateOrganization(data: Omix) {
+export function httpBaseSkylineCreateOrganization(data: Omix) {
     return request({
-        url: '/api/account/dept/create',
+        url: '/api/skyline/deploy/organization/create',
         method: 'POST',
         data
     })
 }
 
 /**更新或移动组织节点**/
-export function httpBaseAccountUpdateOrganization(data: Omix) {
+export function httpBaseSkylineUpdateOrganization(data: Omix) {
     return request({
-        url: '/api/account/dept/update',
+        url: '/api/skyline/deploy/organization/update',
         method: 'POST',
         data
     })
 }
 
 /**获取组织详情**/
-export function httpBaseAccountOrganizationResolver(params: Omix) {
+export function httpBaseSkylineOrganizationResolver(params: Omix) {
     return request({
-        url: '/api/account/dept/resolve',
+        url: '/api/skyline/deploy/organization/resolve',
         method: 'GET',
         params
     })
 }
 
 /**获取组织类型和状态枚举**/
-export function httpBaseAccountOrganizationEnums(params: Omix = {}) {
+export function httpBaseSkylineOrganizationEnums(params: Omix = {}) {
     return request({
-        url: '/api/account/dept/enums',
+        url: '/api/skyline/deploy/organization/enums',
         method: 'GET',
         params
     })
 }
 
 /**获取完整组织树**/
-export function httpBaseAccountOrganizationTreeStructure(params: Omix = {}) {
+export function httpBaseSkylineOrganizationTreeStructure(params: Omix = {}) {
     return request({
-        url: '/api/account/dept/tree/structure',
+        url: '/api/skyline/deploy/organization/tree/structure',
         method: 'GET',
         params
     })
 }
 
 /**获取带启用成员的完整组织树**/
-export function httpBaseAccountOrganizationTreeUser() {
+export function httpBaseSkylineOrganizationTreeUser() {
     return request({
-        url: '/api/account/dept/tree/user',
+        url: '/api/skyline/deploy/organization/tree/user',
         method: 'GET'
     })
 }
 
 /**删除没有下级、成员和权限引用的组织节点**/
-export function httpBaseAccountDeleteOrganization(data: Omix) {
+export function httpBaseSkylineDeleteOrganization(data: Omix) {
     return request({
-        url: '/api/account/dept/delete',
+        url: '/api/skyline/deploy/organization/delete',
         method: 'POST',
         data
     })
 }
 
 /**按组织主键获取该组织的直接启用成员**/
-export function httpBaseAccountOrganizationColumnUser(params: Omix) {
+export function httpBaseSkylineOrganizationColumnUser(params: Omix) {
     return request({
-        url: '/api/account/dept/column/user',
+        url: '/api/skyline/deploy/organization/column/user',
         method: 'GET',
         params
     })
 }
 
 /**按账号UID全集同步组织成员**/
-export function httpBaseAccountUpdateOrganizationUser(data: Omix) {
+export function httpBaseSkylineUpdateOrganizationUser(data: Omix) {
     return request({
-        url: '/api/account/dept/update/user',
+        url: '/api/skyline/deploy/organization/update/user',
         method: 'POST',
         data
     })
