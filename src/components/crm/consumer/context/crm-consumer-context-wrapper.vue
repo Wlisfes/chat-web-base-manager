@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, ref, computed, Fragment, PropType, onMounted } from 'vue'
+import { defineComponent, ref, computed, Fragment, PropType } from 'vue'
 import { useVModels, useIntersectionObserver } from '@vueuse/core'
 import { useState } from '@/hooks'
 
@@ -31,7 +31,7 @@ export default defineComponent({
         return () => (
             <Fragment>
                 <div ref={sentinel} class="h-0"></div>
-                <div class={{ 'sticky top-0 z-1': true, [state.stuck ? 'is-stuck' : 'p-inline-14 p-bs-14']: true }}>
+                <div class={{ 'sticky top-0 z-2': true, [state.stuck ? 'is-stuck' : 'p-inline-14 p-bs-14']: true }}>
                     <common-base-element
                         is-white
                         class={{ 'p-inline-14 p-bs-14': true, 'is-stuck p-block-14! common-skyline--bottom': state.stuck }}
@@ -41,7 +41,7 @@ export default defineComponent({
                                 <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
                             </div>
                             <div class="flex items-center">
-                                <n-button size="small">刷新 {state.stuck ? '1' : '0'}</n-button>
+                                <n-button size="small">刷新</n-button>
                             </div>
                         </div>
                     </common-base-element>

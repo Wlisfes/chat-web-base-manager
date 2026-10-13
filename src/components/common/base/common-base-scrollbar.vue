@@ -28,3 +28,11 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.common-base-scrollbar {
+    :deep(.n-scrollbar-rail__scrollbar) {
+        z-index: 99;
+    }
+}
+</style>
