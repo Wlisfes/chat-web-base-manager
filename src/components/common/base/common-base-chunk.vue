@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, PropType, CSSProperties } from 'vue'
-import { isEmpty, isCommonBaseChunkType, fetchChunkOption, fetchChunkType, fetchChunkColor, CommonBaseChunkType } from '@/utils'
+import { isEmpty, isCommonBaseChunkType, fetchChunkOption, fetchChunkOptionPath, fetchChunkType, fetchChunkColor } from '@/utils'
+import { type CommonBaseChunkType } from '@/utils'
 import { useProvider } from '@/hooks'
 
 export default defineComponent({
@@ -14,8 +15,12 @@ export default defineComponent({
         value: { type: [Number, String] },
         /**value为空时显示内容**/
         empty: { type: [Number, String], default: '-' },
-        /**枚举选项列表，按 value 匹配出 label 与 type**/
+        /**枚举选项列表，按 value 匹配出 label 与 type；支持 children 树形结构**/
         items: { type: Array as PropType<Array<Omix>>, default: () => [] },
+        /**树形枚举是否回显父级路径，开启后展示为“父级 / 子级”**/
+        showPath: { type: Boolean, default: false },
+        /**父级路径分隔符**/
+        separator: { type: String, default: ' / ' },
         /**颜色类型，Naive 主题色或自定义色板**/
         type: {
             type: String as PropType<CommonBaseChunkType>,
@@ -31,6 +36,10 @@ export default defineComponent({
         const chunkLabel = computed(() => {
             if (isEmpty(props.value)) {
                 return props.empty
+            }
+            if (props.showPath) {
+                const path = fetchChunkOptionPath(props.value, props.items)
+                return path.length > 0 ? path.map(item => item.label).join(props.separator) : props.value
             }
             return fetchChunkOption(props.value, props.items)?.label ?? props.value ?? '-'
         })
