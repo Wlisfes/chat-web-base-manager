@@ -41,14 +41,10 @@ export default defineComponent({
                     class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                 >
                     <n-tab-pane name="basic" display-directive="show" tab={() => <common-skeleton-block>详情信息</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
+                        <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
                     </n-tab-pane>
                     <n-tab-pane name="sms" display-directive="show" tab={() => <common-skeleton-block>短信应用</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
+                        <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
                     </n-tab-pane>
                     <n-tab-pane name="mail" display-directive="show" tab={() => <common-skeleton-block>邮件应用</common-skeleton-block>}>
                         <common-base-scrollbar>

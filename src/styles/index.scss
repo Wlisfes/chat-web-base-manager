@@ -36,12 +36,14 @@ body,
             user-select: none;
         }
     }
-    > .n-tabs-pane-wrapper,
-    > .n-tabs-pane-wrapper > .n-tab-pane {
+    > .n-tabs-pane-wrapper {
         position: relative;
-        flex-direction: column;
-        display: flex;
+        display: grid;
         flex: 1;
+        padding: 0;
+    }
+    > .n-tabs-pane-wrapper > .n-tab-pane {
+        grid-area: 1 / 1;
         padding: 0;
     }
     &.inset-bar > .n-tabs-nav {

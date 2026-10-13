@@ -17,7 +17,7 @@ export default defineComponent({
                 v-slots={{ render: slots.default }}
             >
                 <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
-                    {Array.from({ length: 10 }, (_, index) => (
+                    {Array.from({ length: 20 }, (_, index) => (
                         <n-card content-class="flex flex-col p-0! overflow-hidden">
                             <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
                                 <common-skeleton-block>
