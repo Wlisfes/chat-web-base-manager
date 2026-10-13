@@ -1,6 +1,7 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
-import { useVModels } from '@vueuse/core'
+import { defineComponent, ref, computed, Fragment, PropType, onMounted } from 'vue'
+import { useVModels, useIntersectionObserver } from '@vueuse/core'
+import { useState } from '@/hooks'
 
 export default defineComponent({
     name: 'CrmConsumerContextWrapper',
@@ -15,57 +16,52 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
+        const { state, setState } = useState({ stuck: false })
+        /**吸顶哨兵节点**/
+        const sentinel = ref<HTMLElement>()
+        /**获取滚动节点**/
+        const scrollRoot = computed(() => {
+            return sentinel.value?.closest<HTMLElement>('.n-scrollbar-container')
+        })
+        useIntersectionObserver(sentinel, fetchSentinelObserver, { root: scrollRoot })
+        async function fetchSentinelObserver([entry]: Array<Omix>) {
+            return await setState({ stuck: !entry.isIntersecting })
+        }
 
         return () => (
-            <n-card class="crm-consumer-context-wrapper flex flex-col" content-class="p-16! flex flex-col gap-10">
-                <div class="flex flex-col overflow-hidden">
-                    <div class="flex justify-between gap-20 overflow-hidden">
-                        <div class="flex flex-col overflow-hidden">
-                            {/* <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                                <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
-                            </div> */}
-                            <div class="flex items-center p-block-8 gap-10 overflow-hidden">
+            <Fragment>
+                <div ref={sentinel} class="h-0"></div>
+                <div class={{ 'sticky top-0 z-1': true, [state.stuck ? 'is-stuck' : 'p-inline-14 p-bs-14']: true }}>
+                    <common-base-element
+                        is-white
+                        class={{ 'p-inline-14 p-bs-14': true, 'is-stuck p-block-14! common-skyline--bottom': state.stuck }}
+                    >
+                        <div class="flex justify-between gap-x-20">
+                            <div class="flex items-center gap-10 overflow-hidden">
                                 <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
                             </div>
+                            <div class="flex items-center">
+                                <n-button size="small">刷新 {state.stuck ? '1' : '0'}</n-button>
+                            </div>
                         </div>
-                        <div class="flex items-center">
-                            <n-button>刷新</n-button>
-                        </div>
-                    </div>
-                    <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
+                    </common-base-element>
+                </div>
+                <common-base-element is-white class="flex flex-col gap-y-10 m-inline-14 p-inline-14 p-be-14 p-bs-10">
+                    <div class="flex gap-x-20 text-12 line-height-16 overflow-hidden">
                         <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
                         <n-text depth="3">
                             <span>归属人：</span>
                             <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
                         </n-text>
                     </div>
-                </div>
-                <common-business-progressbar
-                    initialize={props.initialize}
-                    stage={faseNode.value.stage}
-                    items={props.chunkOptions.stageOptions}
-                ></common-business-progressbar>
-            </n-card>
+                    <common-business-progressbar
+                        initialize={props.initialize}
+                        stage={faseNode.value.stage}
+                        items={props.chunkOptions.stageOptions}
+                    ></common-business-progressbar>
+                </common-base-element>
+            </Fragment>
         )
     }
 })
 </script>
-
-<style lang="scss" scoped>
-.crm-consumer-context-progressbar {
-    position: relative;
-    // .common-block {
-    //     position: relative;
-    //     &:first-child {
-    //         margin-inline-start: 0;
-    //         clip-path: polygon(0% 0%, 93% 0%, 100% 50%, 93% 100%, 0% 100%);
-    //     }
-    //     &:last-child {
-    //         clip-path: polygon(100% 0, 100% 100%, 0% 100%, 7% 50%, 0% 0%);
-    //     }
-    //     &:not(:first-child):not(:last-child) {
-    //         clip-path: polygon(93% 0%, 100% 50%, 93% 100%, 0% 100%, 7% 50%, 0% 0%);
-    //     }
-    // }
-}
-</style>
