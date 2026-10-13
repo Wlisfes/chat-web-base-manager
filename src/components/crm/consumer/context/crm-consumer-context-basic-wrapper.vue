@@ -112,7 +112,7 @@ export default defineComponent({
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="注册来源：">
-                            <common-base-chunk value={faseNode.value.source} items={props.sourceOptions}></common-base-chunk>
+                            <common-base-chunk show-path value={faseNode.value.source} items={props.sourceOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="付款模式：">
                             <common-base-chunk value={faseNode.value.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>

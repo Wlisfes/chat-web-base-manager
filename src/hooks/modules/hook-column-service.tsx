@@ -194,6 +194,9 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
     const instState = computed(() => {
         const keyNames = state.actions.map((item: Omix) => item.key)
         return {
+            /**超级管理员**/
+            superAdmin: superAdmin.value,
+            /**操作列是否显示**/
             showCommand: superAdmin.value || (keyNames.length > 0 && keyNames.some((code: string) => sheetOptions.value.includes(code))),
             /**单选按钮禁用**/
             isSingle: state.select.length !== 1,

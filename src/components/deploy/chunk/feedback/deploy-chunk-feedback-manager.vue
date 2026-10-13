@@ -38,13 +38,8 @@ export default defineComponent({
                     status: undefined
                 },
                 columns: [
-                    {
-                        type: 'expand',
-                        expandable: (row: Omix) => (row.items ?? []).length > 0,
-                        renderExpand: rowData => <deploy-chunk-common-block></deploy-chunk-common-block>
-                    },
-                    { title: 'ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '枚举名称', key: 'name', minWidth: 120, disabled: true },
+                    { title: 'ID', key: 'keyId', width: 160, check: false },
+                    { title: '枚举名称', key: 'name', minWidth: 200, disabled: true },
                     { title: '枚举值', key: 'value', minWidth: 120 },
                     { title: '排序号', key: 'sort', width: 100 },
                     { title: '状态', key: 'status', width: 100 },
@@ -58,6 +53,7 @@ export default defineComponent({
 
         /**新增枚举**/
         async function fetchCreateDeployChunkResolver() {
+            console.log(instState.value.superAdmin)
             return feedback.fetchDeployChunkResolver({
                 command: 'CREATE',
                 title: '新增',
@@ -156,6 +152,7 @@ export default defineComponent({
                 <common-database-table
                     class="p-inline-0! p-block-0!"
                     show-command={instState.value.showCommand}
+                    pagination={['select'].includes(props.node.kind)}
                     bordered={false}
                     limit={state.limit}
                     total={state.total}
@@ -187,7 +184,7 @@ export default defineComponent({
                                         text
                                         title="编辑"
                                         type="info"
-                                        disabled={!data.allowUpdate}
+                                        disabled={instState.value.superAdmin ? false : !data.allowUpdate}
                                         onClick={(e: MouseEvent) => fetchUpdateDeployChunkResolver(data)}
                                     >
                                         编辑
@@ -198,7 +195,7 @@ export default defineComponent({
                                         text
                                         title="删除"
                                         type="error"
-                                        disabled={!data.allowDelete}
+                                        disabled={instState.value.superAdmin ? false : !data.allowDelete}
                                         onClick={(e: MouseEvent) => fetchDeleteDeployChunk(data)}
                                     >
                                         删除

@@ -37,6 +37,22 @@ export function isNaiveChunkType(type: unknown): type is NaiveChunkType {
     return (NAIVE_CHUNK_TYPES as readonly unknown[]).includes(type)
 }
 
+/**是否为自定义色板类型。*/
+export function isCustomChunkType(type: unknown): type is CustomChunkType {
+    return typeof type === 'string' && Object.prototype.hasOwnProperty.call(CUSTOM_CHUNK_COLORS, type)
+}
+
+/**Naive UI 按钮原生 type；tertiary 为按钮特有的弱化类型。*/
+export const NAIVE_BUTTON_TYPES = ['default', 'tertiary', ...NAIVE_CHUNK_TYPES] as const
+export type NaiveButtonType = (typeof NAIVE_BUTTON_TYPES)[number]
+/**通用按钮颜色类型：Naive 原生 type 加自定义色板（与 common-base-chunk 共用色板）。*/
+export type CommonBaseButtonType = NaiveButtonType | CustomChunkType
+
+/**是否为通用按钮颜色类型。*/
+export function isCommonBaseButtonType(type: unknown): type is CommonBaseButtonType {
+    return (NAIVE_BUTTON_TYPES as readonly unknown[]).includes(type) || isCustomChunkType(type)
+}
+
 /**是否为通用颜色类型。*/
 export function isCommonBaseChunkType(type: unknown): type is CommonBaseChunkType {
     return (COMMON_BASE_CHUNK_TYPES as readonly unknown[]).includes(type)
@@ -47,7 +63,40 @@ export function fetchChunkOption(value: unknown, items: Array<Omix> = []): Omix 
     if (value === undefined || value === null || value === '') {
         return undefined
     }
-    return items.find(item => String(item.value) === String(value))
+    // 枚举选项可能是树形结构（下级挂在 children 中），按深度优先遍历所有层级匹配。
+    const target = String(value)
+    for (const item of items) {
+        if (String(item.value) === target) {
+            return item
+        }
+        if (Array.isArray(item.children) && item.children.length > 0) {
+            const node = fetchChunkOption(value, item.children)
+            if (node) {
+                return node
+            }
+        }
+    }
+    return undefined
+}
+
+/**按 value 匹配树形枚举选项并返回从一级到命中节点的路径；未命中时返回空数组。*/
+export function fetchChunkOptionPath(value: unknown, items: Array<Omix> = []): Array<Omix> {
+    if (value === undefined || value === null || value === '') {
+        return []
+    }
+    const target = String(value)
+    for (const item of items) {
+        if (String(item.value) === target) {
+            return [item]
+        }
+        if (Array.isArray(item.children) && item.children.length > 0) {
+            const path = fetchChunkOptionPath(value, item.children)
+            if (path.length > 0) {
+                return [item, ...path]
+            }
+        }
+    }
+    return []
 }
 
 /**解析颜色类型：优先使用枚举选项的 type，无效时回退到显式传入的 type。*/
