@@ -1,16 +1,27 @@
 <script lang="tsx">
-import { defineComponent, h } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineComponent, h, nextTick, ref, watch } from 'vue'
 import { useConfiger, useGlobal, useStore } from '@/store'
-import { isEmpty } from '@/utils'
+import { isEmpty, isNotEmpty } from '@/utils'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
     name: 'LayoutCommonSider',
 
     setup(props, ctx) {
+        const menuRef = ref()
         const router = useRouter()
         const configer = useConfiger()
         const { menuOptions } = useStore(useGlobal)
+
+        /**高亮菜单变化时展开其所在的父级菜单，保证从标签页或无菜单页面进入时左侧菜单同步展开**/
+        watch(() => [configer.router, menuOptions.value], fetchWatchRouter, { immediate: true })
+        async function fetchWatchRouter() {
+            return await nextTick().then(() => {
+                if (isNotEmpty(menuRef.value) && menuRef.value?.showOption) {
+                    return menuRef.value.showOption(configer.router)
+                }
+            })
+        }
 
         async function fetchSelecter(path: string, data: Omix) {
             return await router.push({ path })
@@ -23,6 +34,7 @@ export default defineComponent({
 
         return () => (
             <n-menu
+                ref={menuRef}
                 class="layout-common-sider select-none"
                 style={{ '--n-item-height': '36px' }}
                 label-field="name"
