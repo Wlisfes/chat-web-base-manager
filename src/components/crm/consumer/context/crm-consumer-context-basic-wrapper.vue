@@ -23,11 +23,6 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
-        /**联系方式类型枚举**/
-        // const { chunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
-        //     types: ['CHUNK_SYSTEM_COMMON_CONTACT_TYPE'],
-        //     immediate: true
-        // })
         /**联系人列表**/
         const { state, fetchRefresh, instOptions } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUserContact({ ...payload, page: base.page, size: base.size }),
@@ -96,6 +91,14 @@ export default defineComponent({
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前等级：">
                             {faseNode.value.level ?? '-'}
                         </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label-class={props.labelClass} label="客户来源：">
+                            <common-base-chunk
+                                show-path
+                                mode="text"
+                                value={faseNode.value.source}
+                                items={props.sourceOptions}
+                            ></common-base-chunk>
+                        </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前阶段：">
                             <common-base-chunk value={faseNode.value.stage} items={props.chunkOptions.stageOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
@@ -111,9 +114,7 @@ export default defineComponent({
                                 items={props.chunkOptions.authStatusOptions}
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
-                        <common-base-columns-wrapper label-class={props.labelClass} label="注册来源：">
-                            <common-base-chunk show-path value={faseNode.value.source} items={props.sourceOptions}></common-base-chunk>
-                        </common-base-columns-wrapper>
+
                         <common-base-columns-wrapper label-class={props.labelClass} label="付款模式：">
                             <common-base-chunk value={faseNode.value.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
