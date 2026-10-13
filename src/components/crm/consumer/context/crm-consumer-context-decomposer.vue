@@ -26,7 +26,34 @@ export default defineComponent({
 
         return () => (
             <crm-consumer-context-skeleton initialize={faseState.initialize}>
-                <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
+                <common-base-scrollbar class="absolute inset-0 overflow-hidden">
+                    <div class="flex flex-col m-inline-14 m-bs-14 p-inline-14 p-bs-14 bg-white sticky top-0 z-1 overflow-hidden">
+                        <div class="flex justify-between gap-x-20 overflow-hidden">
+                            <div class="flex items-center gap-10 overflow-hidden">
+                                <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
+                            </div>
+                            <div class="flex items-center">
+                                <n-button>刷新</n-button>
+                            </div>
+                        </div>
+                        <div class="flex gap-x-20 text-12 line-height-16 overflow-hidden">
+                            <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
+                            <n-text depth="3">
+                                <span>归属人：</span>
+                                <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
+                            </n-text>
+                        </div>
+                    </div>
+                    <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
+                        <crm-consumer-context-wrapper
+                            initialize={faseState.initialize}
+                            chunk-options={chunkOptions.value}
+                            v-model:faseNode={faseNode.value}
+                        ></crm-consumer-context-wrapper>
+                        <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
+                    </common-base-element>
+                </common-base-scrollbar>
+                {/* <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
                     <crm-consumer-context-wrapper
                         initialize={faseState.initialize}
                         chunk-options={chunkOptions.value}
@@ -66,7 +93,7 @@ export default defineComponent({
                             <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
                         </n-tab-pane>
                     </n-tabs>
-                </common-base-element>
+                </common-base-element> */}
             </crm-consumer-context-skeleton>
         )
     }

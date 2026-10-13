@@ -21,9 +21,9 @@ export default defineComponent({
                 <div class="flex flex-col overflow-hidden">
                     <div class="flex justify-between gap-20 overflow-hidden">
                         <div class="flex flex-col overflow-hidden">
-                            <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
+                            {/* <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
                                 <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
-                            </div>
+                            </div> */}
                             <div class="flex items-center p-block-8 gap-10 overflow-hidden">
                                 <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
                             </div>
@@ -33,6 +33,7 @@ export default defineComponent({
                         </div>
                     </div>
                     <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
+                        <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
                         <n-text depth="3">
                             <span>归属人：</span>
                             <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
