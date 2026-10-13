@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, KeepAlive } from 'vue'
-import { RouterView } from 'vue-router'
+import { defineComponent, h, KeepAlive } from 'vue'
 import { useConfiger, useGlobal, useStore } from '@/store'
+import { RouterView } from 'vue-router'
 
 export default defineComponent({
     name: 'BaseLayout',
@@ -40,8 +40,12 @@ export default defineComponent({
                             <n-element class="flex flex-col flex-1 relative transition-background-color transition-duration-300 bg-[var(--common-body-bg-color)]">
                                 <RouterView>
                                     {{
-                                        default: ({ Component }: Omix) => {
-                                            return <KeepAlive include={keepTabNemas.value}>{Component}</KeepAlive>
+                                        default: ({ Component, route }: Omix) => {
+                                            return (
+                                                <KeepAlive include={keepTabNemas.value}>
+                                                    {Component && h(Component, { key: route.fullPath })}
+                                                </KeepAlive>
+                                            )
                                         }
                                     }}
                                 </RouterView>
