@@ -31,8 +31,9 @@ export default defineComponent({
                     kind: undefined
                 },
                 columns: [
-                    { title: '分类名称', key: 'name', width: 200, disabled: true },
+                    { title: 'ID', key: 'keyId', width: 120, disabled: true },
                     { title: '字段类型', key: 'kind', width: 120, disabled: true },
+                    { title: '分类名称', key: 'name', width: 200, disabled: true },
                     { title: '枚举数量', key: 'chunkCount', align: 'center', width: 120, disabled: true },
                     { title: '备注', key: 'remark', minWidth: 220 },
                     { title: '创建人', key: 'createBy', width: 120 },
@@ -111,7 +112,7 @@ export default defineComponent({
                             </n-text>
                         ),
                         col_kind: (data: Omix) => {
-                            return <common-base-chunk bordered value={data.kind} items={chunkOptions.value.kindOptions}></common-base-chunk>
+                            return <common-base-chunk value={data.kind} items={chunkOptions.value.kindOptions}></common-base-chunk>
                         },
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
