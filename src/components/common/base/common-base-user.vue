@@ -5,6 +5,8 @@ import { isNotEmpty } from '@/utils'
 export default defineComponent({
     name: 'CommonBaseUser',
     props: {
+        /**前缀**/
+        prefix: { type: String, default: '' },
         /**渲染类型**/
         element: { type: String as PropType<'avatar' | 'text'>, default: 'text' },
         /**数据对象**/
@@ -14,7 +16,7 @@ export default defineComponent({
         return () => {
             if (['text'].includes(props.element)) {
                 if (isNotEmpty(props.data?.name) && isNotEmpty(props.data?.number)) {
-                    return <span>{`${props.data.name} ${props.data.number}`}</span>
+                    return <span>{`${props.prefix}${props.data.name} ${props.data.number}`}</span>
                 } else if (isNotEmpty(props.data?.name) && props.data?.uid == 0) {
                     return <span>{props.data.name}</span>
                 }

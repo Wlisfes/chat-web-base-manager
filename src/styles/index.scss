@@ -35,15 +35,20 @@ body,
         .n-tabs-tab__label {
             user-select: none;
         }
+        .v-x-scroll {
+            overflow-y: hidden;
+        }
+        .n-tabs-bar {
+            bottom: 0px;
+            height: 3px;
+        }
     }
+    > .n-tabs-pane-wrapper > .n-tab-pane,
     > .n-tabs-pane-wrapper {
         position: relative;
-        display: grid;
+        display: flex;
+        flex-direction: column;
         flex: 1;
-        padding: 0;
-    }
-    > .n-tabs-pane-wrapper > .n-tab-pane {
-        grid-area: 1 / 1;
         padding: 0;
     }
     &.inset-bar > .n-tabs-nav {

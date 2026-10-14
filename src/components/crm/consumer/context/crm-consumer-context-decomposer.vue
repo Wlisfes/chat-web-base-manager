@@ -19,12 +19,53 @@ export default defineComponent({
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            options: { tabName: 'sms' }
+            options: { tabName: 'basic' }
         })
 
         return () => (
             <crm-consumer-context-skeleton initialize={faseState.initialize}>
-                <common-base-scrollbar class="absolute inset-0 overflow-hidden">
+                <common-base-element class="absolute inset-0 flex flex-col overflow-hidden">
+                    <crm-consumer-context-wrapper
+                        initialize={faseState.initialize}
+                        chunk-options={chunkOptions.value}
+                        chunk-state={chunkState}
+                        v-model:faseNode={faseNode.value}
+                    ></crm-consumer-context-wrapper>
+                    <n-tabs
+                        animated
+                        type="line"
+                        tabs-padding={16}
+                        v-model:value={faseState.tabName}
+                        class="common-base-tabser inset-absolute flex-1 overflow-hidden"
+                    >
+                        <n-tab-pane name="basic" tab="详情信息" display-directive="show:lazy">
+                            <crm-consumer-context-basic-wrapper
+                                chunk-state={chunkState}
+                                chunk-options={chunkOptions.value}
+                                v-model:faseNode={faseNode.value}
+                            ></crm-consumer-context-basic-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="sms" tab="短信应用" display-directive="show">
+                            <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="mail" tab="邮件应用" display-directive="show:lazy">
+                            <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="whatsapp" tab="社媒应用" display-directive="show:lazy">
+                            <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="deploy" tab="配置" display-directive="show:lazy">
+                            <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="attachment" tab="附件" display-directive="show:lazy">
+                            <crm-consumer-context-attachment-wrapper></crm-consumer-context-attachment-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane name="daily" tab="日志" display-directive="show:lazy">
+                            <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
+                        </n-tab-pane>
+                    </n-tabs>
+                </common-base-element>
+                {/* <common-base-scrollbar class="absolute inset-0 overflow-hidden">
                     <crm-consumer-context-wrapper
                         initialize={faseState.initialize}
                         chunk-options={chunkOptions.value}
@@ -65,7 +106,7 @@ export default defineComponent({
                             </n-tab-pane>
                         </n-tabs>
                     </common-base-element>
-                </common-base-scrollbar>
+                </common-base-scrollbar> */}
             </crm-consumer-context-skeleton>
         )
     }
