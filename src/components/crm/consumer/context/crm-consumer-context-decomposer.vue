@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
 import { useBaseService, useChunkService } from '@/hooks'
+import { Lightning, Chat, Document, Book } from '@vicons/carbon'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -19,7 +20,7 @@ export default defineComponent({
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            options: { tabName: 'basic' }
+            options: { tabName: 'sms' }
         })
 
         return () => (
@@ -38,14 +39,32 @@ export default defineComponent({
                         v-model:value={faseState.tabName}
                         class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     >
-                        <n-tab-pane name="basic" tab="详情信息" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="basic"
+                            display-directive="show:lazy"
+                            tab={
+                                <div class="flex items-center gap-x-5 overflow-hidden">
+                                    <n-icon size={18} component={<Document />} />
+                                    详情信息
+                                </div>
+                            }
+                        >
                             <crm-consumer-context-basic-wrapper
                                 chunk-state={chunkState}
                                 chunk-options={chunkOptions.value}
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="sms" tab="短信应用" display-directive="show">
+                        <n-tab-pane
+                            name="sms"
+                            display-directive="show"
+                            tab={
+                                <div class="flex items-center gap-x-5 overflow-hidden">
+                                    <n-icon size={18} component={<Chat />} />
+                                    短信应用
+                                </div>
+                            }
+                        >
                             <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
                         </n-tab-pane>
                         <n-tab-pane name="mail" tab="邮件应用" display-directive="show:lazy">

@@ -45,74 +45,76 @@ export default defineComponent({
 
         return () => (
             <crm-consumer-context-sms-skeleton initialize={state.initialize}>
-                <common-base-element is-white class="flex flex-col min-h-full overflow-hidden">
-                    <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
-                        {state.total > 0 && (
-                            <Fragment>
-                                {state.dataSource.map((item: Omix) => (
-                                    <n-card key={item.keyId} content-class="flex flex-col p-0! overflow-hidden">
-                                        <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
-                                            <common-base-alert-wrapper
-                                                class="p-10"
-                                                type="info"
-                                                value={item.type}
-                                                items={chunkOptions.value.typeOptions}
-                                            >
-                                                <n-icon size={28} color="var(--n-icon-color)">
-                                                    {h(SMS_APP_ICONS[item.type] ?? Chat)}
-                                                </n-icon>
-                                            </common-base-alert-wrapper>
-                                            <div class="flex flex-col flex-1 gap-y-2 overflow-hidden">
-                                                <n-text class="text-16 line-height-24" depth={1}>
-                                                    {item.appAlias ?? '-'}
-                                                </n-text>
-                                                <n-text class="line-height-22" depth={3}>
-                                                    应用别名
-                                                </n-text>
-                                            </div>
-                                            <div class="m-be-auto flex items-center">
-                                                <common-base-chunk
+                <common-base-scrollbar class="crm-consumer-context-sms-wrapper" content-class="p-inline-14 p-block-14">
+                    <common-base-element is-white class="flex flex-col min-h-full overflow-hidden">
+                        <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
+                            {state.total > 0 && (
+                                <Fragment>
+                                    {state.dataSource.map((item: Omix) => (
+                                        <n-card key={item.keyId} content-class="flex flex-col p-0! overflow-hidden">
+                                            <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
+                                                <common-base-alert-wrapper
+                                                    class="p-10"
+                                                    type="info"
                                                     value={item.type}
                                                     items={chunkOptions.value.typeOptions}
-                                                ></common-base-chunk>
+                                                >
+                                                    <n-icon size={28} color="var(--n-icon-color)">
+                                                        {h(SMS_APP_ICONS[item.type] ?? Chat)}
+                                                    </n-icon>
+                                                </common-base-alert-wrapper>
+                                                <div class="flex flex-col flex-1 gap-y-2 overflow-hidden">
+                                                    <n-text class="text-16 line-height-24" depth={1}>
+                                                        {item.appAlias ?? '-'}
+                                                    </n-text>
+                                                    <n-text class="line-height-22" depth={3}>
+                                                        应用别名
+                                                    </n-text>
+                                                </div>
+                                                <div class="m-be-auto flex items-center">
+                                                    <common-base-chunk
+                                                        value={item.type}
+                                                        items={chunkOptions.value.typeOptions}
+                                                    ></common-base-chunk>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用ID">
-                                                <n-ellipsis tooltip={false}>{item.appId ?? '-'}</n-ellipsis>
-                                            </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用名称">
-                                                <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
-                                            </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用状态">
-                                                <common-base-chunk
-                                                    value={item.status}
-                                                    items={chunkOptions.value.statusOptions}
-                                                ></common-base-chunk>
-                                            </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="备注">
-                                                <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
-                                            </common-base-columns-wrapper>
-                                        </div>
-                                    </n-card>
-                                ))}
-                            </Fragment>
-                        )}
-                        <n-card content-class="flex flex-col p-0! overflow-hidden">
-                            <common-base-alert-wrapper bordered={false} type="default">
-                                <div class="h-208 box-border flex flex-col p-14 items-center justify-center">
-                                    <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
-                                        <common-base-icon size={18}>
-                                            <local-nest-plus />
-                                        </common-base-icon>
-                                        <span class="text-16 p-is-5">添加应用</span>
-                                    </common-base-button>
-                                    <n-text depth="3">{`已添加应用数：${state.total}，还可添加应用数：${(faseNode.value.config?.smsAppLimit ?? 0) - state.total}`}</n-text>
-                                </div>
-                            </common-base-alert-wrapper>
-                        </n-card>
-                    </common-base-columns-template>
-                </common-base-element>
+                                            <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用ID">
+                                                    <n-ellipsis tooltip={false}>{item.appId ?? '-'}</n-ellipsis>
+                                                </common-base-columns-wrapper>
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用名称">
+                                                    <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
+                                                </common-base-columns-wrapper>
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用状态">
+                                                    <common-base-chunk
+                                                        value={item.status}
+                                                        items={chunkOptions.value.statusOptions}
+                                                    ></common-base-chunk>
+                                                </common-base-columns-wrapper>
+                                                <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="备注">
+                                                    <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
+                                                </common-base-columns-wrapper>
+                                            </div>
+                                        </n-card>
+                                    ))}
+                                </Fragment>
+                            )}
+                            <n-card content-class="flex flex-col p-0! overflow-hidden">
+                                <common-base-alert-wrapper bordered={false} type="default">
+                                    <div class="h-208 box-border flex flex-col p-14 items-center justify-center">
+                                        <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
+                                            <common-base-icon size={18}>
+                                                <local-nest-plus />
+                                            </common-base-icon>
+                                            <span class="text-16 p-is-5">添加应用</span>
+                                        </common-base-button>
+                                        <n-text depth="3">{`已添加应用数：${state.total}，还可添加应用数：${(faseNode.value.config?.smsAppLimit ?? 0) - state.total}`}</n-text>
+                                    </div>
+                                </common-base-alert-wrapper>
+                            </n-card>
+                        </common-base-columns-template>
+                    </common-base-element>
+                </common-base-scrollbar>
             </crm-consumer-context-sms-skeleton>
         )
     }
