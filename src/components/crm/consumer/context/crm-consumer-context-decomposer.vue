@@ -30,7 +30,7 @@ export default defineComponent({
                         chunk-options={chunkOptions.value}
                         v-model:faseNode={faseNode.value}
                     ></crm-consumer-context-wrapper>
-                    <common-base-element class="flex flex-col flex-1 gap-14 p-inline-14 p-block-14">
+                    <common-base-element class="flex flex-col flex-1 p-block-14 overflow-hidden">
                         <n-tabs
                             animated
                             type="line"
@@ -40,9 +40,8 @@ export default defineComponent({
                         >
                             <n-tab-pane name="basic" tab="详情信息" display-directive="show:lazy">
                                 <crm-consumer-context-basic-wrapper
-                                    chunk-options={chunkOptions.value}
                                     chunk-state={chunkState}
-                                    source-options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                                    chunk-options={chunkOptions.value}
                                     v-model:faseNode={faseNode.value}
                                 ></crm-consumer-context-basic-wrapper>
                             </n-tab-pane>

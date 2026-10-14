@@ -17,9 +17,7 @@ export default defineComponent({
         /**客户静态枚举**/
         chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**字典枚举**/
-        chunkState: { type: Object as PropType<Omix>, default: () => ({}) },
-        /**注册来源字典枚举**/
-        sourceOptions: { type: Array as PropType<Array<Omix>>, default: () => [] }
+        chunkState: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
@@ -92,7 +90,7 @@ export default defineComponent({
                                 show-path
                                 mode="text"
                                 value={faseNode.value.source}
-                                items={props.sourceOptions}
+                                items={props.chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前阶段：">
