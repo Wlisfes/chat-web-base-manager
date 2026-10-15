@@ -113,12 +113,16 @@ export default defineComponent({
                         </common-base-columns-wrapper>
                     </common-base-columns-template>
                 </common-base-element>
-                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
+                <common-base-element
+                    is-white
+                    is-border
+                    wrap="p-14 flex flex-col flex-1 overflow-hidden"
+                    class-name="flex flex-col flex-1 p-14 gap-y-10 overflow-hidden"
+                >
                     <common-business-header bar title="联系人信息"></common-business-header>
                     <common-database-table
                         bordered={false}
                         pagination={false}
-                        flex-height={false}
                         limit={state.limit}
                         total={state.total}
                         columns={state.columns}

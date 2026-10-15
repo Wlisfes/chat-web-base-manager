@@ -41,7 +41,12 @@ export default defineComponent({
                         ))}
                     </common-base-columns-template>
                 </common-base-element>
-                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10">
+                <common-base-element
+                    is-white
+                    is-border
+                    wrap="p-14 flex flex-col flex-1 overflow-hidden"
+                    class-name="flex flex-col flex-1 p-14 gap-y-10 overflow-hidden"
+                >
                     <n-skeleton sharp={false} height="24px" width="100px" />
                     <common-database-table
                         limit={0}
@@ -49,7 +54,6 @@ export default defineComponent({
                         loading={false}
                         bordered={false}
                         pagination={false}
-                        flex-height={false}
                         columns={columns.value}
                     />
                 </common-base-element>
