@@ -44,8 +44,12 @@ export default defineComponent({
         })
 
         return () => (
-            <n-element style={root.value} class="common-skeleton-block relative overflow-hidden box-border line-height-22">
-                <div class={`flex flex-col opacity-0 pointer-events-none box-border ${props.elementClass}`}>
+            <n-element class="common-skeleton-block relative overflow-hidden box-border line-height-22">
+                {/* n-element 渲染时会覆盖 style，高度和上下边距必须放在文档流节点上才会撑开单元格 */}
+                <div
+                    style={{ ...root.value, ...style.value }}
+                    class={`flex flex-col opacity-0 pointer-events-none box-border ${props.elementClass}`}
+                >
                     {slots.default && slots.default()}
                 </div>
                 <div

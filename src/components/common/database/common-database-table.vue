@@ -34,8 +34,6 @@ export default defineComponent({
         total: { type: Number, default: 0 },
         /**初始化状态；为 true 时按列配置渲染骨架屏，不展示真实单元格和表单**/
         initialize: { type: Boolean, default: false },
-        /**初始化骨架屏行数**/
-        cols: { type: Number, default: 20 },
         /**加载状态**/
         loading: { type: Boolean, default: true },
         /**开启分页**/
@@ -50,8 +48,12 @@ export default defineComponent({
         virtualScroll: { type: Boolean, default: false },
         /**开启横向虚拟滚动**/
         virtualScrollX: { type: Boolean, default: false },
+        /**初始化骨架屏行数**/
+        cols: { type: Number, default: 20 },
         /**虚拟滚动最小行高**/
         minRowHeight: { type: Number, default: 44 },
+        /**骨架屏单元格高度**/
+        colsRowHeight: { type: Number, default: 24 },
         /**被选中的行的对象列表**/
         select: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**表头配置自定义排版规则**/
@@ -116,11 +118,16 @@ export default defineComponent({
         })
         const SKELETON_WIDTHS = ['62%', '78%', '54%', '70%', '66%']
         const skeletonRows = computed(() => Array.from({ length: Math.max(props.cols, 0) }, (_, index) => ({ keyId: index + 1 })))
-        /**用列标题撑开骨架尺寸，文案本身不显示；列上的 render、表单不执行。*/
-        function fetchSkeleton(content: string, width?: string) {
+        /**
+         * 骨架条保持 22px。height 是单元格目标高度，先扣掉表格上下各 8px 内边距。
+         * 剩余高度大于 22 时，多出的部分平分到骨架块的上下边距，这样行高才会真正变化。
+         */
+        function fetchSkeleton(content: string, width?: string, rowHeight = 39) {
+            const contentHeight = Math.max(rowHeight - 16, 22)
+            const block = contentHeight > 22 ? (contentHeight - 22) / 2 : undefined
             return (
-                <common-skeleton-block>
-                    <span class="inline-block h-16" style={{ width }}>
+                <common-skeleton-block block={block}>
+                    <span class="inline-block h-22 line-height-22" style={{ width }}>
                         {content}
                     </span>
                 </common-skeleton-block>
@@ -143,7 +150,7 @@ export default defineComponent({
                         fixed: item.fixed,
                         className: item.className,
                         title: () => fetchSkeleton(title),
-                        render: () => fetchSkeleton(width ? title : '请选择', width)
+                        render: () => fetchSkeleton(width ? title : '请选择', width, props.colsRowHeight)
                     }
                 })
         })
