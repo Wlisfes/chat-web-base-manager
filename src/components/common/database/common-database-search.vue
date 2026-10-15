@@ -14,6 +14,8 @@ export default defineComponent({
         '-update:database',
         'update:loading',
         '-update:loading',
+        'update:initialize',
+        '-update:initialize',
         'update:formState',
         '-update:formState',
         '-submit',
@@ -36,6 +38,8 @@ export default defineComponent({
         bordered: { type: Boolean, default: true },
         /**开启边框**/
         loading: { type: Boolean, default: false },
+        /**初始化状态**/
+        initialize: { type: Boolean, default: false },
         /**表单对象**/
         formState: { type: Object as PropType<Omix>, default: () => ({}) },
         /**文案描述宽度**/
@@ -48,7 +52,7 @@ export default defineComponent({
         const formOptions = ref<Omix>({})
         const formRef = ref({} as Omix<FormInst>)
         const { width } = useElementSize(element)
-        const { when, loading, formState, database } = useVModels(props, emit)
+        const { when, loading, initialize, formState, database } = useVModels(props, emit)
         /**最小折叠高度**/
         const height = computed(() => fetchWherer(Boolean(props.line), 10 + 32 * props.line + (props.line - 1) * 10, 0))
         /**表单样式**/
@@ -145,10 +149,10 @@ export default defineComponent({
                                     <common-base-button
                                         class="min-w-80"
                                         type="primary"
-                                        secondary
                                         icon={Search}
-                                        loading={loading.value}
-                                        disabled={loading.value}
+                                        secondary={!initialize.value}
+                                        loading={initialize.value ? false : loading.value}
+                                        disabled={loading.value || initialize.value}
                                         onClick={(e: MouseEvent) => emit('-submit', formState.value)}
                                     >
                                         查询
