@@ -116,8 +116,8 @@ export default defineComponent({
                 <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="联系人信息"></common-business-header>
                     <common-database-table
-                        pagination={false}
                         bordered={false}
+                        pagination={false}
                         flex-height={false}
                         limit={state.limit}
                         total={state.total}

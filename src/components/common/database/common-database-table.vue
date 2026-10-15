@@ -32,8 +32,10 @@ export default defineComponent({
         size: { type: Number, default: 50 },
         /**总条数**/
         total: { type: Number, default: 0 },
-        /**初始化状态**/
-        initialize: { type: Boolean, default: true },
+        /**初始化状态；为 true 时按列配置渲染骨架屏，不展示真实单元格和表单**/
+        initialize: { type: Boolean, default: false },
+        /**初始化骨架屏行数**/
+        cols: { type: Number, default: 20 },
         /**加载状态**/
         loading: { type: Boolean, default: true },
         /**开启分页**/
@@ -111,6 +113,39 @@ export default defineComponent({
         /**复选框选中id列表**/
         const faseSelect = computed(() => {
             return select.value.map(item => item.keyId)
+        })
+        const SKELETON_WIDTHS = ['62%', '78%', '54%', '70%', '66%']
+        const skeletonRows = computed(() => Array.from({ length: Math.max(props.cols, 0) }, (_, index) => ({ keyId: index + 1 })))
+        /**用列标题撑开骨架尺寸，文案本身不显示；列上的 render、表单不执行。*/
+        function fetchSkeleton(content: string, width?: string) {
+            return (
+                <common-skeleton-block>
+                    <span class="inline-block h-16" style={{ width }}>
+                        {content}
+                    </span>
+                </common-skeleton-block>
+            )
+        }
+        const skeletonColumns = computed(() => {
+            return faseColumns.value
+                .filter(item => item.key !== 'settings')
+                .map((item, index) => {
+                    const source = props.columns.find(column => column.key === item.key)
+                    const titleMap: Record<string, string> = { command: '操作', selection: '选' }
+                    const title =
+                        typeof source?.title === 'string' && source.title ? source.title : titleMap[String(item.key)] || '字段名称'
+                    const width = source?.skeleton === 'form' ? undefined : SKELETON_WIDTHS[index % SKELETON_WIDTHS.length]
+                    return {
+                        key: item.key,
+                        width: item.width,
+                        minWidth: item.minWidth,
+                        align: item.align,
+                        fixed: item.fixed,
+                        className: item.className,
+                        title: () => fetchSkeleton(title),
+                        render: () => fetchSkeleton(width ? title : '请选择', width)
+                    }
+                })
         })
         /**仅 minWidth 列平分剩余宽度，写入真实 width 保证不低于 minWidth**/
         function fetchColumnFlexWidth(columns: Array<Omix<DataTableColumn>>) {
@@ -287,15 +322,15 @@ export default defineComponent({
                                 size="small"
                                 style={tableStyle.value}
                                 row-key={rowKey}
-                                loading={loading.value}
+                                loading={initialize.value ? false : loading.value}
                                 min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}
                                 single-line={false}
                                 virtual-scroll={props.virtualScroll}
                                 virtual-scroll-x={props.virtualScroll && props.virtualScrollX}
                                 virtual-scroll-header={props.virtualScroll && props.virtualScrollX}
-                                data={data.value}
-                                columns={faseColumns.value}
+                                data={initialize.value ? skeletonRows.value : data.value}
+                                columns={initialize.value ? skeletonColumns.value : faseColumns.value}
                                 checked-row-keys={faseSelect.value}
                                 scrollbar-props={scrollbarProps}
                                 render-cell={fetchCellRender}
@@ -303,7 +338,12 @@ export default defineComponent({
                             ></n-data-table>
                         </div>
                     </n-element>
-                    {props.pagination && (
+                    {props.pagination && initialize.value && (
+                        <div class={`common-database-pagination flex justify-end items-center gap-8 ${props.paginationClass}`}>
+                            {['共 0 条', '上一页', '1', '下一页', '50 / 页'].map(item => fetchSkeleton(item))}
+                        </div>
+                    )}
+                    {props.pagination && !initialize.value && (
                         <n-element class={`common-database-pagination flex justify-end ${props.paginationClass}`}>
                             <n-pagination
                                 page={page.value}
