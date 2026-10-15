@@ -37,11 +37,11 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '序号', key: 'index', width: 90, align: 'center' },
-                    { title: '联系人名称', key: 'name', width: 160 },
+                    { title: '联系人名称', key: 'name', width: 200 },
                     { title: '联系方式', key: 'items', width: 300, ellipsis: false },
-                    { title: '地址', key: 'address', minWidth: 260, ellipsis: false },
+                    { title: '地址', key: 'address', minWidth: 300 },
                     { title: '备注', key: 'remark', minWidth: 260, check: false },
-                    { title: '状态', key: 'status', width: 100 },
+                    { title: '状态', key: 'status', width: 120 },
                     { title: '创建人', key: 'createBy', width: 120 },
                     { title: '创建时间', key: 'createTime', width: 160 },
                     { title: '更新人', key: 'modifyBy', width: 120 },
@@ -140,6 +140,7 @@ export default defineComponent({
                                         {(data.items ?? []).map((item: Omix, index: number) => (
                                             <div class="flex items-center gap-x-5 overflow-hidden">
                                                 <common-base-chunk
+                                                    mode="text"
                                                     value={item.type}
                                                     items={props.chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
                                                 ></common-base-chunk>
@@ -150,14 +151,8 @@ export default defineComponent({
                                 )
                             },
                             col_name: (data: Omix) => (
-                                <div class="flex items-center gap-x-10 overflow-hidden">
-                                    <common-base-button
-                                        class="p-inline-4"
-                                        type="tertiary"
-                                        secondary
-                                        icon-size={24}
-                                        icon={UserAvatarFilledAlt}
-                                    ></common-base-button>
+                                <div class="flex items-center gap-x-5 overflow-hidden">
+                                    <common-base-icon size={20} component={<UserAvatarFilledAlt />}></common-base-icon>
                                     <span>{data.name ?? '-'}</span>
                                 </div>
                             ),
