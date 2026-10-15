@@ -76,7 +76,7 @@ export default defineComponent({
                             display-directive="show:lazy"
                             tab={<common-base-tab-title title="基础配置" icon={<SettingsServices />} />}
                         >
-                            <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
+                            <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
                             name="attachment"

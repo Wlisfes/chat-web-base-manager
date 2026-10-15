@@ -86,7 +86,7 @@ export default defineComponent({
             try {
                 return await Promise.all([Service.httpBaseCrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
                     const contact = pick(data.contact, ['name', 'address', 'remark'])
-                    const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, keyId: v4() }))
+                    const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, disabled: true, keyId: v4() }))
                     return await setForm({ ...data, items, contact }).then(async () => {
                         return await setState({ initialize: false })
                     })

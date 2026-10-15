@@ -50,6 +50,7 @@ export default defineComponent({
                         label-field="label"
                         label-value="value"
                         options={props.options}
+                        disabled={node.value.disabled}
                         v-model:value={node.value.type}
                     ></form-base-select>
                 </form-base-column>
@@ -83,6 +84,7 @@ export default defineComponent({
                             type="error"
                             icon-size={20}
                             icon="nest-minus"
+                            onClick={() => list.value.splice(props.index, 1)}
                         ></common-base-button>
                     )}
                 </form-base-column>
