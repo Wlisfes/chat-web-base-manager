@@ -62,7 +62,7 @@ export default defineComponent({
             }
             return (
                 <n-text class={chunkClass.value} style={chunkStyle.value}>
-                    {slots.default ? slots.default() : chunkLabel.value}
+                    {slots.default ? slots.default(chunkLabel.value) : chunkLabel.value}
                 </n-text>
             )
         }

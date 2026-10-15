@@ -44,7 +44,7 @@ export default defineComponent({
                     payMode: undefined,
                     /**认证状态**/
                     authStatus: undefined,
-                    /**注册来源**/
+                    /**客户来源**/
                     source: undefined
                 },
                 columns: [
@@ -57,7 +57,7 @@ export default defineComponent({
                     { title: '认证状态', key: 'authStatus', width: 100 },
                     { title: '客户类型', key: 'classType', width: 100 },
                     { title: '付款模式', key: 'payMode', width: 100 },
-                    { title: '注册来源', key: 'source', width: 120 },
+                    { title: '客户来源', key: 'source', width: 140 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', minWidth: 140 },
                     { title: '邮箱', key: 'email', width: 200 },
@@ -172,14 +172,19 @@ export default defineComponent({
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="source" label="注册来源">
-                        <form-base-select
-                            clearable
-                            placeholder="请选择注册来源"
-                            loading={chunkState.loading}
+                    <common-database-search-column prop="source" label="客户来源">
+                        <form-base-cascader
+                            show-path
+                            filterable
+                            check-strategy="child"
+                            expand-trigger="click"
+                            label-field="label"
+                            label-value="value"
+                            children-field="children"
+                            placeholder="请选择客户来源"
                             options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
-                        ></form-base-select>
+                        ></form-base-cascader>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
@@ -207,6 +212,13 @@ export default defineComponent({
                                     {data.name}
                                 </n-text>
                             </common-base-content>
+                        ),
+                        col_source: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                value={data.source}
+                                items={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
                             return <common-base-number value={data.balance}></common-base-number>
