@@ -45,7 +45,7 @@ export default defineComponent({
                         type="line"
                         bar-width={0}
                         tabs-padding={16}
-                        default-value="basic"
+                        default-value="sms"
                         class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     >
                         <n-tab-pane
@@ -57,7 +57,7 @@ export default defineComponent({
                         </n-tab-pane>
                         <n-tab-pane
                             name="sms"
-                            display-directive="show"
+                            display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="短信应用" icon={<Chat />} />}
                         >
                             <crm-consumer-context-sms-skeleton initialize />

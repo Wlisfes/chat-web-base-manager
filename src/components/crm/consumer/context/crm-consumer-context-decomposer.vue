@@ -20,7 +20,7 @@ export default defineComponent({
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            options: { tabName: 'basic' }
+            options: { tabName: 'sms' }
         })
 
         return () => (
@@ -50,7 +50,11 @@ export default defineComponent({
                                 v-model:faseNode={faseNode.value}
                             ></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="sms" display-directive="show" tab={<common-base-tab-title title="短信应用" icon={<Chat />} />}>
+                        <n-tab-pane
+                            name="sms"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="短信应用" icon={<Chat />} />}
+                        >
                             <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
