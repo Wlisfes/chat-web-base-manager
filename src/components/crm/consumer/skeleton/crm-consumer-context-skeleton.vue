@@ -53,7 +53,7 @@ export default defineComponent({
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="详细信息" icon={<ApplicationWeb />} />}
                         >
-                            <div>dsada</div>
+                            <crm-consumer-context-basic-skeleton initialize></crm-consumer-context-basic-skeleton>
                         </n-tab-pane>
                         <n-tab-pane
                             name="sms"

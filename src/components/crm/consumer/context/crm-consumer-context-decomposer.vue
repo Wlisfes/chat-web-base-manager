@@ -20,7 +20,7 @@ export default defineComponent({
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            options: { tabName: 'sms' }
+            options: { tabName: 'basic' }
         })
 
         return () => (

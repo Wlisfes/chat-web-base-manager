@@ -51,7 +51,7 @@ export default defineComponent({
         )
 
         return () => (
-            <common-base-element is-white class="flex flex-col min-h-full p-12 gap-y-24 overflow-hidden">
+            <common-base-element-double is-white class="flex flex-col min-h-full p-12 gap-y-24 overflow-hidden">
                 <div class="flex flex-col gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
                     <common-base-columns-template is-border class="gap-y-10 gap-x-20 p-10" type="auto-fit" number={400}>
@@ -178,7 +178,7 @@ export default defineComponent({
                         </common-database-table>
                     </div>
                 </div>
-            </common-base-element>
+            </common-base-element-double>
         )
     }
 })
