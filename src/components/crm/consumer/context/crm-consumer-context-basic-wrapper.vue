@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, Fragment } from 'vue'
 import { useChunkService, useColumnService } from '@/hooks'
 import { useVModels } from '@vueuse/core'
 import { Lightning, Chat, UserAvatarFilledAlt } from '@vicons/carbon'
@@ -38,7 +38,7 @@ export default defineComponent({
                 columns: [
                     { title: '序号', key: 'index', width: 90, align: 'center' },
                     { title: '联系人名称', key: 'name', width: 160 },
-                    { title: '联系方式', key: 'items', width: 260, ellipsis: false },
+                    { title: '联系方式', key: 'items', width: 300, ellipsis: false },
                     { title: '地址', key: 'address', minWidth: 260, ellipsis: false },
                     { title: '备注', key: 'remark', minWidth: 260, check: false },
                     { title: '状态', key: 'status', width: 100 },
@@ -51,10 +51,10 @@ export default defineComponent({
         )
 
         return () => (
-            <common-base-element-double is-white class="flex flex-col min-h-full p-12 gap-y-24 overflow-hidden">
-                <div class="flex flex-col gap-y-10 overflow-hidden">
+            <Fragment>
+                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
-                    <common-base-columns-template is-border class="gap-y-10 gap-x-20 p-10" type="auto-fit" number={400}>
+                    <common-base-columns-template class="gap-y-10 gap-x-20" type="auto-fit" number={400}>
                         <common-base-columns-wrapper label-class={props.labelClass} label="客户名称：">
                             {faseNode.value.name ?? '-'}
                         </common-base-columns-wrapper>
@@ -108,77 +108,72 @@ export default defineComponent({
                                 items={props.chunkOptions.authStatusOptions}
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
-
                         <common-base-columns-wrapper label-class={props.labelClass} label="付款模式：">
                             <common-base-chunk value={faseNode.value.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>
                         </common-base-columns-wrapper>
                     </common-base-columns-template>
-                </div>
-                <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
+                </common-base-element>
+                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="联系人信息"></common-business-header>
-                    <div class="flex flex-col flex-1 overflow-hidden">
-                        <common-database-table
-                            pagination-class="p-bs-12!"
-                            bordered={false}
-                            limit={state.limit}
-                            total={state.total}
-                            columns={state.columns}
-                            v-model:page={state.page}
-                            v-model:size={state.size}
-                            v-model:select={state.select}
-                            v-model:data={state.dataSource}
-                            v-model:loading={state.loading}
-                            v-model:initialize={state.initialize}
-                            v-model:customize={state.customize}
-                            on-update:customize={instOptions.fetchUpdateCustomize}
-                            on-update:page={(page: number) => fetchRefresh({ page })}
-                            on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                        >
-                            {{
-                                col_items: (data: Omix) => {
-                                    return (
-                                        <div class="flex flex-col overflow-hidden">
-                                            {(data.items ?? []).map((item: Omix, index: number) => (
-                                                <div class="flex items-center gap-x-5 overflow-hidden">
-                                                    <common-base-chunk
-                                                        value={item.type}
-                                                        items={props.chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
-                                                    ></common-base-chunk>
-                                                    <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )
-                                },
-                                col_name: (data: Omix) => (
-                                    <div class="flex items-center gap-x-10 overflow-hidden">
-                                        <common-base-button
-                                            class="p-inline-4"
-                                            type="tertiary"
-                                            secondary
-                                            icon-size={24}
-                                            icon={UserAvatarFilledAlt}
-                                        ></common-base-button>
-                                        <span>{data.name ?? '-'}</span>
+                    <common-database-table
+                        pagination={false}
+                        bordered={false}
+                        flex-height={false}
+                        limit={state.limit}
+                        total={state.total}
+                        columns={state.columns}
+                        v-model:page={state.page}
+                        v-model:size={state.size}
+                        v-model:select={state.select}
+                        v-model:data={state.dataSource}
+                        v-model:loading={state.loading}
+                        v-model:initialize={state.initialize}
+                        v-model:customize={state.customize}
+                        on-update:customize={instOptions.fetchUpdateCustomize}
+                        on-update:page={(page: number) => fetchRefresh({ page })}
+                        on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
+                    >
+                        {{
+                            col_items: (data: Omix) => {
+                                return (
+                                    <div class="flex flex-col overflow-hidden">
+                                        {(data.items ?? []).map((item: Omix, index: number) => (
+                                            <div class="flex items-center gap-x-5 overflow-hidden">
+                                                <common-base-chunk
+                                                    value={item.type}
+                                                    items={props.chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
+                                                ></common-base-chunk>
+                                                <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ),
-                                col_status: (data: Omix) => (
-                                    <common-base-chunk
-                                        value={data.status}
-                                        items={props.chunkOptions.contactStatusOptions}
-                                    ></common-base-chunk>
-                                ),
-                                col_createBy: (data: Omix) => {
-                                    return <common-base-user element="text" data={data.createByOptions}></common-base-user>
-                                },
-                                col_modifyBy: (data: Omix) => {
-                                    return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
-                                }
-                            }}
-                        </common-database-table>
-                    </div>
-                </div>
-            </common-base-element-double>
+                                )
+                            },
+                            col_name: (data: Omix) => (
+                                <div class="flex items-center gap-x-10 overflow-hidden">
+                                    <common-base-button
+                                        class="p-inline-4"
+                                        type="tertiary"
+                                        secondary
+                                        icon-size={24}
+                                        icon={UserAvatarFilledAlt}
+                                    ></common-base-button>
+                                    <span>{data.name ?? '-'}</span>
+                                </div>
+                            ),
+                            col_status: (data: Omix) => (
+                                <common-base-chunk value={data.status} items={props.chunkOptions.contactStatusOptions}></common-base-chunk>
+                            ),
+                            col_createBy: (data: Omix) => {
+                                return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                            },
+                            col_modifyBy: (data: Omix) => {
+                                return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                            }
+                        }}
+                    </common-database-table>
+                </common-base-element>
+            </Fragment>
         )
     }
 })

@@ -1,9 +1,14 @@
 <script lang="tsx">
 import { defineComponent, computed, PropType, VNode } from 'vue'
+import { isNotEmpty } from '@/utils'
 
 export default defineComponent({
     name: 'CommonBaseElement',
     props: {
+        /**边距控制**/
+        wrap: { type: String, default: '' },
+        /**额外样式**/
+        className: { type: String, default: '' },
         /**开启背景色**/
         isWhite: { type: Boolean, default: false },
         /**开启边框**/
@@ -15,7 +20,7 @@ export default defineComponent({
     },
     setup(props, { slots }) {
         const className = computed(() => ({
-            'common-base-element': true,
+            [`common-base-element ${props.className}`]: true,
             'is-white': props.isWhite,
             'is-border': props.isBorder
         }))
@@ -24,6 +29,12 @@ export default defineComponent({
             if (props.abstract) {
                 const vnode = slots.default?.() ?? []
                 return vnode.length === 0 ? props.empty : <n-element class={className.value}>{vnode}</n-element>
+            } else if (isNotEmpty(props.wrap.trimStart().trimEnd())) {
+                return (
+                    <div class={props.wrap}>
+                        <n-element class={className.value}>{slots.default && slots.default()}</n-element>
+                    </div>
+                )
             }
             return <n-element class={className.value}>{slots.default && slots.default()}</n-element>
         }

@@ -42,6 +42,8 @@ export default defineComponent({
         paginationClass: { type: String, default: '' },
         /**开启边框**/
         bordered: { type: Boolean, default: true },
+        /**撑满父容器高度；关闭后按行内容撑开高度，用于父级没有固定高度的场景**/
+        flexHeight: { type: Boolean, default: true },
         /**开启纵向虚拟滚动**/
         virtualScroll: { type: Boolean, default: false },
         /**开启横向虚拟滚动**/
@@ -85,7 +87,12 @@ export default defineComponent({
         })
         const rowKey = (e: Omix) => e.keyId
         const scrollbarProps = { size: 100, trigger: 'none' as const }
-        const tableStyle = computed(() => ({ flex: 1, '--n-opacity-loading': initialize.value ? 0 : 0.5 }))
+        const tableStyle = computed(() => ({
+            flex: props.flexHeight ? 1 : undefined,
+            '--n-opacity-loading': initialize.value ? 0 : 0.5
+        }))
+        /**撑满高度时参与父容器伸缩；按内容撑开时不收缩、不裁切**/
+        const flexClass = computed(() => (props.flexHeight ? 'flex-1 overflow-hidden' : ''))
         const tableSize = useElementSize(tableRef)
         /**容器整数宽度，避免亚像素变化触发列重算**/
         const tableWidth = computed(() => Math.floor(tableSize.width.value))
@@ -249,21 +256,21 @@ export default defineComponent({
 
         return () => (
             <n-element
-                class="common-database-container flex flex-col flex-1 overflow-hidden"
+                class={`common-database-container flex flex-col ${flexClass.value}`}
                 style={{ [`--common-limit-width`]: `${props.limit}px`, padding: 'var(--common-limit-width)' }}
             >
                 <n-card
-                    class="flex flex-col flex-1 overflow-hidden"
-                    content-class="flex flex-col flex-1 overflow-hidden p-0!"
+                    class={`flex flex-col ${flexClass.value}`}
+                    content-class={`flex flex-col ${flexClass.value} p-0!`}
                     bordered={props.bordered}
                 >
-                    <n-element class="common-database-table flex flex-col flex-1 overflow-hidden">
+                    <n-element class={`common-database-table flex flex-col ${flexClass.value}`}>
                         {slots.default && (
                             <n-element ref={headerRef} class="flex flex-col line-height-22 overflow-hidden">
                                 {slots.default && slots.default()}
                             </n-element>
                         )}
-                        <div ref={tableRef} class="common-database-table-container flex flex-col flex-1 overflow-hidden">
+                        <div ref={tableRef} class={`common-database-table-container flex flex-col ${flexClass.value}`}>
                             {props.showCommand && data.value.length > 0 && (
                                 <common-database-table-visibility
                                     show-settings={props.showSettings}
@@ -276,7 +283,7 @@ export default defineComponent({
                             <n-data-table
                                 remote
                                 bordered
-                                flex-height
+                                flex-height={props.flexHeight}
                                 size="small"
                                 style={tableStyle.value}
                                 row-key={rowKey}
@@ -352,13 +359,13 @@ export default defineComponent({
         :deep(.n-data-table-th.chunk-command) {
             padding: 0;
         }
-        :deep(.n-data-table:not(.n-data-table--single-line) .n-data-table-base-table-body) {
-            .n-scrollbar-container:has(~ .n-scrollbar-rail.n-scrollbar-rail--vertical--right.n-scrollbar-rail--disabled) {
-                .n-data-table-tbody > tr:last-child > td {
-                    border-bottom: 1px solid var(--n-merged-border-color);
-                }
-            }
-        }
+        // :deep(.n-data-table:not(.n-data-table--single-line) .n-data-table-base-table-body) {
+        //     .n-scrollbar-container:has(~ .n-scrollbar-rail.n-scrollbar-rail--vertical--right.n-scrollbar-rail--disabled) {
+        //         .n-data-table-tbody > tr:last-child > td {
+        //             border-bottom: 1px solid var(--n-merged-border-color);
+        //         }
+        //     }
+        // }
     }
     .n-element.common-database-pagination {
         transition: border-color 0.3s var(--n-bezier);
