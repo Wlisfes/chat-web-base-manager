@@ -5,19 +5,20 @@ import { Chat } from '@vicons/carbon'
 export default defineComponent({
     name: 'CrmConsumerContextSmsSkeleton',
     props: {
+        /**最大骨架屏数量**/
+        max: { type: Number, default: 20 },
         /**骨架屏**/
         initialize: { type: Boolean, default: true }
     },
     setup(props, { slots }) {
         return () => (
             <common-skeleton-provider
-                is-white
                 class-name="flex flex-col flex-1 overflow-hidden"
                 loading={props.initialize}
                 v-slots={{ render: slots.default }}
             >
                 <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
-                    {Array.from({ length: 20 }, (_, index) => (
+                    {Array.from({ length: props.max }, (_, index) => (
                         <n-card content-class="flex flex-col p-0! overflow-hidden">
                             <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
                                 <common-skeleton-block>
@@ -29,7 +30,7 @@ export default defineComponent({
                                 </common-skeleton-block>
                                 <div class="flex flex-col flex-1 gap-y-2 p-ie-40 overflow-hidden">
                                     <common-skeleton-block block="2px" class="line-height-24 m-ie-auto">
-                                        LYNSK1233001OTP
+                                        CSK1233MRKTA005
                                     </common-skeleton-block>
                                     <common-skeleton-block block="2px" class="m-ie-auto">
                                         应用名称

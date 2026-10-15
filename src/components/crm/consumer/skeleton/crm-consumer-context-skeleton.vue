@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
+import { Chat, ApplicationWeb, Email, ChangeCatalog, SettingsServices, CloudServices } from '@vicons/carbon'
 
 export default defineComponent({
     name: 'CrmConsumerContextSkeleton',
@@ -10,72 +11,94 @@ export default defineComponent({
     setup(props, { slots }) {
         return () => (
             <common-skeleton-provider
-                class-name="flex flex-col flex-1 gap-14 p-inline-14 p-block-14"
+                class-name="flex flex-col flex-1 relative overflow-hidden"
                 loading={props.initialize}
                 v-slots={{ render: slots.default }}
             >
-                <n-card class="flex flex-col" content-class="p-16! flex flex-col gap-10">
-                    <div class="flex flex-col overflow-hidden">
-                        <div class="flex justify-between gap-20 overflow-hidden">
-                            <div class="flex flex-col overflow-hidden">
-                                <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                                    <n-skeleton sharp={false} height="16px" width="180px" />
-                                </div>
-                                <div class="flex items-center p-block-8 gap-10 overflow-hidden">
+                <common-base-element class="absolute inset-0 flex flex-col overflow-hidden">
+                    <common-base-element is-white class="flex flex-col p-inline-16 p-bs-16 p-be-5 overflow-hidden">
+                        <div class="flex p-be-10 overflow-hidden">
+                            <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
+                                <div class="flex gap-10 overflow-hidden">
                                     <n-skeleton sharp={false} height="24px" width="320px" />
+                                    <n-skeleton sharp={false} height="24px" width="70px" />
+                                    <n-skeleton sharp={false} height="24px" width="60px" />
+                                </div>
+                                <div class="flex gap-x-20 text-12 line-height-16 overflow-hidden">
+                                    <n-skeleton sharp={false} height="16px" width="197px" />
+                                    <n-skeleton sharp={false} height="16px" width="123px" />
+                                    <n-skeleton sharp={false} height="16px" width="91px" />
+                                    <n-skeleton sharp={false} height="16px" width="80px" />
                                 </div>
                             </div>
+                            <div class="flex gap-x-10 m-be-auto overflow-hidden">
+                                <n-skeleton sharp={false} height="32px" width="80px" />
+                                <n-skeleton sharp={false} height="32px" width="80px" />
+                                <n-skeleton sharp={false} height="32px" width="80px" />
+                                <n-skeleton sharp={false} height="32px" width="80px" />
+                            </div>
                         </div>
-                        <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                            <n-skeleton sharp={false} height="16px" width="180px" />
-                        </div>
-                    </div>
-                    <common-business-progressbar initialize></common-business-progressbar>
-                </n-card>
-                <n-tabs
-                    animated
-                    type="line"
-                    default-value="sms"
-                    bar-width={0}
-                    tabs-padding={14}
-                    class="common-base-tabser inset-absolute flex-1 overflow-hidden"
-                >
-                    <n-tab-pane name="basic" display-directive="show" tab={() => <common-skeleton-block>详情信息</common-skeleton-block>}>
-                        <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                    </n-tab-pane>
-                    <n-tab-pane name="sms" display-directive="show" tab={() => <common-skeleton-block>短信应用</common-skeleton-block>}>
-                        <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                    </n-tab-pane>
-                    <n-tab-pane name="mail" display-directive="show" tab={() => <common-skeleton-block>邮件应用</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
-                    </n-tab-pane>
-                    <n-tab-pane
-                        name="whatsapp"
-                        display-directive="show"
-                        tab={() => <common-skeleton-block>社媒应用</common-skeleton-block>}
+                        <common-business-progressbar initialize></common-business-progressbar>
+                    </common-base-element>
+                    <n-tabs
+                        animated
+                        type="line"
+                        bar-width={0}
+                        tabs-padding={16}
+                        default-value="sms"
+                        class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     >
-                        <common-base-scrollbar>
+                        <n-tab-pane
+                            name="basic"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="详细信息" icon={<ApplicationWeb />} />}
+                        >
+                            <div>dsada</div>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="sms"
+                            display-directive="show"
+                            tab={<common-base-tab-title initialize title="短信应用" icon={<Chat />} />}
+                        >
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
-                    </n-tab-pane>
-                    <n-tab-pane name="deploy" display-directive="show" tab={() => <common-skeleton-block>配置</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
-                    </n-tab-pane>
-                    <n-tab-pane name="attachment" display-directive="show" tab={() => <common-skeleton-block>附件信息</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
-                    </n-tab-pane>
-                    <n-tab-pane name="daily" display-directive="show" tab={() => <common-skeleton-block>日志</common-skeleton-block>}>
-                        <common-base-scrollbar>
-                            <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
-                        </common-base-scrollbar>
-                    </n-tab-pane>
-                </n-tabs>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="mail"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="邮件应用" icon={<Email />} />}
+                        >
+                            <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="whatsapp"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="社媒应用" icon={<local-nest-whatsapp />} />}
+                        >
+                            <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="deploy"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="基础配置" icon={<SettingsServices />} />}
+                        >
+                            <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="attachment"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="附件信息" icon={<CloudServices />} />}
+                        >
+                            <crm-consumer-context-attachment-wrapper></crm-consumer-context-attachment-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="daily"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="操作日志" icon={<ChangeCatalog />} />}
+                        >
+                            <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
+                        </n-tab-pane>
+                    </n-tabs>
+                </common-base-element>
             </common-skeleton-provider>
         )
     }

@@ -25,7 +25,6 @@ export default defineComponent({
                             <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
                             <common-base-chunk
                                 mode="chunk"
-                                round
                                 value={faseNode.value.classType}
                                 items={props.chunkOptions.classTypeOptions}
                             ></common-base-chunk>
