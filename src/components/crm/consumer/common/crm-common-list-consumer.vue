@@ -50,8 +50,8 @@ export default defineComponent({
                 columns: [
                     { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'name', minWidth: 240, disabled: true, ellipsis: false },
-                    { title: '客户别名', key: 'alias', width: 150 },
-                    { title: '品牌', key: 'brandKeyId', width: 120 },
+                    { title: '客户别名', key: 'alias', width: 140 },
+                    { title: '品牌', key: 'brandKeyId', width: 100 },
                     { title: '阶段', key: 'stage', width: 100 },
                     { title: '状态', key: 'status', width: 100 },
                     { title: '认证状态', key: 'authStatus', width: 100 },
@@ -66,7 +66,7 @@ export default defineComponent({
                     { title: '币种', key: 'currency', width: 100 },
                     { title: '余额', key: 'balance', width: 120 },
                     { title: '信用额度', key: 'credit', width: 120 },
-                    { title: '备注', key: 'remark', minWidth: 200 },
+                    { title: '备注', key: 'remark', minWidth: 200, check: false },
                     { title: '创建时间', key: 'createTime', width: 160 }
                 ]
             }
