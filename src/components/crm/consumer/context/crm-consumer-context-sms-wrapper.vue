@@ -46,7 +46,7 @@ export default defineComponent({
         return () => (
             <crm-consumer-context-sms-skeleton initialize={state.initialize}>
                 <common-base-scrollbar class="crm-consumer-context-sms-wrapper" content-class="p-inline-14 p-block-14">
-                    <common-base-element is-white class="flex flex-col min-h-full overflow-hidden">
+                    <common-base-element class="flex flex-col min-h-full overflow-hidden">
                         <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
                             {state.total > 0 && (
                                 <Fragment>

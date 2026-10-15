@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
 import { useBaseService, useChunkService } from '@/hooks'
-import { Lightning, Chat, Document, Book } from '@vicons/carbon'
+import { Chat, ApplicationWeb, Email, ChangeCatalog, SettingsServices, CloudServices } from '@vicons/carbon'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -42,12 +42,7 @@ export default defineComponent({
                         <n-tab-pane
                             name="basic"
                             display-directive="show:lazy"
-                            tab={
-                                <div class="flex items-center gap-x-5 overflow-hidden">
-                                    <n-icon size={18} component={<Document />} />
-                                    详情信息
-                                </div>
-                            }
+                            tab={<common-base-tab-title title="详细信息" icon={<ApplicationWeb />} icon-props={{ size: 18 }} />}
                         >
                             <crm-consumer-context-basic-wrapper
                                 chunk-state={chunkState}
@@ -58,74 +53,47 @@ export default defineComponent({
                         <n-tab-pane
                             name="sms"
                             display-directive="show"
-                            tab={
-                                <div class="flex items-center gap-x-5 overflow-hidden">
-                                    <n-icon size={18} component={<Chat />} />
-                                    短信应用
-                                </div>
-                            }
+                            tab={<common-base-tab-title title="短信应用" icon={<Chat />} icon-props={{ size: 18 }} />}
                         >
                             <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="mail" tab="邮件应用" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="mail"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="邮件应用" icon={<Email />} icon-props={{ size: 18 }} />}
+                        >
                             <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="whatsapp" tab="社媒应用" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="whatsapp"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="社媒应用" icon={<local-nest-whatsapp />} icon-props={{ size: 18 }} />}
+                        >
                             <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="deploy" tab="配置" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="deploy"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="基础配置" icon={<SettingsServices />} icon-props={{ size: 18 }} />}
+                        >
                             <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="attachment" tab="附件" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="attachment"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="附件信息" icon={<CloudServices />} icon-props={{ size: 18 }} />}
+                        >
                             <crm-consumer-context-attachment-wrapper></crm-consumer-context-attachment-wrapper>
                         </n-tab-pane>
-                        <n-tab-pane name="daily" tab="日志" display-directive="show:lazy">
+                        <n-tab-pane
+                            name="daily"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="操作日志" icon={<ChangeCatalog />} icon-props={{ size: 18 }} />}
+                        >
                             <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
                         </n-tab-pane>
                     </n-tabs>
                 </common-base-element>
-                {/* <common-base-scrollbar class="absolute inset-0 overflow-hidden">
-                    <crm-consumer-context-wrapper
-                        initialize={faseState.initialize}
-                        chunk-options={chunkOptions.value}
-                        v-model:faseNode={faseNode.value}
-                    ></crm-consumer-context-wrapper>
-                    <common-base-element class="flex flex-col flex-1 p-block-14 overflow-hidden">
-                        <n-tabs
-                            animated
-                            type="line"
-                            tabs-padding={14}
-                            class="common-base-tabser flex-1 overflow-hidden "
-                            v-model:value={faseState.tabName}
-                        >
-                            <n-tab-pane name="basic" tab="详情信息" display-directive="show:lazy">
-                                <crm-consumer-context-basic-wrapper
-                                    chunk-state={chunkState}
-                                    chunk-options={chunkOptions.value}
-                                    v-model:faseNode={faseNode.value}
-                                ></crm-consumer-context-basic-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="sms" tab="短信应用" display-directive="show">
-                                <crm-consumer-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-consumer-context-sms-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="mail" tab="邮件应用" display-directive="show:lazy">
-                                <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="whatsapp" tab="社媒应用" display-directive="show:lazy">
-                                <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="deploy" tab="配置" display-directive="show:lazy">
-                                <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="attachment" tab="附件" display-directive="show:lazy">
-                                <crm-consumer-context-attachment-wrapper></crm-consumer-context-attachment-wrapper>
-                            </n-tab-pane>
-                            <n-tab-pane name="daily" tab="日志" display-directive="show:lazy">
-                                <crm-consumer-context-daily-wrapper></crm-consumer-context-daily-wrapper>
-                            </n-tab-pane>
-                        </n-tabs>
-                    </common-base-element>
-                </common-base-scrollbar> */}
             </crm-consumer-context-skeleton>
         )
     }

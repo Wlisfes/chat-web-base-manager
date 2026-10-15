@@ -65,7 +65,7 @@ export default defineComponent({
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
                         </common-base-scrollbar>
                     </n-tab-pane>
-                    <n-tab-pane name="attachment" display-directive="show" tab={() => <common-skeleton-block>附件</common-skeleton-block>}>
+                    <n-tab-pane name="attachment" display-directive="show" tab={() => <common-skeleton-block>附件信息</common-skeleton-block>}>
                         <common-base-scrollbar>
                             <crm-consumer-context-sms-skeleton initialize></crm-consumer-context-sms-skeleton>
                         </common-base-scrollbar>

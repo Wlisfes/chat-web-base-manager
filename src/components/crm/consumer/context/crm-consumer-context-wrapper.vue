@@ -1,8 +1,7 @@
 <script lang="tsx">
-import { defineComponent, ref, computed, Fragment, PropType } from 'vue'
-import { useVModels, useIntersectionObserver } from '@vueuse/core'
-import { Lightning, Chat, ChatBot, Time, UserAdmin, Currency, Building } from '@vicons/carbon'
-import { useState } from '@/hooks'
+import { defineComponent, PropType } from 'vue'
+import { Enterprise, Time, UserAdmin, Currency } from '@vicons/carbon'
+import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
     name: 'CrmConsumerContextWrapper',
@@ -19,8 +18,8 @@ export default defineComponent({
         const { faseNode } = useVModels(props, emit)
 
         return () => (
-            <common-base-element is-white class="flex flex-col p-inline-16 p-bs-16 p-be-10 overflow-hidden">
-                <div class="flex items-center p-be-10 overflow-hidden">
+            <common-base-element is-white class="flex flex-col p-inline-16 p-bs-16 p-be-5 overflow-hidden">
+                <div class="flex p-be-10 overflow-hidden">
                     <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
                         <div class="flex gap-10 overflow-hidden">
                             <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
@@ -47,7 +46,7 @@ export default defineComponent({
                             </n-text>
                             {(faseNode.value.ownerUserUidOptions?.organizations ?? []).length > 0 && (
                                 <n-text depth="3" class="flex items-center gap-x-5 overflow-hidden">
-                                    <n-icon size={14} component={<Building />} />
+                                    <n-icon size={14} component={<Enterprise />} />
                                     <span>{`部门：${faseNode.value.ownerUserUidOptions.organizations.map((e: Omix) => e.name).join('、')}`}</span>
                                 </n-text>
                             )}
@@ -57,7 +56,7 @@ export default defineComponent({
                             </n-text>
                         </div>
                     </div>
-                    <div class="flex items-center">
+                    <div class="flex m-be-auto">
                         <n-button>刷新</n-button>
                         <n-button>编辑客户</n-button>
                     </div>
@@ -69,53 +68,6 @@ export default defineComponent({
                 ></common-business-progressbar>
             </common-base-element>
         )
-
-        // const { state, setState } = useState({ stuck: false })
-        // /**吸顶哨兵节点**/
-        // const sentinel = ref<HTMLElement>()
-        // /**获取滚动节点**/
-        // const scrollRoot = computed(() => {
-        //     return sentinel.value?.closest<HTMLElement>('.n-scrollbar-container')
-        // })
-        // useIntersectionObserver(sentinel, fetchSentinelObserver, { root: scrollRoot })
-        // async function fetchSentinelObserver([entry]: Array<Omix>) {
-        //     return await setState({ stuck: !entry.isIntersecting })
-        // }
-
-        // return () => (
-        //     <Fragment>
-        //         <div ref={sentinel} class="h-0"></div>
-        //         <div class={{ 'sticky top-0 z-2': true, [state.stuck ? 'is-stuck' : 'p-inline-14 p-bs-14']: true }}>
-        //             <common-base-element
-        //                 is-white
-        //                 class={{ 'p-inline-14 p-bs-14': true, 'is-stuck p-block-14! common-skyline--bottom': state.stuck }}
-        //             >
-        //                 <div class="flex justify-between gap-x-20">
-        //                     <div class="flex items-center gap-10 overflow-hidden">
-        //                         <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
-        //                     </div>
-        //                     <div class="flex items-center">
-        //                         <n-button size="small">刷新</n-button>
-        //                     </div>
-        //                 </div>
-        //             </common-base-element>
-        //         </div>
-        //         <common-base-element is-white class="flex flex-col gap-y-10 m-inline-14 p-inline-14 p-be-14 p-bs-10">
-        //             <div class="flex gap-x-20 text-12 line-height-16 overflow-hidden">
-        //                 <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
-        //                 <n-text depth="3">
-        //                     <span>归属人：</span>
-        //                     <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
-        //                 </n-text>
-        //             </div>
-        //             <common-business-progressbar
-        //                 initialize={props.initialize}
-        //                 stage={faseNode.value.stage}
-        //                 items={props.chunkOptions.stageOptions}
-        //             ></common-business-progressbar>
-        //         </common-base-element>
-        //     </Fragment>
-        // )
     }
 })
 </script>
