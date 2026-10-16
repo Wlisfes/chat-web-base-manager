@@ -1,7 +1,6 @@
 <script lang="tsx">
-import { useColumnService, useSelectService, pick } from '@/hooks'
-import { isEmpty, stop } from '@/utils'
 import { defineComponent } from 'vue'
+import { useColumnService, useSelectService, pick, stop } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -38,10 +37,11 @@ export default defineComponent({
                     { title: '客户ID', key: 'userKeyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'userName', minWidth: 200, disabled: true, ellipsis: false },
                     { title: '客户别名', key: 'userAlias', width: 130 },
-                    { title: '应用别名', key: 'appAlias', minWidth: 160 },
+                    { title: '应用ID', key: 'appId', width: 180 },
+                    { title: '应用别名', key: 'appAlias', width: 160 },
                     { title: 'MCC', key: 'mcc', width: 80 },
                     { title: 'Code', key: 'code', width: 80 },
-                    { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
+                    { title: '国家/地区', key: 'countryKeyId', width: 180 },
                     { title: '汇率', key: 'exchangeRate', width: 100 },
                     { title: '报价币种', key: 'currency', width: 100 },
                     { title: '上行本币价格', key: 'upLocal', width: 140 },
@@ -64,12 +64,6 @@ export default defineComponent({
                     state: { tabTitle: data.name }
                 })
             })
-        }
-
-        /**国家/地区名称**/
-        function fetchCountryName(data: Omix) {
-            const country = countryOptions.dataSource.value.find((item: Omix) => item.keyId === data.countryKeyId)
-            return country ? `${country.cnName} - ${country.enName}` : data.code
         }
 
         return () => (
