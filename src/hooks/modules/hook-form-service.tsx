@@ -52,10 +52,7 @@ export function useFormService<T extends Omix, R extends FormRules, U extends Om
     onMounted(async () => {
         return await fetchHandler(Boolean(options.immediate ?? true), async () => {
             return await setState({ visible: true } as never).then(async () => {
-                const tasks: Array<any> = []
-                return await Promise.all(tasks).then(() => {
-                    return options.callback?.(formState.value, state)
-                })
+                return options.callback?.(formState.value, state)
             })
         })
     })

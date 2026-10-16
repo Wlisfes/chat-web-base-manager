@@ -1,38 +1,52 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useFormService, useSelectService } from '@/hooks'
+import { useFormService, useSelectService, useChunkService } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'CrmSmsQuoteContextWrapper',
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
+            callback: fetchInitialization,
             options: { current: 2 },
             formState: {
                 /**客户ID**/
                 userKeyId: 10241010,
                 /**应用ID**/
                 appId: `wFBLI3u78MuNNSmT`,
+                /**应用别名**/
+                appAlias: undefined,
                 /**报价国家/地区主键**/
                 countryKeyIds: [1136, 1133, 1134, 1135, 1130, 1131, 1132, 1127, 1128, 1129],
                 /**报价草稿批次ID**/
-                draftBatchId: `c63f9ef1-1c4d-428f-aa4d-d2068b430cd6`
+                draftBatchId: `5a9379d4-2db4-4288-978e-52f012459154`
             }
+        })
+        /**短信报价静态枚举**/
+        const { chunkOptions, fetchChunkService } = useChunkService(e => Service.httpBaseCrmSmsQuoteEnums(), {
+            immediate: false
         })
         /**客户下拉数据**/
         const userOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), {
-            immediate: true,
+            immediate: false,
             transform: data => data.map(item => ({ ...item, showName: `${item.alias} - ${item.name}` }))
         })
         /**应用下拉数据**/
         const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApp({ userKeyId: formState.value.userKeyId }), {
+            loading: false,
             immediate: false
         })
         /**MCC下拉数据**/
         const mccOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
-            immediate: true,
+            immediate: false,
             transform: data => data.map(item => ({ value: item.keyId, label: `[${item.code}] ${item.cnName} - ${item.enName}` }))
         })
+        /**数据初始化**/
+        async function fetchInitialization() {
+            return await Promise.all([fetchChunkService(), userOptions.fetchRequest(), mccOptions.fetchRequest()]).then(async () => {
+                return await setState({ initialize: false, loading: false })
+            })
+        }
 
         return () => (
             <layout-common-container>
@@ -76,6 +90,7 @@ export default defineComponent({
                                 user-options={userOptions}
                                 app-options={appOptions}
                                 mcc-options={mccOptions}
+                                chunk-options={chunkOptions.value}
                                 set-state={setState}
                                 set-form={setForm}
                                 fetch-validater={fetchValidater}

@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType, Fragment } from 'vue'
+import { defineComponent, Fragment } from 'vue'
 
 export default defineComponent({
     name: 'CommonBaseWrapper',

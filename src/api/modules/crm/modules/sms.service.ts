@@ -8,6 +8,14 @@ export function httpBaseCrmSmsAppEnums() {
     })
 }
 
+/**客户关系管理-短信报价静态枚举**/
+export function httpBaseCrmSmsQuoteEnums() {
+    return request({
+        url: '/api/sms/quote/enums',
+        method: 'GET'
+    })
+}
+
 /**客户关系管理-短信应用分页列表**/
 export function httpBaseCrmColumnSmsApp(data: Omix) {
     return request({

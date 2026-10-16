@@ -1,9 +1,8 @@
 <script lang="tsx">
 import { computed, defineComponent, Fragment, PropType, watch } from 'vue'
+import { useColumnService, useChunkService, fetchCurrent, pick } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { useColumnService } from '@/hooks'
 import { useVModels } from '@vueuse/core'
-import { fetchCurrent } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -25,53 +24,36 @@ export default defineComponent({
         /**应用下拉数据**/
         appOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**MCC下拉数据**/
-        mccOptions: { type: Object as PropType<Omix>, default: () => ({}) }
+        mccOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**枚举下拉数据**/
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
-
         /**当前客户信息**/
-        const consumerInfo = computed(() => {
-            return fetchCurrent(props.userOptions.dataSource.value ?? [], (e: Omix) => e.keyId === formState.value.userKeyId)
+        const faseNode = computed(() => {
+            return fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId)
         })
-        /**当前应用信息**/
-        const appInfo = computed(() => {
-            return fetchCurrent(props.appOptions?.dataSource?.value ?? [], (e: Omix) => e.appId === formState.value.appId)
+        const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => fetchBaseCrmColumnSmsQuoteDraft(base, payload), {
+            formState: { draftBatchId: formState.value.draftBatchId },
+            columns: [
+                { title: '序号', key: 'index', width: 80, align: 'center' },
+                { title: '客户别名', key: 'userAlias', width: 130 },
+                { title: '应用别名', key: 'appAlias', width: 160 },
+                { title: 'MCC', key: 'mcc', width: 100 },
+                { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
+                { title: '下行费率(USD)', key: 'downUsd', minWidth: 200, ellipsis: false },
+                { title: '上行费率(USD)', key: 'upUsd', minWidth: 200, ellipsis: false },
+                { title: '生效时间', key: 'effectiveTime', minWidth: 240, ellipsis: false },
+                { title: '下行变更状态', key: 'downStatus', width: 120 },
+                { title: '上行变更状态', key: 'upStatus', width: 120 }
+            ]
         })
 
-        const { state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
-            {
-                formState: { draftBatchId: undefined },
-                immediate: false,
-                size: 100,
-                transform: (data: Omix) =>
-                    data.list.map((item: Omix, index: number) => ({
-                        ...item,
-                        index: index + 1,
-                        upUsd: Number(item.upUsd) / 1_000_000,
-                        downUsd: Number(item.downUsd) / 1_000_000
-                    })),
-                columns: [
-                    { title: '序号', key: 'index', width: 80 },
-                    { title: 'MCC', key: 'mcc', width: 100 },
-                    { title: '国家/地区', key: 'code', minWidth: 260 },
-                    { title: '下行费率(USD)', key: 'downUsd', width: 320 },
-                    { title: '上行费率(USD)', key: 'upUsd', width: 320 },
-                    { title: '生效时间', key: 'effectiveTime', width: 250 },
-                    { title: '下行变更状态', key: 'downStatus', width: 160 },
-                    { title: '上行变更状态', key: 'upStatus', width: 160 }
-                ]
-            }
-        )
-
-        watch(
-            () => props.state.current,
-            current => {
-                if (current === 2 && formState.value.draftBatchId) fetchRefresh({ page: 1 })
-            },
-            { immediate: true }
-        )
+        /**客户关系管理-短信报价草稿分页列表**/
+        async function fetchBaseCrmColumnSmsQuoteDraft(base: Omix, payload: Omix) {
+            return Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, ...pick(base, ['page', 'size']) })
+        }
 
         async function fetchSubmit() {
             return await props.setState({ loading: true }).then(async () => {
@@ -104,21 +86,22 @@ export default defineComponent({
 
         return () => (
             <Fragment>
-                <common-base-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
+                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
                     <common-base-columns-template class="gap-x-10 gap-y-5 m-bs-10" type="auto-fill" number={250}>
-                        <common-base-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="报价币种：">{consumerInfo.value.currency ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户名称：">{faseNode.value.name ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户别名：">{faseNode.value.alias ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="报价币种：">{faseNode.value.currency ?? '-'}</common-base-columns-wrapper>
                     </common-base-columns-template>
                 </common-base-element>
                 <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden">
                     <common-database-table
                         class="p-0! overflow-hidden"
+                        show-index
                         show-command
-                        show-settings
                         pagination={false}
+                        cols-row-height={32}
                         limit={state.limit}
                         total={state.total}
                         columns={state.columns}
@@ -134,28 +117,43 @@ export default defineComponent({
                         on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                     >
                         {{
-                            col_code: (data: Omix) => {
-                                const country = props.mccOptions.dataSource.value.find((item: Omix) => item.keyId === data.countryKeyId)
-                                return <span>{country ? `${country.cnName} - ${country.enName}` : data.code}</span>
-                            },
-                            col_downUsd: (data: Omix) => (
-                                <n-input-number class="w-180!" min={0} step={0.000001} precision={6} v-model:value={data.downUsd} />
-                            ),
-                            col_upUsd: (data: Omix) => (
-                                <n-input-number class="w-180!" min={0} step={0.000001} precision={6} v-model:value={data.upUsd} />
+                            col_countryKeyId: (data: Omix) => (
+                                <common-base-chunk
+                                    mode="text"
+                                    ellipsis
+                                    value={data.countryKeyId}
+                                    items={props.mccOptions.dataSource.value}
+                                ></common-base-chunk>
                             ),
                             col_downStatus: (data: Omix) => (
-                                <n-tag bordered={false} type={data.downStatus === 'addition' ? 'success' : 'default'}>
-                                    {data.downStatus === 'addition' ? '新增' : '未变'}
-                                </n-tag>
+                                <common-base-chunk
+                                    value={data.downStatus}
+                                    items={props.chunkOptions.changeStatusOptions}
+                                ></common-base-chunk>
                             ),
                             col_upStatus: (data: Omix) => (
-                                <n-tag bordered={false} type={data.upStatus === 'addition' ? 'success' : 'default'}>
-                                    {data.upStatus === 'addition' ? '新增' : '未变'}
-                                </n-tag>
+                                <common-base-chunk value={data.upStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
+                            ),
+                            col_downUsd: (data: Omix) => (
+                                <form-base-number-input
+                                    class="w-full"
+                                    min={0}
+                                    step={0.000001}
+                                    precision={6}
+                                    v-model:value={data.downUsd}
+                                ></form-base-number-input>
+                            ),
+                            col_upUsd: (data: Omix) => (
+                                <form-base-number-input
+                                    class="w-full"
+                                    min={0}
+                                    step={0.000001}
+                                    precision={6}
+                                    v-model:value={data.upUsd}
+                                ></form-base-number-input>
                             ),
                             col_effectiveTime: (data: Omix) => (
-                                <n-date-picker
+                                <form-base-date-picker
                                     type="datetime"
                                     clearable={false}
                                     value-format="yyyy-MM-dd HH:mm:ss"

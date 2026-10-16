@@ -17,9 +17,10 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, ...pick(base, ['page', 'size']), statuses: [props.status] }),
+            (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, ...pick(base, ['page', 'size']) }),
             {
                 formState: {
+                    statuses: [props.status],
                     /**客户ID**/
                     userKeyId: undefined,
                     /**客户别名**/

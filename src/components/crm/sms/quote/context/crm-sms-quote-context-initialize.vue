@@ -30,7 +30,7 @@ export default defineComponent({
 
         /**客户类型变更**/
         async function fetchChangeConsumer(userKeyId: number, item: Omix) {
-            return await props.setForm({ appId: undefined }).then(async () => {
+            return await props.setForm({ appId: undefined, userName: item.name, currency: item.currency }).then(async () => {
                 return await props.appOptions.fetchRequest()
             })
         }
@@ -75,6 +75,7 @@ export default defineComponent({
                                 label-field="showName"
                                 label-value="keyId"
                                 v-model:value={formState.value.userKeyId}
+                                loading={props.userOptions.loading.value}
                                 options={props.userOptions.dataSource.value}
                                 on-change:value={fetchChangeConsumer}
                             ></form-base-select>
@@ -89,19 +90,21 @@ export default defineComponent({
                                 label-field="appAlias"
                                 label-value="appId"
                                 v-model:value={formState.value.appId}
+                                loading={props.appOptions.loading.value}
                                 options={props.appOptions.dataSource.value}
+                                on-change:value={(appId: string, e: Omix) => props.setForm({ appAlias: e.appAlias })}
                             ></form-base-select>
                         </form-base-column>
                     </common-base-columns-template>
-                    <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
+                    <common-base-element class="flex flex-col flex-1 gap-y-10 overflow-hidden">
                         <common-business-header bar title="配置报价方向"></common-business-header>
-                        <div class="flex-1 relative overflow-hidden">
-                            <form-base-column
-                                class="inset-0 position-absolute"
-                                path="countryKeyIds"
-                                show-label={false}
-                                rule={{ required: true, type: 'array', trigger: 'change', message: '请选择报价方向' }}
-                            >
+                        <form-base-column
+                            class="flex-1 overflow-hidden"
+                            path="countryKeyIds"
+                            show-label={false}
+                            rule={{ required: true, type: 'array', trigger: 'change', message: '请选择报价方向' }}
+                        >
+                            <common-base-wrapper class-name="inset-0 absolute" opacity={0} loading={props.state.initialize}>
                                 <n-transfer
                                     class="h-full inset-0 position-absolute overflow-hidden"
                                     source-filterable
@@ -109,16 +112,16 @@ export default defineComponent({
                                     v-model:value={formState.value.countryKeyIds}
                                     options={props.mccOptions.dataSource.value}
                                 ></n-transfer>
-                            </form-base-column>
-                        </div>
-                    </div>
+                            </common-base-wrapper>
+                        </form-base-column>
+                    </common-base-element>
                 </common-base-element>
                 <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
                     <n-button
                         class="min-w-168"
                         type="primary"
                         loading={props.state.loading}
-                        disabled={props.state.loading}
+                        disabled={props.state.loading || props.state.initialize}
                         onClick={fetchSubmit}
                     >
                         下一步：编辑报价

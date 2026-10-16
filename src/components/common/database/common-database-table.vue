@@ -73,7 +73,9 @@ export default defineComponent({
         /**开启列设置**/
         showSettings: { type: Boolean, default: false },
         /**开启操作列**/
-        showCommand: { type: Boolean, default: false }
+        showCommand: { type: Boolean, default: false },
+        /**开启序号显示**/
+        showIndex: { type: Boolean, default: false }
     },
     setup(props, { emit, slots }) {
         const headerRef = ref<Omix<{ $el: HTMLElement }>>()
@@ -186,6 +188,10 @@ export default defineComponent({
                 if (isEmpty(base.ellipsis) || base.ellipsis === true) {
                     base.ellipsis = state.TABLE_ELLIPSIS
                 }
+            }
+            /**开启序号配置**/
+            if (['index'].includes(base.key) && props.showIndex) {
+                base.render = (data: Omix, index: number) => index + 1
             }
             if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
                 base.render = (data: Omix, index: number) => slots[`col_${key}`]?.(data, base, index) ?? <span>-</span>
