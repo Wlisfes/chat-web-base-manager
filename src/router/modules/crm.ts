@@ -21,16 +21,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/crm/partner/index.vue')
     },
     {
-        path: '/crm/sms/quote/create',
-        name: 'CrmSmsQuoteCreate',
+        path: '/crm/sms/quote',
+        name: 'CrmSmsQuoteManager',
         meta: { title: '短信报价', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/crm/sms-quote/create/index.vue')
+        component: () => import('@/views/crm/sms/quote/index.vue')
     },
     {
-        path: '/crm/sms/quote',
-        name: 'CrmSmsQuote',
-        meta: { title: '报价查询', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/crm/sms-quote/list/index.vue')
+        path: '/crm/sms/quote/wrapper',
+        name: 'CrmSmsQuoteContextWrapper',
+        meta: { title: '新增短信报价', AUTH: 'AUTH', keepAlive: true, router: '/crm/sms/quote' },
+        component: () => import('@/components/crm/sms/quote/context/crm-sms-quote-context-wrapper.vue')
     }
 ]
 
