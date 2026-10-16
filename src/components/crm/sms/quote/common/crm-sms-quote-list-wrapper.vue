@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
-import { useColumnService, useSelectService } from '@/hooks'
+import { useColumnService, useSelectService, pick } from '@/hooks'
+import { defineComponent } from 'vue'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -16,14 +16,20 @@ export default defineComponent({
         })
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, statuses: [props.status] }),
+            (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, ...pick(base, ['page', 'size']), statuses: [props.status] }),
             {
                 formState: {
+                    /**客户ID**/
                     userKeyId: undefined,
+                    /**客户别名**/
                     userAlias: undefined,
+                    /**应用ID**/
                     appId: undefined,
+                    /**应用别名**/
                     appAlias: undefined,
-                    countryKeyIds: [] as number[],
+                    /**国家/地区主键列表**/
+                    countryKeyIds: [],
+                    /**移动国家代码**/
                     mcc: undefined
                 },
                 columns: [
@@ -59,10 +65,10 @@ export default defineComponent({
             <n-element class="h-full flex flex-col gap-14 overflow-hidden">
                 <common-database-search
                     class="p-0!"
-                    function-class="justify-end"
-                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
                     border-less={['top']}
                     square={['l-t', 'r-t']}
+                    function-class="justify-end"
+                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
                     ref={formRef}
                     label-width={90}
                     limit={state.limit}
@@ -73,6 +79,15 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
+                    <common-database-search-function abstract class="flex gap-col-10">
+                        <common-base-authorize key-name="dssds">
+                            <router-link to="/crm/sms/quote/wrapper">
+                                <common-base-button class="min-w-80" type="primary">
+                                    新增报价
+                                </common-base-button>
+                            </router-link>
+                        </common-base-authorize>
+                    </common-database-search-function>
                     <common-database-search-column prop="userKeyId" label="客户ID">
                         <form-base-input
                             clearable

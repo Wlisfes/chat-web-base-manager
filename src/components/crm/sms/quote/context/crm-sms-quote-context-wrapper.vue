@@ -7,20 +7,20 @@ export default defineComponent({
     name: 'CrmSmsQuoteContextWrapper',
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
-            options: { current: 1 },
+            options: { current: 2 },
             formState: {
                 /**客户ID**/
-                userKeyId: undefined,
+                userKeyId: 10241010,
                 /**应用ID**/
-                appId: undefined,
+                appId: `wFBLI3u78MuNNSmT`,
                 /**报价国家/地区主键**/
-                countryKeyIds: [] as Array<number>,
+                countryKeyIds: [1136, 1133, 1134, 1135, 1130, 1131, 1132, 1127, 1128, 1129],
                 /**报价草稿批次ID**/
-                draftBatchId: undefined
+                draftBatchId: `c63f9ef1-1c4d-428f-aa4d-d2068b430cd6`
             }
         })
         /**客户下拉数据**/
-        const consumerOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), {
+        const userOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), {
             immediate: true,
             transform: data => data.map(item => ({ ...item, showName: `${item.alias} - ${item.name}` }))
         })
@@ -44,6 +44,67 @@ export default defineComponent({
                         <n-step class="items-center" title="发布报价" />
                     </common-business-steps-wrapper>
                 </common-base-element>
+                <form-base-container
+                    class="flex flex-col flex-1 relative overflow-hidden"
+                    ref={formRef}
+                    model={formState.value}
+                    rules={state.rules}
+                    disabled={state.loading}
+                >
+                    <n-tabs
+                        animated
+                        type="line"
+                        tabs-padding={14}
+                        class="common-base-tabser inset-absolute inset-bar flex-1 overflow-hidden "
+                        v-model:value={state.current}
+                    >
+                        <n-tab-pane name={1} tab="填写报价内容">
+                            <crm-sms-quote-context-initialize
+                                state={state}
+                                user-options={userOptions}
+                                app-options={appOptions}
+                                mcc-options={mccOptions}
+                                set-state={setState}
+                                set-form={setForm}
+                                fetch-validater={fetchValidater}
+                                v-model:formState={formState.value}
+                            ></crm-sms-quote-context-initialize>
+                        </n-tab-pane>
+                        <n-tab-pane name={2} tab="编辑报价">
+                            <crm-sms-quote-context-update
+                                state={state}
+                                user-options={userOptions}
+                                app-options={appOptions}
+                                mcc-options={mccOptions}
+                                set-state={setState}
+                                set-form={setForm}
+                                fetch-validater={fetchValidater}
+                                v-model:formState={formState.value}
+                            ></crm-sms-quote-context-update>
+                        </n-tab-pane>
+                        <n-tab-pane name={3} tab="报价预览">
+                            <crm-sms-quote-context-preview
+                                state={state}
+                                user-options={userOptions}
+                                app-options={appOptions}
+                                mcc-options={mccOptions}
+                                set-state={setState}
+                                set-form={setForm}
+                                fetch-validater={fetchValidater}
+                                v-model:formState={formState.value}
+                            ></crm-sms-quote-context-preview>
+                        </n-tab-pane>
+                        <n-tab-pane name={4} tab="发布报价">
+                            <crm-sms-quote-context-publish
+                                state={state}
+                                set-state={setState}
+                                set-form={setForm}
+                                fetch-validater={fetchValidater}
+                                v-model:formState={formState.value}
+                            ></crm-sms-quote-context-publish>
+                        </n-tab-pane>
+                    </n-tabs>
+                </form-base-container>
             </layout-common-container>
         )
     }
