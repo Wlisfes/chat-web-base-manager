@@ -44,20 +44,20 @@ export default defineComponent({
                     payMode: undefined,
                     /**认证状态**/
                     authStatus: undefined,
-                    /**注册来源**/
+                    /**客户来源**/
                     source: undefined
                 },
                 columns: [
                     { title: '客户ID', key: 'keyId', width: 100, disabled: true },
                     { title: '客户名称', key: 'name', minWidth: 240, disabled: true, ellipsis: false },
-                    { title: '客户别名', key: 'alias', width: 150 },
-                    { title: '品牌', key: 'brandKeyId', width: 120 },
+                    { title: '客户别名', key: 'alias', width: 140 },
+                    { title: '品牌', key: 'brandKeyId', width: 100 },
                     { title: '阶段', key: 'stage', width: 100 },
                     { title: '状态', key: 'status', width: 100 },
                     { title: '认证状态', key: 'authStatus', width: 100 },
                     { title: '客户类型', key: 'classType', width: 100 },
                     { title: '付款模式', key: 'payMode', width: 100 },
-                    { title: '注册来源', key: 'source', width: 120 },
+                    { title: '客户来源', key: 'source', width: 140 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', minWidth: 140 },
                     { title: '邮箱', key: 'email', width: 200 },
@@ -66,7 +66,7 @@ export default defineComponent({
                     { title: '币种', key: 'currency', width: 100 },
                     { title: '余额', key: 'balance', width: 120 },
                     { title: '信用额度', key: 'credit', width: 120 },
-                    { title: '备注', key: 'remark', minWidth: 200 },
+                    { title: '备注', key: 'remark', minWidth: 200, check: false },
                     { title: '创建时间', key: 'createTime', width: 160 }
                 ]
             }
@@ -100,10 +100,11 @@ export default defineComponent({
                     ref={formRef}
                     label-width={90}
                     limit={state.limit}
-                    v-model:loading={state.loading}
                     v-model:when={state.when}
+                    v-model:loading={state.loading}
                     v-model:database={state.database}
                     v-model:formState={formState.value}
+                    v-model:initialize={state.initialize}
                     on-update:database={instOptions.fetchUpdateDatabase}
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
@@ -172,14 +173,19 @@ export default defineComponent({
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="source" label="注册来源">
-                        <form-base-select
-                            clearable
-                            placeholder="请选择注册来源"
-                            loading={chunkState.loading}
+                    <common-database-search-column prop="source" label="客户来源">
+                        <form-base-cascader
+                            show-path
+                            filterable
+                            check-strategy="child"
+                            expand-trigger="click"
+                            label-field="label"
+                            label-value="value"
+                            children-field="children"
+                            placeholder="请选择客户来源"
                             options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
-                        ></form-base-select>
+                        ></form-base-cascader>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
@@ -207,6 +213,13 @@ export default defineComponent({
                                     {data.name}
                                 </n-text>
                             </common-base-content>
+                        ),
+                        col_source: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                value={data.source}
+                                items={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
                             return <common-base-number value={data.balance}></common-base-number>

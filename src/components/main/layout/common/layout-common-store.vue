@@ -103,8 +103,8 @@ export default defineComponent({
         }
 
         return () => (
-            <n-layout-header class="layout-common-store flex overflow-hidden">
-                <div ref={element} class="element-wrapper flex-1 whitespace-nowrap p-be-8 cursor-pointer overflow-hidden">
+            <n-layout-header bordered class="layout-common-store flex overflow-hidden">
+                <div ref={element} class="element-wrapper flex-1 whitespace-nowrap p-be-7 cursor-pointer overflow-hidden">
                     <div class="inline-flex gap-x-8 element-bscrollbar">
                         {tabOptions.value.map(item => (
                             <div
@@ -136,7 +136,7 @@ export default defineComponent({
                         ))}
                     </div>
                 </div>
-                <div class="flex gap-x-8 p-is-8 p-ie-12 p-be-8 overflow-hidden">
+                <div class="flex gap-x-8 p-is-8 p-ie-12 p-be-7 overflow-hidden">
                     <common-base-button
                         secondary
                         size="small"

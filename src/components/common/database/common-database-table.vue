@@ -32,8 +32,8 @@ export default defineComponent({
         size: { type: Number, default: 50 },
         /**总条数**/
         total: { type: Number, default: 0 },
-        /**初始化状态**/
-        initialize: { type: Boolean, default: true },
+        /**初始化状态；为 true 时按列配置渲染骨架屏，不展示真实单元格和表单**/
+        initialize: { type: Boolean, default: false },
         /**加载状态**/
         loading: { type: Boolean, default: true },
         /**开启分页**/
@@ -42,12 +42,18 @@ export default defineComponent({
         paginationClass: { type: String, default: '' },
         /**开启边框**/
         bordered: { type: Boolean, default: true },
+        /**撑满父容器高度；关闭后按行内容撑开高度，用于父级没有固定高度的场景**/
+        flexHeight: { type: Boolean, default: true },
         /**开启纵向虚拟滚动**/
         virtualScroll: { type: Boolean, default: false },
         /**开启横向虚拟滚动**/
         virtualScrollX: { type: Boolean, default: false },
+        /**初始化骨架屏行数**/
+        cols: { type: Number, default: 20 },
         /**虚拟滚动最小行高**/
         minRowHeight: { type: Number, default: 44 },
+        /**骨架屏单元格高度**/
+        colsRowHeight: { type: Number, default: 24 },
         /**被选中的行的对象列表**/
         select: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**表头配置自定义排版规则**/
@@ -85,7 +91,12 @@ export default defineComponent({
         })
         const rowKey = (e: Omix) => e.keyId
         const scrollbarProps = { size: 100, trigger: 'none' as const }
-        const tableStyle = computed(() => ({ flex: 1, '--n-opacity-loading': initialize.value ? 0 : 0.5 }))
+        const tableStyle = computed(() => ({
+            flex: props.flexHeight ? 1 : undefined,
+            '--n-opacity-loading': initialize.value ? 0 : 0.5
+        }))
+        /**撑满高度时参与父容器伸缩；按内容撑开时不收缩、不裁切**/
+        const flexClass = computed(() => (props.flexHeight ? 'flex-1 overflow-hidden' : ''))
         const tableSize = useElementSize(tableRef)
         /**容器整数宽度，避免亚像素变化触发列重算**/
         const tableWidth = computed(() => Math.floor(tableSize.width.value))
@@ -104,6 +115,45 @@ export default defineComponent({
         /**复选框选中id列表**/
         const faseSelect = computed(() => {
             return select.value.map(item => item.keyId)
+        })
+        /**分页条数选项；内置 size picker 无插槽，改为自行渲染以便套骨架屏**/
+        const pageSizeOptions = computed(() => props.pageSizes.map(value => ({ label: `${value} / 页`, value })))
+        const SKELETON_WIDTHS = ['62%', '78%', '54%', '70%', '66%']
+        const skeletonRows = computed(() => Array.from({ length: Math.max(props.cols, 0) }, (_, index) => ({ keyId: index + 1 })))
+        /**
+         * 骨架条保持 22px。height 是单元格目标高度，先扣掉表格上下各 8px 内边距。
+         * 剩余高度大于 22 时，多出的部分平分到骨架块的上下边距，这样行高才会真正变化。
+         */
+        function fetchSkeleton(content: string, width?: string, height = 24) {
+            const block = height > 22 ? (height - 22) / 2 : undefined
+            return (
+                <common-skeleton-block block={block}>
+                    <span class="inline-block h-22 line-height-22" style={{ width }}>
+                        {content}
+                    </span>
+                </common-skeleton-block>
+            )
+        }
+        const skeletonColumns = computed(() => {
+            return faseColumns.value
+                .filter(item => item.key !== 'settings')
+                .map((item, index) => {
+                    const source = props.columns.find(column => column.key === item.key)
+                    const titleMap: Record<string, string> = { command: '操作', selection: '选' }
+                    const title =
+                        typeof source?.title === 'string' && source.title ? source.title : titleMap[String(item.key)] || '字段名称'
+                    const width = source?.skeleton === 'form' ? undefined : SKELETON_WIDTHS[index % SKELETON_WIDTHS.length]
+                    return {
+                        key: item.key,
+                        width: item.width,
+                        minWidth: item.minWidth,
+                        align: item.align,
+                        fixed: item.fixed,
+                        className: item.className,
+                        title: () => fetchSkeleton(title),
+                        render: () => fetchSkeleton(width ? title : '请选择', width, props.colsRowHeight)
+                    }
+                })
         })
         /**仅 minWidth 列平分剩余宽度，写入真实 width 保证不低于 minWidth**/
         function fetchColumnFlexWidth(columns: Array<Omix<DataTableColumn>>) {
@@ -249,21 +299,21 @@ export default defineComponent({
 
         return () => (
             <n-element
-                class="common-database-container flex flex-col flex-1 overflow-hidden"
+                class={`common-database-container flex flex-col ${flexClass.value}`}
                 style={{ [`--common-limit-width`]: `${props.limit}px`, padding: 'var(--common-limit-width)' }}
             >
                 <n-card
-                    class="flex flex-col flex-1 overflow-hidden"
-                    content-class="flex flex-col flex-1 overflow-hidden p-0!"
+                    class={`flex flex-col ${flexClass.value}`}
+                    content-class={`flex flex-col ${flexClass.value} p-0!`}
                     bordered={props.bordered}
                 >
-                    <n-element class="common-database-table flex flex-col flex-1 overflow-hidden">
+                    <n-element class={`common-database-table flex flex-col ${flexClass.value}`}>
                         {slots.default && (
                             <n-element ref={headerRef} class="flex flex-col line-height-22 overflow-hidden">
                                 {slots.default && slots.default()}
                             </n-element>
                         )}
-                        <div ref={tableRef} class="common-database-table-container flex flex-col flex-1 overflow-hidden">
+                        <div ref={tableRef} class={`common-database-table-container flex flex-col ${flexClass.value}`}>
                             {props.showCommand && data.value.length > 0 && (
                                 <common-database-table-visibility
                                     show-settings={props.showSettings}
@@ -276,19 +326,19 @@ export default defineComponent({
                             <n-data-table
                                 remote
                                 bordered
-                                flex-height
+                                flex-height={props.flexHeight}
                                 size="small"
                                 style={tableStyle.value}
                                 row-key={rowKey}
-                                loading={loading.value}
+                                loading={initialize.value ? false : loading.value}
                                 min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}
                                 single-line={false}
                                 virtual-scroll={props.virtualScroll}
                                 virtual-scroll-x={props.virtualScroll && props.virtualScrollX}
                                 virtual-scroll-header={props.virtualScroll && props.virtualScrollX}
-                                data={data.value}
-                                columns={faseColumns.value}
+                                data={initialize.value ? skeletonRows.value : data.value}
+                                columns={initialize.value ? skeletonColumns.value : faseColumns.value}
                                 checked-row-keys={faseSelect.value}
                                 scrollbar-props={scrollbarProps}
                                 render-cell={fetchCellRender}
@@ -296,6 +346,11 @@ export default defineComponent({
                             ></n-data-table>
                         </div>
                     </n-element>
+                    {/* {props.pagination && initialize.value && (
+                        <n-element class={`common-database-pagination flex justify-end items-center gap-8 ${props.paginationClass}`}>
+                            {['共 0 条', '上一页', '1', '下一页', '50 / 页'].map(item => fetchSkeleton(item, undefined, 42))}
+                        </n-element>
+                    )} */}
                     {props.pagination && (
                         <n-element class={`common-database-pagination flex justify-end ${props.paginationClass}`}>
                             <n-pagination
@@ -304,29 +359,64 @@ export default defineComponent({
                                 page-size={size.value}
                                 v-model:page={page.value}
                                 page-sizes={props.pageSizes}
-                                show-size-picker={props.showSizePicker}
+                                show-size-picker={false}
                                 show-quick-jumper={props.showQuickJumper}
                                 on-update:page={fetchUpdatePage}
                                 on-update:page-size={fetchUpdateSize}
                             >
                                 {{
-                                    suffix: fetchWherer(props.showQuickJumper, () => <span>页</span>),
-                                    goto: () => <span>前往</span>,
-                                    prefix: () => <span class="whitespace-nowrap">{`共 ${props.total} 条`}</span>,
+                                    suffix: fetchWherer(props.showQuickJumper || props.showSizePicker, () => (
+                                        <div class="flex items-center gap-8 overflow-hidden">
+                                            {props.showQuickJumper && (
+                                                <common-skeleton-block initialize={initialize.value}>
+                                                    <span class="line-height-28">页</span>
+                                                </common-skeleton-block>
+                                            )}
+                                            {props.showSizePicker && (
+                                                <common-skeleton-block initialize={initialize.value}>
+                                                    <n-select
+                                                        size="small"
+                                                        placeholder=""
+                                                        value={size.value}
+                                                        options={pageSizeOptions.value}
+                                                        consistent-menu-width={false}
+                                                        show-checkmark={false}
+                                                        on-update:value={fetchUpdateSize}
+                                                    ></n-select>
+                                                </common-skeleton-block>
+                                            )}
+                                        </div>
+                                    )),
+                                    goto: () => (
+                                        <common-skeleton-block initialize={initialize.value}>
+                                            <span class="line-height-28">前往</span>
+                                        </common-skeleton-block>
+                                    ),
+                                    prefix: () => (
+                                        <common-skeleton-block initialize={initialize.value}>
+                                            <span class="whitespace-nowrap line-height-28">{`共 ${props.total} 条`}</span>
+                                        </common-skeleton-block>
+                                    ),
                                     label: (data: Omix<{ node: number; active: boolean }>) => (
-                                        <common-base-button size="small" secondary type={data.active ? 'primary' : undefined}>
-                                            {data.node}
-                                        </common-base-button>
+                                        <common-skeleton-block initialize={initialize.value}>
+                                            <common-base-button size="small" secondary type={data.active ? 'primary' : undefined}>
+                                                {data.node}
+                                            </common-base-button>
+                                        </common-skeleton-block>
                                     ),
                                     prev: (data: Omix<PaginationInfo>) => (
-                                        <common-base-button size="small" secondary disabled={data.page <= 1}>
-                                            上一页
-                                        </common-base-button>
+                                        <common-skeleton-block initialize={initialize.value}>
+                                            <common-base-button size="small" secondary disabled={data.page <= 1}>
+                                                上一页
+                                            </common-base-button>
+                                        </common-skeleton-block>
                                     ),
                                     next: (data: Omix<PaginationInfo>) => (
-                                        <common-base-button size="small" secondary disabled={data.page >= data.pageCount}>
-                                            下一页
-                                        </common-base-button>
+                                        <common-skeleton-block initialize={initialize.value}>
+                                            <common-base-button size="small" secondary disabled={data.page >= data.pageCount}>
+                                                下一页
+                                            </common-base-button>
+                                        </common-skeleton-block>
                                     )
                                 }}
                             </n-pagination>
@@ -352,7 +442,7 @@ export default defineComponent({
         :deep(.n-data-table-th.chunk-command) {
             padding: 0;
         }
-        :deep(.n-data-table:not(.n-data-table--single-line) .n-data-table-base-table-body) {
+        :deep(.n-data-table.n-data-table--flex-height:not(.n-data-table--single-line) .n-data-table-base-table-body) {
             .n-scrollbar-container:has(~ .n-scrollbar-rail.n-scrollbar-rail--vertical--right.n-scrollbar-rail--disabled) {
                 .n-data-table-tbody > tr:last-child > td {
                     border-bottom: 1px solid var(--n-merged-border-color);

@@ -5,6 +5,8 @@ import { isNotEmpty, isString } from '@/utils'
 export default defineComponent({
     name: 'CommonSkeletonBlock',
     props: {
+        /**是否显示初始化**/
+        initialize: { type: Boolean, default: true },
         /**左右边距**/
         inline: { type: [String, Number] },
         /**上下边距**/
@@ -44,16 +46,21 @@ export default defineComponent({
         })
 
         return () => (
-            <n-element style={root.value} class="common-skeleton-block relative overflow-hidden box-border line-height-22">
-                <div class={`flex flex-col opacity-0 pointer-events-none box-border ${props.elementClass}`}>
+            <n-element class="common-skeleton-block relative overflow-hidden box-border line-height-22">
+                <div
+                    style={{ ...root.value, ...style.value }}
+                    class={[`flex flex-col box-border ${props.elementClass}`, { 'opacity-0 pointer-events-none': props.initialize }]}
+                >
                     {slots.default && slots.default()}
                 </div>
-                <div
-                    style={style.value}
-                    class={`flex flex-col absolute inset-0 w-full h-full overflow-hidden box-border ${props.className}`}
-                >
-                    <n-skeleton class="w-full h-full" sharp={props.sharp} circle={props.circle} round={props.round} />
-                </div>
+                {props.initialize && (
+                    <div
+                        style={style.value}
+                        class={`flex flex-col absolute inset-0 w-full h-full overflow-hidden box-border ${props.className}`}
+                    >
+                        <n-skeleton class="w-full h-full" sharp={props.sharp} circle={props.circle} round={props.round} />
+                    </div>
+                )}
             </n-element>
         )
     }

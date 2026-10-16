@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, KeepAlive } from 'vue'
-import { RouterView } from 'vue-router'
+import { defineComponent, h, KeepAlive } from 'vue'
 import { useConfiger, useGlobal, useStore } from '@/store'
+import { RouterView } from 'vue-router'
 
 export default defineComponent({
     name: 'BaseLayout',
@@ -18,6 +18,7 @@ export default defineComponent({
                 </n-layout-header>
                 <n-layout has-sider content-class="flex flex-col overflow-hidden">
                     <n-layout-sider
+                        class="base-layout-sider"
                         width={240}
                         collapse-mode="width"
                         native-scrollbar={false}
@@ -40,8 +41,12 @@ export default defineComponent({
                             <n-element class="flex flex-col flex-1 relative transition-background-color transition-duration-300 bg-[var(--common-body-bg-color)]">
                                 <RouterView>
                                     {{
-                                        default: ({ Component }: Omix) => {
-                                            return <KeepAlive include={keepTabNemas.value}>{Component}</KeepAlive>
+                                        default: ({ Component, route }: Omix) => {
+                                            return (
+                                                <KeepAlive include={keepTabNemas.value}>
+                                                    {Component && h(Component, { key: route.fullPath })}
+                                                </KeepAlive>
+                                            )
                                         }
                                     }}
                                 </RouterView>
@@ -54,3 +59,18 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.n-layout-sider.base-layout-sider {
+    position: relative;
+    &::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 35px;
+        border-right: 1px solid var(--divider-color);
+        transition: border-color 0.3s var(--n-bezier);
+    }
+}
+</style>

@@ -76,7 +76,9 @@ export function setupGuardRouter(router: Router) {
         window.$loadingBar.finish()
         return await fetchHandler(['AUTH'].includes(String(to.meta.AUTH)), async () => {
             return await fetchUpdateRouter(to).then(async menu => {
-                return await setState({ router: to.path })
+                // 无菜单的页面（如客户详情）通过 meta.router 指定需要高亮的菜单路径，其余页面按当前路径高亮。
+                const menuRouter = typeof to.meta.router === 'string' && to.meta.router ? to.meta.router : to.path
+                return await setState({ router: menuRouter })
             })
         })
     })

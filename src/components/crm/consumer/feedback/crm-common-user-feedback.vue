@@ -26,7 +26,7 @@ export default defineComponent({
         /**客户静态枚举、联系方式类型枚举**/
         const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_SYSTEM_COMMON_CONTACT_TYPE'],
+            types: ['CHUNK_CRM_CRM_USER_SOURCE', 'CHUNK_SYSTEM_COMMON_CONTACT_TYPE'],
             immediate: false
         })
         /**表单实例**/
@@ -43,6 +43,8 @@ export default defineComponent({
                 email: props.node.email,
                 /**电话号码**/
                 phone: props.node.phone,
+                /**客户来源**/
+                source: props.node.source,
                 /**付款模式**/
                 payMode: props.node.payMode,
                 /**备注**/
@@ -64,6 +66,7 @@ export default defineComponent({
                 brandKeyId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'blur' },
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
                 email: { required: true, message: '请输入邮箱', trigger: 'blur' },
+                source: { required: true, message: '请选择客户来源', trigger: 'blur' },
                 payMode: { required: true, message: '请选择付款模式', trigger: 'blur' },
                 contact: {
                     name: { required: true, message: '请输入联系人名称', trigger: 'blur' },
@@ -83,7 +86,7 @@ export default defineComponent({
             try {
                 return await Promise.all([Service.httpBaseCrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
                     const contact = pick(data.contact, ['name', 'address', 'remark'])
-                    const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, keyId: v4() }))
+                    const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, disabled: true, keyId: v4() }))
                     return await setForm({ ...data, items, contact }).then(async () => {
                         return await setState({ initialize: false })
                     })
@@ -183,6 +186,20 @@ export default defineComponent({
                             v-model:value={formState.value.phone}
                         ></form-base-input>
                     </form-base-column>
+                    <form-base-column label="客户来源" path="source">
+                        <form-base-cascader
+                            show-path
+                            filterable
+                            check-strategy="child"
+                            expand-trigger="click"
+                            label-field="label"
+                            label-value="value"
+                            children-field="children"
+                            placeholder="请选择客户来源"
+                            options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            v-model:value={formState.value.source}
+                        ></form-base-cascader>
+                    </form-base-column>
                     <form-base-column full label="备注" path="remark">
                         <n-input
                             type="textarea"
@@ -192,7 +209,6 @@ export default defineComponent({
                             autosize={{ minRows: 2, maxRows: 6 }}
                         />
                     </form-base-column>
-
                     <form-base-column label="联系人名称" path="contact.name">
                         <form-base-input
                             maxlength={64}

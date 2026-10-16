@@ -173,8 +173,9 @@ export default defineComponent({
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
-                    show-command={instState.value.showCommand}
                     show-settings
+                    cols-row-height={48}
+                    show-command={instState.value.showCommand}
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}

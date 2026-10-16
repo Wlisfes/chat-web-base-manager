@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
+import { Enterprise, Time, UserAdmin, Currency } from '@vicons/carbon'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
@@ -17,26 +18,46 @@ export default defineComponent({
         const { faseNode } = useVModels(props, emit)
 
         return () => (
-            <n-card class="crm-consumer-context-wrapper flex flex-col" content-class="p-16! flex flex-col gap-10">
-                <div class="flex flex-col overflow-hidden">
-                    <div class="flex justify-between gap-20 overflow-hidden">
-                        <div class="flex flex-col overflow-hidden">
-                            <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                                <n-text depth="3">{`创建时间：${faseNode.value.createTime ?? '-'}`}</n-text>
-                            </div>
-                            <div class="flex items-center p-block-8 gap-10 overflow-hidden">
-                                <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
-                            </div>
+            <common-base-element is-white class="flex flex-col p-inline-16 p-bs-16 p-be-5 overflow-hidden">
+                <div class="flex p-be-10 overflow-hidden">
+                    <div class="flex flex-col flex-1 gap-y-10 overflow-hidden">
+                        <div class="flex gap-10 overflow-hidden">
+                            <n-h1 class="m-0 text-20 font-500 line-height-24">{`${faseNode.value.name} (${faseNode.value.keyId})`}</n-h1>
+                            <common-base-chunk
+                                mode="chunk"
+                                value={faseNode.value.classType}
+                                items={props.chunkOptions.classTypeOptions}
+                            ></common-base-chunk>
+                            <common-base-chunk
+                                mode="chunk"
+                                value={faseNode.value.authStatus}
+                                items={props.chunkOptions.authStatusOptions}
+                            ></common-base-chunk>
                         </div>
-                        <div class="flex items-center">
-                            <n-button>刷新</n-button>
+                        <div class="flex gap-x-20 text-12 line-height-16 overflow-hidden">
+                            <n-text depth="3" class="flex items-center gap-x-5 overflow-hidden">
+                                <n-icon size={14} component={<Time />} />
+                                <span>{`创建时间：${faseNode.value.createTime ?? '-'}`}</span>
+                            </n-text>
+                            <n-text depth="3" class="flex items-center gap-x-5 overflow-hidden">
+                                <n-icon size={14} component={<UserAdmin />} />
+                                <common-base-user prefix="归属人：" data={faseNode.value.ownerUserUidOptions}></common-base-user>
+                            </n-text>
+                            {(faseNode.value.ownerUserUidOptions?.organizations ?? []).length > 0 && (
+                                <n-text depth="3" class="flex items-center gap-x-5 overflow-hidden">
+                                    <n-icon size={14} component={<Enterprise />} />
+                                    <span>{`部门：${faseNode.value.ownerUserUidOptions.organizations.map((e: Omix) => e.name).join('、')}`}</span>
+                                </n-text>
+                            )}
+                            <n-text depth="3" class="flex items-center gap-x-5 overflow-hidden">
+                                <n-icon size={14} component={<Currency />} />
+                                <span>{`币种：${faseNode.value.currency ?? '-'}`}</span>
+                            </n-text>
                         </div>
                     </div>
-                    <div class="flex gap-20 text-12 line-height-16 overflow-hidden">
-                        <n-text depth="3">
-                            <span>归属人：</span>
-                            <common-base-user element="text" data={faseNode.value.ownerUserUidOptions}></common-base-user>
-                        </n-text>
+                    <div class="flex m-be-auto">
+                        <n-button>刷新</n-button>
+                        <n-button>编辑客户</n-button>
                     </div>
                 </div>
                 <common-business-progressbar
@@ -44,27 +65,8 @@ export default defineComponent({
                     stage={faseNode.value.stage}
                     items={props.chunkOptions.stageOptions}
                 ></common-business-progressbar>
-            </n-card>
+            </common-base-element>
         )
     }
 })
 </script>
-
-<style lang="scss" scoped>
-.crm-consumer-context-progressbar {
-    position: relative;
-    // .common-block {
-    //     position: relative;
-    //     &:first-child {
-    //         margin-inline-start: 0;
-    //         clip-path: polygon(0% 0%, 93% 0%, 100% 50%, 93% 100%, 0% 100%);
-    //     }
-    //     &:last-child {
-    //         clip-path: polygon(100% 0, 100% 100%, 0% 100%, 7% 50%, 0% 0%);
-    //     }
-    //     &:not(:first-child):not(:last-child) {
-    //         clip-path: polygon(93% 0%, 100% 50%, 93% 100%, 0% 100%, 7% 50%, 0% 0%);
-    //     }
-    // }
-}
-</style>
