@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, Fragment, Component, h, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
-import { Lightning, Chat, ChatBot } from '@vicons/carbon'
+import { Chat, ChatBot, ChatLaunch } from '@vicons/carbon'
 import { useVModels } from '@vueuse/core'
 import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
@@ -9,8 +9,8 @@ import * as Service from '@/api/instance.service'
 /**短信应用类型对应的图标；颜色统一使用枚举接口返回的 type。*/
 const SMS_APP_ICONS: Record<string, Component> = {
     MRKT: ChatBot,
-    NTFY: Chat,
-    SOTP: Lightning
+    NTFY: ChatLaunch,
+    SOTP: Chat
 }
 
 export default defineComponent({
