@@ -157,7 +157,7 @@ export default defineComponent({
                                         class="min-w-80"
                                         type="primary"
                                         icon={Search}
-                                        secondary={!initialize.value}
+                                        secondary={initialize.value || loading.value ? false : true}
                                         loading={initialize.value ? false : loading.value}
                                         disabled={loading.value || initialize.value}
                                         onClick={(e: MouseEvent) => emit('-submit', formState.value)}

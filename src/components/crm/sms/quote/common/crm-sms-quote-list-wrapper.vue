@@ -1,5 +1,6 @@
 <script lang="tsx">
 import { useColumnService, useSelectService, pick } from '@/hooks'
+import { isEmpty, stop } from '@/utils'
 import { defineComponent } from 'vue'
 import * as Service from '@/api/instance.service'
 
@@ -12,10 +13,11 @@ export default defineComponent({
     setup(props, ctx) {
         /**国家/地区下拉数据**/
         const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+            transform: s => s.map(e => ({ ...e, value: e.keyId, label: e.showName })),
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnSmsQuote({ ...payload, ...pick(base, ['page', 'size']), statuses: [props.status] }),
             {
                 formState: {
@@ -34,31 +36,40 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '客户ID', key: 'userKeyId', width: 100, disabled: true },
-                    { title: '客户名称', key: 'consumerName', minWidth: 160, check: true },
-                    { title: '客户别名', key: 'userAlias', width: 140, check: true },
-                    { title: '应用ID', key: 'appId', width: 120, check: true },
-                    { title: '应用别名', key: 'appAlias', minWidth: 160, check: true },
-                    { title: 'MCC', key: 'mcc', width: 80, check: true },
-                    { title: 'Code', key: 'code', width: 80, check: true },
-                    { title: '国家/地区', key: 'countryName', minWidth: 180, check: true },
-                    { title: '上行价格(USD)', key: 'upUsd', width: 140, check: true },
-                    { title: '下行价格(USD)', key: 'downUsd', width: 140, check: true },
-                    { title: '报价币种', key: 'currency', width: 100, check: true },
-                    { title: '上行本币价格', key: 'upLocal', width: 140, check: true },
-                    { title: '下行本币价格', key: 'downLocal', width: 140, check: true },
-                    { title: '汇率', key: 'exchangeRate', width: 120, check: true },
-                    { title: '汇率日期', key: 'exchangeDate', width: 120, check: true },
-                    { title: '生效时间', key: 'effectiveTime', width: 170, check: true },
-                    { title: '失效时间', key: 'expiryTime', width: 170, check: true },
-                    { title: '创建时间', key: 'createTime', width: 170, check: true }
+                    { title: '客户名称', key: 'userName', minWidth: 200, disabled: true, ellipsis: false },
+                    { title: '客户别名', key: 'userAlias', width: 130 },
+                    { title: '应用别名', key: 'appAlias', minWidth: 160 },
+                    { title: 'MCC', key: 'mcc', width: 80 },
+                    { title: 'Code', key: 'code', width: 80 },
+                    { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
+                    { title: '汇率', key: 'exchangeRate', width: 100 },
+                    { title: '报价币种', key: 'currency', width: 100 },
+                    { title: '上行本币价格', key: 'upLocal', width: 140 },
+                    { title: '下行本币价格', key: 'downLocal', width: 140 },
+                    { title: '上行价格(USD)', key: 'upUsd', width: 140 },
+                    { title: '下行价格(USD)', key: 'downUsd', width: 140 },
+                    { title: '汇率日期', key: 'exchangeDate', width: 120 },
+                    { title: '生效时间', key: 'effectiveTime', width: 170 },
+                    { title: '失效时间', key: 'expiryTime', width: 170 },
+                    { title: '创建时间', key: 'createTime', width: 170 }
                 ]
             }
         )
 
-        /**价格格式化**/
-        function formatPrice(value: number) {
-            if (value === undefined || value === null) return '-'
-            return (Number(value) / 1_000_000).toFixed(6)
+        /**跳转客户详情**/
+        async function fetchJumpContextConsumer(event: MouseEvent, data: Omix) {
+            return await stop(event, async () => {
+                return await router.push({
+                    path: `/crm/consumer/context/${data.keyId}`,
+                    state: { tabTitle: data.name }
+                })
+            })
+        }
+
+        /**国家/地区名称**/
+        function fetchCountryName(data: Omix) {
+            const country = countryOptions.dataSource.value.find((item: Omix) => item.keyId === data.countryKeyId)
+            return country ? `${country.cnName} - ${country.enName}` : data.code
         }
 
         return () => (
@@ -158,33 +169,40 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_consumerName: (data: Omix) => (
-                            <common-database-table-content>{data.userOptions?.name}</common-database-table-content>
+                        col_userName: (data: Omix) => (
+                            <common-base-content ellipsis value={data.userOptions?.name}>
+                                <n-text
+                                    class="cursor-pointer"
+                                    type="info"
+                                    onClick={(e: MouseEvent) => fetchJumpContextConsumer(e, data.userOptions)}
+                                >
+                                    {data.userOptions?.name ?? '-'}
+                                </n-text>
+                            </common-base-content>
                         ),
-                        col_userAlias: (data: Omix) => (
-                            <common-database-table-content>{data.userOptions?.alias}</common-database-table-content>
+                        col_countryKeyId: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                ellipsis
+                                value={data.countryKeyId}
+                                items={countryOptions.dataSource.value}
+                            ></common-base-chunk>
                         ),
-                        col_countryName: (data: Omix) => (
-                            <common-database-table-content>
-                                {(() => {
-                                    const country = countryOptions.dataSource.value.find((item: Omix) => item.keyId === data.countryKeyId)
-                                    return country ? `${country.cnName} - ${country.enName}` : data.code
-                                })()}
-                            </common-database-table-content>
-                        ),
-                        col_upUsd: (data: Omix) => <common-database-table-content>{formatPrice(data.upUsd)}</common-database-table-content>,
-                        col_downUsd: (data: Omix) => (
-                            <common-database-table-content>{formatPrice(data.downUsd)}</common-database-table-content>
-                        ),
-                        col_upLocal: (data: Omix) => (
-                            <common-database-table-content>{formatPrice(data.upLocal)}</common-database-table-content>
-                        ),
-                        col_downLocal: (data: Omix) => (
-                            <common-database-table-content>{formatPrice(data.downLocal)}</common-database-table-content>
-                        ),
-                        col_expiryTime: (data: Omix) => (
-                            <common-database-table-content>{data.expiryTime ?? '永久有效'}</common-database-table-content>
-                        )
+                        col_upUsd: (data: Omix) => {
+                            return <common-base-number value={data.upUsd}></common-base-number>
+                        },
+                        col_downUsd: (data: Omix) => {
+                            return <common-base-number value={data.downUsd}></common-base-number>
+                        },
+                        col_upLocal: (data: Omix) => {
+                            return <common-base-number value={data.upLocal}></common-base-number>
+                        },
+                        col_downLocal: (data: Omix) => {
+                            return <common-base-number value={data.downLocal}></common-base-number>
+                        },
+                        col_expiryTime: (data: Omix) => {
+                            return <common-base-content value={data.expiryTime ?? '永久有效'}></common-base-content>
+                        }
                     }}
                 </common-database-table>
             </n-element>
