@@ -13,22 +13,22 @@ export default defineComponent({
                 <n-tabs
                     animated
                     type="line"
-                    default-value="effective"
                     tabs-padding={14}
-                    class="common-base-tabser inset-absolute flex-1 overflow-hidden "
+                    default-value="effective"
                     v-model:value={state.tabName}
+                    class="common-base-tabser inset-border inset-absolute overflow-hidden"
                 >
                     <n-tab-pane name="effective" tab="已生效" display-directive="show:lazy">
-                        <crm-sms-quote-list status="effective"></crm-sms-quote-list>
+                        <crm-sms-quote-list-wrapper status="effective"></crm-sms-quote-list-wrapper>
                     </n-tab-pane>
                     <n-tab-pane name="pending" tab="待生效" display-directive="show:lazy">
-                        <crm-sms-quote-list status="pending"></crm-sms-quote-list>
+                        <crm-sms-quote-list-wrapper status="pending"></crm-sms-quote-list-wrapper>
                     </n-tab-pane>
                     <n-tab-pane name="expired" tab="已失效" display-directive="show:lazy">
-                        <crm-sms-quote-list status="expired"></crm-sms-quote-list>
+                        <crm-sms-quote-list-wrapper status="expired"></crm-sms-quote-list-wrapper>
                     </n-tab-pane>
                     <n-tab-pane name="deleted" tab="已作废" display-directive="show:lazy">
-                        <crm-sms-quote-list status="deleted"></crm-sms-quote-list>
+                        <crm-sms-quote-list-wrapper status="deleted"></crm-sms-quote-list-wrapper>
                     </n-tab-pane>
                 </n-tabs>
             </layout-common-container>

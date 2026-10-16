@@ -51,6 +51,13 @@ body,
         flex: 1;
         padding: 0;
     }
+    &.inset-border > .n-tabs-nav--line-type .n-tabs-nav-scroll-content {
+        border-top: 1px solid var(--n-tab-border-color);
+        border-left: 1px solid var(--n-tab-border-color);
+        border-right: 1px solid var(--n-tab-border-color);
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+    }
     &.inset-bar > .n-tabs-nav {
         display: none;
     }
