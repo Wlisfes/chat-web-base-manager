@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, Fragment, PropType } from 'vue'
-import { useColumnService, useProvider, fetchCurrent } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
+import { useColumnService, useProvider } from '@/hooks'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
@@ -127,6 +127,7 @@ export default defineComponent({
                     return await props.setState({ loading: false, disabled: false })
                 }
                 try {
+                    console.log(props.faseNode)
                     return await props.setState({ loading: false, current: 3 })
                 } catch (err) {
                     return await props.setState({ loading: false }).then(async () => {
@@ -140,11 +141,19 @@ export default defineComponent({
             <Fragment>
                 <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
-                    <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
-                        <common-base-columns-wrapper label="客户名称：">{props.faseNode.name ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="客户别名：">{props.faseNode.alias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="报价币种：">{props.faseNode.currency ?? '-'}</common-base-columns-wrapper>
+                    <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={240}>
+                        <common-base-columns-wrapper label="客户名称：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.name ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户别名：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.alias ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="应用别名：">
+                            <common-skeleton-block initialize={state.initialize}>{formState.value.appAlias ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="报价币种：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.currency ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
                     </common-base-columns-template>
                 </common-base-element>
                 <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden">
@@ -228,18 +237,22 @@ export default defineComponent({
                     </common-database-table>
                 </common-base-element>
                 <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
-                    <n-button class="min-w-168" disabled={props.state.loading} onClick={() => props.setState({ current: 1 })}>
-                        上一步：填写报价内容
-                    </n-button>
-                    <n-button
-                        class="min-w-168"
-                        type="primary"
-                        loading={props.state.loading}
-                        disabled={props.state.loading || baulk.value}
-                        onClick={fetchSubmit}
-                    >
-                        下一步：报价预览
-                    </n-button>
+                    <common-skeleton-block initialize={state.initialize}>
+                        <n-button class="min-w-160" disabled={props.state.loading} onClick={() => props.setState({ current: 1 })}>
+                            上一步：填写报价内容
+                        </n-button>
+                    </common-skeleton-block>
+                    <common-skeleton-block initialize={state.initialize}>
+                        <n-button
+                            class="min-w-160"
+                            type="primary"
+                            loading={props.state.loading}
+                            disabled={props.state.loading || baulk.value}
+                            onClick={fetchSubmit}
+                        >
+                            下一步：报价预览
+                        </n-button>
+                    </common-skeleton-block>
                 </common-base-element>
             </Fragment>
         )

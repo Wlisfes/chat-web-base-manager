@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType } from 'vue'
-import { useVModels } from '@vueuse/core'
 import { fetchNotifyService } from '@/plugins'
+import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -119,15 +119,17 @@ export default defineComponent({
                     </common-base-element>
                 </common-base-element>
                 <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
-                    <n-button
-                        class="min-w-168"
-                        type="primary"
-                        loading={props.state.loading}
-                        disabled={props.state.loading || props.state.initialize}
-                        onClick={fetchSubmit}
-                    >
-                        下一步：编辑报价
-                    </n-button>
+                    <common-skeleton-block initialize={props.state.initialize}>
+                        <n-button
+                            class="min-w-160"
+                            type="primary"
+                            loading={props.state.loading}
+                            disabled={props.state.loading || props.state.initialize}
+                            onClick={fetchSubmit}
+                        >
+                            下一步：编辑报价
+                        </n-button>
+                    </common-skeleton-block>
                 </common-base-element>
             </Fragment>
         )

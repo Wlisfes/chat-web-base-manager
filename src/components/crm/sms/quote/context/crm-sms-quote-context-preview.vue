@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { computed, defineComponent, Fragment, PropType, ref } from 'vue'
-import { useColumnService, fetchCurrent } from '@/hooks'
+import { defineComponent, computed, Fragment, PropType } from 'vue'
+import { useColumnService } from '@/hooks'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
@@ -31,9 +31,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
-        /**草稿批次统计（由草稿分页接口返回，后端基于整批有效草稿计算）**/
-        const summary = ref<Omix>({})
-        const { state, instOptions, faseState, fetchRefresh } = useColumnService((e, payload) => fetchBaseCrmColumnSmsQuoteDraft(payload), {
+        const { state, instOptions, faseState, fetchRefresh } = useColumnService((e, p) => Service.httpBaseCrmColumnSmsQuoteDraft(p), {
             formState: { status: 'enable', draftBatchId: formState.value.draftBatchId },
             columns: [
                 { title: '序号', key: 'index', width: 100 },
@@ -50,57 +48,53 @@ export default defineComponent({
                 { title: '生效时间', key: 'effectiveTime', width: 160 }
             ]
         })
-
-        const summaryItems = computed(() => [
-            { label: '报价条目', value: summary.value.total, color: 'var(--text-color-1)' },
-            { label: '国家/地区', value: summary.value.countries, color: 'var(--text-color-1)' },
-            { label: '新增', value: summary.value.additions, color: 'var(--success-color)' },
-            { label: '涨价', value: summary.value.increases, color: 'var(--error-color)' },
-            { label: '降价', value: summary.value.decreases, color: 'var(--warning-color)' },
-            { label: '定时生效', value: summary.value.scheduled, color: 'var(--primary-color)' }
+        /**汇总**/
+        const columns = computed(() => [
+            { label: '报价条目', value: faseState.value.summary?.total },
+            { label: '国家/地区', value: faseState.value.summary?.countries },
+            { label: '新增报价', type: 'success', value: faseState.value.summary?.additions },
+            { label: '涨价数', type: 'error', value: faseState.value.summary?.increases },
+            { label: '降价数', type: 'warning', value: faseState.value.summary?.decreases },
+            { label: '定时生效', type: 'info', value: faseState.value.summary?.scheduled }
         ])
 
-        /**客户关系管理-短信报价草稿分页列表，同时记录批次统计**/
-        async function fetchBaseCrmColumnSmsQuoteDraft(payload: Omix) {
-            try {
-                const response = await Service.httpBaseCrmColumnSmsQuoteDraft(payload)
-                summary.value = response.data.summary ?? {}
-                return response
-            } catch (err) {
-                summary.value = {}
-                throw err
-            }
-        }
-
+        /**下一步：发布报价**/
         async function fetchSubmit() {
             return await props.setState({ current: 4 })
         }
 
         return () => (
             <Fragment>
-                <common-base-element
-                    is-white
-                    is-border
-                    wrap="p-inline-14 p-bs-14"
-                    class-name="flex flex-wrap items-center gap-x-24 gap-y-8 p-inline-14 p-block-10 overflow-hidden"
-                >
-                    <div class="flex flex-wrap items-center gap-x-24 gap-y-4 flex-1 overflow-hidden">
-                        <common-base-columns-wrapper label="客户名称：">{props.faseNode.name ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="客户别名：">{props.faseNode.alias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="报价币种：">{props.faseNode.currency ?? '-'}</common-base-columns-wrapper>
+                <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
+                    <div class="flex items-center justify-between gap-x-10 overflow-hidden">
+                        <common-business-header bar title="基本信息"></common-business-header>
+                        <div class="flex items-center gap-x-10 overflow-hidden">
+                            {columns.value.map(item => (
+                                <common-base-columns-wrapper label={`${item.label}：`}>
+                                    <common-skeleton-block initialize={state.initialize}>
+                                        <n-text strong depth={1} type={item.type} class="line-height-24 w-30">
+                                            {item.value ?? '-'}
+                                        </n-text>
+                                    </common-skeleton-block>
+                                </common-base-columns-wrapper>
+                            ))}
+                        </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-x-20 gap-y-4 overflow-hidden">
-                        {summaryItems.value.map(item => (
-                            <common-base-columns-wrapper key={item.label} label={`${item.label}：`}>
-                                <span class="font-bold" style={{ color: item.color }}>
-                                    {item.value ?? '-'}
-                                </span>
-                            </common-base-columns-wrapper>
-                        ))}
-                    </div>
+                    <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={240}>
+                        <common-base-columns-wrapper label="客户名称：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.name ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户别名：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.alias ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="应用别名：">
+                            <common-skeleton-block initialize={state.initialize}>{formState.value.appAlias ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="报价币种：">
+                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.currency ?? '-'}</common-skeleton-block>
+                        </common-base-columns-wrapper>
+                    </common-base-columns-template>
                 </common-base-element>
-
                 <common-database-table
                     show-index
                     pagination={false}
@@ -150,18 +144,22 @@ export default defineComponent({
                     }}
                 </common-database-table>
                 <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">
-                    <n-button class="min-w-168" disabled={props.state.loading} onClick={() => props.setState({ current: 2 })}>
-                        上一步：编辑报价
-                    </n-button>
-                    <n-button
-                        class="min-w-168"
-                        type="primary"
-                        loading={props.state.loading}
-                        disabled={props.state.loading}
-                        onClick={fetchSubmit}
-                    >
-                        下一步：发布报价
-                    </n-button>
+                    <common-skeleton-block initialize={state.initialize}>
+                        <n-button class="min-w-160" disabled={props.state.loading} onClick={() => props.setState({ current: 2 })}>
+                            上一步：编辑报价
+                        </n-button>
+                    </common-skeleton-block>
+                    <common-skeleton-block initialize={state.initialize}>
+                        <n-button
+                            class="min-w-160"
+                            type="primary"
+                            loading={props.state.loading}
+                            disabled={props.state.loading}
+                            onClick={fetchSubmit}
+                        >
+                            下一步：发布报价
+                        </n-button>
+                    </common-skeleton-block>
                 </common-base-element>
             </Fragment>
         )
