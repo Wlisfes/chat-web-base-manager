@@ -29,14 +29,12 @@ export default defineComponent({
         chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const { formState } = useVModels(props, emit)
         const { inverted } = useProvider()
-
+        const { formState } = useVModels(props, emit)
         const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft(payload), {
             formState: { draftBatchId: formState.value.draftBatchId },
-            size: 200,
             columns: [
-                { title: '序号', key: 'index', width: 80, align: 'center' },
+                { title: '序号', key: 'index', width: 100 },
                 { title: 'MCC', key: 'mcc', width: 100 },
                 { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
                 { title: '下行费率(USD)', key: 'downUsd', width: 330, ellipsis: false },

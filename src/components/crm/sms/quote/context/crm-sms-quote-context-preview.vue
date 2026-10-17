@@ -29,52 +29,32 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
-        const consumerInfo = computed(() =>
-            fetchCurrent(props.userOptions.dataSource.value ?? [], (item: Omix) => item.keyId === formState.value.userKeyId)
-        )
-        const appInfo = computed(() =>
-            fetchCurrent(props.appOptions?.dataSource?.value ?? [], (item: Omix) => item.appId === formState.value.appId)
-        )
-        const { state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) =>
-                Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId, status: 'enable' }),
-            {
-                formState: { draftBatchId: undefined },
-                immediate: false,
-                size: 100,
-                transform: (data: Omix) =>
-                    data.list.map((item: Omix, index: number) => ({
-                        ...item,
-                        index: index + 1,
-                        upUsd: Number(item.upUsd).toFixed(6),
-                        downUsd: Number(item.downUsd).toFixed(6)
-                    })),
-                columns: [
-                    { title: '序号', key: 'index', width: 80 },
-                    { title: 'MCC', key: 'mcc', width: 100 },
-                    { title: '国家/地区', key: 'code', minWidth: 200 },
-                    { title: '下行费率(USD)', key: 'downUsd', minWidth: 160 },
-                    { title: '上行费率(USD)', key: 'upUsd', minWidth: 160 },
-                    { title: '下行变更状态', key: 'downStatus', minWidth: 160 },
-                    { title: '上行变更状态', key: 'upStatus', minWidth: 160 },
-                    { title: '生效时间', key: 'effectiveTime', minWidth: 160 }
-                ]
-            }
-        )
+        const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft(payload), {
+            formState: { status: 'enable', draftBatchId: formState.value.draftBatchId },
+            columns: [
+                { title: '序号', key: 'index', width: 100 },
+                { title: '客户ID', key: 'userKeyId', width: 100 },
+                { title: '客户别名', key: 'userAlias', width: 130 },
+                { title: '客户名称', key: 'userName', width: 240, ellipsis: false },
+                { title: '应用别名', key: 'appAlias', width: 160 },
+                { title: 'MCC', key: 'mcc', width: 100 },
+                { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
+                { title: '下行费率(USD)', key: 'downUsd', width: 160 },
+                { title: '上行费率(USD)', key: 'upUsd', width: 160 },
+                { title: '下行变更状态', key: 'downStatus', width: 120 },
+                { title: '上行变更状态', key: 'upStatus', width: 120 },
+                { title: '生效时间', key: 'effectiveTime', width: 160 }
+            ]
+        })
+        /**当前客户信息**/
+        const faseNode = computed(() => fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId))
+
         const summary = computed(() => ({
             countries: new Set(state.dataSource.map((item: Omix) => item.countryKeyId)).size,
             additions: state.dataSource.filter((item: Omix) => item.upStatus === 'NEW' || item.downStatus === 'NEW').length,
             scheduled: state.dataSource.filter((item: Omix) => item.effectiveTime && new Date(item.effectiveTime).getTime() > Date.now())
                 .length
         }))
-
-        watch(
-            () => props.state.current,
-            current => {
-                if (current === 3 && formState.value.draftBatchId) fetchRefresh({ page: 1 })
-            },
-            { immediate: true }
-        )
 
         async function fetchSubmit() {
             return await props.setState({ current: 4 })
@@ -83,12 +63,20 @@ export default defineComponent({
         return () => (
             <Fragment>
                 <common-base-element is-white class="flex flex-col m-inline-14 m-bs-14 b-rd-4 overflow-hidden">
-                    <div class="flex flex-col gap-y-10 p-14 overflow-hidden">
-                        <common-business-header bar title="基本信息"></common-business-header>
+                    <div class="flex flex-col p-14 overflow-hidden">
+                        <common-business-header bar title="基本信息" class="m-be-10"></common-business-header>
                         <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
-                            <common-base-columns-wrapper label="客户名称：">{consumerInfo.value.name ?? '-'}</common-base-columns-wrapper>
-                            <common-base-columns-wrapper label="客户别名：">{consumerInfo.value.alias ?? '-'}</common-base-columns-wrapper>
-                            <common-base-columns-wrapper label="应用别名：">{appInfo.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="客户名称：">{faseNode.value.name ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="客户别名：">{faseNode.value.alias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                        </common-base-columns-template>
+                        <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
+                            <common-base-columns-wrapper label="报价条目：">{faseNode.value.name ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="新增报价：">{faseNode.value.alias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="定时生效数：">
+                                {formState.value.appAlias ?? '-'}
+                            </common-base-columns-wrapper>
                         </common-base-columns-template>
                     </div>
                     <div class="flex flex-col p-14 common-skyline--top overflow-hidden">
@@ -110,6 +98,7 @@ export default defineComponent({
                 </common-base-element>
 
                 <common-database-table
+                    show-index
                     pagination={false}
                     limit={state.limit}
                     total={state.total}
@@ -126,12 +115,34 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
+                        col_userName: (data: Omix) => (
+                            <common-base-content ellipsis value={data.userOptions?.name}>
+                                {data.userOptions?.name ?? '-'}
+                            </common-base-content>
+                        ),
+                        col_countryKeyId: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                ellipsis
+                                value={data.countryKeyId}
+                                items={props.mccOptions.dataSource.value}
+                            ></common-base-chunk>
+                        ),
+                        col_downUsd: (data: Omix) => {
+                            return <common-base-number value={data.downUsd}></common-base-number>
+                        },
+                        col_upUsd: (data: Omix) => {
+                            return <common-base-number value={data.upUsd}></common-base-number>
+                        },
                         col_downStatus: (data: Omix) => (
                             <common-base-chunk value={data.downStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
                         ),
                         col_upStatus: (data: Omix) => (
                             <common-base-chunk value={data.upStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
-                        )
+                        ),
+                        col_effectiveTime: (data: Omix) => {
+                            return <common-base-content value={data.effectiveTime ?? '立即生效'}></common-base-content>
+                        }
                     }}
                 </common-database-table>
                 <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center overflow-hidden">

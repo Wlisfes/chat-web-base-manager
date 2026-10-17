@@ -8,7 +8,7 @@ export default defineComponent({
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
-            options: { current: 2 },
+            options: { current: 3 },
             formState: {
                 /**客户ID**/
                 userKeyId: undefined,
