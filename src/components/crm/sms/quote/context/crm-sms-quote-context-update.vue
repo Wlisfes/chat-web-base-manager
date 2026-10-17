@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { computed, defineComponent, Fragment, PropType } from 'vue'
-import { useColumnService, useProvider, fetchCurrent, pick } from '@/hooks'
+import { useColumnService, useProvider, fetchCurrent } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
