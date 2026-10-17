@@ -1,8 +1,7 @@
 <script lang="tsx">
 import { computed, defineComponent, Fragment, PropType, watch } from 'vue'
+import { useColumnService, fetchCurrent } from '@/hooks'
 import { useVModels } from '@vueuse/core'
-import { useColumnService } from '@/hooks'
-import { fetchCurrent } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({

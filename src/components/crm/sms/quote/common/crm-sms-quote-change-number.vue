@@ -1,9 +1,8 @@
 <script lang="tsx">
 import { defineComponent, computed, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
+import { useState, isEmpty } from '@/hooks'
 import { useVModels } from '@vueuse/core'
-import { useState } from '@/hooks'
-import { isEmpty } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -22,7 +21,10 @@ export default defineComponent({
         const amount = computed(() => node.value[props.mode === 'upUsd' ? 'existingUpUsd' : 'existingDownUsd'])
         /**内容渲染**/
         const change = computed(() => {
-            return `原价：<span class="text-[var(--primary-color)]">${isEmpty(amount.value) ? '-' : amount.value}</span> / 条`
+            if (isEmpty(amount.value)) {
+                return `原价：<span class="text-[var(--primary-color)]">-</span>`
+            }
+            return `原价：<span class="text-[var(--primary-color)]">${amount.value}</span> / 条`
         })
         /**金额**/
         async function fetchChnageNumber() {

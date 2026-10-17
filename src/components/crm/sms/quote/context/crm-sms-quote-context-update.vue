@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { computed, defineComponent, Fragment, PropType } from 'vue'
-import { useColumnService, fetchCurrent, pick } from '@/hooks'
+import { useColumnService, useProvider, fetchCurrent, pick } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
@@ -30,6 +30,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
+        const { inverted } = useProvider()
         /**当前客户信息**/
         const faseNode = computed(() => {
             return fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId)
@@ -51,37 +52,20 @@ export default defineComponent({
         })
         /**存在费率、生效时间正在保存的行；保存完成前禁止上一步/下一步，避免预览拿到旧数据**/
         const saving = computed(() => state.dataSource.some((item: Omix) => item.loading))
-
         /**客户关系管理-短信报价草稿分页列表**/
         async function fetchBaseCrmColumnSmsQuoteDraft(base: Omix, payload: Omix) {
             return Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, ...pick(base, ['page', 'size']) })
         }
 
-        /**时间变更**/
-        async function fetchChnageDateTime(node: Omix, effectiveTime: string) {
-            try {
-                return await Service.httpBaseCrmUpdateSmsQuoteDraft({ keyId: node.keyId, effectiveTime }).then(async ({ data }) => {
-                    console.log(data)
-                })
-            } catch (err) {
-                // return await done({ loading: false }).then(async () => {
-                return await fetchNotifyService({ type: 'error', title: err.message })
-                // })
-            }
-        }
-
         /**上行或下行价格较现行报价增长时整行标红提醒**/
         function fetchRowClassName(data: Omix) {
             const status = [data.upStatus, data.downStatus]
-            if (status.includes('INCREASE')) {
+            if (data.status === 'deleted') {
+                return 'crm-sms-quote--deleted'
+            } else if (status.includes('INCREASE')) {
                 return 'crm-sms-quote--increase'
             }
             return status.includes('DECREASE') ? 'crm-sms-quote--decrease' : ''
-        }
-
-        /**报价草稿名称，用于二次确认提示**/
-        function fetchDraftName(data: Omix) {
-            return [data.appAlias, data.mcc].filter(Boolean).join(' / ')
         }
 
         /**软删除或恢复报价草稿，删除后不参与预览和发布**/
@@ -140,30 +124,26 @@ export default defineComponent({
             })
         }
 
+        /**下一步：报价预览**/
         async function fetchSubmit() {
-            if (saving.value) {
-                return
-            }
-            return await props.setState({ loading: true }).then(async () => {
-                return await props.fetchValidater().then(async (error: boolean) => {
-                    if (error) {
-                        return await props.setState({ loading: false })
-                    }
-                    try {
-                        const dataSource = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
-                        if (dataSource.length === 0) {
-                            return await props.setState({ loading: false }).then(async () => {
-                                return await fetchNotifyService({ type: 'warning', title: '没有可预览的报价草稿' })
-                            })
-                        }
-                        /**费率、生效时间在单元格失焦/确认时已实时保存，这里无需再逐行提交**/
-                        return await props.setState({ loading: false, current: 3 })
-                    } catch (err) {
+            return await props.fetchValidater().then(async (error: boolean) => {
+                if (error) {
+                    return await props.setState({ loading: false, disabled: false })
+                }
+                try {
+                    const dataSource = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
+                    if (dataSource.length === 0) {
                         return await props.setState({ loading: false }).then(async () => {
-                            return await fetchNotifyService({ type: 'error', title: err.message })
+                            return await fetchNotifyService({ type: 'warning', title: '没有可预览的报价草稿' })
                         })
                     }
-                })
+                    /**费率、生效时间在单元格失焦/确认时已实时保存，这里无需再逐行提交**/
+                    return await props.setState({ loading: false, current: 3 })
+                } catch (err) {
+                    return await props.setState({ loading: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
             })
         }
 
@@ -195,6 +175,7 @@ export default defineComponent({
                         v-model:loading={state.loading}
                         v-model:initialize={state.initialize}
                         row-class-name={fetchRowClassName}
+                        style={{ '--crm-sms-quote-mix': inverted.value ? '20%' : '15%' }}
                         v-model:customize={state.customize}
                         on-update:customize={instOptions.fetchUpdateCustomize}
                         on-update:page={(page: number) => fetchRefresh({ page })}
@@ -281,16 +262,26 @@ export default defineComponent({
 /**
  * 价格变更行背景色：直接在行上覆写表格单元格的颜色变量（普通、悬浮、排序），
  * 悬浮与固定列都读取这些变量，因此鼠标移入不会覆盖背景色，也无需提高选择器权重。
- * 基于 --n-td-color 混色，避免引用自身变量造成循环。
+ * 基于 --n-td-color 混色，避免引用自身变量造成循环；暗黑模式提高混色比例（--crm-sms-quote-mix）保证可辨识。
  */
 :deep(.n-data-table-tr.crm-sms-quote--increase) {
-    --n-merged-td-color: color-mix(in srgb, var(--n-td-color) 88%, var(--error-color));
+    --n-merged-td-color: color-mix(in srgb, var(--n-td-color), var(--error-color) var(--crm-sms-quote-mix, 10%));
     --n-merged-td-color-hover: var(--n-merged-td-color);
     --n-merged-td-color-sorting: var(--n-merged-td-color);
 }
 :deep(.n-data-table-tr.crm-sms-quote--decrease) {
-    --n-merged-td-color: color-mix(in srgb, var(--n-td-color) 88%, var(--warning-color));
+    --n-merged-td-color: color-mix(in srgb, var(--n-td-color), var(--warning-color) var(--crm-sms-quote-mix, 10%));
     --n-merged-td-color-hover: var(--n-merged-td-color);
     --n-merged-td-color-sorting: var(--n-merged-td-color);
+}
+:deep(.n-data-table-tr.crm-sms-quote--deleted) {
+    --n-merged-td-color: color-mix(in srgb, var(--n-td-color), var(--text-color-3) var(--crm-sms-quote-mix, 10%));
+    --n-merged-td-color-hover: var(--n-merged-td-color);
+    --n-merged-td-color-sorting: var(--n-merged-td-color);
+    --n-td-text-color: var(--text-color-3);
+    /**已删除行弱化文字（操作列除外，保留恢复/移除按钮的可点击感）**/
+    .n-data-table-td:not(.chunk-command) > * {
+        opacity: 0.9;
+    }
 }
 </style>
