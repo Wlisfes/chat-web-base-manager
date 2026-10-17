@@ -1,9 +1,8 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
+import { useState, moment } from '@/hooks'
 import { useVModels } from '@vueuse/core'
-import { useState } from '@/hooks'
-import { moment } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -16,11 +15,6 @@ export default defineComponent({
     setup(props, { emit }) {
         const { node } = useVModels(props, emit)
         const { state, setState } = useState({ loading: false })
-
-        /**生效时间只能选择今天至30天后（按天计算）**/
-        function fetchDateDisabled(time: number) {
-            return time > moment().add(30, 'day').endOf('day').valueOf()
-        }
 
         /**时间变更**/
         async function fetchChnageDateTime(keyId: number, effectiveTime: string) {
