@@ -97,15 +97,6 @@ export function httpBaseCrmDeleteSmsQuoteDraft(data: Omix) {
     })
 }
 
-/**客户关系管理-预览短信报价**/
-export function httpBaseCrmPreviewSmsQuote(data: Omix) {
-    return request({
-        url: '/api/sms/quote/preview',
-        method: 'POST',
-        data
-    })
-}
-
 /**客户关系管理-发布短信报价**/
 export function httpBaseCrmPublishSmsQuote(data: Omix) {
     return request({

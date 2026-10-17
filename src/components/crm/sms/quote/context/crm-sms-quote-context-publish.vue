@@ -17,7 +17,9 @@ export default defineComponent({
         /**验证表单方法**/
         fetchValidater: { type: Function, required: true },
         /**表单对象**/
-        formState: { type: Object as PropType<Omix>, default: () => ({}) }
+        formState: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**当前客户信息**/
+        faseNode: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)

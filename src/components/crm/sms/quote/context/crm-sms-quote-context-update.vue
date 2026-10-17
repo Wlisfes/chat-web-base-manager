@@ -19,6 +19,8 @@ export default defineComponent({
         fetchValidater: { type: Function, required: true },
         /**表单对象**/
         formState: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**当前客户信息**/
+        faseNode: { type: Object as PropType<Omix>, default: () => ({}) },
         /**客户下拉数据**/
         userOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**应用下拉数据**/
@@ -45,8 +47,6 @@ export default defineComponent({
                 { title: '草稿状态', key: 'status', width: 120 }
             ]
         })
-        /**当前客户信息**/
-        const faseNode = computed(() => fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId))
         /**存在费率、生效时间正在保存的行；保存完成前禁止上一步/下一步，避免预览拿到旧数据**/
         const baulk = computed(() => {
             const items = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
@@ -141,10 +141,10 @@ export default defineComponent({
                 <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
                     <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
-                        <common-base-columns-wrapper label="客户名称：">{faseNode.value.name ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="客户别名：">{faseNode.value.alias ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户名称：">{props.faseNode.name ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="客户别名：">{props.faseNode.alias ?? '-'}</common-base-columns-wrapper>
                         <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
-                        <common-base-columns-wrapper label="报价币种：">{faseNode.value.currency ?? '-'}</common-base-columns-wrapper>
+                        <common-base-columns-wrapper label="报价币种：">{props.faseNode.currency ?? '-'}</common-base-columns-wrapper>
                     </common-base-columns-template>
                 </common-base-element>
                 <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden">

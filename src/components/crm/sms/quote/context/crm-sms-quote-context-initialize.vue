@@ -18,6 +18,8 @@ export default defineComponent({
         fetchValidater: { type: Function, required: true },
         /**表单对象**/
         formState: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**当前客户信息**/
+        faseNode: { type: Object as PropType<Omix>, default: () => ({}) },
         /**客户下拉数据**/
         userOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**应用下拉数据**/

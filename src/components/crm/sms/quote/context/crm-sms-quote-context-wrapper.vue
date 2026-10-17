@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { defineComponent } from 'vue'
-import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { defineComponent, computed } from 'vue'
+import { useFormService, useSelectService, useChunkService, fetchCurrent } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -8,7 +8,7 @@ export default defineComponent({
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
-            options: { current: 3 },
+            options: { current: 2 },
             formState: {
                 /**客户ID**/
                 userKeyId: undefined,
@@ -40,6 +40,10 @@ export default defineComponent({
         const mccOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
             immediate: false,
             transform: data => data.map(item => ({ value: item.keyId, label: `[${item.code}] ${item.cnName} - ${item.enName}` }))
+        })
+        /**当前客户信息**/
+        const faseNode = computed(() => {
+            return fetchCurrent(userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId)
         })
         /**数据初始化**/
         async function fetchInitialization() {
@@ -75,6 +79,7 @@ export default defineComponent({
                         <n-tab-pane name={1} tab="填写报价内容">
                             <crm-sms-quote-context-initialize
                                 state={state}
+                                fase-node={faseNode.value}
                                 user-options={userOptions}
                                 app-options={appOptions}
                                 mcc-options={mccOptions}
@@ -87,6 +92,7 @@ export default defineComponent({
                         <n-tab-pane name={2} tab="编辑报价">
                             <crm-sms-quote-context-update
                                 state={state}
+                                fase-node={faseNode.value}
                                 user-options={userOptions}
                                 app-options={appOptions}
                                 mcc-options={mccOptions}
@@ -100,6 +106,7 @@ export default defineComponent({
                         <n-tab-pane name={3} tab="报价预览">
                             <crm-sms-quote-context-preview
                                 state={state}
+                                fase-node={faseNode.value}
                                 user-options={userOptions}
                                 app-options={appOptions}
                                 mcc-options={mccOptions}
@@ -113,6 +120,7 @@ export default defineComponent({
                         <n-tab-pane name={4} tab="发布报价">
                             <crm-sms-quote-context-publish
                                 state={state}
+                                fase-node={faseNode.value}
                                 set-state={setState}
                                 set-form={setForm}
                                 fetch-validater={fetchValidater}
