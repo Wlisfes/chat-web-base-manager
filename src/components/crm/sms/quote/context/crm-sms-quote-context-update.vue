@@ -39,18 +39,18 @@ export default defineComponent({
             size: 200,
             columns: [
                 { title: '序号', key: 'index', width: 80, align: 'center' },
-                { title: '客户别名', key: 'userAlias', width: 130 },
-                { title: '应用别名', key: 'appAlias', width: 160 },
                 { title: 'MCC', key: 'mcc', width: 100 },
                 { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
-                { title: '下行费率(USD)', key: 'downUsd', minWidth: 200, ellipsis: false },
-                { title: '上行费率(USD)', key: 'upUsd', minWidth: 200, ellipsis: false },
-                { title: '生效时间', key: 'effectiveTime', minWidth: 240, ellipsis: false },
+                { title: '下行费率(USD)', key: 'downUsd', width: 330, ellipsis: false },
+                { title: '上行费率(USD)', key: 'upUsd', width: 330, ellipsis: false },
+                { title: '生效时间', key: 'effectiveTime', width: 240, ellipsis: false },
                 { title: '下行变更状态', key: 'downStatus', width: 120 },
                 { title: '上行变更状态', key: 'upStatus', width: 120 },
                 { title: '草稿状态', key: 'status', width: 120 }
             ]
         })
+        /**存在费率、生效时间正在保存的行；保存完成前禁止上一步/下一步，避免预览拿到旧数据**/
+        const saving = computed(() => state.dataSource.some((item: Omix) => item.loading))
 
         /**客户关系管理-短信报价草稿分页列表**/
         async function fetchBaseCrmColumnSmsQuoteDraft(base: Omix, payload: Omix) {
@@ -68,6 +68,15 @@ export default defineComponent({
                 return await fetchNotifyService({ type: 'error', title: err.message })
                 // })
             }
+        }
+
+        /**上行或下行价格较现行报价增长时整行标红提醒**/
+        function fetchRowClassName(data: Omix) {
+            const status = [data.upStatus, data.downStatus]
+            if (status.includes('INCREASE')) {
+                return 'crm-sms-quote--increase'
+            }
+            return status.includes('DECREASE') ? 'crm-sms-quote--decrease' : ''
         }
 
         /**报价草稿名称，用于二次确认提示**/
@@ -132,6 +141,9 @@ export default defineComponent({
         }
 
         async function fetchSubmit() {
+            if (saving.value) {
+                return
+            }
             return await props.setState({ loading: true }).then(async () => {
                 return await props.fetchValidater().then(async (error: boolean) => {
                     if (error) {
@@ -182,6 +194,7 @@ export default defineComponent({
                         v-model:data={state.dataSource}
                         v-model:loading={state.loading}
                         v-model:initialize={state.initialize}
+                        row-class-name={fetchRowClassName}
                         v-model:customize={state.customize}
                         on-update:customize={instOptions.fetchUpdateCustomize}
                         on-update:page={(page: number) => fetchRefresh({ page })}
@@ -252,7 +265,7 @@ export default defineComponent({
                         class="min-w-168"
                         type="primary"
                         loading={props.state.loading}
-                        disabled={props.state.loading}
+                        disabled={props.state.loading || saving.value}
                         onClick={fetchSubmit}
                     >
                         下一步：报价预览
@@ -263,3 +276,21 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+/**
+ * 价格变更行背景色：直接在行上覆写表格单元格的颜色变量（普通、悬浮、排序），
+ * 悬浮与固定列都读取这些变量，因此鼠标移入不会覆盖背景色，也无需提高选择器权重。
+ * 基于 --n-td-color 混色，避免引用自身变量造成循环。
+ */
+:deep(.n-data-table-tr.crm-sms-quote--increase) {
+    --n-merged-td-color: color-mix(in srgb, var(--n-td-color) 88%, var(--error-color));
+    --n-merged-td-color-hover: var(--n-merged-td-color);
+    --n-merged-td-color-sorting: var(--n-merged-td-color);
+}
+:deep(.n-data-table-tr.crm-sms-quote--decrease) {
+    --n-merged-td-color: color-mix(in srgb, var(--n-td-color) 88%, var(--warning-color));
+    --n-merged-td-color-hover: var(--n-merged-td-color);
+    --n-merged-td-color-sorting: var(--n-merged-td-color);
+}
+</style>

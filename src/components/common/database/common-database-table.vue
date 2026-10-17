@@ -75,7 +75,9 @@ export default defineComponent({
         /**开启操作列**/
         showCommand: { type: Boolean, default: false },
         /**开启序号显示**/
-        showIndex: { type: Boolean, default: false }
+        showIndex: { type: Boolean, default: false },
+        /**行样式类名**/
+        rowClassName: { type: [String, Function] as PropType<string | ((data: Omix, index: number) => string)>, default: undefined }
     },
     setup(props, { emit, slots }) {
         const headerRef = ref<Omix<{ $el: HTMLElement }>>()
@@ -336,6 +338,7 @@ export default defineComponent({
                                 size="small"
                                 style={tableStyle.value}
                                 row-key={rowKey}
+                                row-class-name={initialize.value ? undefined : props.rowClassName}
                                 loading={initialize.value ? false : loading.value}
                                 min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}

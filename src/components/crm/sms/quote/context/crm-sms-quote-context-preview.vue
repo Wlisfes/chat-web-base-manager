@@ -24,7 +24,9 @@ export default defineComponent({
         /**应用下拉数据**/
         appOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**MCC下拉数据**/
-        mccOptions: { type: Object as PropType<Omix>, default: () => ({}) }
+        mccOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**枚举下拉数据**/
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
@@ -62,7 +64,7 @@ export default defineComponent({
         )
         const summary = computed(() => ({
             countries: new Set(state.dataSource.map((item: Omix) => item.countryKeyId)).size,
-            additions: state.dataSource.filter((item: Omix) => item.upStatus === 'addition' || item.downStatus === 'addition').length,
+            additions: state.dataSource.filter((item: Omix) => item.upStatus === 'NEW' || item.downStatus === 'NEW').length,
             scheduled: state.dataSource.filter((item: Omix) => item.effectiveTime && new Date(item.effectiveTime).getTime() > Date.now())
                 .length
         }))
@@ -126,14 +128,10 @@ export default defineComponent({
                 >
                     {{
                         col_downStatus: (data: Omix) => (
-                            <n-tag bordered={false} type={data.downStatus === 'addition' ? 'success' : 'default'}>
-                                {data.downStatus === 'addition' ? '新增' : '未变'}
-                            </n-tag>
+                            <common-base-chunk value={data.downStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
                         ),
                         col_upStatus: (data: Omix) => (
-                            <n-tag bordered={false} type={data.upStatus === 'addition' ? 'success' : 'default'}>
-                                {data.upStatus === 'addition' ? '新增' : '未变'}
-                            </n-tag>
+                            <common-base-chunk value={data.upStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>

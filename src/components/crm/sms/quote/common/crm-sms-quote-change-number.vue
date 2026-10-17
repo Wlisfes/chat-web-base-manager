@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, computed, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
 import { useVModels } from '@vueuse/core'
 import { useState } from '@/hooks'
@@ -18,7 +18,12 @@ export default defineComponent({
     setup(props, { emit }) {
         const { node } = useVModels(props, emit)
         const { state, setState } = useState({ loading: false, value: node.value[props.mode] })
-
+        /**现行报价原价；当前应用无该方向报价时为空**/
+        const amount = computed(() => node.value[props.mode === 'upUsd' ? 'existingUpUsd' : 'existingDownUsd'])
+        /**内容渲染**/
+        const change = computed(() => {
+            return `原价：<span class="text-[var(--primary-color)]">${isEmpty(amount.value) ? '-' : amount.value}</span> / 条`
+        })
         /**金额**/
         async function fetchChnageNumber() {
             if (isEmpty(state.value) || Number(state.value) === node.value[props.mode]) {
@@ -33,8 +38,8 @@ export default defineComponent({
                         [props.mode]: state.value
                     }).then(async ({ data }) => {
                         return await setState({ loading: false }).then(async () => {
-                            node.value.loading = false
-                            node.value[props.mode] = state.value
+                            /**回写最新价格与变更状态（增长/降低/未变）**/
+                            Object.assign(node.value, data, { loading: false })
                             return await fetchNotifyService({ type: 'success', title: '操作成功' })
                         })
                     })
@@ -47,15 +52,20 @@ export default defineComponent({
             })
         }
         return () => (
-            <form-base-number-input
-                class="w-full"
-                min={0}
-                step={0.000001}
-                precision={6}
-                disabled={node.value.status === 'deleted'}
-                v-model:value={state.value}
-                on-blur={fetchChnageNumber}
-            ></form-base-number-input>
+            <div class="flex items-center gap-x-10 overflow-hidden">
+                <form-base-number-input
+                    class="flex-1 overflow-hidden"
+                    min={0}
+                    step={0.01}
+                    precision={6}
+                    show-button={false}
+                    loading={state.loading}
+                    disabled={state.loading || node.value.status === 'deleted'}
+                    v-model:value={state.value}
+                    on-blur={fetchChnageNumber}
+                ></form-base-number-input>
+                <div class="whitespace-nowrap min-w-150 overflow-hidden" v-html={change.value}></div>
+            </div>
         )
     }
 })

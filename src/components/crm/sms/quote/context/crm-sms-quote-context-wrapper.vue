@@ -11,15 +11,15 @@ export default defineComponent({
             options: { current: 2 },
             formState: {
                 /**客户ID**/
-                userKeyId: 10241010,
+                userKeyId: undefined,
                 /**应用ID**/
-                appId: `wFBLI3u78MuNNSmT`,
+                appId: undefined,
                 /**应用别名**/
                 appAlias: undefined,
                 /**报价国家/地区主键**/
-                countryKeyIds: [1136, 1133, 1134, 1135, 1130, 1131, 1132, 1127, 1128, 1129],
+                countryKeyIds: [],
                 /**报价草稿批次ID**/
-                draftBatchId: `efa0b869-c604-4b1e-9332-1e0da5a9f5e5`
+                draftBatchId: `42c10db4-7947-4a1b-aec6-482207c46f35`
             }
         })
         /**短信报价静态枚举**/
@@ -103,6 +103,7 @@ export default defineComponent({
                                 user-options={userOptions}
                                 app-options={appOptions}
                                 mcc-options={mccOptions}
+                                chunk-options={chunkOptions.value}
                                 set-state={setState}
                                 set-form={setForm}
                                 fetch-validater={fetchValidater}
