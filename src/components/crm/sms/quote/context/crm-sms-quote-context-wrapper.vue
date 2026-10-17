@@ -19,7 +19,7 @@ export default defineComponent({
                 /**报价国家/地区主键**/
                 countryKeyIds: [1136, 1133, 1134, 1135, 1130, 1131, 1132, 1127, 1128, 1129],
                 /**报价草稿批次ID**/
-                draftBatchId: `5a9379d4-2db4-4288-978e-52f012459154`
+                draftBatchId: `efa0b869-c604-4b1e-9332-1e0da5a9f5e5`
             }
         })
         /**短信报价静态枚举**/

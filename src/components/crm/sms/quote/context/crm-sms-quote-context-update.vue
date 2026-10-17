@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { computed, defineComponent, Fragment, PropType, watch } from 'vue'
-import { useColumnService, useChunkService, fetchCurrent, pick } from '@/hooks'
-import { fetchNotifyService } from '@/plugins'
+import { computed, defineComponent, Fragment, PropType } from 'vue'
+import { useColumnService, fetchCurrent, pick } from '@/hooks'
+import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
@@ -36,6 +36,7 @@ export default defineComponent({
         })
         const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => fetchBaseCrmColumnSmsQuoteDraft(base, payload), {
             formState: { draftBatchId: formState.value.draftBatchId },
+            size: 200,
             columns: [
                 { title: '序号', key: 'index', width: 80, align: 'center' },
                 { title: '客户别名', key: 'userAlias', width: 130 },
@@ -46,13 +47,88 @@ export default defineComponent({
                 { title: '上行费率(USD)', key: 'upUsd', minWidth: 200, ellipsis: false },
                 { title: '生效时间', key: 'effectiveTime', minWidth: 240, ellipsis: false },
                 { title: '下行变更状态', key: 'downStatus', width: 120 },
-                { title: '上行变更状态', key: 'upStatus', width: 120 }
+                { title: '上行变更状态', key: 'upStatus', width: 120 },
+                { title: '草稿状态', key: 'status', width: 120 }
             ]
         })
 
         /**客户关系管理-短信报价草稿分页列表**/
         async function fetchBaseCrmColumnSmsQuoteDraft(base: Omix, payload: Omix) {
             return Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, ...pick(base, ['page', 'size']) })
+        }
+
+        /**时间变更**/
+        async function fetchChnageDateTime(node: Omix, effectiveTime: string) {
+            try {
+                return await Service.httpBaseCrmUpdateSmsQuoteDraft({ keyId: node.keyId, effectiveTime }).then(async ({ data }) => {
+                    console.log(data)
+                })
+            } catch (err) {
+                // return await done({ loading: false }).then(async () => {
+                return await fetchNotifyService({ type: 'error', title: err.message })
+                // })
+            }
+        }
+
+        /**报价草稿名称，用于二次确认提示**/
+        function fetchDraftName(data: Omix) {
+            return [data.appAlias, data.mcc].filter(Boolean).join(' / ')
+        }
+
+        /**软删除或恢复报价草稿，删除后不参与预览和发布**/
+        async function fetchUpdateDraftStatus(data: Omix, status: string) {
+            const name = [data.appAlias, data.mcc].filter(Boolean).join('-')
+            const actions: Record<typeof status, string> = {
+                enable: `确认恢复报价草稿<span class="text-[var(--n-icon-color)] p-inline-10">${name}</span>吗？`,
+                deleted: `确认删除报价草稿<span class="text-[var(--n-icon-color)] p-inline-10">${name}</span>吗？`
+            }
+            return await fetchDialogService({
+                title: '提示',
+                type: 'warning',
+                content: <div v-html={actions[status]}></div>,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            return await Service.httpBaseCrmUpdateSmsQuoteDraftStatus({ keyIds: [data.keyId], status }).then(async () => {
+                                data.status = status
+                                return await done({ visible: false }).then(async () => {
+                                    return await fetchNotifyService({ title: `操作成功` })
+                                })
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
+                    })
+                }
+            })
+        }
+
+        /**移除报价草稿，物理删除后不可恢复**/
+        async function fetchDeleteDraft(data: Omix) {
+            const name = `<span class="text-[var(--n-icon-color)] p-inline-10">${[data.appAlias, data.mcc].filter(Boolean).join('-')}</span>`
+            return await fetchDialogService({
+                title: '提示',
+                type: 'error',
+                content: <div v-html={`确认移除报价草稿${name}吗？移除后不可恢复。`}></div>,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            return await Service.httpBaseCrmDeleteSmsQuoteDraft({ keyIds: [data.keyId] }).then(async () => {
+                                return await done({ visible: false }).then(async () => {
+                                    await fetchNotifyService({ title: '移除成功' })
+                                    return await fetchRefresh()
+                                })
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
+                    })
+                }
+            })
         }
 
         async function fetchSubmit() {
@@ -62,18 +138,13 @@ export default defineComponent({
                         return await props.setState({ loading: false })
                     }
                     try {
-                        await Promise.all(
-                            state.dataSource.map((item: Omix) =>
-                                Service.httpBaseCrmUpdateSmsQuoteDraft({
-                                    keyId: item.keyId,
-                                    upUsd: Math.round(Number(item.upUsd) * 1_000_000),
-                                    downUsd: Math.round(Number(item.downUsd) * 1_000_000),
-                                    effectiveTime: item.effectiveTime,
-                                    expiryTime: item.expiryTime,
-                                    remark: item.remark
-                                })
-                            )
-                        )
+                        const dataSource = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
+                        if (dataSource.length === 0) {
+                            return await props.setState({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'warning', title: '没有可预览的报价草稿' })
+                            })
+                        }
+                        /**费率、生效时间在单元格失焦/确认时已实时保存，这里无需再逐行提交**/
                         return await props.setState({ loading: false, current: 3 })
                     } catch (err) {
                         return await props.setState({ loading: false }).then(async () => {
@@ -88,7 +159,7 @@ export default defineComponent({
             <Fragment>
                 <common-base-element is-white is-border wrap="p-inline-14 p-bs-14" class-name="flex flex-col p-14 gap-y-10 overflow-hidden">
                     <common-business-header bar title="基本信息"></common-business-header>
-                    <common-base-columns-template class="gap-x-10 gap-y-5 m-bs-10" type="auto-fill" number={250}>
+                    <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={250}>
                         <common-base-columns-wrapper label="客户名称：">{faseNode.value.name ?? '-'}</common-base-columns-wrapper>
                         <common-base-columns-wrapper label="客户别名：">{faseNode.value.alias ?? '-'}</common-base-columns-wrapper>
                         <common-base-columns-wrapper label="应用别名：">{formState.value.appAlias ?? '-'}</common-base-columns-wrapper>
@@ -134,42 +205,38 @@ export default defineComponent({
                             col_upStatus: (data: Omix) => (
                                 <common-base-chunk value={data.upStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
                             ),
+                            col_status: (data: Omix) => (
+                                <common-base-chunk value={data.status} items={props.chunkOptions.draftStatusOptions}></common-base-chunk>
+                            ),
                             col_downUsd: (data: Omix) => (
-                                <form-base-number-input
-                                    class="w-full"
-                                    min={0}
-                                    step={0.000001}
-                                    precision={6}
-                                    v-model:value={data.downUsd}
-                                ></form-base-number-input>
+                                <crm-sms-quote-change-number
+                                    mode="downUsd"
+                                    key={data.keyId}
+                                    v-model:node={data}
+                                ></crm-sms-quote-change-number>
                             ),
                             col_upUsd: (data: Omix) => (
-                                <form-base-number-input
-                                    class="w-full"
-                                    min={0}
-                                    step={0.000001}
-                                    precision={6}
-                                    v-model:value={data.upUsd}
-                                ></form-base-number-input>
+                                <crm-sms-quote-change-number
+                                    mode="upUsd"
+                                    key={data.keyId}
+                                    v-model:node={data}
+                                ></crm-sms-quote-change-number>
                             ),
-                            col_effectiveTime: (data: Omix) => (
-                                <form-base-date-picker
-                                    type="datetime"
-                                    clearable={false}
-                                    value-format="yyyy-MM-dd HH:mm:ss"
-                                    v-model:formatted-value={data.effectiveTime}
-                                />
-                            ),
+                            col_effectiveTime: (data: Omix) => {
+                                return <crm-sms-quote-change-datetime key={data.keyId} v-model:node={data}></crm-sms-quote-change-datetime>
+                            },
                             col_command: (data: Omix) => (
                                 <div class="flex items-center gap-x-8 overflow-hidden">
-                                    <common-base-button
-                                        text
-                                        type="error"
-                                        onClick={async () => {
-                                            await Service.httpBaseCrmDeleteSmsQuoteDraft({ keyIds: [data.keyId] })
-                                            await fetchRefresh({ page: 1 })
-                                        }}
-                                    >
+                                    {data.status === 'deleted' ? (
+                                        <common-base-button text type="primary" onClick={() => fetchUpdateDraftStatus(data, 'enable')}>
+                                            恢复
+                                        </common-base-button>
+                                    ) : (
+                                        <common-base-button text type="warning" onClick={() => fetchUpdateDraftStatus(data, 'deleted')}>
+                                            删除
+                                        </common-base-button>
+                                    )}
+                                    <common-base-button text type="error" onClick={() => fetchDeleteDraft(data)}>
                                         移除
                                     </common-base-button>
                                 </div>

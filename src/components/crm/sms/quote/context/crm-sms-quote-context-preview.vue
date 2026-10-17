@@ -35,7 +35,8 @@ export default defineComponent({
             fetchCurrent(props.appOptions?.dataSource?.value ?? [], (item: Omix) => item.appId === formState.value.appId)
         )
         const { state, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId }),
+            (base, payload) =>
+                Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, draftBatchId: formState.value.draftBatchId, status: 'enable' }),
             {
                 formState: { draftBatchId: undefined },
                 immediate: false,
@@ -44,8 +45,8 @@ export default defineComponent({
                     data.list.map((item: Omix, index: number) => ({
                         ...item,
                         index: index + 1,
-                        upUsd: (Number(item.upUsd) / 1_000_000).toFixed(6),
-                        downUsd: (Number(item.downUsd) / 1_000_000).toFixed(6)
+                        upUsd: Number(item.upUsd).toFixed(6),
+                        downUsd: Number(item.downUsd).toFixed(6)
                     })),
                 columns: [
                     { title: '序号', key: 'index', width: 80 },

@@ -79,7 +79,16 @@ export function httpBaseCrmUpdateSmsQuoteDraft(data: Omix) {
     })
 }
 
-/**客户关系管理-批量删除短信报价草稿**/
+/**客户关系管理-批量变更短信报价草稿状态（删除/恢复）**/
+export function httpBaseCrmUpdateSmsQuoteDraftStatus(data: Omix) {
+    return request({
+        url: '/api/sms/quote/draft/status/update',
+        method: 'POST',
+        data
+    })
+}
+
+/**客户关系管理-批量移除短信报价草稿（物理删除）**/
 export function httpBaseCrmDeleteSmsQuoteDraft(data: Omix) {
     return request({
         url: '/api/sms/quote/draft/delete',

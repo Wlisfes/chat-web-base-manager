@@ -42,8 +42,8 @@ export default defineComponent({
                         return await props.setState({ loading: false })
                     }
                     try {
-                        return await Service.httpBaseCrmInitSmsQuoteDraft(formState.value).then(async response => {
-                            await props.setForm({ draftBatchId: response.data.draftBatchId })
+                        return await Service.httpBaseCrmInitSmsQuoteDraft(formState.value).then(async ({ data }) => {
+                            await props.setForm({ draftBatchId: data.draftBatchId })
                             return await props.setState({ loading: false, current: 2 })
                         })
                     } catch (err) {
