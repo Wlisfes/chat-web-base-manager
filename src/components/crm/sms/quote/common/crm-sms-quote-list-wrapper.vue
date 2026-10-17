@@ -184,16 +184,16 @@ export default defineComponent({
                             ></common-base-chunk>
                         ),
                         col_upUsd: (data: Omix) => {
-                            return <common-base-number value={data.upUsd}></common-base-number>
+                            return <common-base-number shrink value={data.upUsd}></common-base-number>
                         },
                         col_downUsd: (data: Omix) => {
-                            return <common-base-number value={data.downUsd}></common-base-number>
+                            return <common-base-number shrink value={data.downUsd}></common-base-number>
                         },
                         col_upLocal: (data: Omix) => {
-                            return <common-base-number value={data.upLocal}></common-base-number>
+                            return <common-base-number shrink value={data.upLocal}></common-base-number>
                         },
                         col_downLocal: (data: Omix) => {
-                            return <common-base-number value={data.downLocal}></common-base-number>
+                            return <common-base-number shrink value={data.downLocal}></common-base-number>
                         },
                         col_expiryTime: (data: Omix) => {
                             return <common-base-content value={data.expiryTime ?? '永久有效'}></common-base-content>

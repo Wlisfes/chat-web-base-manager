@@ -2,6 +2,7 @@
 import { defineComponent, computed, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
 import { useState, isEmpty } from '@/hooks'
+import { fetchShrinkNumber } from '@/utils'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
@@ -16,9 +17,14 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { node } = useVModels(props, emit)
-        const { state, setState } = useState({ loading: false, value: node.value[props.mode] })
-        /**现行报价原价；当前应用无该方向报价时为空**/
-        const amount = computed(() => node.value[props.mode === 'upUsd' ? 'existingUpUsd' : 'existingDownUsd'])
+        /**接口金额为放大百万倍的存储值，输入框与原价展示使用实际金额**/
+        const shrink = computed(() => fetchShrinkNumber(node.value[props.mode]))
+        const { state, setState } = useState({ loading: false, value: shrink.value })
+        /**现行报价原价（实际金额）；当前应用无该方向报价时为空**/
+        const amount = computed(() => {
+            const existing = node.value[props.mode === 'upUsd' ? 'existingUpUsd' : 'existingDownUsd']
+            return isEmpty(existing) ? existing : fetchShrinkNumber(existing)
+        })
         /**内容渲染**/
         const change = computed(() => {
             if (isEmpty(amount.value)) {
@@ -28,9 +34,9 @@ export default defineComponent({
         })
         /**金额**/
         async function fetchChnageNumber() {
-            if (isEmpty(state.value) || Number(state.value) === node.value[props.mode]) {
+            if (isEmpty(state.value) || Number(state.value) == shrink.value) {
                 /**金额一致无需修改**/
-                return await setState({ value: node.value[props.mode] })
+                return await setState({ value: shrink.value })
             }
             return await setState({ loading: true }).then(async () => {
                 node.value.loading = true

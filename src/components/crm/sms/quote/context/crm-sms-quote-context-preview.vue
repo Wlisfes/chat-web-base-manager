@@ -127,10 +127,10 @@ export default defineComponent({
                             ></common-base-chunk>
                         ),
                         col_downUsd: (data: Omix) => {
-                            return <common-base-number value={data.downUsd}></common-base-number>
+                            return <common-base-number shrink value={data.downUsd}></common-base-number>
                         },
                         col_upUsd: (data: Omix) => {
-                            return <common-base-number value={data.upUsd}></common-base-number>
+                            return <common-base-number shrink value={data.upUsd}></common-base-number>
                         },
                         col_downStatus: (data: Omix) => (
                             <common-base-chunk value={data.downStatus} items={props.chunkOptions.changeStatusOptions}></common-base-chunk>
