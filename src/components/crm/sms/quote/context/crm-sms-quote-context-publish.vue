@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
+import { useGlobal, useStore } from '@/store'
 import { useVModels } from '@vueuse/core'
 import * as Service from '@/api/instance.service'
 
@@ -8,14 +9,16 @@ export default defineComponent({
     name: 'CrmSmsQuoteContextPublish',
     emits: ['update:formState'],
     props: {
-        /**表单基础状态**/
-        state: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**页面路径快照注入**/
+        router: { type: String, required: true },
         /**设置表单基础状态方法**/
         setState: { type: Function, required: true },
         /**表单更新方法**/
         setForm: { type: Function, required: true },
         /**验证表单方法**/
         fetchValidater: { type: Function, required: true },
+        /**表单基础状态**/
+        state: { type: Object as PropType<Omix>, default: () => ({}) },
         /**表单对象**/
         formState: { type: Object as PropType<Omix>, default: () => ({}) },
         /**当前客户信息**/
@@ -23,6 +26,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
+        const { router, fetchRemoveRouter } = useStore(useGlobal)
 
         /**确认发布**/
         async function fetchSubmit() {
@@ -32,7 +36,10 @@ export default defineComponent({
                 }
                 try {
                     return await Service.httpBaseCrmPublishSmsQuote({ draftBatchId: formState.value.draftBatchId }).then(async () => {
-                        return fetchNotifyService({ type: 'success', title: '报价发布成功' })
+                        await fetchNotifyService({ type: 'success', title: '报价发布成功' })
+                        return await router.push({ path: '/crm/sms/quote' }).then(async () => {
+                            return await fetchRemoveRouter({ fullPath: props.router }, router)
+                        })
                     })
                 } catch (err) {
                     return await props.setState({ loading: false }).then(async () => {

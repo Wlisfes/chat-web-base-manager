@@ -5,13 +5,17 @@ import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'CrmSmsQuoteContextWrapper',
+    props: {
+        /**页面路径快照注入**/
+        router: { type: String, required: true }
+    },
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
-            options: { current: 3 },
+            options: { current: 1 },
             formState: {
                 /**客户ID**/
-                userKeyId: 10241010,
+                userKeyId: undefined,
                 /**应用ID**/
                 appId: undefined,
                 /**应用别名**/
@@ -19,7 +23,7 @@ export default defineComponent({
                 /**报价国家/地区主键**/
                 countryKeyIds: [],
                 /**报价草稿批次ID**/
-                draftBatchId: `42c10db4-7947-4a1b-aec6-482207c46f35`
+                draftBatchId: undefined
             }
         })
         /**短信报价静态枚举**/
@@ -120,6 +124,7 @@ export default defineComponent({
                         <n-tab-pane name={4} tab="发布报价" display-directive="show:lazy">
                             <crm-sms-quote-context-publish
                                 state={state}
+                                router={props.router}
                                 fase-node={faseNode.value}
                                 set-state={setState}
                                 set-form={setForm}

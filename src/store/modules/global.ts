@@ -1,7 +1,7 @@
-import { ref, toRefs, computed } from 'vue'
+import { ref, toRefs, computed, markRaw } from 'vue'
 import { defineStore } from 'pinia'
 import { useStore, useConfiger } from '@/store'
-import { fetchMetaDefault } from '@/router'
+import { router, fetchMetaDefault } from '@/router'
 import { omit, fetchDestroy } from '@/utils'
 import { useState } from '@/hooks'
 import * as Service from '@/api/instance.service'
@@ -185,6 +185,7 @@ export const useGlobal = defineStore(
         return {
             ...toRefs(state),
             faseUser,
+            router: markRaw(router),
             setState,
             fetchReset,
             fetchBaseInitialize,

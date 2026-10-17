@@ -30,6 +30,7 @@ const routes: RouteRecordRaw[] = [
         path: '/crm/sms/quote/wrapper',
         name: 'CrmSmsQuoteContextWrapper',
         meta: { title: '新增短信报价', AUTH: 'AUTH', keepAlive: true, router: '/crm/sms/quote' },
+        props: route => ({ router: route.fullPath }),
         component: () => import('@/components/crm/sms/quote/context/crm-sms-quote-context-wrapper.vue')
     }
 ]

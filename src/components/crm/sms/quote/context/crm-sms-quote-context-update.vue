@@ -127,7 +127,6 @@ export default defineComponent({
                     return await props.setState({ loading: false, disabled: false })
                 }
                 try {
-                    console.log(props.faseNode)
                     return await props.setState({ loading: false, current: 3 })
                 } catch (err) {
                     return await props.setState({ loading: false }).then(async () => {
