@@ -73,7 +73,11 @@ export default defineComponent({
         /**开启列设置**/
         showSettings: { type: Boolean, default: false },
         /**开启操作列**/
-        showCommand: { type: Boolean, default: false }
+        showCommand: { type: Boolean, default: false },
+        /**开启序号显示**/
+        showIndex: { type: Boolean, default: false },
+        /**行样式类名**/
+        rowClassName: { type: [String, Function] as PropType<string | ((data: Omix, index: number) => string)>, default: undefined }
     },
     setup(props, { emit, slots }) {
         const headerRef = ref<Omix<{ $el: HTMLElement }>>()
@@ -149,7 +153,7 @@ export default defineComponent({
                         minWidth: item.minWidth,
                         align: item.align,
                         fixed: item.fixed,
-                        className: item.className,
+                        className: item.key === 'command' ? undefined : item.className,
                         title: () => fetchSkeleton(title),
                         render: () => fetchSkeleton(width ? title : '请选择', width, props.colsRowHeight)
                     }
@@ -186,6 +190,10 @@ export default defineComponent({
                 if (isEmpty(base.ellipsis) || base.ellipsis === true) {
                     base.ellipsis = state.TABLE_ELLIPSIS
                 }
+            }
+            /**开启序号配置**/
+            if (['index'].includes(base.key) && props.showIndex) {
+                base.render = (data: Omix, index: number) => index + 1
             }
             if (isNotEmpty(key) && isNotEmpty(slots[`col_${key}`])) {
                 base.render = (data: Omix, index: number) => slots[`col_${key}`]?.(data, base, index) ?? <span>-</span>
@@ -330,6 +338,7 @@ export default defineComponent({
                                 size="small"
                                 style={tableStyle.value}
                                 row-key={rowKey}
+                                row-class-name={initialize.value ? undefined : props.rowClassName}
                                 loading={initialize.value ? false : loading.value}
                                 min-row-height={props.virtualScroll ? props.minRowHeight : undefined}
                                 scroll-x={width.value}

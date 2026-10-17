@@ -7,6 +7,8 @@ import { useProvider } from '@/hooks'
 export default defineComponent({
     name: 'CommonBaseChunk',
     props: {
+        /**内容超长时是否显示tooltip**/
+        ellipsis: { type: Boolean, default: false },
         /**渲染模式：标签或纯文本**/
         mode: { type: String as PropType<'chunk' | 'text'>, default: 'chunk' },
         /**是否显示边框，对应 n-tag 的 bordered**/
@@ -58,6 +60,21 @@ export default defineComponent({
                     <n-tag class={chunkClass.value} style={chunkStyle.value} bordered={props.bordered} type="default">
                         {slots.default ? slots.default() : chunkLabel.value}
                     </n-tag>
+                )
+            } else if (props.ellipsis) {
+                return (
+                    <n-performant-ellipsis
+                        tooltip={{
+                            scrollable: true,
+                            placement: 'top',
+                            style: { maxWidth: 'min(640px, 90vw)', maxHeight: 'min(640px, 45vh)', wordBreak: 'break-all' }
+                        }}
+                    >
+                        {{
+                            tooltip: () => chunkLabel.value,
+                            default: () => (slots.default ? slots.default(chunkLabel.value) : chunkLabel.value)
+                        }}
+                    </n-performant-ellipsis>
                 )
             }
             return (

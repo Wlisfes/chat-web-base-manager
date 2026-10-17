@@ -1,3 +1,4 @@
+export * from '@/utils'
 export * from '@/hooks/modules/hook-state'
 export * from '@/hooks/modules/hook-provider'
 export * from '@/hooks/modules/hook-form-service'

@@ -46,7 +46,7 @@ export default defineComponent({
         })
 
         return () => (
-            <n-element class="common-skeleton-block relative overflow-hidden box-border line-height-22">
+            <n-element class="common-skeleton-block relative box-border line-height-22">
                 <div
                     style={{ ...root.value, ...style.value }}
                     class={[`flex flex-col box-border ${props.elementClass}`, { 'opacity-0 pointer-events-none': props.initialize }]}

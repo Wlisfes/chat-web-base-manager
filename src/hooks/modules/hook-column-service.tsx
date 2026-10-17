@@ -66,6 +66,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
 ) {
     const route = useRoute()
     const router = useRouter()
+    const faseState = ref<Omix>({})
     const formRef = ref<FormInst>() as Ref<FormInst & Omix<{ $el: HTMLFormElement }>>
     const formState = ref<typeof options.formState>(cloneDeep(options.formState))
     const observer = ref(Observer<Record<string, Omix>>())
@@ -180,10 +181,12 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
                     if (options.transform && typeof options.transform === 'function') {
                         data.list = ((await options.transform(data)) ?? []) as Array<Omix<T>>
                     }
+                    faseState.value = data ?? {}
                     return await fetchCallbackRequest({ total: data.total ?? 0, dataSource: data.list })
                 })
             } catch (err) {
                 return await fetchNotifyService({ type: 'error', title: err.message }).then(async () => {
+                    faseState.value = {}
                     return await fetchCallbackRequest({ total: 0, dataSource: [] })
                 })
             }
@@ -223,6 +226,7 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
         state,
         formRef,
         formState,
+        faseState,
         observer,
         instState,
         instOptions,

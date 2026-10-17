@@ -28,15 +28,17 @@ export default defineComponent({
         functionClass: { type: String, default: '' },
         /**移除对边圆角**/
         square: { type: Array as PropType<Array<'l-t' | 'l-b' | 'r-t' | 'r-b'>>, default: () => [] },
+        /**移除指定方向边框；bordered 为 false 时整体无边框**/
+        borderLess: { type: Array as PropType<Array<'top' | 'right' | 'bottom' | 'left'>>, default: () => [] },
+        /**开启边框**/
+        bordered: { type: Boolean, default: true },
+        /**折叠收缩配置**/
+        when: { type: Boolean, default: true },
         /**收缩最小显示行**/
         line: { type: Number, default: 0 },
         /**边距值**/
         limit: { type: Number, default: 12 },
-        /**折叠收缩配置**/
-        when: { type: Boolean, default: true },
-        /**开启边框**/
-        bordered: { type: Boolean, default: true },
-        /**开启边框**/
+        /**开启loading**/
         loading: { type: Boolean, default: false },
         /**初始化状态**/
         initialize: { type: Boolean, default: false },
@@ -61,15 +63,20 @@ export default defineComponent({
             'p-be-12': when.value || (database.value.length > 0 && database.value.some(item => item.check)),
             'formstate-collapse': width.value < 674
         }))
-        /**圆角样式**/
+        /**圆角、边框样式**/
         const cardStyle = computed<CSSProperties>(() => {
             const leftTopRadius = props.square.includes('l-t') ? '0px' : 'var(--n-border-radius)'
             const leftBottomRadius = props.square.includes('l-b') ? '0px' : 'var(--n-border-radius)'
             const rightTopRadius = props.square.includes('r-t') ? '0px' : 'var(--n-border-radius)'
             const rightBottomRadius = props.square.includes('r-b') ? '0px' : 'var(--n-border-radius)'
-            return {
+            const style: CSSProperties = {
                 borderRadius: `${leftTopRadius} ${rightTopRadius} ${rightBottomRadius} ${leftBottomRadius}`
             }
+            if (props.borderLess.includes('top')) style.borderTopWidth = '0px'
+            if (props.borderLess.includes('right')) style.borderRightWidth = '0px'
+            if (props.borderLess.includes('bottom')) style.borderBottomWidth = '0px'
+            if (props.borderLess.includes('left')) style.borderLeftWidth = '0px'
+            return style
         })
         /**展开、收起**/
         async function fetchClickUpdate() {
@@ -150,7 +157,7 @@ export default defineComponent({
                                         class="min-w-80"
                                         type="primary"
                                         icon={Search}
-                                        secondary={!initialize.value}
+                                        secondary={initialize.value || loading.value ? false : true}
                                         loading={initialize.value ? false : loading.value}
                                         disabled={loading.value || initialize.value}
                                         onClick={(e: MouseEvent) => emit('-submit', formState.value)}

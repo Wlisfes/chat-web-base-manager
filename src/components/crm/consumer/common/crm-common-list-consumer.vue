@@ -222,10 +222,10 @@ export default defineComponent({
                             ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
-                            return <common-base-number value={data.balance}></common-base-number>
+                            return <common-base-number shrink value={data.balance}></common-base-number>
                         },
                         col_credit: (data: Omix) => {
-                            return <common-base-number value={data.credit}></common-base-number>
+                            return <common-base-number shrink value={data.credit}></common-base-number>
                         },
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>

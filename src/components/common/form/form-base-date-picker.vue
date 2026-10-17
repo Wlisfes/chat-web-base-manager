@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { defineComponent, computed, nextTick, PropType } from 'vue'
-import { moment, isNotEmpty } from '@/utils'
+import { defineComponent, computed, nextTick, PropType, VNode } from 'vue'
+import { moment, isNotEmpty, isEmpty } from '@/utils'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
@@ -12,9 +12,13 @@ export default defineComponent({
         /**开始时间**/
         startTime: { type: [String, Number] },
         /**结束时间**/
-        endTime: { type: [String, Number] }
+        endTime: { type: [String, Number] },
+        /**自定义图标**/
+        dateIcon: { type: Object as PropType<VNode> },
+        /**加载状态**/
+        loading: { type: Boolean, default: false }
     },
-    setup(props, { emit }) {
+    setup(props, { emit, slots }) {
         const { startTime, endTime } = useVModels(props, emit)
 
         /**时间组合模式**/
@@ -47,11 +51,33 @@ export default defineComponent({
                         type={props.type}
                         value={rangeTime.value}
                         on-update:value={fetchRangeUpdate}
-                    />
+                    ></n-date-picker>
                 )
             }
-            return <n-date-picker class="form-base-date-picker w-full" type={props.type} />
+            return (
+                <n-date-picker class="form-base-date-picker w-full" type={props.type}>
+                    {{
+                        'date-icon': () => (
+                            <common-internal-loading
+                                class="form-base-date-picker__loading"
+                                stroke-width={24}
+                                scale={0.85}
+                                show={props.loading}
+                            >
+                                {isEmpty(props.dateIcon) ? <common-internal-date-icon></common-internal-date-icon> : props.dateIcon}
+                            </common-internal-loading>
+                        )
+                    }}
+                </n-date-picker>
+            )
         }
     }
 })
 </script>
+
+<style lang="scss" scoped>
+/**仅加载动画沿用输入框 loading 的颜色变量，默认日期图标保持 naive-ui 原有图标颜色**/
+.form-base-date-picker :deep(.form-base-date-picker__loading .common-internal-loading__wrapper) {
+    color: var(--n-loading-color);
+}
+</style>
