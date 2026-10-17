@@ -12,11 +12,11 @@ export default defineComponent({
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             immediate: true
         })
-        /**注册来源选项：Skyline 枚举 CHUNK_CRM_CRM_USER_SOURCE，value 即枚举项主键**/
+        /**注册来源选项：Skyline 枚举 CHUNK_CRM_USER_SOURCE，value 即枚举项主键**/
         const sourceOptions = useSelectService(
             async () => {
-                const response = await Service.httpBaseSkylineChunkOptionColumn({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_CRM_USER_SOURCE'] })
-                return { ...response, data: response.data.CHUNK_CRM_CRM_USER_SOURCE?.options ?? [] }
+                const response = await Service.httpBaseSkylineChunkOptionColumn({ module: 'CHUNK_CRM', types: ['CHUNK_CRM_USER_SOURCE'] })
+                return { ...response, data: response.data.CHUNK_CRM_USER_SOURCE?.options ?? [] }
             },
             {
                 immediate: true,

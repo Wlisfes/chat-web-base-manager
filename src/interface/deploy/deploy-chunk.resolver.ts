@@ -1,5 +1,5 @@
 /**枚举所属模块。*/
-export type ChunkModule = 'CHUNK_SYSTEM' | 'CHUNK_CRM' | 'CHUNK_SRM'
+export type ChunkModule = 'CHUNK_SKYLINE' | 'CHUNK_CRM' | 'CHUNK_SRM'
 
 /**枚举项状态。*/
 export type ChunkStatus = 'enable' | 'disable'

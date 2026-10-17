@@ -15,7 +15,7 @@ export default defineComponent({
         /**客户静态枚举、注册来源字典枚举**/
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_CRM_CRM_USER_SOURCE', 'CHUNK_SYSTEM_COMMON_CONTACT_TYPE'],
+            types: ['CHUNK_CRM_USER_SOURCE', 'CHUNK_SKYLINE_COMMON_CONTACT_TYPE'],
             immediate: true
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseCrmUserResolver({ keyId: props.keyId }), {

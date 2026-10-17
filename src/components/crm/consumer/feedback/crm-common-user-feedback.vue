@@ -26,7 +26,7 @@ export default defineComponent({
         /**客户静态枚举、联系方式类型枚举**/
         const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_CRM_CRM_USER_SOURCE', 'CHUNK_SYSTEM_COMMON_CONTACT_TYPE'],
+            types: ['CHUNK_CRM_USER_SOURCE', 'CHUNK_SKYLINE_COMMON_CONTACT_TYPE'],
             immediate: false
         })
         /**表单实例**/
@@ -196,7 +196,7 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择客户来源"
-                            options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            options={chunkState.CHUNK_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>
                     </form-base-column>
@@ -229,7 +229,7 @@ export default defineComponent({
                                 <common-business-contact-block
                                     key={item.keyId}
                                     index={index}
-                                    options={chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
+                                    options={chunkState.CHUNK_SKYLINE_COMMON_CONTACT_TYPE.options}
                                     v-model:list={formState.value.items}
                                     v-model:node={item}
                                 ></common-business-contact-block>
