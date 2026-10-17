@@ -49,6 +49,7 @@ export default defineComponent({
                         class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     >
                         <n-tab-pane
+                            disabled
                             name="basic"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="详细信息" icon={<ApplicationWeb />} />}
@@ -56,6 +57,7 @@ export default defineComponent({
                             <crm-consumer-context-basic-skeleton initialize />
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="sms"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="短信应用" icon={<Chat />} />}
@@ -63,6 +65,7 @@ export default defineComponent({
                             <crm-consumer-context-sms-skeleton initialize />
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="mail"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="邮件应用" icon={<Email />} />}
@@ -70,6 +73,7 @@ export default defineComponent({
                             <crm-consumer-context-mail-wrapper></crm-consumer-context-mail-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="whatsapp"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="社媒应用" icon={<local-nest-whatsapp />} />}
@@ -77,6 +81,7 @@ export default defineComponent({
                             <crm-consumer-context-whatsapp-wrapper></crm-consumer-context-whatsapp-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="deploy"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="基础配置" icon={<SettingsServices />} />}
@@ -84,6 +89,7 @@ export default defineComponent({
                             <crm-consumer-context-basic-wrapper></crm-consumer-context-basic-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="attachment"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="附件信息" icon={<CloudServices />} />}
@@ -91,6 +97,7 @@ export default defineComponent({
                             <crm-consumer-context-attachment-wrapper></crm-consumer-context-attachment-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
+                            disabled
                             name="daily"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize title="操作日志" icon={<ChangeCatalog />} />}

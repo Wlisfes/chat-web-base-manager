@@ -23,7 +23,7 @@ export default defineComponent({
         /**客户静态枚举、字典枚举**/
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
             request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_CRM_CRM_USER_SOURCE'],
+            types: ['CHUNK_CRM_USER_SOURCE'],
             immediate: true
         })
         /**表格实例**/
@@ -183,7 +183,7 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择客户来源"
-                            options={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                            options={chunkState.CHUNK_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>
                     </common-database-search-column>
@@ -218,7 +218,7 @@ export default defineComponent({
                             <common-base-chunk
                                 mode="text"
                                 value={data.source}
-                                items={chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                                items={chunkState.CHUNK_CRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {

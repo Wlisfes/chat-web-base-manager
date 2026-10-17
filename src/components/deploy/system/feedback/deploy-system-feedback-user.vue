@@ -29,7 +29,7 @@ export default defineComponent({
         /**岗位选项、职级选项字典枚举**/
         const { chunkState, fetchCommonService } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
             immediate: false,
-            types: ['CHUNK_SYSTEM_ACCOUNT_USER_POST', 'CHUNK_SYSTEM_ACCOUNT_USER_LEVEL']
+            types: ['CHUNK_SKYLINE_USER_POST', 'CHUNK_SKYLINE_USER_LEVEL']
         })
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
@@ -177,7 +177,7 @@ export default defineComponent({
                                 label-value="keyId"
                                 placeholder="请选择岗位"
                                 loading={chunkState.loading}
-                                options={chunkState.CHUNK_SYSTEM_ACCOUNT_USER_POST.options}
+                                options={chunkState.CHUNK_SKYLINE_USER_POST.options}
                                 v-model:value={formState.value.postKeyIds}
                             ></form-base-select>
                         </form-base-column>
@@ -189,7 +189,7 @@ export default defineComponent({
                                 label-value="keyId"
                                 placeholder="请选择职级"
                                 loading={chunkState.loading}
-                                options={chunkState.CHUNK_SYSTEM_ACCOUNT_USER_LEVEL.options}
+                                options={chunkState.CHUNK_SKYLINE_USER_LEVEL.options}
                                 value={formState.value.levelKeyIds[0] ?? null}
                                 onUpdate:value={(value: number | null) => (formState.value.levelKeyIds = value ? [value] : [])}
                             ></form-base-select>

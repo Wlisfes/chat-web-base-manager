@@ -90,7 +90,7 @@ export default defineComponent({
                                 show-path
                                 mode="text"
                                 value={faseNode.value.source}
-                                items={props.chunkState.CHUNK_CRM_CRM_USER_SOURCE.options}
+                                items={props.chunkState.CHUNK_CRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label-class={props.labelClass} label="当前阶段：">
@@ -146,7 +146,7 @@ export default defineComponent({
                                                 <common-base-chunk
                                                     mode="text"
                                                     value={item.type}
-                                                    items={props.chunkState.CHUNK_SYSTEM_COMMON_CONTACT_TYPE.options}
+                                                    items={props.chunkState.CHUNK_SKYLINE_COMMON_CONTACT_TYPE.options}
                                                 ></common-base-chunk>
                                                 <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
                                             </div>

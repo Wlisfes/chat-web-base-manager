@@ -78,8 +78,9 @@ export default defineComponent({
                     ref={formRef}
                     label-width={90}
                     limit={state.limit}
-                    v-model:loading={state.loading}
                     v-model:when={state.when}
+                    v-model:loading={state.loading}
+                    v-model:initialize={state.initialize}
                     v-model:database={state.database}
                     v-model:formState={formState.value}
                     on-restore={instOptions.fetchRestore}
