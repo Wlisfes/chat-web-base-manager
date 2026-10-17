@@ -151,7 +151,7 @@ export default defineComponent({
                         minWidth: item.minWidth,
                         align: item.align,
                         fixed: item.fixed,
-                        className: item.className,
+                        className: item.key === 'command' ? undefined : item.className,
                         title: () => fetchSkeleton(title),
                         render: () => fetchSkeleton(width ? title : '请选择', width, props.colsRowHeight)
                     }
