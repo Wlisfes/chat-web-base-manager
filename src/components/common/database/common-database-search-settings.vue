@@ -10,6 +10,8 @@ export default defineComponent({
     name: 'CommonDatabaseSearchSettings',
     emits: ['update:faseWhen', 'update:database', '-update:database'],
     props: {
+        /**初始化状态**/
+        initialize: { type: Boolean, default: false },
         /**弹出层容器样式**/
         className: { type: String, default: '' },
         /**表单边界配置**/
@@ -117,7 +119,7 @@ export default defineComponent({
                 >
                     {{
                         trigger: () => (
-                            <common-base-button class="min-w-80" icon={Settings} onClick={fetchState}>
+                            <common-base-button class="min-w-80" icon={Settings} disabled={props.initialize} onClick={fetchState}>
                                 设置
                             </common-base-button>
                         ),

@@ -158,7 +158,7 @@ export default defineComponent({
                                         type="primary"
                                         icon={Search}
                                         secondary={initialize.value || loading.value ? false : true}
-                                        loading={initialize.value ? false : loading.value}
+                                        loading={initialize.value || loading.value}
                                         disabled={loading.value || initialize.value}
                                         onClick={(e: MouseEvent) => emit('-submit', formState.value)}
                                     >
@@ -166,7 +166,7 @@ export default defineComponent({
                                     </common-base-button>
                                 )}
                                 {props.function.includes('restore') && columns.length > 0 && (
-                                    <common-base-button class="min-w-80" onClick={() => emit('-restore')}>
+                                    <common-base-button class="min-w-80" disabled={initialize.value} onClick={() => emit('-restore')}>
                                         重置
                                     </common-base-button>
                                 )}
@@ -174,6 +174,7 @@ export default defineComponent({
                                     <common-base-button
                                         class="min-w-80"
                                         icon={when.value ? UpToTop : DownToBottom}
+                                        disabled={initialize.value}
                                         onClick={fetchClickUpdate}
                                     >
                                         {when.value ? '收起' : '展开'}
@@ -182,6 +183,7 @@ export default defineComponent({
                                 {props.function.includes('deploy') && columns.length > 0 && (
                                     <common-database-search-settings
                                         columns={columns}
+                                        initialize={initialize.value}
                                         v-model:database={database.value}
                                         on-update:database={(...args: Array<any>) => emit('-update:database', ...args)}
                                     ></common-database-search-settings>
