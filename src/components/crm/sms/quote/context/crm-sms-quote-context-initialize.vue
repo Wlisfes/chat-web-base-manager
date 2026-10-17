@@ -44,10 +44,11 @@ export default defineComponent({
                         return await props.setState({ loading: false })
                     }
                     try {
-                        return await Service.httpBaseCrmInitSmsQuoteDraft(formState.value).then(async ({ data }) => {
-                            await props.setForm({ draftBatchId: data.draftBatchId })
-                            return await props.setState({ loading: false, current: 2 })
-                        })
+                        return await props.setState({ loading: false, current: 2 })
+                        // return await Service.httpBaseCrmInitSmsQuoteDraft(formState.value).then(async ({ data }) => {
+                        //     await props.setForm({ draftBatchId: data.draftBatchId })
+                        //     return await props.setState({ loading: false, current: 2 })
+                        // })
                     } catch (err) {
                         return await props.setState({ loading: false }).then(async () => {
                             return await fetchNotifyService({ type: 'error', title: err.message })

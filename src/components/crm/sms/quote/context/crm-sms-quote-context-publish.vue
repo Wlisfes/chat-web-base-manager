@@ -1,8 +1,8 @@
 <script lang="tsx">
-import { defineComponent, Fragment, PropType, ref, watch } from 'vue'
-import { httpBaseCrmUserResolver, httpBaseCrmPublishSmsQuote } from '@/api/instance.service'
+import { defineComponent, Fragment, PropType } from 'vue'
 import { fetchNotifyService } from '@/plugins'
 import { useVModels } from '@vueuse/core'
+import * as Service from '@/api/instance.service'
 
 export default defineComponent({
     name: 'CrmSmsQuoteContextPublish',
@@ -23,96 +23,76 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
-        const consumerInfo = ref<any>({})
-        const loading = ref(false)
 
-        /**进入发布步骤时加载客户信息。*/
-        watch(
-            () => props.state.current,
-            newStep => {
-                if (newStep === 4) {
-                    fetchConsumer()
+        /**确认发布**/
+        async function fetchSubmit() {
+            return await props.fetchValidater().then(async (error: boolean) => {
+                if (error) {
+                    return await props.setState({ loading: false, disabled: false })
                 }
-            },
-            { immediate: true }
-        )
-
-        async function fetchConsumer() {
-            const f = formState.value
-            if (!f.userKeyId) return
-            try {
-                const consumerResponse = await httpBaseCrmUserResolver({ keyId: f.userKeyId })
-                consumerInfo.value = consumerResponse.data || {}
-            } catch (err: any) {
-                fetchNotifyService({ type: 'error', title: '加载客户信息失败', message: err.message })
-            }
-        }
-
-        /**发布报价。*/
-        async function handlePublish() {
-            const f = formState.value
-            if (!f.draftBatchId) return
-
-            try {
-                loading.value = true
-                await httpBaseCrmPublishSmsQuote({ draftBatchId: f.draftBatchId })
-                fetchNotifyService({ type: 'success', title: '报价发布成功' })
-
-                props.setForm({
-                    userKeyId: undefined,
-                    appId: undefined,
-                    countryKeyIds: [],
-                    draftBatchId: undefined
-                })
-                await props.setState({ current: 1 })
-            } catch (err: any) {
-                fetchNotifyService({ type: 'error', title: '发布报价失败', message: err.message })
-            } finally {
-                loading.value = false
-            }
-        }
-
-        function handlePrev() {
-            props.setState({ current: 3 })
+                try {
+                    return await Service.httpBaseCrmPublishSmsQuote({ draftBatchId: formState.value.draftBatchId }).then(async () => {
+                        return fetchNotifyService({ type: 'success', title: '报价发布成功' })
+                    })
+                } catch (err) {
+                    return await props.setState({ loading: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
+                    })
+                }
+            })
         }
 
         return () => {
-            const f = formState.value
-
             return (
                 <Fragment>
-                    <common-base-element class="crm-sms-quote-publish flex flex-col flex-1 p-14 overflow-y-auto">
-                        <common-base-element
-                            is-white
-                            class="p-20 flex-1 flex flex-col b-rd-3 shadow-sm border border-gray-100 max-w-1000 mx-auto w-full"
-                        >
-                            <common-business-header bar title="发布报价确认" class="m-be-16"></common-business-header>
-
-                            <common-base-element class="flex flex-col gap-14 flex-1">
-                                <div class="text-13 text-gray-600 bg-indigo-50/50 p-12 b-rd-2 border border-indigo-100 flex flex-col gap-4">
-                                    <div>
-                                        报价客户：
-                                        <span>
-                                            {consumerInfo.value.name || '-'} ({consumerInfo.value.alias || '-'})
-                                        </span>
-                                    </div>
-                                    <div>
-                                        报价应用：<span>{f.appId || '-'}</span>
-                                    </div>
-                                    <div class="text-11 text-gray-400 m-ts-4">发布后将按设置的生效时间更新该应用的国家/地区短信报价。</div>
-                                </div>
-                                <n-alert type="info" title="本次操作仅发布报价数据，不发送邮件通知。" />
-                            </common-base-element>
-                        </common-base-element>
+                    <common-base-element
+                        is-white
+                        is-border
+                        wrap="p-inline-14 p-bs-14"
+                        class-name="flex flex-col p-14 gap-y-10 overflow-hidden"
+                    >
+                        <common-business-header bar title="基本信息"></common-business-header>
+                        <common-base-columns-template class="gap-x-10 gap-y-5" type="auto-fill" number={240}>
+                            <common-base-columns-wrapper label="客户名称：">
+                                <common-skeleton-block initialize={props.state.initialize}>
+                                    {props.faseNode.name ?? '-'}
+                                </common-skeleton-block>
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="客户别名：">
+                                <common-skeleton-block initialize={props.state.initialize}>
+                                    {props.faseNode.alias ?? '-'}
+                                </common-skeleton-block>
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="应用别名：">
+                                <common-skeleton-block initialize={props.state.initialize}>
+                                    {formState.value.appAlias ?? '-'}
+                                </common-skeleton-block>
+                            </common-base-columns-wrapper>
+                            <common-base-columns-wrapper label="报价币种：">
+                                <common-skeleton-block initialize={props.state.initialize}>
+                                    {props.faseNode.currency ?? '-'}
+                                </common-skeleton-block>
+                            </common-base-columns-wrapper>
+                        </common-base-columns-template>
                     </common-base-element>
-
+                    <common-base-element class="flex flex-col flex-1 p-14 overflow-hidden"></common-base-element>
                     <common-base-element is-white class="flex p-14 gap-x-14 justify-center items-center border-t border-gray-100 shadow-sm">
-                        <n-button class="min-w-168 h-36" onClick={handlePrev}>
-                            上一步：报价预览
-                        </n-button>
-                        <n-button class="min-w-168 h-36" type="primary" loading={loading.value} onClick={handlePublish}>
-                            确认发布
-                        </n-button>
+                        <common-skeleton-block initialize={props.state.initialize}>
+                            <n-button class="min-w-160" disabled={props.state.loading} onClick={() => props.setState({ current: 2 })}>
+                                上一步：报价预览
+                            </n-button>
+                        </common-skeleton-block>
+                        <common-skeleton-block initialize={props.state.initialize}>
+                            <n-button
+                                class="min-w-160"
+                                type="primary"
+                                loading={props.state.loading}
+                                disabled={props.state.loading}
+                                onClick={fetchSubmit}
+                            >
+                                确认发布
+                            </n-button>
+                        </common-skeleton-block>
                     </common-base-element>
                 </Fragment>
             )

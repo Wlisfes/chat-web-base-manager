@@ -8,7 +8,7 @@ export default defineComponent({
     setup(props, ctx) {
         const { formRef, formState, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
-            options: { current: 2 },
+            options: { current: 3 },
             formState: {
                 /**客户ID**/
                 userKeyId: 10241010,
@@ -76,7 +76,7 @@ export default defineComponent({
                         class="common-base-tabser inset-absolute inset-bar flex-1 overflow-hidden "
                         v-model:value={state.current}
                     >
-                        <n-tab-pane name={1} tab="填写报价内容">
+                        <n-tab-pane name={1} tab="填写报价内容" display-directive="show:lazy">
                             <crm-sms-quote-context-initialize
                                 state={state}
                                 fase-node={faseNode.value}
@@ -89,7 +89,7 @@ export default defineComponent({
                                 v-model:formState={formState.value}
                             ></crm-sms-quote-context-initialize>
                         </n-tab-pane>
-                        <n-tab-pane name={2} tab="编辑报价">
+                        <n-tab-pane name={2} tab="编辑报价" display-directive="show:lazy">
                             <crm-sms-quote-context-update
                                 state={state}
                                 fase-node={faseNode.value}
@@ -103,7 +103,7 @@ export default defineComponent({
                                 v-model:formState={formState.value}
                             ></crm-sms-quote-context-update>
                         </n-tab-pane>
-                        <n-tab-pane name={3} tab="报价预览">
+                        <n-tab-pane name={3} tab="报价预览" display-directive="show:lazy">
                             <crm-sms-quote-context-preview
                                 state={state}
                                 fase-node={faseNode.value}
@@ -117,7 +117,7 @@ export default defineComponent({
                                 v-model:formState={formState.value}
                             ></crm-sms-quote-context-preview>
                         </n-tab-pane>
-                        <n-tab-pane name={4} tab="发布报价">
+                        <n-tab-pane name={4} tab="发布报价" display-directive="show:lazy">
                             <crm-sms-quote-context-publish
                                 state={state}
                                 fase-node={faseNode.value}

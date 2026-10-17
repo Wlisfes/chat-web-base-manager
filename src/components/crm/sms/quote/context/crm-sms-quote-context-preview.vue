@@ -72,7 +72,7 @@ export default defineComponent({
                             {columns.value.map(item => (
                                 <common-base-columns-wrapper label={`${item.label}：`}>
                                     <common-skeleton-block initialize={state.initialize}>
-                                        <n-text strong depth={1} type={item.type} class="line-height-24 w-30">
+                                        <n-text strong depth={1} type={item.type} class="line-height-24 w-40">
                                             {item.value ?? '-'}
                                         </n-text>
                                     </common-skeleton-block>
