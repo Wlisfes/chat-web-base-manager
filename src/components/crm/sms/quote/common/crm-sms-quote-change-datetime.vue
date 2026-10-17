@@ -46,9 +46,10 @@ export default defineComponent({
                 type="datetime"
                 clearable={false}
                 placement="left-start"
+                placeholder="请选择生效时间"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                v-model:formatted-value={node.value.effectiveTime}
                 loading={state.loading}
+                v-model:formatted-value={node.value.effectiveTime}
                 disabled={state.loading || node.value.status === 'deleted'}
                 is-date-disabled={(time: number) => time > moment().add(30, 'day').endOf('day').valueOf()}
                 on-confirm={(time: number, date: string) => fetchChnageDateTime(node.value.keyId, date)}

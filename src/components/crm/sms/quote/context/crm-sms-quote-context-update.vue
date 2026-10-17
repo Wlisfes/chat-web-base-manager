@@ -31,11 +31,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const { formState } = useVModels(props, emit)
         const { inverted } = useProvider()
-        /**当前客户信息**/
-        const faseNode = computed(() => {
-            return fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId)
-        })
-        const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => fetchBaseCrmColumnSmsQuoteDraft(base, payload), {
+
+        const { state, instOptions, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsQuoteDraft(payload), {
             formState: { draftBatchId: formState.value.draftBatchId },
             size: 200,
             columns: [
@@ -50,12 +47,13 @@ export default defineComponent({
                 { title: '草稿状态', key: 'status', width: 120 }
             ]
         })
+        /**当前客户信息**/
+        const faseNode = computed(() => fetchCurrent(props.userOptions.dataSource.value, (e: Omix) => e.keyId == formState.value.userKeyId))
         /**存在费率、生效时间正在保存的行；保存完成前禁止上一步/下一步，避免预览拿到旧数据**/
-        const saving = computed(() => state.dataSource.some((item: Omix) => item.loading))
-        /**客户关系管理-短信报价草稿分页列表**/
-        async function fetchBaseCrmColumnSmsQuoteDraft(base: Omix, payload: Omix) {
-            return Service.httpBaseCrmColumnSmsQuoteDraft({ ...payload, ...pick(base, ['page', 'size']) })
-        }
+        const baulk = computed(() => {
+            const items = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
+            return items.length === 0 || state.dataSource.some((item: Omix) => item.loading)
+        })
 
         /**上行或下行价格较现行报价增长时整行标红提醒**/
         function fetchRowClassName(data: Omix) {
@@ -131,13 +129,6 @@ export default defineComponent({
                     return await props.setState({ loading: false, disabled: false })
                 }
                 try {
-                    const dataSource = state.dataSource.filter((item: Omix) => item.status !== 'deleted')
-                    if (dataSource.length === 0) {
-                        return await props.setState({ loading: false }).then(async () => {
-                            return await fetchNotifyService({ type: 'warning', title: '没有可预览的报价草稿' })
-                        })
-                    }
-                    /**费率、生效时间在单元格失焦/确认时已实时保存，这里无需再逐行提交**/
                     return await props.setState({ loading: false, current: 3 })
                 } catch (err) {
                     return await props.setState({ loading: false }).then(async () => {
@@ -246,7 +237,7 @@ export default defineComponent({
                         class="min-w-168"
                         type="primary"
                         loading={props.state.loading}
-                        disabled={props.state.loading || saving.value}
+                        disabled={props.state.loading || baulk.value}
                         onClick={fetchSubmit}
                     >
                         下一步：报价预览
