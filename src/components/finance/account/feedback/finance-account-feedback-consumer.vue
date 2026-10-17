@@ -31,7 +31,7 @@ export default defineComponent({
         /**联系方式类型枚举**/
         const { chunkState: contactChunkState, fetchCommonService: fetchContactChunkService } = useChunkService(
             e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            { immediate: false, types: ['CHUNK_SKYLINE_COMMON_CONTACT_TYPE'] }
+            { immediate: false, types: ['CHUNK_SKYLINE_CONTACT_TYPE'] }
         )
         /**表单实例**/
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
@@ -215,7 +215,7 @@ export default defineComponent({
                                                     label-field="label"
                                                     label-value="keyId"
                                                     loading={contactChunkState.loading}
-                                                    options={contactChunkState.CHUNK_SKYLINE_COMMON_CONTACT_TYPE.options}
+                                                    options={contactChunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
                                                     v-model:value={value.type}
                                                 ></form-base-select>
                                                 <form-base-input

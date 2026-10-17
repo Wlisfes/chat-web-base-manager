@@ -146,7 +146,7 @@ export default defineComponent({
                                                 <common-base-chunk
                                                     mode="text"
                                                     value={item.type}
-                                                    items={props.chunkState.CHUNK_SKYLINE_COMMON_CONTACT_TYPE.options}
+                                                    items={props.chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
                                                 ></common-base-chunk>
                                                 <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
                                             </div>
