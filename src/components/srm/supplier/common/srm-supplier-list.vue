@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useColumnService, useSelectService, useChunkService } from '@/hooks'
-import { EventType } from '@/utils'
+import { EventType, stop } from '@/utils'
 import * as feedback from '@/components/srm/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -23,7 +23,7 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSrmColumnUser({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:srm:supplier',
@@ -60,6 +60,16 @@ export default defineComponent({
                 ]
             }
         )
+
+        /**跳转供应商详情**/
+        async function fetchJumpContextSupplier(event: MouseEvent, data: Omix) {
+            return await stop(event, async () => {
+                return await router.push({
+                    path: `/srm/supplier/context/${data.keyId}`,
+                    state: { tabTitle: data.name }
+                })
+            })
+        }
 
         /**新增供应商**/
         async function fetchCreateSupplier() {
@@ -167,7 +177,9 @@ export default defineComponent({
                     {{
                         col_name: (data: Omix) => (
                             <common-base-content ellipsis value={data.name}>
-                                {data.name}
+                                <n-text class="cursor-pointer" type="info" onClick={(e: MouseEvent) => fetchJumpContextSupplier(e, data)}>
+                                    {data.name}
+                                </n-text>
                             </common-base-content>
                         ),
                         col_source: (data: Omix) => (
