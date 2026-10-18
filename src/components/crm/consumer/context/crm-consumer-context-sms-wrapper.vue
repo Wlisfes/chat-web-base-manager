@@ -99,7 +99,7 @@ export default defineComponent({
                             </Fragment>
                         )}
                         <n-card content-class="flex flex-col p-0! overflow-hidden">
-                            <div class="box-border flex flex-col flex-1 p-14 items-center justify-center">
+                            <div class="box-border flex flex-col flex-1 p-14 min-h-216 items-center justify-center">
                                 <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
                                     <common-base-icon size={18}>
                                         <local-nest-plus />
