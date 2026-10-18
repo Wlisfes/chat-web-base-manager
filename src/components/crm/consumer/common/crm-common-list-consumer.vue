@@ -9,7 +9,15 @@ export default defineComponent({
     name: 'CrmCommonListConsumer',
     props: {
         /**通讯实例**/
-        observer: { type: Object as PropType<EventType>, required: true }
+        observer: { type: Object as PropType<EventType>, required: true },
+        /**客户静态枚举**/
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**客户字典枚举**/
+        chunkState: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**品牌下拉列表**/
+        brandOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**币种下拉列表**/
+        currencyOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, ctx) {
         /**品牌下拉列表**/
@@ -91,7 +99,7 @@ export default defineComponent({
         }
 
         return () => (
-            <n-element class="crm-consumer-common-list h-full flex flex-col gap-14 overflow-hidden">
+            <n-element class="crm-common-list-consumer h-full flex flex-col gap-14 overflow-hidden">
                 <common-database-search
                     class="p-0!"
                     function-class="justify-end"

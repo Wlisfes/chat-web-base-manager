@@ -1,30 +1,23 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService, useSelectService, useChunkService } from '@/hooks'
-import { EventType, stop } from '@/utils'
+import { useColumnService, EventType, pick } from '@/hooks'
 import * as feedback from '@/components/srm/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'SrmSupplierList',
+    name: 'CrmCommonListSupplier',
     props: {
         /**通讯实例**/
-        observer: { type: Object as PropType<EventType>, required: true }
+        observer: { type: Object as PropType<EventType>, required: true },
+        /**供应商静态枚举**/
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**供应商字典枚举**/
+        chunkState: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, ctx) {
-        /**币种下拉列表**/
-        const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
-            immediate: true
-        })
-        /**供应商静态枚举、字典枚举**/
-        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSrmUserEnums(), {
-            request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_SRM_USER_SOURCE'],
-            immediate: true
-        })
         /**表格实例**/
-        const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseSrmColumnUser({ ...payload, page: base.page, size: base.size }),
+        const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSrmColumnUser({ ...payload, ...pick(base, ['page', 'size']) }),
             {
                 keyName: 'chat:srm:supplier',
                 formState: {
@@ -32,8 +25,6 @@ export default defineComponent({
                     name: undefined,
                     /**状态**/
                     status: undefined,
-                    /**币种**/
-                    currency: undefined,
                     /**付款模式**/
                     payMode: undefined,
                     /**供应商来源**/
@@ -43,14 +34,14 @@ export default defineComponent({
                     { title: '供应商ID', key: 'keyId', width: 100, disabled: true },
                     { title: '供应商名称', key: 'name', minWidth: 240, disabled: true, ellipsis: false },
                     { title: '供应商别名', key: 'alias', width: 140 },
+                    { title: '邮箱', key: 'email', width: 200 },
+                    { title: '电话号码', key: 'phone', width: 140 },
                     { title: '阶段', key: 'stage', width: 100 },
                     { title: '状态', key: 'status', width: 100 },
                     { title: '付款模式', key: 'payMode', width: 100 },
                     { title: '供应商来源', key: 'source', width: 140 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', minWidth: 140 },
-                    { title: '邮箱', key: 'email', width: 200 },
-                    { title: '电话号码', key: 'phone', width: 140 },
                     { title: '等级', key: 'level', width: 100 },
                     { title: '币种', key: 'currency', width: 100 },
                     { title: '余额', key: 'balance', width: 120 },
@@ -61,26 +52,16 @@ export default defineComponent({
             }
         )
 
-        /**跳转供应商详情**/
-        async function fetchJumpContextSupplier(event: MouseEvent, data: Omix) {
-            return await stop(event, async () => {
-                return await router.push({
-                    path: `/srm/supplier/context/${data.keyId}`,
-                    state: { tabTitle: data.name }
-                })
-            })
-        }
-
         /**新增供应商**/
         async function fetchCreateSupplier() {
             return await feedback.fetchSrmSupplier({
                 title: '新增供应商',
-                onSubmit: fetchRefresh
+                onSubmit: () => fetchRefresh()
             })
         }
 
         return () => (
-            <n-element class="srm-supplier-list h-full flex flex-col gap-14 overflow-hidden">
+            <n-element class="crm-common-list-supplier h-full flex flex-col gap-14 overflow-hidden">
                 <common-database-search
                     class="p-0!"
                     function-class="justify-end"
@@ -115,29 +96,18 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            loading={chunkState.loading}
-                            options={chunkOptions.value.statusOptions}
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="currency" label="币种">
-                        <form-base-select
-                            clearable
-                            filterable
-                            placeholder="请选择币种"
-                            label-value="currency"
-                            label-field="currency"
-                            loading={currencyOptions.loading.value}
-                            options={currencyOptions.dataSource.value}
-                            v-model:value={formState.value.currency}
-                        ></form-base-select>
-                    </common-database-search-column>
+
                     <common-database-search-column prop="payMode" label="付款模式">
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            loading={chunkState.loading}
-                            options={chunkOptions.value.payModeOptions}
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </common-database-search-column>
@@ -151,15 +121,15 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择供应商来源"
-                            options={chunkState.CHUNK_SRM_USER_SOURCE.options}
+                            options={props.chunkState.CHUNK_SRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>
                     </common-database-search-column>
                 </common-database-search>
                 <common-database-table
                     class="p-0! overflow-hidden"
-                    show-select
                     show-settings
+                    //show-command={instState.value.showCommand}
                     limit={state.limit}
                     total={state.total}
                     columns={state.columns}
@@ -177,16 +147,14 @@ export default defineComponent({
                     {{
                         col_name: (data: Omix) => (
                             <common-base-content ellipsis value={data.name}>
-                                <n-text class="cursor-pointer" type="info" onClick={(e: MouseEvent) => fetchJumpContextSupplier(e, data)}>
-                                    {data.name}
-                                </n-text>
+                                {data.name}
                             </common-base-content>
                         ),
                         col_source: (data: Omix) => (
                             <common-base-chunk
                                 mode="text"
                                 value={data.source}
-                                items={chunkState.CHUNK_SRM_USER_SOURCE.options}
+                                items={props.chunkState.CHUNK_SRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
@@ -202,13 +170,13 @@ export default defineComponent({
                             return <common-base-content value={data.ownerUserUidOptions?.organizations}></common-base-content>
                         },
                         col_stage: (data: Omix) => (
-                            <common-base-chunk value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
+                            <common-base-chunk value={data.stage} items={props.chunkOptions.stageOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
-                            <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
                         ),
                         col_payMode: (data: Omix) => (
-                            <common-base-chunk value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
+                            <common-base-chunk value={data.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>
