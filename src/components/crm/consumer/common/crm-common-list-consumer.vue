@@ -169,6 +169,7 @@ export default defineComponent({
                     <common-database-search-column prop="source" label="客户来源">
                         <form-base-cascader
                             show-path
+                            clearable
                             filterable
                             check-strategy="child"
                             expand-trigger="click"
@@ -176,6 +177,7 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择客户来源"
+                            loading={props.chunkState.loading}
                             options={props.chunkState.CHUNK_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>

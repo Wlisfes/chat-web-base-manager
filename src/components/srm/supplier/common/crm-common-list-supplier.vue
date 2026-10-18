@@ -114,6 +114,7 @@ export default defineComponent({
                     <common-database-search-column prop="source" label="供应商来源">
                         <form-base-cascader
                             show-path
+                            clearable
                             filterable
                             check-strategy="child"
                             expand-trigger="click"
