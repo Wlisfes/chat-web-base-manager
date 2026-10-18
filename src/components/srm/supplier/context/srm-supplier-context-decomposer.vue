@@ -1,7 +1,7 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
 import { useBaseService, useChunkService } from '@/hooks'
-import { ApplicationWeb } from '@vicons/carbon'
+import { Chat, ApplicationWeb, Email, ChangeCatalog, SettingsServices, CloudServices } from '@vicons/carbon'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -49,6 +49,13 @@ export default defineComponent({
                                 chunk-options={chunkOptions.value}
                                 v-model:faseNode={faseNode.value}
                             ></srm-supplier-context-basic-wrapper>
+                        </n-tab-pane>
+                        <n-tab-pane
+                            name="sms"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title title="短信设备" icon={<Chat />} />}
+                        >
+                            <crm-supplier-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-supplier-context-sms-wrapper>
                         </n-tab-pane>
                     </n-tabs>
                 </common-base-element>
