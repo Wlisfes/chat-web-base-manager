@@ -1,8 +1,8 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { useFormService, useSelectService, useChunkService } from '@/hooks'
-import { fetchNotifyService } from '@/plugins'
 import { v4, pick, omit, fetchCloneByte } from '@/utils'
+import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -67,16 +67,7 @@ export default defineComponent({
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
                 email: { required: true, message: '请输入邮箱', trigger: 'blur' },
                 source: { required: true, message: '请选择客户来源', trigger: 'blur' },
-                payMode: { required: true, message: '请选择付款模式', trigger: 'blur' },
-                contact: {
-                    name: { required: true, message: '请输入联系人名称', trigger: 'blur' },
-                    items: {
-                        trigger: 'blur',
-                        validator: (_rule: unknown, items: Array<Omix>) => {
-                            return (items ?? []).every(item => item.type && item.value?.trim()) || new Error('请完善联系方式类型和内容')
-                        }
-                    }
-                }
+                payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
             }
         })
 
@@ -236,7 +227,7 @@ export default defineComponent({
                             ))}
                         </div>
                     </form-base-column>
-                    <form-base-column full label="联系人备注" path="contact.remark">
+                    <form-base-column full label="联系人备注">
                         <n-input
                             type="textarea"
                             maxlength={1024}

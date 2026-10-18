@@ -17,7 +17,9 @@ export default defineComponent({
         /**选项value的字段名**/
         labelValue: { type: String, default: 'value' },
         /**选项children的字段名**/
-        childrenField: { type: String, default: 'children' }
+        childrenField: { type: String, default: 'children' },
+        /**加载状态：n-cascader 不支持 loading，通过 arrow 插槽渲染与 n-select 一致的加载动画**/
+        loading: { type: Boolean, default: false }
     },
     setup(props, { emit }) {
         const { value } = useVModels(props, emit)
@@ -38,13 +40,25 @@ export default defineComponent({
                 children-field={props.childrenField}
                 v-model:value={value.value}
                 on-update:value={fetchUpdate}
-            ></n-cascader>
+            >
+                {{
+                    arrow: () => (
+                        <common-internal-loading class="form-base-cascader__loading" stroke-width={24} scale={0.85} show={props.loading}>
+                            <common-internal-chevron-down></common-internal-chevron-down>
+                        </common-internal-loading>
+                    )
+                }}
+            </n-cascader>
         )
     }
 })
 </script>
 
 <style lang="scss" scoped>
+/**加载动画沿用选择框 loading 的颜色变量，箭头保持 naive-ui 原有颜色**/
+.form-base-cascader :deep(.form-base-cascader__loading .common-internal-loading__wrapper) {
+    color: var(--n-loading-color);
+}
 .form-base-cascader {
     :deep(.n-tag) {
         --n-height: 26px;

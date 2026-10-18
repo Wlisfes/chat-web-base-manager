@@ -1,9 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType, Fragment } from 'vue'
-import { useChunkService, useColumnService } from '@/hooks'
+import { useColumnService } from '@/hooks'
 import { useVModels } from '@vueuse/core'
-import { Lightning, Chat, UserAvatarFilledAlt } from '@vicons/carbon'
-import { fetchCurrent } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -29,12 +27,6 @@ export default defineComponent({
                 immediate: true,
                 keyName: 'chat:crm:common:basic:consumer',
                 formState: { userKeyId: faseNode.value.keyId },
-                transform: (data: Omix) => {
-                    return (data.list ?? []).map((item: Omix, index: number) => ({
-                        ...item,
-                        index: ((data.page ?? 1) - 1) * (data.size ?? 50) + index + 1
-                    }))
-                },
                 columns: [
                     { title: '序号', key: 'index', width: 90, align: 'center' },
                     { title: '联系人名称', key: 'name', width: 200 },
@@ -121,6 +113,7 @@ export default defineComponent({
                 >
                     <common-business-header bar title="联系人信息"></common-business-header>
                     <common-database-table
+                        show-index
                         bordered={false}
                         pagination={false}
                         limit={state.limit}
@@ -138,27 +131,12 @@ export default defineComponent({
                         on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                     >
                         {{
-                            col_items: (data: Omix) => {
-                                return (
-                                    <div class="flex flex-col overflow-hidden">
-                                        {(data.items ?? []).map((item: Omix, index: number) => (
-                                            <div class="flex items-center gap-x-5 overflow-hidden">
-                                                <common-base-chunk
-                                                    mode="text"
-                                                    value={item.type}
-                                                    items={props.chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
-                                                ></common-base-chunk>
-                                                <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )
-                            },
-                            col_name: (data: Omix) => (
-                                <div class="flex items-center gap-x-5 overflow-hidden">
-                                    <common-base-icon size={20} component={<UserAvatarFilledAlt />}></common-base-icon>
-                                    <span>{data.name ?? '-'}</span>
-                                </div>
+                            col_items: (data: Omix) => (
+                                <common-business-contact-chunk
+                                    node={data}
+                                    items={data.items}
+                                    options={props.chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
+                                ></common-business-contact-chunk>
                             ),
                             col_status: (data: Omix) => (
                                 <common-base-chunk value={data.status} items={props.chunkOptions.contactStatusOptions}></common-base-chunk>
