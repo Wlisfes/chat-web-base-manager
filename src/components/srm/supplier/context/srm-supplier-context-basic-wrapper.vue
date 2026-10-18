@@ -116,22 +116,13 @@ export default defineComponent({
                         on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                     >
                         {{
-                            col_items: (data: Omix) => {
-                                return (
-                                    <div class="flex flex-col overflow-hidden">
-                                        {(data.items ?? []).map((item: Omix, index: number) => (
-                                            <div class="flex items-center gap-x-5 overflow-hidden">
-                                                <common-base-chunk
-                                                    mode="text"
-                                                    value={item.type}
-                                                    items={props.chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
-                                                ></common-base-chunk>
-                                                <div class="flex-1 overflow-hidden">{item.value ?? '-'}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )
-                            },
+                            col_items: (data: Omix) => (
+                                <common-business-contact-chunk
+                                    node={data}
+                                    items={data.items}
+                                    options={props.chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
+                                ></common-business-contact-chunk>
+                            ),
                             col_status: (data: Omix) => (
                                 <common-base-chunk value={data.status} items={props.chunkOptions.contactStatusOptions}></common-base-chunk>
                             ),
