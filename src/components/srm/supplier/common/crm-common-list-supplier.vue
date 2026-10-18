@@ -121,6 +121,7 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择供应商来源"
+                            loading={props.chunkState.loading}
                             options={props.chunkState.CHUNK_SRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>

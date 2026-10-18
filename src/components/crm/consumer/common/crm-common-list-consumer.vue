@@ -1,7 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useColumnService, useSelectService, useChunkService } from '@/hooks'
-import { EventType, stop } from '@/utils'
+import { useColumnService, EventType, stop } from '@/hooks'
 import * as feedback from '@/components/crm/hooks'
 import * as Service from '@/api/instance.service'
 
@@ -20,20 +19,6 @@ export default defineComponent({
         currencyOptions: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, ctx) {
-        /**品牌下拉列表**/
-        const brandOptions = useSelectService(e => Service.httpBaseFinanceSelectBrand(), {
-            immediate: true
-        })
-        /**币种下拉列表**/
-        const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
-            immediate: true
-        })
-        /**客户静态枚举、字典枚举**/
-        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseCrmUserEnums(), {
-            request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-            types: ['CHUNK_CRM_USER_SOURCE'],
-            immediate: true
-        })
         /**表格实例**/
         const { formRef, formState, state, router, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseCrmColumnUser({ ...payload, page: base.page, size: base.size }),
@@ -134,8 +119,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择状态"
-                            loading={chunkState.loading}
-                            options={chunkOptions.value.statusOptions}
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
@@ -146,8 +131,8 @@ export default defineComponent({
                             placeholder="请选择品牌"
                             label-field="name"
                             label-value="keyId"
-                            loading={brandOptions.loading.value}
-                            options={brandOptions.dataSource.value}
+                            loading={props.brandOptions.loading.value}
+                            options={props.brandOptions.dataSource.value}
                             v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
                     </common-database-search-column>
@@ -158,8 +143,8 @@ export default defineComponent({
                             placeholder="请选择币种"
                             label-value="currency"
                             label-field="currency"
-                            loading={currencyOptions.loading.value}
-                            options={currencyOptions.dataSource.value}
+                            loading={props.currencyOptions.loading.value}
+                            options={props.currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
                         ></form-base-select>
                     </common-database-search-column>
@@ -167,8 +152,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择付款模式"
-                            loading={chunkState.loading}
-                            options={chunkOptions.value.payModeOptions}
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.payModeOptions}
                             v-model:value={formState.value.payMode}
                         ></form-base-select>
                     </common-database-search-column>
@@ -176,8 +161,8 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             placeholder="请选择认证状态"
-                            loading={chunkState.loading}
-                            options={chunkOptions.value.authStatusOptions}
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.authStatusOptions}
                             v-model:value={formState.value.authStatus}
                         ></form-base-select>
                     </common-database-search-column>
@@ -191,7 +176,7 @@ export default defineComponent({
                             label-value="value"
                             children-field="children"
                             placeholder="请选择客户来源"
-                            options={chunkState.CHUNK_CRM_USER_SOURCE.options}
+                            options={props.chunkState.CHUNK_CRM_USER_SOURCE.options}
                             v-model:value={formState.value.source}
                         ></form-base-cascader>
                     </common-database-search-column>
@@ -226,7 +211,7 @@ export default defineComponent({
                             <common-base-chunk
                                 mode="text"
                                 value={data.source}
-                                items={chunkState.CHUNK_CRM_USER_SOURCE.options}
+                                items={props.chunkState.CHUNK_CRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         ),
                         col_balance: (data: Omix) => {
@@ -245,19 +230,19 @@ export default defineComponent({
                             return <common-base-content value={data.brandKeyIdOptions?.name}></common-base-content>
                         },
                         col_stage: (data: Omix) => (
-                            <common-base-chunk value={data.stage} items={chunkOptions.value.stageOptions}></common-base-chunk>
+                            <common-base-chunk value={data.stage} items={props.chunkOptions.stageOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
-                            <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.status} items={props.chunkOptions.statusOptions}></common-base-chunk>
                         ),
                         col_authStatus: (data: Omix) => (
-                            <common-base-chunk value={data.authStatus} items={chunkOptions.value.authStatusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.authStatus} items={props.chunkOptions.authStatusOptions}></common-base-chunk>
                         ),
                         col_classType: (data: Omix) => (
-                            <common-base-chunk value={data.classType} items={chunkOptions.value.classTypeOptions}></common-base-chunk>
+                            <common-base-chunk value={data.classType} items={props.chunkOptions.classTypeOptions}></common-base-chunk>
                         ),
                         col_payMode: (data: Omix) => (
-                            <common-base-chunk value={data.payMode} items={chunkOptions.value.payModeOptions}></common-base-chunk>
+                            <common-base-chunk value={data.payMode} items={props.chunkOptions.payModeOptions}></common-base-chunk>
                         )
                     }}
                 </common-database-table>
