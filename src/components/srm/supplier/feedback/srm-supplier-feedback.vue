@@ -1,8 +1,7 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { useFormService, useChunkService, fetchCloneByte, v4, pick, omit } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
-import { v4, pick, omit, fetchCloneByte } from '@/utils'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -15,10 +14,6 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        /**币种下拉列表**/
-        const currencyOptions = useSelectService(e => Service.httpBaseFinanceSelectCurrency(), {
-            immediate: false
-        })
         /**供应商静态枚举、联系方式类型枚举**/
         const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseSrmUserEnums(), {
             request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
@@ -32,7 +27,7 @@ export default defineComponent({
                 /**供应商名称**/
                 name: props.node.name,
                 /**币种**/
-                currency: props.node.currency,
+                currency: props.node.currency ?? 'USD',
                 /**邮箱**/
                 email: props.node.email,
                 /**电话号码**/
@@ -60,24 +55,14 @@ export default defineComponent({
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
                 email: { required: true, message: '请输入邮箱', trigger: 'blur' },
                 source: { required: true, message: '请选择供应商来源', trigger: 'blur' },
-                payMode: { required: true, message: '请选择付款模式', trigger: 'blur' },
-                contact: {
-                    name: { required: true, message: '请输入联系人名称', trigger: 'blur' },
-                    items: {
-                        trigger: 'blur',
-                        validator: (_rule: unknown, items: Array<Omix>) => {
-                            return (items ?? []).every(item => item.type && item.value?.trim()) || new Error('请完善联系方式类型和内容')
-                        }
-                    }
-                }
+                payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
             }
         })
 
         /**详情初始化**/
         async function fetchInitialization() {
-            const taskNames: Array<Promise<Omix>> = [currencyOptions.fetchRequest(), fetchChunkService()]
             try {
-                return await Promise.all([Service.httpBaseSrmUserFaker(), ...taskNames]).then(async ([{ data }]) => {
+                return await Promise.all([Service.httpBaseSrmUserFaker(), fetchChunkService()]).then(async ([{ data }]) => {
                     const contact = pick(data.contact, ['name', 'address', 'remark'])
                     const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, disabled: true, keyId: v4() }))
                     return await setForm({ ...data, items, contact }).then(async () => {
@@ -147,14 +132,12 @@ export default defineComponent({
                         ></form-base-input>
                     </form-base-column>
                     <form-base-column label="币种" path="currency">
-                        <form-base-select
-                            filterable
+                        <form-base-input
+                            disabled
+                            maxlength={64}
                             placeholder="请选择币种"
-                            label-value="currency"
-                            label-field="currency"
-                            options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
-                        ></form-base-select>
+                        ></form-base-input>
                     </form-base-column>
                     <form-base-column label="邮箱" path="email">
                         <form-base-input maxlength={128} placeholder="请输入邮箱" v-model:value={formState.value.email}></form-base-input>
@@ -223,7 +206,7 @@ export default defineComponent({
                             ))}
                         </div>
                     </form-base-column>
-                    <form-base-column full label="联系人备注" path="contact.remark">
+                    <form-base-column full label="联系人备注">
                         <n-input
                             type="textarea"
                             maxlength={1024}
