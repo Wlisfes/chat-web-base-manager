@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { ApplicationWeb } from '@vicons/carbon'
+import { ApplicationWeb, Chat } from '@vicons/carbon'
 
 export default defineComponent({
     name: 'SrmSupplierContextSkeleton',
@@ -43,7 +43,7 @@ export default defineComponent({
                         type="line"
                         bar-width={0}
                         tabs-padding={16}
-                        default-value="basic"
+                        default-value="simbank"
                         class="common-base-tabser inset-absolute flex-1 overflow-hidden"
                     >
                         <n-tab-pane
@@ -53,6 +53,14 @@ export default defineComponent({
                             tab={<common-base-tab-title initialize title="详细信息" icon={<ApplicationWeb />} />}
                         >
                             <srm-supplier-context-basic-skeleton initialize />
+                        </n-tab-pane>
+                        <n-tab-pane
+                            disabled
+                            name="simbank"
+                            display-directive="show:lazy"
+                            tab={<common-base-tab-title initialize title="短信应用" icon={<Chat />} />}
+                        >
+                            <srm-supplier-context-simbank-skeleton initialize />
                         </n-tab-pane>
                     </n-tabs>
                 </common-base-element>
