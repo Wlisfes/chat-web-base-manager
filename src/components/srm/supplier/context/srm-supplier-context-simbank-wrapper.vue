@@ -14,7 +14,7 @@ const SMS_APP_ICONS: Record<string, Component> = {
 }
 
 export default defineComponent({
-    name: 'CrmSupplierContextSmsWrapper',
+    name: 'CrmSupplierContextSimbankWrapper',
     emits: ['update:faseNode'],
     props: {
         /**枚举对象**/

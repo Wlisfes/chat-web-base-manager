@@ -20,7 +20,7 @@ export default defineComponent({
         })
         const { faseNode, faseState } = useBaseService(() => Service.httpBaseSrmUserResolver({ keyId: props.keyId }), {
             immediate: true,
-            options: { tabName: 'basic' }
+            options: { tabName: 'simbank' }
         })
 
         return () => (
@@ -51,11 +51,11 @@ export default defineComponent({
                             ></srm-supplier-context-basic-wrapper>
                         </n-tab-pane>
                         <n-tab-pane
-                            name="sms"
+                            name="simbank"
                             display-directive="show:lazy"
                             tab={<common-base-tab-title title="短信设备" icon={<Chat />} />}
                         >
-                            <crm-supplier-context-sms-wrapper v-model:faseNode={faseNode.value}></crm-supplier-context-sms-wrapper>
+                            <srm-supplier-context-simbank-wrapper v-model:faseNode={faseNode.value}></srm-supplier-context-simbank-wrapper>
                         </n-tab-pane>
                     </n-tabs>
                 </common-base-element>
