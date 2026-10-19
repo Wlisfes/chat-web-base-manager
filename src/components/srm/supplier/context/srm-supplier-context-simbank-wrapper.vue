@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType } from 'vue'
-import { useColumnService, useChunkService } from '@/hooks'
+import { useColumnService, useChunkService, pick } from '@/hooks'
 import { Chip } from '@vicons/carbon'
 import { useVModels } from '@vueuse/core'
 import * as feedback from '@/components/srm/hooks'
@@ -23,7 +23,7 @@ export default defineComponent({
         })
         /**SIMBANK 设备列表：卡片展示不分页，单次最多加载 300 台**/
         const { state, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseSrmColumnSimbank({ ...payload, page: 1, size: 300 }),
+            (base, payload) => Service.httpBaseSrmColumnSimbank({ ...payload, ...pick(base, ['page', 'size']) }),
             {
                 formState: { userKeyId: faseNode.value.keyId },
                 immediate: true
@@ -35,7 +35,6 @@ export default defineComponent({
             return await feedback.fetchSrmSupplierSimbank({
                 title: '新增设备',
                 faseNode: faseNode.value,
-                modelOptions: props.chunkState.CHUNK_SRM_SIMBANK_MODEL?.options ?? [],
                 onSubmit: () => fetchRefresh()
             })
         }
@@ -75,13 +74,13 @@ export default defineComponent({
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备名称">
+                                            <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="设备名称">
                                                 <n-ellipsis tooltip={false}>{item.name ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备ID">
+                                            <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="设备ID">
                                                 <n-ellipsis tooltip={false}>{item.keyId ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备型号">
+                                            <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="设备型号">
                                                 <div class="flex items-center gap-x-10 overflow-hidden">
                                                     <common-base-chunk
                                                         value={item.model}
@@ -90,17 +89,14 @@ export default defineComponent({
                                                     <n-text depth={3}>{`${item.total ?? 0} 个端口`}</n-text>
                                                 </div>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="MAC地址">
+                                            <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="MAC地址">
                                                 <n-ellipsis tooltip={false}>{item.mac ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备状态">
+                                            <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="设备状态">
                                                 <common-base-chunk
                                                     value={item.status}
                                                     items={chunkOptions.value.statusOptions}
                                                 ></common-base-chunk>
-                                            </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="归属人">
-                                                <common-base-user element="text" data={item.ownerUserUidOptions}></common-base-user>
                                             </common-base-columns-wrapper>
                                         </div>
                                     </n-card>

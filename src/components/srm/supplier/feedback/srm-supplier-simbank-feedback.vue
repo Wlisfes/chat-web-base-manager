@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { computed, defineComponent, PropType } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { isMACAddress, isEmpty } from 'class-validator'
-import { useFormService, useChunkService, fetchCurrent } from '@/hooks'
+import { useFormService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -12,24 +12,16 @@ export default defineComponent({
         /**标题**/
         title: { type: String, required: true },
         /**供应商详情信息**/
-        faseNode: { type: Object as PropType<Omix>, default: () => ({}) },
-        /**设备型号枚举选项：Skyline 枚举 CHUNK_SRM_SIMBANK_MODEL，json.total 为端口数**/
-        modelOptions: { type: Array as PropType<Array<Omix>>, default: () => [] }
+        faseNode: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        /**供应商静态枚举、注册来源、联系方式类型、设备型号字典枚举**/
-        // const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSrmUserEnums(e), {
-        //     request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
-        //     types: ['CHUNK_SRM_USER_SOURCE', 'CHUNK_SKYLINE_CONTACT_TYPE', 'CHUNK_SRM_SIMBANK_MODEL'],
-        //     immediate: true
-        // })
-        /**设备型号选中项**/
-        const modelOptions = computed(() => {
-            return fetchCurrent(props.modelOptions, item => item.keyId == formState.value.model)
+        /**设备型号字典枚举**/
+        const { chunkState } = useChunkService(e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }), {
+            types: ['CHUNK_SRM_SIMBANK_MODEL'],
+            immediate: true
         })
         /**表单实例**/
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
-            callback: () => setState({ initialize: false }),
             formState: {
                 /**归属供应商主键**/
                 userKeyId: props.faseNode.keyId,
@@ -42,7 +34,7 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入设备名称', trigger: 'blur' },
-                model: { type: 'number', required: true, message: '请选择设备型号', trigger: 'blur' },
+                model: { required: true, message: '请选择设备型号', trigger: 'blur' },
                 mac: {
                     required: true,
                     trigger: 'blur',
@@ -82,7 +74,7 @@ export default defineComponent({
                 width={560}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
-                v-model:initialize={state.initialize}
+                v-model:initialize={chunkState.initialize}
                 onSubmit={fetchSubmit}
                 onCancel={() => setState({ visible: false })}
                 onClose={() => emit('close', { done: setState })}
@@ -102,17 +94,10 @@ export default defineComponent({
                         <form-base-select
                             placeholder="请选择设备型号"
                             label-field="label"
-                            label-value="keyId"
-                            options={props.modelOptions}
+                            label-value="value"
+                            options={chunkState.CHUNK_SRM_SIMBANK_MODEL.options}
                             v-model:value={formState.value.model}
                         ></form-base-select>
-                    </form-base-column>
-                    <form-base-column label="端口数" required>
-                        <form-base-input
-                            disabled
-                            placeholder="选择设备型号后自动带出"
-                            value={modelOptions.value.json?.total ?? '-'}
-                        ></form-base-input>
                     </form-base-column>
                     <form-base-column label="MAC地址" path="mac">
                         <form-base-input
