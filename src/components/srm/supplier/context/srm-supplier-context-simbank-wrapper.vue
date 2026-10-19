@@ -1,51 +1,48 @@
 <script lang="tsx">
-import { defineComponent, Fragment, Component, h, PropType } from 'vue'
+import { defineComponent, Fragment, PropType } from 'vue'
 import { useColumnService, useChunkService } from '@/hooks'
-import { Chat, ChatBot, ChatLaunch } from '@vicons/carbon'
+import { Chip } from '@vicons/carbon'
 import { useVModels } from '@vueuse/core'
-import * as feedback from '@/components/crm/hooks'
+import * as feedback from '@/components/srm/hooks'
 import * as Service from '@/api/instance.service'
 
-/**短信应用类型对应的图标；颜色统一使用枚举接口返回的 type。*/
-const SMS_APP_ICONS: Record<string, Component> = {
-    MRKT: ChatBot,
-    NTFY: ChatLaunch,
-    SOTP: Chat
-}
-
 export default defineComponent({
-    name: 'CrmSupplierContextSimbankWrapper',
+    name: 'SrmSupplierContextSimbankWrapper',
     emits: ['update:faseNode'],
     props: {
-        /**枚举对象**/
+        /**字典枚举：CHUNK_SRM_SIMBANK_MODEL 设备型号**/
         chunkState: { type: Object as PropType<Omix>, default: () => ({}) },
-        /**详情数据**/
+        /**供应商详情信息**/
         faseNode: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { faseNode } = useVModels(props, emit)
-        /**短信应用静态枚举**/
-        const { chunkOptions } = useChunkService(e => Service.httpBaseCrmSmsAppEnums(), {
+        /**SIMBANK 设备静态枚举**/
+        const { chunkOptions } = useChunkService(e => Service.httpBaseSrmSimbankEnums(), {
             immediate: true
         })
-        /**短信应用列表**/
-        const { state, fetchRefresh } = useColumnService((base, payload) => Service.httpBaseCrmColumnSmsApp(payload), {
-            formState: { userKeyId: faseNode.value.keyId },
-            immediate: true
-        })
+        /**SIMBANK 设备列表：卡片展示不分页，单次最多加载 300 台**/
+        const { state, fetchRefresh } = useColumnService(
+            (base, payload) => Service.httpBaseSrmColumnSimbank({ ...payload, page: 1, size: 300 }),
+            {
+                formState: { userKeyId: faseNode.value.keyId },
+                immediate: true
+            }
+        )
 
-        /**添加短信应用**/
-        async function fetchCrmSmsAppStore() {
-            return await feedback.fetchCrmSmsAppStore({
-                title: '添加短信应用',
+        /**新增 SIMBANK 设备**/
+        async function fetchCreateSimbank() {
+            return await feedback.fetchSrmSupplierSimbank({
+                title: '新增设备',
                 faseNode: faseNode.value,
+                modelOptions: props.chunkState.CHUNK_SRM_SIMBANK_MODEL?.options ?? [],
                 onSubmit: () => fetchRefresh()
             })
         }
 
         return () => (
-            <crm-consumer-context-sms-skeleton initialize={state.initialize}>
-                <common-base-scrollbar class="crm-consumer-context-sms-wrapper">
+            <srm-supplier-context-simbank-skeleton initialize={state.initialize}>
+                <common-base-scrollbar class="srm-supplier-context-simbank-wrapper">
                     <common-base-columns-template class="gap-14 p-14" type="auto-fill" number={360}>
                         {state.total > 0 && (
                             <Fragment>
@@ -54,44 +51,56 @@ export default defineComponent({
                                         <div class="flex gap-x-10 p-inline-14 p-block-14 overflow-hidden">
                                             <common-base-alert-wrapper
                                                 class="p-10"
-                                                type="info"
-                                                value={item.type}
-                                                items={chunkOptions.value.typeOptions}
+                                                type="default"
+                                                value={item.online}
+                                                items={chunkOptions.value.onlineOptions}
                                             >
                                                 <n-icon size={28} color="var(--n-icon-color)">
-                                                    {h(SMS_APP_ICONS[item.type] ?? Chat)}
+                                                    <Chip />
                                                 </n-icon>
                                             </common-base-alert-wrapper>
                                             <div class="flex flex-col flex-1 gap-y-2 overflow-hidden">
-                                                <n-text class="text-16 line-height-24" depth={1}>
-                                                    {item.appAlias ?? '-'}
-                                                </n-text>
+                                                <n-ellipsis class="text-16 line-height-24" tooltip={false}>
+                                                    {item.alias ?? '-'}
+                                                </n-ellipsis>
                                                 <n-text class="line-height-22" depth={3}>
-                                                    应用别名
+                                                    设备别名
                                                 </n-text>
                                             </div>
                                             <div class="m-be-auto flex items-center">
                                                 <common-base-chunk
-                                                    value={item.type}
-                                                    items={chunkOptions.value.typeOptions}
+                                                    value={item.online}
+                                                    items={chunkOptions.value.onlineOptions}
                                                 ></common-base-chunk>
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用ID">
-                                                <n-ellipsis tooltip={false}>{item.appId ?? '-'}</n-ellipsis>
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备名称">
+                                                <n-ellipsis tooltip={false}>{item.name ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用名称">
-                                                <n-ellipsis tooltip={false}>{item.appName ?? '-'}</n-ellipsis>
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备ID">
+                                                <n-ellipsis tooltip={false}>{item.keyId ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="应用状态">
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备型号">
+                                                <div class="flex items-center gap-x-10 overflow-hidden">
+                                                    <common-base-chunk
+                                                        value={item.model}
+                                                        items={props.chunkState.CHUNK_SRM_SIMBANK_MODEL?.options}
+                                                    ></common-base-chunk>
+                                                    <n-text depth={3}>{`${item.total ?? 0} 个端口`}</n-text>
+                                                </div>
+                                            </common-base-columns-wrapper>
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="MAC地址">
+                                                <n-ellipsis tooltip={false}>{item.mac ?? '-'}</n-ellipsis>
+                                            </common-base-columns-wrapper>
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="设备状态">
                                                 <common-base-chunk
                                                     value={item.status}
                                                     items={chunkOptions.value.statusOptions}
                                                 ></common-base-chunk>
                                             </common-base-columns-wrapper>
-                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="备注">
-                                                <n-ellipsis tooltip={false}>{item.remark ?? '-'}</n-ellipsis>
+                                            <common-base-columns-wrapper label-class="w-4.2em m-ie-10" label="归属人">
+                                                <common-base-user element="text" data={item.ownerUserUidOptions}></common-base-user>
                                             </common-base-columns-wrapper>
                                         </div>
                                     </n-card>
@@ -100,18 +109,18 @@ export default defineComponent({
                         )}
                         <n-card content-class="flex flex-col p-0! overflow-hidden">
                             <div class="box-border flex flex-col flex-1 p-14 min-h-216 items-center justify-center">
-                                <common-base-button class="p-10" text type="primary" onClick={fetchCrmSmsAppStore}>
+                                <common-base-button class="p-10" text type="primary" onClick={fetchCreateSimbank}>
                                     <common-base-icon size={18}>
                                         <local-nest-plus />
                                     </common-base-icon>
-                                    <span class="text-16 p-is-5">添加应用</span>
+                                    <span class="text-16 p-is-5">添加 simbank 设备</span>
                                 </common-base-button>
-                                <n-text depth="3">{`已添加应用数：${state.total}，还可添加应用数：${(faseNode.value.config?.smsAppLimit ?? 0) - state.total}`}</n-text>
+                                <n-text depth="3">{`已添加设备数：${state.total}，还可添加设备数：${(faseNode.value.config?.simbankLimit ?? 0) - state.total}`}</n-text>
                             </div>
                         </n-card>
                     </common-base-columns-template>
                 </common-base-scrollbar>
-            </crm-consumer-context-sms-skeleton>
+            </srm-supplier-context-simbank-skeleton>
         )
     }
 })
