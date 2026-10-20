@@ -81,13 +81,10 @@ export default defineComponent({
                                                 <n-ellipsis tooltip={false}>{item.keyId ?? '-'}</n-ellipsis>
                                             </common-base-columns-wrapper>
                                             <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="设备型号">
-                                                <div class="flex items-center gap-x-10 overflow-hidden">
-                                                    <common-base-chunk
-                                                        value={item.model}
-                                                        items={props.chunkState.CHUNK_SRM_SIMBANK_MODEL?.options}
-                                                    ></common-base-chunk>
-                                                    <n-text depth={3}>{`${item.total ?? 0} 个端口`}</n-text>
-                                                </div>
+                                                <common-base-chunk
+                                                    value={item.model}
+                                                    items={props.chunkState.CHUNK_SRM_SIMBANK_MODEL?.options}
+                                                ></common-base-chunk>
                                             </common-base-columns-wrapper>
                                             <common-base-columns-wrapper label-class="w-4.6em m-ie-10" label="MAC地址">
                                                 <n-ellipsis tooltip={false}>{item.mac ?? '-'}</n-ellipsis>
