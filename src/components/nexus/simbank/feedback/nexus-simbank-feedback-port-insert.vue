@@ -31,12 +31,12 @@ export default defineComponent({
         /**按端口激活方向生成插卡模拟数据：服务端按 countryKeyId 查询国际区号**/
         async function fetchInitialization() {
             try {
-                if (!props.node.countryKeyId) {
-                    throw new Error('激活方向不存在，请重新激活后再插卡')
-                }
-                const { data } = await Service.httpBaseSrmSimbankPortFaker({ countryKeyId: props.node.countryKeyId })
-                return await setForm(data).then(async () => {
-                    return await setState({ initialize: false, loading: false, disabled: false })
+                return await Service.httpBaseSrmSimbankPortFaker({
+                    countryKeyId: props.node.countryKeyId
+                }).then(async ({ data }) => {
+                    return await setForm(data).then(async () => {
+                        return await setState({ initialize: false, loading: false, disabled: false })
+                    })
                 })
             } catch (err) {
                 return await setState({ initialize: false, loading: false, disabled: false }).then(async () => {
