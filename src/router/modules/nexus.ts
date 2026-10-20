@@ -9,9 +9,9 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/nexus/simbank/port',
-        name: 'SrmSupplierContextDecomposer1',
+        name: 'NexusSimbankPort',
         meta: { title: 'simbank端口', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/nexus/simbank/manager/index.vue')
+        component: () => import('@/views/nexus/simbank/port/index.vue')
     }
 ]
 

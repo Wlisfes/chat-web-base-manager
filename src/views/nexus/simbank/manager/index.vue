@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useChunkService, useSelectService, pick } from '@/hooks'
+import { useColumnService, useChunkService, useSelectService, pick, stop } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/nexus/hooks'
 import * as Service from '@/api/instance.service'
@@ -19,7 +19,7 @@ export default defineComponent({
             immediate: true
         })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSrmColumnSimbank({ ...payload, ...pick(base, ['page', 'size']) }),
             {
                 keyName: 'chat:nexus:simbank:manager',
@@ -44,20 +44,30 @@ export default defineComponent({
                     { title: '设备名称', key: 'name', minWidth: 200, disabled: true },
                     { title: '设备别名', key: 'alias', width: 160 },
                     { title: 'MAC地址', key: 'mac', width: 160 },
-                    { title: '设备型号', key: 'model', width: 140 },
-                    { title: '端口数', key: 'total', width: 90 },
                     { title: '在线状态', key: 'online', width: 100 },
                     { title: '设备状态', key: 'status', width: 100 },
-                    { title: '归属供应商', key: 'userKeyId', minWidth: 200 },
-                    { title: '归属人', key: 'ownerUserUid', width: 140 },
-                    { title: '归属部门', key: 'ownerOrganizations', minWidth: 160 },
-                    { title: '创建人', key: 'createBy', width: 140 },
+                    { title: '设备型号', key: 'model', width: 100 },
+                    { title: '端口数', key: 'total', width: 100 },
+                    { title: '归属供应商', key: 'userKeyId', width: 200 },
+                    { title: '归属人', key: 'ownerUserUid', width: 120 },
+                    { title: '归属部门', key: 'ownerOrganizations', width: 160 },
+                    { title: '创建人', key: 'createBy', width: 120 },
                     { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新人', key: 'modifyBy', width: 140, check: false },
-                    { title: '更新时间', key: 'modifyTime', width: 160, check: false }
+                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
         )
+
+        /**跳转客户详情**/
+        async function fetchJumpContextSupplier(event: MouseEvent, data: Omix) {
+            return await stop(event, async () => {
+                return await router.push({
+                    path: `/srm/supplier/context/${data.keyId}`,
+                    state: { tabTitle: data.name }
+                })
+            })
+        }
 
         /**新增设备**/
         async function fetchCreateNexusSimbankManager() {
@@ -206,9 +216,17 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
-                        col_userKeyId: (data: Omix) => {
-                            return <common-base-content ellipsis value={data.userKeyIdOptions?.name}></common-base-content>
-                        },
+                        col_userKeyId: (data: Omix) => (
+                            <common-base-content ellipsis value={data.userKeyIdOptions?.name}>
+                                <n-text
+                                    class="cursor-pointer"
+                                    type="info"
+                                    onClick={(e: MouseEvent) => fetchJumpContextSupplier(e, data.userKeyIdOptions)}
+                                >
+                                    {data.userKeyIdOptions?.name}
+                                </n-text>
+                            </common-base-content>
+                        ),
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         },
