@@ -12,6 +12,12 @@ const routes: RouteRecordRaw[] = [
         name: 'NexusSimbankPort',
         meta: { title: 'simbank端口', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/nexus/simbank/port/index.vue')
+    },
+    {
+        path: '/nexus/simbank/message',
+        name: 'NexusSimbankMessage',
+        meta: { title: 'simbank消息', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/nexus/simbank/message/index.vue')
     }
 ]
 

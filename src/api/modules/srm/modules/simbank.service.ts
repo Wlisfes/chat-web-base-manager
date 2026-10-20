@@ -132,3 +132,19 @@ export function httpBaseSrmSimbankPortRelease(data: Omix) {
         data
     })
 }
+/**SIMBANK 短信历史静态枚举**/
+export function httpBaseSrmSimbankMessageEnums() {
+    return request({
+        url: '/api/srm/simbank/message/enums',
+        method: 'GET'
+    })
+}
+
+/**查询 SIMBANK 短信历史分页列表**/
+export function httpBaseSrmColumnSimbankMessage(data: Omix) {
+    return request({
+        url: '/api/srm/simbank/message/column',
+        method: 'POST',
+        data
+    })
+}
