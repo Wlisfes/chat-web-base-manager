@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**国家/地区下拉数据**/
-        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: false
         })
         /**调价方式静态枚举**/

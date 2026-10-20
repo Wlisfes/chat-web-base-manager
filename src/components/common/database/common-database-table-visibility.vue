@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, watch, PropType, Fragment } from 'vue'
+import { computed, defineComponent, watch, PropType, Fragment } from 'vue'
 import { useVModels, useCurrentElement, useElementSize } from '@vueuse/core'
 
 export default defineComponent({
@@ -16,6 +16,8 @@ export default defineComponent({
     setup(props, { emit, slots }) {
         const { data, width } = useVModels(props, emit)
         const element = useElementSize(useCurrentElement<HTMLElement>())
+        /**无数据时也渲染一行，让骨架屏阶段就能量出操作列宽度**/
+        const measureRows = computed(() => (data.value.length > 0 ? data.value : [{ keyId: 0 }]))
 
         watch(() => element.width.value, fetchCurrentWatcher, { immediate: true })
         function fetchCurrentWatcher() {
@@ -26,14 +28,12 @@ export default defineComponent({
 
         return () => (
             <div class="absolute top-200% w-max common-database-table-visibility" style={{ visibility: 'hidden' }}>
-                {data.value.length > 0 && (
-                    <Fragment>
-                        {data.value.map(item => (
-                            // 每行插槽独立包裹测量，避免 Fragment 返回的文本或组件在隐藏层中横向拼接
-                            <div class="w-max">{slots.default ? slots.default(item) : null}</div>
-                        ))}
-                    </Fragment>
-                )}
+                <Fragment>
+                    {measureRows.value.map(item => (
+                        // 每行插槽独立包裹测量，避免 Fragment 返回的文本或组件在隐藏层中横向拼接
+                        <div class="w-max">{slots.default ? slots.default(item) : null}</div>
+                    ))}
+                </Fragment>
             </div>
         )
     }

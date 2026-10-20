@@ -42,7 +42,7 @@ export default defineComponent({
                 try {
                     await Service.httpBaseSkylineUpdateRoleSheet({
                         keyId: props.faseOptions.keyId,
-                        sheetKeyIds: [...faseState.checkedKeys, ...faseState.indeterminateKeys]
+                        sheetKeyIds: [...new Set([...faseState.checkedKeys, ...faseState.indeterminateKeys])]
                     })
                     return await setState({ loading: false }).then(async () => {
                         await fetchNotifyService({ title: '操作成功' })

@@ -1,4 +1,6 @@
-export default [
+import type { RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
     {
         path: '/finance/base/brand',
         name: 'FinanceBaseBrand',
@@ -36,3 +38,5 @@ export default [
         component: () => import('@/views/finance/account/consumer/index.vue')
     }
 ]
+
+export default routes
