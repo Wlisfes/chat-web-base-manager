@@ -22,7 +22,7 @@ export default defineComponent({
             transform: list => list.map(item => ({ ...item, label: `[${item.alias}] ${item.name}` }))
         })
         /**激活方向下拉**/
-        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: true
         })
         /**表格实例**/
@@ -58,7 +58,7 @@ export default defineComponent({
                     { title: 'SIM卡号', key: 'sim', width: 160 },
                     { title: 'ICCID', key: 'iccid', width: 200 },
                     { title: 'IMEI', key: 'imei', width: 160 },
-                    { title: '激活方向', key: 'countryKeyId', width: 220 },
+                    { title: '激活方向', key: 'countryKeyId', width: 180 },
                     { title: '激活状态', key: 'activateStatus', width: 100 },
                     { title: '插卡状态', key: 'insertStatus', width: 100 },
                     { title: '端口状态', key: 'status', width: 100 },

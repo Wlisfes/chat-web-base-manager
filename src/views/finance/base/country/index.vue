@@ -8,12 +8,12 @@ export default defineComponent({
     name: 'FinanceBaseCountry',
     setup(props, ctx) {
         /**国家/地区静态枚举**/
-        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseFinanceCountryEnums(), {
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineCountryEnums(), {
             immediate: true
         })
         /**表格实例**/
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
-            (base, payload) => Service.httpBaseFinanceColumnCountry({ ...payload, page: base.page, size: base.size }),
+            (base, payload) => Service.httpBaseSkylineColumnCountry({ ...payload, page: base.page, size: base.size }),
             {
                 keyName: 'chat:finance:base:country',
                 actions: [{ title: '编辑', key: 'chat:finance:base:country:update' }],
@@ -46,7 +46,7 @@ export default defineComponent({
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseFinanceCountryStatusUpdate({ keyId: node.keyId, status })
+                            await Service.httpBaseSkylineCountryStatusUpdate({ keyId: node.keyId, status })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
                                 return await fetchRefresh()

@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService } from '@/hooks'
+import { useFormService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -14,10 +14,8 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
-            immediate: true
-        })
         const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
+            callback: fetchInitialization,
             formState: {
                 sim: '',
                 iccid: '',
@@ -30,22 +28,13 @@ export default defineComponent({
             }
         })
 
-        /**当前激活方向**/
-        function fetchDirection() {
-            return countryOptions.dataSource.value.find((item: Omix) => item.keyId === props.node.countryKeyId)
-        }
-
-        /**按激活方向国际区号生成插卡模拟数据**/
-        async function fetchFaker() {
+        /**按端口激活方向生成插卡模拟数据：服务端按 countryKeyId 查询国际区号**/
+        async function fetchInitialization() {
             try {
-                if (!countryOptions.dataSource.value.length) {
-                    await countryOptions.fetchRequest()
-                }
-                const direction = fetchDirection()
-                if (!direction?.code) {
+                if (!props.node.countryKeyId) {
                     throw new Error('激活方向不存在，请重新激活后再插卡')
                 }
-                const { data } = await Service.httpBaseSrmSimbankPortFaker({ code: direction.code })
+                const { data } = await Service.httpBaseSrmSimbankPortFaker({ countryKeyId: props.node.countryKeyId })
                 return await setForm(data).then(async () => {
                     return await setState({ initialize: false, loading: false, disabled: false })
                 })
@@ -63,10 +52,8 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const direction = fetchDirection()
                     await Service.httpBaseSrmSimbankPortInsert({
                         keyId: props.node.keyId,
-                        code: direction?.code,
                         sim: formState.value.sim,
                         iccid: formState.value.iccid,
                         imei: formState.value.imei
@@ -83,8 +70,6 @@ export default defineComponent({
             })
         }
 
-        fetchFaker()
-
         return () => (
             <common-dialog-provider
                 title={props.title}
@@ -97,9 +82,6 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setState })}
             >
                 <form-base-container require-mark-placement="left" size="medium" ref={formRef} model={formState.value} rules={state.rules}>
-                    <form-base-column label="激活方向">
-                        <n-text>{fetchDirection()?.showName || props.node.countryKeyId}</n-text>
-                    </form-base-column>
                     <form-base-column label="SIM卡号" path="sim">
                         <form-base-input
                             maxlength={32}

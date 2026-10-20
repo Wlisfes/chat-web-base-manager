@@ -29,7 +29,7 @@ export default defineComponent({
             immediate: false
         })
         /**MCC下拉数据**/
-        const mccOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+        const mccOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: true,
             transform: data => data.map(item => ({ value: item.keyId, label: `[${item.code}] ${item.cnName} - ${item.enName}` }))
         })

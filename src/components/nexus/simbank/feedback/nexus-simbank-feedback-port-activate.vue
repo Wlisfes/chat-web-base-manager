@@ -14,7 +14,7 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const countryOptions = useSelectService(() => Service.httpBaseFinanceSelectCountry(), {
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: true
         })
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
