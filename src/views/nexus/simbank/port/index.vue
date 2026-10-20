@@ -54,7 +54,7 @@ export default defineComponent({
                 columns: [
                     { title: '端口ID', key: 'keyId', width: 100, disabled: true },
                     { title: '端口编号', key: 'port', width: 100, disabled: true },
-                    { title: '设备名称', key: 'simbankKeyId', width: 220, disabled: true },
+                    { title: '设备名称', key: 'simbankKeyId', width: 160, disabled: true },
                     { title: 'SIM卡号', key: 'sim', width: 160 },
                     { title: 'ICCID', key: 'iccid', width: 200 },
                     { title: 'IMEI', key: 'imei', width: 160 },
@@ -62,7 +62,7 @@ export default defineComponent({
                     { title: '激活状态', key: 'activateStatus', width: 100 },
                     { title: '插卡状态', key: 'insertStatus', width: 100 },
                     { title: '端口状态', key: 'status', width: 100 },
-                    { title: '归属供应商', key: 'userKeyId', width: 200 },
+                    { title: '归属供应商', key: 'userKeyId', minWidth: 240 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', width: 160 },
                     { title: '创建人', key: 'createBy', width: 120 },
