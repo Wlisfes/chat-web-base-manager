@@ -146,7 +146,12 @@ export default defineComponent({
                     const titleMap: Record<string, string> = { command: '操作', selection: '选' }
                     const title =
                         typeof source?.title === 'string' && source.title ? source.title : titleMap[String(item.key)] || '字段名称'
-                    const skeletonWidth = item.key === 'command' ? '100%' : source?.skeleton === 'form' ? undefined : SKELETON_WIDTHS[index % SKELETON_WIDTHS.length]
+                    const skeletonWidth =
+                        item.key === 'command'
+                            ? '100%'
+                            : source?.skeleton === 'form'
+                              ? undefined
+                              : SKELETON_WIDTHS[index % SKELETON_WIDTHS.length]
                     return {
                         key: item.key,
                         width: item.width,
