@@ -20,6 +20,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/deploy/chunk/srm/index.vue')
     },
     {
+        path: '/deploy/basic/country',
+        name: 'DeployBasicCountry',
+        meta: { title: '国家/地区管理', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/basic/country/index.vue')
+    },
+    {
         path: '/deploy/datetask/system',
         name: 'DeployDatetaskSystem',
         meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },
