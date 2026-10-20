@@ -1,12 +1,13 @@
 import { concat } from '@/utils'
 import crm from '@/router/modules/crm'
 import srm from '@/router/modules/srm'
+import nexus from '@/router/modules/nexus'
 import deploy from '@/router/modules/deploy'
 import finance from '@/router/modules/finance'
 
 /**路由列表配置**/
 export function fetchSetupRouter() {
-    return concat(crm, srm, finance, deploy, [
+    return concat(crm, srm, nexus, finance, deploy, [
         {
             path: '/manager',
             name: 'Manager',

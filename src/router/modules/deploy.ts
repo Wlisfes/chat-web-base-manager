@@ -1,4 +1,6 @@
-export default [
+import type { RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
     {
         path: '/deploy/chunk/system',
         name: 'DeployChunkSystemManager',
@@ -48,3 +50,5 @@ export default [
         component: () => import('@/views/deploy/system/dept/index.vue')
     }
 ]
+
+export default routes
