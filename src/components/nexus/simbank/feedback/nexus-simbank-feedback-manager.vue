@@ -6,7 +6,7 @@ import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'NexusSimbankFeedback',
+    name: 'NexusSimbankFeedbackManager',
     emits: ['close', 'submit'],
     props: {
         /**标题**/
@@ -42,10 +42,10 @@ export default defineComponent({
                 status: props.node.status ?? 'enable'
             },
             rules: {
-                userKeyId: { required: true, type: 'number', message: '请选择归属供应商', trigger: 'change' },
+                userKeyId: { required: true, type: 'number', message: '请选择归属供应商', trigger: 'blur' },
+                model: { required: true, type: 'number', message: '请选择设备型号', trigger: 'blur' },
                 name: { required: true, message: '请输入设备名称', trigger: 'blur' },
-                model: { required: true, type: 'number', message: '请选择设备型号', trigger: 'change' },
-                status: { required: true, message: '请选择设备状态', trigger: 'change' },
+                status: { required: true, message: '请选择设备状态', trigger: 'blur' },
                 mac: {
                     required: true,
                     trigger: 'blur',

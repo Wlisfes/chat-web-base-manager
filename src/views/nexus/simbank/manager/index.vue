@@ -60,8 +60,8 @@ export default defineComponent({
         )
 
         /**新增设备**/
-        async function fetchCreateNexusSimbank() {
-            return await feedback.fetchNexusSimbank({
+        async function fetchCreateNexusSimbankManager() {
+            return await feedback.fetchNexusSimbankManager({
                 title: '新增设备',
                 command: 'CREATE',
                 onSubmit: () => fetchRefresh()
@@ -69,8 +69,8 @@ export default defineComponent({
         }
 
         /**编辑设备**/
-        async function fetchUpdateNexusSimbank(node: Omix) {
-            return await feedback.fetchNexusSimbank({
+        async function fetchUpdateNexusSimbankManager(node: Omix) {
+            return await feedback.fetchNexusSimbankManager({
                 title: '编辑设备',
                 command: 'UPDATE',
                 node,
@@ -108,6 +108,7 @@ export default defineComponent({
                     function-class="justify-end"
                     function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
                     ref={formRef}
+                    label-width={85}
                     limit={state.limit}
                     v-model:loading={state.loading}
                     v-model:when={state.when}
@@ -119,7 +120,7 @@ export default defineComponent({
                 >
                     <common-database-search-function abstract class="flex gap-col-10">
                         <common-base-authorize key-name="chat:nexus:simbank:manager:create">
-                            <common-base-button class="min-w-80" type="primary" onClick={fetchCreateNexusSimbank}>
+                            <common-base-button class="min-w-80" type="primary" onClick={fetchCreateNexusSimbankManager}>
                                 新增
                             </common-base-button>
                         </common-base-authorize>
@@ -223,7 +224,7 @@ export default defineComponent({
                         col_command: (data: Omix) => (
                             <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
-                                    <common-base-button text title="编辑" type="info" onClick={() => fetchUpdateNexusSimbank(data)}>
+                                    <common-base-button text title="编辑" type="info" onClick={() => fetchUpdateNexusSimbankManager(data)}>
                                         编辑
                                     </common-base-button>
                                 </common-base-authorize>
