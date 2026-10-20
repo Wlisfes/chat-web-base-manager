@@ -53,8 +53,8 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '端口ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '端口编号', key: 'port', width: 100 },
-                    { title: '所属设备', key: 'simbankKeyId', minWidth: 220, disabled: true },
+                    { title: '端口编号', key: 'port', width: 100, disabled: true },
+                    { title: '设备名称', key: 'simbankKeyId', width: 220, disabled: true },
                     { title: 'SIM卡号', key: 'sim', width: 160 },
                     { title: 'ICCID', key: 'iccid', width: 200 },
                     { title: 'IMEI', key: 'imei', width: 160 },
@@ -210,7 +210,6 @@ export default defineComponent({
                             loading={simbankOptions.loading.value}
                             options={simbankOptions.dataSource.value}
                             v-model:value={formState.value.simbankKeyId}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="userKeyId" label="归属供应商">
@@ -223,7 +222,6 @@ export default defineComponent({
                             loading={userOptions.loading.value}
                             options={userOptions.dataSource.value}
                             v-model:value={formState.value.userKeyId}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="activateStatus" label="激活状态">
@@ -233,7 +231,6 @@ export default defineComponent({
                             loading={chunkState.loading}
                             options={chunkOptions.value.activateStatusOptions}
                             v-model:value={formState.value.activateStatus}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="insertStatus" label="插卡状态">
@@ -243,7 +240,6 @@ export default defineComponent({
                             loading={chunkState.loading}
                             options={chunkOptions.value.insertStatusOptions}
                             v-model:value={formState.value.insertStatus}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="status" label="端口状态">
@@ -253,7 +249,6 @@ export default defineComponent({
                             loading={chunkState.loading}
                             options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                     <common-database-search-column prop="countryKeyId" label="激活方向">
@@ -266,7 +261,6 @@ export default defineComponent({
                             loading={countryOptions.loading.value}
                             options={countryOptions.dataSource.value}
                             v-model:value={formState.value.countryKeyId}
-                            on-change:value={fetchRefresh}
                         ></form-base-select>
                     </common-database-search-column>
                 </common-database-search>
@@ -290,7 +284,7 @@ export default defineComponent({
                     {{
                         col_simbankKeyId: (data: Omix) => (
                             <common-base-content ellipsis value={data.simbankOptions?.name}>
-                                {[data.simbankOptions?.alias, data.simbankOptions?.name].filter(Boolean).join(' / ')}
+                                {data.simbankOptions?.name}
                             </common-base-content>
                         ),
                         col_activateStatus: (data: Omix) => (
