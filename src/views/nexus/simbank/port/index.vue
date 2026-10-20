@@ -31,9 +31,9 @@ export default defineComponent({
             {
                 keyName: 'chat:nexus:simbank:port',
                 actions: [
-                    { title: '插卡', key: 'chat:nexus:simbank:port:insert' },
-                    { title: '激活', key: 'chat:nexus:simbank:port:activate' },
-                    { title: '启用/禁用', key: 'chat:nexus:simbank:port:status' }
+                    { title: '启用/禁用', key: 'chat:nexus:simbank:port:status' },
+                    { title: '插卡/拔卡', key: 'chat:nexus:simbank:port:insert' },
+                    { title: '激活/释放', key: 'chat:nexus:simbank:port:activate' }
                 ],
                 formState: {
                     /**SIM/ICCID/IMEI/端口编号/设备名称/别名/MAC/设备ID**/
@@ -104,6 +104,52 @@ export default defineComponent({
                 title: '激活SIM卡',
                 node,
                 onSubmit: () => fetchRefresh()
+            })
+        }
+
+        /**拔出 SIM 卡**/
+        async function fetchRemoveNexusSimbankPort(node: Omix) {
+            return await fetchDialogService({
+                title: '拔出SIM卡',
+                content: `确认拔出【${fetchPortLabel(node)}】吗？拔卡后将清除 SIM、ICCID、IMEI。`,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            await Service.httpBaseSrmSimbankPortRemove({ keyId: node.keyId })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
+                    })
+                }
+            })
+        }
+
+        /**释放已激活端口**/
+        async function fetchReleaseNexusSimbankPort(node: Omix) {
+            return await fetchDialogService({
+                title: '释放端口',
+                content: `确认释放【${fetchPortLabel(node)}】吗？释放后将清除卡号、激活状态和激活方向。`,
+                async onSubmit(done: Function) {
+                    return await done({ loading: true }).then(async () => {
+                        try {
+                            await Service.httpBaseSrmSimbankPortRelease({ keyId: node.keyId })
+                            return await done({ visible: false }).then(async () => {
+                                await fetchNotifyService({ title: '操作成功' })
+                                return await fetchRefresh()
+                            })
+                        } catch (err) {
+                            return await done({ loading: false }).then(async () => {
+                                return await fetchNotifyService({ type: 'error', title: err.message })
+                            })
+                        }
+                    })
+                }
             })
         }
 
@@ -294,43 +340,44 @@ export default defineComponent({
                         col_command: (data: Omix) => (
                             <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
-                                    {data.insertStatus !== 'inserted' && (
-                                        <common-base-button text title="插卡" type="info" onClick={() => fetchInsertNexusSimbankPort(data)}>
-                                            插卡
-                                        </common-base-button>
+                                    {['enable'].includes(data.status) ? (
+                                        <common-base-button
+                                            {...{ text: true, type: 'warning', title: '禁用', content: '禁用' }}
+                                            onClick={() => fetchUpdateNexusSimbankPortStatus(data, 'disable')}
+                                        />
+                                    ) : (
+                                        <common-base-button
+                                            {...{ text: true, type: 'success', title: '启用', content: '启用' }}
+                                            onClick={() => fetchUpdateNexusSimbankPortStatus(data, 'enable')}
+                                        />
                                     )}
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[1].key}>
-                                    {data.insertStatus === 'inserted' && data.activateStatus !== 'active' && (
+                                    {['inserted'].includes(data.insertStatus) ? (
                                         <common-base-button
-                                            text
-                                            title="激活"
-                                            type="warning"
-                                            onClick={() => fetchActivateNexusSimbankPort(data)}
-                                        >
-                                            激活
-                                        </common-base-button>
+                                            {...{ text: true, type: 'orange', title: '拔卡', content: '拔卡' }}
+                                            onClick={() => fetchRemoveNexusSimbankPort(data)}
+                                        />
+                                    ) : (
+                                        <common-base-button
+                                            {...{ text: true, type: 'info', content: '插卡' }}
+                                            title={['inactive'].includes(data.activateStatus) ? '激活端口后才能插卡' : '插卡'}
+                                            disabled={['inactive'].includes(data.activateStatus)}
+                                            onClick={() => fetchInsertNexusSimbankPort(data)}
+                                        />
                                     )}
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[2].key}>
-                                    {['enable'].includes(data.status) ? (
+                                    {['inactive'].includes(data.activateStatus) ? (
                                         <common-base-button
-                                            text
-                                            title="禁用"
-                                            type="error"
-                                            onClick={() => fetchUpdateNexusSimbankPortStatus(data, 'disable')}
-                                        >
-                                            禁用
-                                        </common-base-button>
+                                            {...{ text: true, type: 'success', title: '激活', content: '激活' }}
+                                            onClick={() => fetchActivateNexusSimbankPort(data)}
+                                        />
                                     ) : (
                                         <common-base-button
-                                            text
-                                            title="启用"
-                                            type="success"
-                                            onClick={() => fetchUpdateNexusSimbankPortStatus(data, 'enable')}
-                                        >
-                                            启用
-                                        </common-base-button>
+                                            {...{ text: true, type: 'error', title: '释放', content: '释放' }}
+                                            onClick={() => fetchReleaseNexusSimbankPort(data)}
+                                        />
                                     )}
                                 </common-base-authorize>
                             </common-base-element>

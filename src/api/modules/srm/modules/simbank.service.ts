@@ -89,10 +89,11 @@ export function httpBaseSrmSimbankPortStatusUpdate(data: Omix) {
 }
 
 /**随机生成插卡模拟数据**/
-export function httpBaseSrmSimbankPortFaker() {
+export function httpBaseSrmSimbankPortFaker(params: Omix) {
     return request({
         url: '/api/srm/simbank/port/faker',
-        method: 'GET'
+        method: 'GET',
+        params
     })
 }
 
@@ -109,6 +110,24 @@ export function httpBaseSrmSimbankPortInsert(data: Omix) {
 export function httpBaseSrmSimbankPortActivate(data: Omix) {
     return request({
         url: '/api/srm/simbank/port/activate',
+        method: 'POST',
+        data
+    })
+}
+
+/**拔出 SIM 卡**/
+export function httpBaseSrmSimbankPortRemove(data: Omix) {
+    return request({
+        url: '/api/srm/simbank/port/remove',
+        method: 'POST',
+        data
+    })
+}
+
+/**释放已激活端口**/
+export function httpBaseSrmSimbankPortRelease(data: Omix) {
+    return request({
+        url: '/api/srm/simbank/port/release',
         method: 'POST',
         data
     })
