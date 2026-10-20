@@ -29,10 +29,10 @@ export default defineComponent({
                                     </common-base-alert-wrapper>
                                 </common-skeleton-block>
                                 <div class="flex flex-col flex-1 gap-y-2 p-ie-40 overflow-hidden">
-                                    <common-skeleton-block block="2px" class="line-height-24 m-ie-auto">
-                                        SSK1233SMSA001
+                                    <common-skeleton-block block="2px" class="w-130 h-24">
+                                        SSK1233SMSA004
                                     </common-skeleton-block>
-                                    <common-skeleton-block block="2px" class="m-ie-auto">
+                                    <common-skeleton-block block="1px" class="w-60 h-22">
                                         设备别名
                                     </common-skeleton-block>
                                 </div>
@@ -44,10 +44,13 @@ export default defineComponent({
                                     </common-skeleton-block>
                                 </div>
                             </div>
-                            <div class="flex flex-col gap-y-14 p-inline-14 p-be-16 p-bs-2 overflow-hidden">
-                                {Array.from({ length: 6 }, () => (
-                                    <common-base-columns-wrapper label={<n-skeleton class="w-5.2em h-18 m-ie-10" sharp={false} />}>
-                                        <n-skeleton class="w-full h-18" sharp={false} />
+                            <div class="flex flex-col gap-y-10 p-inline-14 p-be-14 overflow-hidden">
+                                {Array.from({ length: 5 }, () => (
+                                    <common-base-columns-wrapper
+                                        class="p-block-2"
+                                        label={<n-skeleton class="w-4.6em m-ie-10 h-20" sharp={false} />}
+                                    >
+                                        <n-skeleton class="w-full h-20" sharp={false} />
                                     </common-base-columns-wrapper>
                                 ))}
                             </div>
