@@ -18,6 +18,18 @@ const routes: RouteRecordRaw[] = [
         name: 'NexusSimbankMessage',
         meta: { title: 'simbank消息', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/nexus/simbank/message/index.vue')
+    },
+    {
+        path: '/nexus/sms/channel',
+        name: 'NexusSmsChannel',
+        meta: { title: '短信通道', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/nexus/sms/channel/index.vue')
+    },
+    {
+        path: '/nexus/sms/route',
+        name: 'NexusSmsRoute',
+        meta: { title: '短信路由', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/nexus/sms/route/index.vue')
     }
 ]
 

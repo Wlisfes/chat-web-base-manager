@@ -65,7 +65,8 @@ export default defineComponent({
                     { title: '成本(USD)', key: 'cost', width: 130 },
                     { title: '售价(USD)', key: 'price', width: 130 },
                     { title: '任务', key: 'taskName', width: 160 },
-                    { title: '通道', key: 'channelName', width: 140 },
+                    { title: '通道', key: 'channelAlias', width: 160 },
+                    { title: '通道负责人', key: 'channelOwnerUserUid', width: 120 },
                     { title: '发送时间', key: 'sendTime', width: 160 },
                     { title: '创建时间', key: 'createTime', width: 160 }
                 ]
@@ -220,10 +221,7 @@ export default defineComponent({
                         ),
                         col_userName: (data: Omix) => (
                             <common-base-content ellipsis value={data.userName}>
-                                <n-text
-                                    type="info"
-                                    onClick={(e: MouseEvent) => data.userKeyId && fetchJumpContextSupplier(e, data)}
-                                >
+                                <n-text type="info" onClick={(e: MouseEvent) => data.userKeyId && fetchJumpContextSupplier(e, data)}>
                                     {data.userName}
                                 </n-text>
                             </common-base-content>
@@ -231,6 +229,9 @@ export default defineComponent({
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         },
+                        col_channelOwnerUserUid: (data: Omix) => (
+                            <common-base-user element="text" data={data.channelOwnerUserUidOptions}></common-base-user>
+                        ),
                         col_cost: (data: Omix) => <common-base-number shrink value={data.cost}></common-base-number>,
                         col_price: (data: Omix) => <common-base-number shrink value={data.price}></common-base-number>
                     }}
