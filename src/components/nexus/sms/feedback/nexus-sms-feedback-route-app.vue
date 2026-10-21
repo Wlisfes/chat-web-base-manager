@@ -10,7 +10,7 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**路由方案**/
+        /**路由**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
@@ -22,7 +22,7 @@ export default defineComponent({
         const appKeyIds = ref<Array<number>>([])
         const appOptions = ref<Array<Omix>>([])
         const appLoading = ref(false)
-        /**方案已绑定的短信应用**/
+        /**路由已绑定的短信应用**/
         const { state, fetchRefresh } = useColumnService(
             (base, payload) =>
                 Service.httpBaseSrmColumnRouteApp({ ...payload, ...pick(base, ['page', 'size']), routeKeyId: props.node.keyId }),
@@ -57,7 +57,7 @@ export default defineComponent({
             }
         }
 
-        /**绑定短信应用：已绑定其他方案的应用会改绑到当前方案**/
+        /**绑定短信应用：已绑定其他路由的应用会改绑到当前路由**/
         async function fetchBind() {
             if (appKeyIds.value.length === 0) return await fetchNotifyService({ type: 'warning', title: '请选择短信应用' })
             try {
@@ -71,11 +71,11 @@ export default defineComponent({
             return await fetchRefresh()
         }
 
-        /**解绑短信应用：解绑后应用走默认方案**/
+        /**解绑短信应用：解绑后应用走通用路由**/
         async function fetchUnbind(node: Omix) {
             return await fetchDialogService({
                 title: '解绑短信应用',
-                content: `确认解绑短信应用【${node.appKeyIdOptions?.appName ?? node.appKeyId}】吗？解绑后该应用走默认方案。`,
+                content: `确认解绑短信应用【${node.appKeyIdOptions?.appName ?? node.appKeyId}】吗？解绑后该应用走通用路由，路由没有绑定应用后变回通用路由。`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -139,7 +139,7 @@ export default defineComponent({
                         </div>
                     </common-base-authorize>
                     <n-text depth="3">
-                        一个短信应用只能绑定一个方案，已绑定其他方案的应用会改绑到当前方案；未绑定方案的应用走默认方案。
+                        一个短信应用只能绑定一个路由，绑定后路由变为定向路由；已绑定其他路由的应用会改绑到当前路由；未绑定路由的应用走通用路由。
                     </n-text>
                     <common-database-table
                         flex-height={false}

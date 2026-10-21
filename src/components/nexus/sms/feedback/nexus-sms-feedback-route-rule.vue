@@ -11,7 +11,7 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**路由方案**/
+        /**路由**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
@@ -19,7 +19,7 @@ export default defineComponent({
         const { chunkOptions } = useChunkService(() => Service.httpBaseSrmRouteEnums(), { immediate: true })
         /**方向下拉**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), { immediate: true })
-        /**方案下的规则**/
+        /**路由下的规则**/
         const { formState, state, fetchRefresh } = useColumnService(
             (base, payload) =>
                 Service.httpBaseSrmColumnRouteRule({ ...payload, ...pick(base, ['page', 'size']), routeKeyId: props.node.keyId }),
@@ -44,7 +44,7 @@ export default defineComponent({
             }
         )
 
-        /**规则变更后刷新列表并通知方案列表更新规则数**/
+        /**规则变更后刷新列表并通知路由列表更新规则数**/
         async function fetchChanged() {
             await emit('submit', { done: setDialog })
             return await fetchRefresh()
@@ -158,8 +158,8 @@ export default defineComponent({
                         </common-base-authorize>
                     </div>
                     <n-text depth="3">
-                        选路时在方案内按 号码段 &gt; 运营商 &gt; 方向
-                        从细到粗匹配，没有可用通道的规则会被跳过；方案内没有匹配规则时回落到默认方案。
+                        选路时在路由内按 号码段 &gt; 运营商 &gt; 方向
+                        从细到粗匹配，没有可用通道的规则会被跳过；定向路由内没有匹配规则时回落到通用路由。
                     </n-text>
                     <common-database-table
                         flex-height={false}

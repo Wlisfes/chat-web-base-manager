@@ -5,32 +5,27 @@ export function httpBaseSrmRouteEnums() {
     return request({ url: '/api/srm/route/enums', method: 'GET' })
 }
 
-/**新增路由方案**/
+/**新增路由**/
 export function httpBaseSrmCreateRoute(data: Omix) {
     return request({ url: '/api/srm/route/create', method: 'POST', data })
 }
 
-/**编辑路由方案**/
+/**编辑路由**/
 export function httpBaseSrmUpdateRoute(data: Omix) {
     return request({ url: '/api/srm/route/update', method: 'POST', data })
 }
 
-/**设为默认路由方案**/
-export function httpBaseSrmRouteDefaultUpdate(data: Omix) {
-    return request({ url: '/api/srm/route/default/update', method: 'POST', data })
-}
-
-/**删除路由方案**/
+/**删除路由**/
 export function httpBaseSrmDeleteRoute(data: Omix) {
     return request({ url: '/api/srm/route/delete', method: 'POST', data })
 }
 
-/**分页查询路由方案**/
+/**分页查询路由**/
 export function httpBaseSrmColumnRoute(data: Omix) {
     return request({ url: '/api/srm/route/column', method: 'POST', data })
 }
 
-/**路由方案下拉选项**/
+/**路由下拉选项**/
 export function httpBaseSrmSelectRoute() {
     return request({ url: '/api/srm/route/select', method: 'GET' })
 }
@@ -75,12 +70,12 @@ export function httpBaseSrmListRouteChannel(params: Omix) {
     return request({ url: '/api/srm/route/rule/channel/list', method: 'GET', params })
 }
 
-/**短信应用绑定路由方案**/
+/**短信应用绑定路由**/
 export function httpBaseSrmBindRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/bind', method: 'POST', data })
 }
 
-/**短信应用解绑路由方案**/
+/**短信应用解绑路由**/
 export function httpBaseSrmUnbindRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/unbind', method: 'POST', data })
 }

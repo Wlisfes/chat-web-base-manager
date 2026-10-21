@@ -163,8 +163,8 @@ export default defineComponent({
                                     <span>{result.value.message}</span>
                                     <n-text depth="3">
                                         号码 {result.value.phone} · 类型 {result.value.type}
-                                        {result.value.routeOptions && ` · 方案 ${result.value.routeOptions.name}`}
-                                        {result.value.fallback && ' · 已回落到默认方案'}
+                                        {result.value.routeOptions && ` · 路由 ${result.value.routeOptions.name}`}
+                                        {result.value.fallback && ' · 已回落到通用路由'}
                                     </n-text>
                                 </div>
                             </n-alert>
