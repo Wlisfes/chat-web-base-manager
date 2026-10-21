@@ -10,21 +10,20 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**路由**/
+        /**路由规则**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { state: dialog, setState: setDialog } = useState({ visible: true, loading: false, initialize: false })
         const { chunkOptions } = useChunkService(() => Service.httpBaseSrmChannelEnums(), { immediate: true })
-        const routeEnums = useChunkService(() => Service.httpBaseSrmRouteEnums(), { immediate: true })
-        /**路由下的通道**/
+        /**规则下的通道**/
         const dataSource = ref<Array<Omix>>([])
         const loading = ref(false)
         /**全部通道**/
         const channels = ref<Array<Omix>>([])
         /**待加入的通道**/
         const channelKeyId = ref<number>()
-        /**可加入的通道：方向和类型与路由一致，且未加入**/
+        /**可加入的通道：方向和类型与规则一致，且未加入**/
         const channelOptions = computed(() => {
             const joined = new Set(dataSource.value.map(item => item.channelKeyId))
             return channels.value
@@ -56,11 +55,11 @@ export default defineComponent({
             }
         }
 
-        /**刷新路由通道**/
+        /**刷新规则通道**/
         async function fetchRefresh() {
             loading.value = true
             try {
-                const { data } = await Service.httpBaseSrmListRouteChannel({ routeKeyId: props.node.keyId })
+                const { data } = await Service.httpBaseSrmListRouteChannel({ ruleKeyId: props.node.keyId })
                 dataSource.value = data ?? []
             } catch (err) {
                 await fetchNotifyService({ type: 'error', title: err.message })
@@ -73,7 +72,7 @@ export default defineComponent({
         async function fetchCreate() {
             if (!channelKeyId.value) return await fetchNotifyService({ type: 'warning', title: '请选择通道' })
             try {
-                await Service.httpBaseSrmCreateRouteChannel({ routeKeyId: props.node.keyId, channelKeyId: channelKeyId.value })
+                await Service.httpBaseSrmCreateRouteChannel({ ruleKeyId: props.node.keyId, channelKeyId: channelKeyId.value })
                 channelKeyId.value = undefined
                 await fetchNotifyService({ title: '操作成功' })
                 await emit('submit', { done: setDialog })
@@ -112,7 +111,7 @@ export default defineComponent({
         async function fetchDelete(node: Omix) {
             return await fetchDialogService({
                 title: '移除通道',
-                content: `确认把通道【${node.channelOptions?.alias ?? node.channelKeyId}】从路由移除吗？`,
+                content: `确认把通道【${node.channelOptions?.alias ?? node.channelKeyId}】从规则移除吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -144,7 +143,7 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setDialog })}
             >
                 <div class="flex flex-col gap-12">
-                    <common-base-authorize key-name="chat:nexus:sms:route:channel">
+                    <common-base-authorize key-name="chat:nexus:sms:route:rule">
                         <div class="flex gap-12">
                             <form-base-select
                                 clearable
@@ -152,7 +151,7 @@ export default defineComponent({
                                 class="flex-1"
                                 label-field="alias"
                                 label-value="keyId"
-                                placeholder="选择同方向、同类型的通道加入路由"
+                                placeholder="选择同方向、同类型的通道加入规则"
                                 options={channelOptions.value}
                                 v-model:value={channelKeyId.value}
                             ></form-base-select>
@@ -217,7 +216,7 @@ export default defineComponent({
                                 ></n-switch>
                             ),
                             col_command: (data: Omix) => (
-                                <common-base-authorize key-name="chat:nexus:sms:route:channel">
+                                <common-base-authorize key-name="chat:nexus:sms:route:rule">
                                     <common-base-button text type="error" title="移除" onClick={() => fetchDelete(data)}>
                                         移除
                                     </common-base-button>
