@@ -41,6 +41,8 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '路由ID', key: 'keyId', width: 90, disabled: true },
+                    { title: '路由名称', key: 'name', minWidth: 160 },
+                    { title: '路由别名', key: 'alias', minWidth: 140 },
                     { title: '方向', key: 'countryKeyId', minWidth: 200, disabled: true },
                     { title: '短信类型', key: 'type', width: 110 },
                     { title: '适用客户', key: 'userKeyId', minWidth: 180 },
@@ -57,7 +59,11 @@ export default defineComponent({
 
         /**新增路由**/
         async function fetchCreateRoute() {
-            return await feedback.fetchNexusSmsRoute({ title: '新增路由', command: 'CREATE', onSubmit: () => fetchRefresh() })
+            return await feedback.fetchNexusSmsRoute({
+                title: '新增路由',
+                command: 'CREATE',
+                onSubmit: () => fetchRefresh()
+            })
         }
 
         /**编辑路由**/
@@ -70,7 +76,7 @@ export default defineComponent({
             const country = node.countryKeyIdOptions?.cnName ?? node.countryKeyId
             const user = node.userKeyIdOptions?.name ?? '默认路由'
             return await feedback.fetchNexusSmsRouteChannel({
-                title: `路由通道：${country} / ${node.type} / ${user}`,
+                title: `路由通道：${node.name || `${country} / ${node.type} / ${user}`}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
