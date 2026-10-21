@@ -19,12 +19,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '汇率管理', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/finance/base/exchange/index.vue')
     },
-    {
-        path: '/finance/base/country',
-        name: 'FinanceBaseCountry',
-        meta: { title: '国家/地区管理', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/finance/base/country/index.vue')
-    },
+
     {
         path: '/finance/frozen/sms',
         name: 'FinanceFrozenSmsManager',

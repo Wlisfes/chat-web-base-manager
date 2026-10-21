@@ -5,7 +5,7 @@ import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
-    name: 'FinanceBaseCountry',
+    name: 'DeployBasicCountry',
     setup(props, ctx) {
         /**国家/地区静态枚举**/
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineCountryEnums(), {
@@ -15,8 +15,8 @@ export default defineComponent({
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSkylineColumnCountry({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chat:finance:base:country',
-                actions: [{ title: '编辑', key: 'chat:finance:base:country:update' }],
+                keyName: 'chat:deploy:basic:country',
+                actions: [{ title: '编辑', key: 'chat:deploy:basic:country:update' }],
                 formState: {
                     /**国家/地区名称、编码**/
                     cnName: undefined,
