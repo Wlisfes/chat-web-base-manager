@@ -19,11 +19,15 @@ export default defineComponent({
         const { chunkOptions } = useChunkService(() => Service.httpBaseSrmRouteEnums(), { immediate: true })
         /**方向下拉**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), { immediate: true })
+        /**路由下拉：从规则列表页新增时选择所属路由**/
+        const routeOptions = useSelectService(() => Service.httpBaseSrmSelectRoute(), { immediate: true })
         /**匹配条件创建后不可修改**/
         const locked = computed(() => ['UPDATE'].includes(props.command))
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
             initialize: false,
             formState: {
+                /**所属路由：从路由进入时已固定，从规则列表页新增时选择**/
+                routeKeyId: props.node.routeKeyId,
                 /**方向**/
                 countryKeyId: props.node.countryKeyId,
                 /**短信类型**/
@@ -38,6 +42,7 @@ export default defineComponent({
                 remark: props.node.remark
             },
             rules: {
+                routeKeyId: { required: true, type: 'number', message: '请选择所属路由', trigger: 'blur' },
                 countryKeyId: { required: true, type: 'number', message: '请选择方向', trigger: 'blur' },
                 type: { required: true, message: '请选择短信类型', trigger: 'blur' },
                 mnc: { pattern: /^\d{2,3}$/, message: '运营商MNC必须是2-3位数字', trigger: 'blur' },
@@ -63,7 +68,7 @@ export default defineComponent({
                         })
                     } else {
                         await Service.httpBaseSrmCreateRouteRule({
-                            routeKeyId: props.node.routeKeyId,
+                            routeKeyId: formState.value.routeKeyId,
                             countryKeyId: formState.value.countryKeyId,
                             type: formState.value.type,
                             mnc: formState.value.mnc?.trim() || undefined,
@@ -103,6 +108,18 @@ export default defineComponent({
                     rules={state.rules}
                     disabled={state.loading}
                 >
+                    <form-base-column label="所属路由" path="routeKeyId">
+                        <form-base-select
+                            filterable
+                            label-field="name"
+                            label-value="keyId"
+                            placeholder="请选择所属路由，创建后不可修改"
+                            disabled={locked.value || !!props.node.routeKeyId}
+                            loading={routeOptions.loading.value}
+                            options={routeOptions.dataSource.value}
+                            v-model:value={formState.value.routeKeyId}
+                        ></form-base-select>
+                    </form-base-column>
                     <form-base-column label="方向" path="countryKeyId">
                         <form-base-select
                             filterable

@@ -11,7 +11,7 @@ export default defineComponent({
         /**路由静态枚举**/
         const { chunkOptions, chunkState } = useChunkService(() => Service.httpBaseSrmRouteEnums(), { immediate: true })
         /**表格实例**/
-        const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
+        const { formRef, formState, state, router, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSrmColumnRoute({ ...payload, ...pick(base, ['page', 'size']) }),
             {
                 keyName: 'chat:nexus:sms:route',
@@ -63,13 +63,9 @@ export default defineComponent({
             })
         }
 
-        /**规则管理**/
+        /**规则管理：跳转到路由规则页并按当前路由筛选**/
         async function fetchRouteRule(node: Omix) {
-            return await feedback.fetchNexusSmsRouteRule({
-                title: `路由规则：${node.name}`,
-                node,
-                onSubmit: () => fetchRefresh()
-            })
+            return await router.push({ path: '/nexus/sms/rule', query: { routeKeyId: node.keyId } })
         }
 
         /**短信应用绑定**/
@@ -174,16 +170,11 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
-                        col_name: (data: Omix) => (
-                            <common-base-content value={data.name}>
-                                <n-text class="m-is-5">{data.name}</n-text>
-                            </common-base-content>
-                        ),
                         col_type: (data: Omix) => (
-                            <common-base-chunk bordered value={data.type} items={chunkOptions.value.routeTypeOptions}></common-base-chunk>
+                            <common-base-chunk value={data.type} items={chunkOptions.value.routeTypeOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
-                            <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                            <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
