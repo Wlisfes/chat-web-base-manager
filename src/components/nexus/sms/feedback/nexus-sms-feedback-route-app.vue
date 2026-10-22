@@ -71,11 +71,11 @@ export default defineComponent({
             return await fetchRefresh()
         }
 
-        /**解绑短信应用：解绑后应用走通用路由**/
+        /**解绑短信应用：解绑后应用按优先级走同类型路由**/
         async function fetchUnbind(node: Omix) {
             return await fetchDialogService({
                 title: '解绑短信应用',
-                content: `确认解绑短信应用【${node.appKeyIdOptions?.appName ?? node.appKeyId}】吗？解绑后该应用走通用路由，路由没有绑定应用后变回通用路由。`,
+                content: `确认解绑短信应用【${node.appKeyIdOptions?.appName ?? node.appKeyId}】吗？解绑后该应用按优先级走同类型路由。`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -139,7 +139,7 @@ export default defineComponent({
                         </div>
                     </common-base-authorize>
                     <n-text depth="3">
-                        一个短信应用只能绑定一个路由，绑定后路由变为定向路由；已绑定其他路由的应用会改绑到当前路由；未绑定路由的应用走通用路由。
+                        一个短信应用只能绑定一个同类型路由；已绑定其他路由的应用会改绑到当前路由；未绑定或绑定路由不可用时，按优先级走同类型路由。
                     </n-text>
                     <common-database-table
                         flex-height={false}

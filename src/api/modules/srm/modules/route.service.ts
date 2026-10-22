@@ -15,6 +15,11 @@ export function httpBaseSrmUpdateRoute(data: Omix) {
     return request({ url: '/api/srm/route/update', method: 'POST', data })
 }
 
+/**路由详情**/
+export function httpBaseSrmRouteResolver(params: Omix) {
+    return request({ url: '/api/srm/route/resolve', method: 'GET', params })
+}
+
 /**删除路由**/
 export function httpBaseSrmDeleteRoute(data: Omix) {
     return request({ url: '/api/srm/route/delete', method: 'POST', data })

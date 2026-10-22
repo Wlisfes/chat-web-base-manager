@@ -168,7 +168,7 @@ export default defineComponent({
                                     <span>{result.value.message}</span>
                                     <n-text depth="3">
                                         类型 {result.value.type}
-                                        {result.value.fallback && ' · 已回落到通用路由'}
+                                        {result.value.fallback && ' · 已回落到同类型路由'}
                                     </n-text>
                                 </div>
                             </n-alert>
@@ -177,7 +177,7 @@ export default defineComponent({
                                     <n-text strong>
                                         {step.routeOptions.name}
                                         <n-text depth="3">
-                                            {` · ${step.routeOptions.type === 'targeted' ? '定向路由' : '通用路由'} · ${!step.admitted ? '规则不匹配' : step.matched ? '命中' : '没有可用通道'}`}
+                                            {` · ${step.routeOptions.type} · ${!step.admitted ? '规则不匹配' : step.matched ? '命中' : '没有可用通道'}`}
                                         </n-text>
                                     </n-text>
                                     {step.ruleDescription && (

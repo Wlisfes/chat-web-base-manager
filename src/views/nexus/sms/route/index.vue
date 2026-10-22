@@ -29,21 +29,16 @@ export default defineComponent({
                     status: undefined
                 },
                 columns: [
-                    { title: '路由ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '路由别名', key: 'alias', width: 180, disabled: true },
-                    { title: '路由名称', key: 'name', width: 180, disabled: true },
-                    { title: '路由类型', key: 'type', width: 100 },
-                    { title: '优先级', key: 'priority', width: 80 },
-                    { title: '路由状态', key: 'status', width: 100 },
-                    { title: '规则', key: 'ruleSummary', minWidth: 280 },
-                    { title: '通道（可用/全部）', key: 'channelCount', width: 140 },
-                    { title: '覆盖方向', key: 'coverages', minWidth: 260 },
-                    { title: '绑定应用', key: 'appCount', width: 100 },
-                    { title: '创建人', key: 'createBy', width: 120, check: false },
-                    { title: '创建时间', key: 'createTime', width: 160, check: false },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
-                    { title: '更新时间', key: 'modifyTime', width: 160 },
-                    { title: '备注', key: 'remark', minWidth: 200 }
+                    { title: '路由ID', key: 'keyId', width: 120, disabled: true },
+                    { title: '路由别名', key: 'alias', width: 160, disabled: true },
+                    { title: '路由名称', key: 'name', width: 160, disabled: true },
+                    { title: '绑定通道', key: 'channelCount', minWidth: 180 },
+                    { title: '绑定应用', key: 'appCount', minWidth: 180 },
+                    { title: '优先级', key: 'priority', width: 120 },
+                    { title: '路由类型', key: 'type', width: 120 },
+                    { title: '路由状态', key: 'status', width: 120 },
+                    { title: '归属人', key: 'ownerUserUid', width: 120 },
+                    { title: '备注', key: 'remark', width: 200, check: false }
                 ]
             }
         )
@@ -212,7 +207,10 @@ export default defineComponent({
                             ></common-base-content>
                         ),
                         col_appCount: (data: Omix) =>
-                            data.type === 'targeted' ? <span>{data.appCount}</span> : <n-text depth="3">-</n-text>,
+                            <span>{data.appCount}</span>,
+                        col_ownerUserUid: (data: Omix) => (
+                            <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
+                        ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
                         },
@@ -236,8 +234,7 @@ export default defineComponent({
                                 <common-base-authorize key-name={state.actions[2].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'primary', content: '应用' }}
-                                        title={data.type === 'targeted' ? '应用' : '通用路由不绑定短信应用'}
-                                        disabled={data.type !== 'targeted'}
+                                        title="应用"
                                         onClick={() => fetchRouteApp(data)}
                                     />
                                 </common-base-authorize>
