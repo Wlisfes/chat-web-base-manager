@@ -24,6 +24,12 @@ export default defineComponent({
             formState: {
                 /**路由名称**/
                 name: props.node.name,
+                /**路由别名**/
+                alias: props.node.alias,
+                /**路由类型：创建后不可修改**/
+                type: props.node.type ?? 'general',
+                /**排序：通用路由按排序依次尝试**/
+                sort: props.node.sort ?? 0,
                 /**路由状态**/
                 status: props.node.status ?? 'enable',
                 /**备注**/
@@ -31,12 +37,12 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入路由名称', trigger: 'blur' },
-                alias: { required: true, message: '请输入路由别名', trigger: 'blur' },
+                type: { required: true, message: '请选择路由类型', trigger: 'blur' },
                 status: { required: true, message: '请选择路由状态', trigger: 'blur' }
             }
         })
 
-        /**提交：路由类型由短信应用绑定关系自动维护，新增和编辑都不提交类型**/
+        /**提交：路由类型只在新增时提交**/
         async function fetchSubmit() {
             return await fetchValidater().then(async error => {
                 if (error) {
@@ -46,7 +52,7 @@ export default defineComponent({
                     if (['CREATE'].includes(props.command)) {
                         await Service.httpBaseSrmCreateRoute(formState.value)
                     } else {
-                        await Service.httpBaseSrmUpdateRoute({ keyId: props.node.keyId, ...formState.value })
+                        await Service.httpBaseSrmUpdateRoute({ keyId: props.node.keyId, ...formState.value, type: undefined })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -81,6 +87,27 @@ export default defineComponent({
                 >
                     <form-base-column label="路由名称" path="name">
                         <form-base-input maxlength={64} placeholder="请输入路由名称" v-model:value={formState.value.name}></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="路由别名" path="alias">
+                        <form-base-input
+                            maxlength={64}
+                            placeholder="选填，全表唯一"
+                            v-model:value={formState.value.alias}
+                        ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="路由类型" path="type">
+                        <form-base-select
+                            label-field="label"
+                            label-value="value"
+                            disabled={['UPDATE'].includes(props.command)}
+                            options={chunkOptions.value.routeTypeOptions}
+                            v-model:value={formState.value.type}
+                        ></form-base-select>
+                    </form-base-column>
+                    <form-base-column label="排序" path="sort">
+                        <n-input-number class="w-full" min={0} max={9999} precision={0} v-model:value={formState.value.sort}>
+                            {{ suffix: () => '通用路由越小越优先' }}
+                        </n-input-number>
                     </form-base-column>
                     <form-base-column label="路由状态" path="status">
                         <form-base-select

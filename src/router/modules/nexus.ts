@@ -30,12 +30,6 @@ const routes: RouteRecordRaw[] = [
         name: 'NexusSmsRoute',
         meta: { title: '短信路由', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/nexus/sms/route/index.vue')
-    },
-    {
-        path: '/nexus/sms/rule',
-        name: 'NexusSmsRule',
-        meta: { title: '路由规则', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/nexus/sms/rule/index.vue')
     }
 ]
 

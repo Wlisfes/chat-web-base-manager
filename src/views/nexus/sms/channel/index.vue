@@ -212,13 +212,7 @@ export default defineComponent({
                             )
                         },
                         col_routeCount: (data: Omix) => (
-                            <n-text
-                                class="cursor-pointer"
-                                type="info"
-                                onClick={() =>
-                                    router.push({ path: '/nexus/sms/route', query: { countryKeyId: data.countryKeyId, type: data.type } })
-                                }
-                            >
+                            <n-text class="cursor-pointer" type="info" onClick={() => router.push({ path: '/nexus/sms/route' })}>
                                 {data.routeCount}
                             </n-text>
                         ),
