@@ -40,7 +40,7 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入路由名称', trigger: 'blur' },
-                type: { required: true, message: '请选择路由类型', trigger: 'blur' },
+                type: { required: true, message: '请选择路由类型，创建后不可修改', trigger: 'blur' },
                 status: { required: true, message: '请选择路由状态', trigger: 'blur' },
                 ownerUserUid: { required: ['CREATE'].includes(props.command), message: '请选择归属人', trigger: 'blur' }
             }
@@ -75,7 +75,6 @@ export default defineComponent({
                 if (error) {
                     return await setState({ loading: false, disabled: false })
                 }
-
                 try {
                     if (['CREATE'].includes(props.command)) {
                         await Service.httpBaseSrmCreateRoute(formState.value)
@@ -119,7 +118,7 @@ export default defineComponent({
                         <form-base-input maxlength={64} placeholder="请输入路由名称" v-model:value={formState.value.name}></form-base-input>
                     </form-base-column>
                     <form-base-column label="路由别名">
-                        <form-base-input disabled placeholder="自动生成，如 SK1233MRKTA001" value={props.node.alias}></form-base-input>
+                        <form-base-input disabled placeholder="自动生成，如 LSK1233-MRKT-A001" value={props.node.alias}></form-base-input>
                     </form-base-column>
                     <form-base-column label="归属人" path="ownerUserUid">
                         <form-base-select
@@ -137,6 +136,7 @@ export default defineComponent({
                         <form-base-select
                             label-field="label"
                             label-value="value"
+                            placeholder="请选择路由类型，创建后不可修改"
                             disabled={['UPDATE'].includes(props.command)}
                             options={chunkOptions.value.routeTypeOptions}
                             v-model:value={formState.value.type}

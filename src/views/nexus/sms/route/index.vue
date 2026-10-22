@@ -30,8 +30,8 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '路由ID', key: 'keyId', width: 120, disabled: true },
-                    { title: '路由别名', key: 'alias', width: 160, disabled: true },
-                    { title: '路由名称', key: 'name', width: 160, disabled: true },
+                    { title: '路由别名', key: 'alias', width: 180, disabled: true },
+                    { title: '路由名称', key: 'name', width: 180, disabled: true },
                     { title: '绑定通道', key: 'channelCount', minWidth: 180 },
                     { title: '绑定应用', key: 'appCount', minWidth: 180 },
                     { title: '优先级', key: 'priority', width: 120 },
@@ -206,8 +206,7 @@ export default defineComponent({
                                     .join('、')}
                             ></common-base-content>
                         ),
-                        col_appCount: (data: Omix) =>
-                            <span>{data.appCount}</span>,
+                        col_appCount: (data: Omix) => <span>{data.appCount}</span>,
                         col_ownerUserUid: (data: Omix) => (
                             <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         ),

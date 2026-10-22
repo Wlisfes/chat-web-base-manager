@@ -34,21 +34,22 @@ export default defineComponent({
                     status: undefined
                 },
                 columns: [
-                    { title: '通道ID', key: 'keyId', width: 90, disabled: true },
-                    { title: '通道别名', key: 'alias', minWidth: 160, disabled: true },
+                    { title: '通道ID', key: 'keyId', width: 120, disabled: true },
+                    { title: '通道别名', key: 'alias', width: 180, disabled: true },
+                    { title: '通道名称', key: 'name', minWidth: 180, disabled: true },
                     { title: '方向', key: 'countryKeyId', minWidth: 180 },
-                    { title: '通道类型', key: 'type', width: 110 },
-                    { title: '负责人', key: 'ownerUserUid', width: 120 },
-                    { title: '通道状态', key: 'status', width: 100 },
-                    { title: '端口（启用/全部）', key: 'portCount', width: 140 },
-                    { title: '引用路由', key: 'routeCount', width: 90 },
-                    { title: '发送间隔', key: 'sendInterval', width: 110 },
-                    { title: '最大重试', key: 'maxRetry', width: 90 },
-                    { title: '备注', key: 'remark', minWidth: 160 },
-                    { title: '创建人', key: 'createBy', width: 120 },
-                    { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
-                    { title: '更新时间', key: 'modifyTime', width: 160 }
+                    { title: '通道类型', key: 'type', width: 120 },
+                    { title: '归属人', key: 'ownerUserUid', width: 120 },
+                    { title: '通道状态', key: 'status', width: 120 },
+                    { title: '端口', key: 'portCount', width: 120 },
+                    { title: '引用路由', key: 'routeCount', width: 120 },
+                    { title: '发送间隔', key: 'sendInterval', width: 120 },
+                    { title: '最大重试', key: 'maxRetry', width: 120 },
+                    { title: '备注', key: 'remark', width: 200, check: false },
+                    { title: '创建人', key: 'createBy', width: 120, check: false },
+                    { title: '创建时间', key: 'createTime', width: 160, check: false },
+                    { title: '更新人', key: 'modifyBy', width: 120, check: false },
+                    { title: '更新时间', key: 'modifyTime', width: 160, check: false }
                 ]
             }
         )
