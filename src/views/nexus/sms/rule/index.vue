@@ -44,9 +44,9 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '规则ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '所属路由', key: 'routeKeyId', width: 200, disabled: true },
-                    { title: '路由类型', key: 'routeType', width: 110 },
-                    { title: '方向', key: 'countryKeyId', minWidth: 200, disabled: true },
+                    { title: '所属路由', key: 'routeKeyId', width: 180, disabled: true },
+                    { title: '路由类型', key: 'routeType', width: 100, disabled: true },
+                    { title: '方向', key: 'countryKeyId', minWidth: 180, disabled: true },
                     { title: '短信类型', key: 'type', width: 110 },
                     { title: '运营商MNC', key: 'mnc', width: 110 },
                     { title: '号码段', key: 'prefix', width: 130 },
