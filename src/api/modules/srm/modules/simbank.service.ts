@@ -148,3 +148,11 @@ export function httpBaseSrmColumnSimbankMessage(data: Omix) {
         data
     })
 }
+/**按方向和归属人查询可绑定到通道的端口（不分页）**/
+export function httpBaseSrmSelectSimbankPort(data: Omix) {
+    return request({
+        url: '/api/srm/simbank/port/select',
+        method: 'POST',
+        data
+    })
+}

@@ -15,7 +15,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**端口列表下拉**/
-        const portOptions = useSelectService(e => Service.httpBaseSrmSelectChannelPort(pick(e, ['ownerUserUid', 'countryKeyId'])), {
+        const portOptions = useSelectService(e => Service.httpBaseSrmSelectSimbankPort(pick(e, ['ownerUserUid', 'countryKeyId'])), {
             immediate: false,
             options: { countryKeyId: props.node.countryKeyId, ownerUserUid: props.node.ownerUserUid }
         })

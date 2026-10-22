@@ -99,11 +99,4 @@ export function httpBaseSrmColumnChannelPort(data: Omix) {
 }
 
 
-/**按方向和归属人查询可绑定端口**/
-export function httpBaseSrmSelectChannelPort(data: Omix) {
-    return request({
-        url: '/api/srm/channel/port/select',
-        method: 'POST',
-        data
-    })
-}
+
