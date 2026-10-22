@@ -9,9 +9,13 @@ export default defineComponent({
     name: 'NexusSmsChannel',
     setup(props) {
         /**通道静态枚举**/
-        const { chunkOptions, chunkState } = useChunkService(() => Service.httpBaseSrmChannelEnums(), { immediate: true })
+        const { chunkOptions, chunkState } = useChunkService(() => Service.httpBaseSrmChannelEnums(), {
+            immediate: true
+        })
         /**方向下拉**/
-        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), { immediate: true })
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
+            immediate: true
+        })
         /**表格实例**/
         const { formRef, formState, state, router, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSrmColumnChannel({ ...payload, ...pick(base, ['page', 'size']) }),
@@ -38,13 +42,13 @@ export default defineComponent({
                     { title: '通道别名', key: 'alias', width: 180, disabled: true },
                     { title: '通道名称', key: 'name', minWidth: 180, disabled: true },
                     { title: '方向', key: 'countryKeyId', minWidth: 180 },
-                    { title: '通道类型', key: 'type', width: 120 },
-                    { title: '归属人', key: 'ownerUserUid', width: 120 },
-                    { title: '通道状态', key: 'status', width: 120 },
-                    { title: '端口', key: 'portCount', width: 120 },
-                    { title: '引用路由', key: 'routeCount', width: 120 },
-                    { title: '发送间隔', key: 'sendInterval', width: 120 },
-                    { title: '最大重试', key: 'maxRetry', width: 120 },
+                    { title: '通道类型', key: 'type', minWidth: 120 },
+                    { title: '归属人', key: 'ownerUserUid', minWidth: 120 },
+                    { title: '通道状态', key: 'status', minWidth: 120 },
+                    { title: '端口', key: 'portCount', minWidth: 120 },
+                    { title: '引用路由', key: 'routeCount', minWidth: 120 },
+                    { title: '发送间隔', key: 'sendInterval', minWidth: 120 },
+                    { title: '最大重试', key: 'maxRetry', minWidth: 120 },
                     { title: '备注', key: 'remark', width: 200, check: false },
                     { title: '创建人', key: 'createBy', width: 120, check: false },
                     { title: '创建时间', key: 'createTime', width: 160, check: false },
@@ -56,17 +60,30 @@ export default defineComponent({
 
         /**新增通道**/
         async function fetchCreateChannel() {
-            return await feedback.fetchNexusSmsChannel({ title: '新增通道', command: 'CREATE', onSubmit: () => fetchRefresh() })
+            return await feedback.fetchNexusSmsChannel({
+                title: '新增通道',
+                command: 'CREATE',
+                onSubmit: fetchRefresh
+            })
         }
 
         /**编辑通道**/
         async function fetchUpdateChannel(node: Omix) {
-            return await feedback.fetchNexusSmsChannel({ title: '编辑通道', command: 'UPDATE', node, onSubmit: () => fetchRefresh() })
+            return await feedback.fetchNexusSmsChannel({
+                title: '编辑通道',
+                command: 'UPDATE',
+                node,
+                onSubmit: fetchRefresh
+            })
         }
 
         /**通道端口管理**/
         async function fetchChannelPort(node: Omix) {
-            return await feedback.fetchNexusSmsChannelPort({ title: `通道端口：${node.alias}`, node, onSubmit: () => fetchRefresh() })
+            return await feedback.fetchNexusSmsChannelPort({
+                title: `通道端口：${node.alias}`,
+                node,
+                onSubmit: fetchRefresh
+            })
         }
 
         /**确认后执行操作并刷新列表**/
@@ -193,36 +210,36 @@ export default defineComponent({
                     on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
                 >
                     {{
+                        col_portCount: (data: Omix) => {
+                            return <common-base-content value={data.portCount}>{data.portCount}</common-base-content>
+                        },
+                        col_countryKeyId: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                value={data.countryKeyId}
+                                items={countryOptions.dataSource.value}
+                            ></common-base-chunk>
+                        ),
                         col_type: (data: Omix) => (
                             <common-base-chunk value={data.type} items={chunkOptions.value.typeOptions}></common-base-chunk>
                         ),
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
-                        col_portCount: (data: Omix) => (
-                            <n-text type={data.enablePortCount > 0 ? 'default' : 'warning'}>
-                                {data.enablePortCount} / {data.portCount}
-                            </n-text>
-                        ),
-                        col_countryKeyId: (data: Omix) => {
-                            const country = data.countryKeyIdOptions
-                            return (
-                                <common-base-content
-                                    value={country?.cnName ? `${country.code} ${country.cnName} - ${country.enName}` : data.countryKeyId}
-                                ></common-base-content>
-                            )
-                        },
-                        col_routeCount: (data: Omix) => (
-                            <n-text class="cursor-pointer" type="info" onClick={() => router.push({ path: '/nexus/sms/route' })}>
-                                {data.routeCount}
-                            </n-text>
-                        ),
                         col_ownerUserUid: (data: Omix) => (
                             <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         ),
-                        col_sendInterval: (data: Omix) => <span>{data.sendInterval} ms</span>,
-                        col_createBy: (data: Omix) => <common-base-user element="text" data={data.createByOptions}></common-base-user>,
-                        col_modifyBy: (data: Omix) => <common-base-user element="text" data={data.modifyByOptions}></common-base-user>,
+                        col_sendInterval: (data: Omix) => (
+                            <common-base-content value={`${data.sendInterval ?? 0} ms`}>
+                                {`${data.sendInterval ?? 0} ms`}
+                            </common-base-content>
+                        ),
+                        col_createBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.createByOptions}></common-base-user>
+                        },
+                        col_modifyBy: (data: Omix) => {
+                            return <common-base-user element="text" data={data.modifyByOptions}></common-base-user>
+                        },
                         col_command: (data: Omix) => (
                             <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
