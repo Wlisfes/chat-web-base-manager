@@ -40,6 +40,8 @@ export default defineComponent({
                 appKeyId: undefined as number | undefined,
                 /**方向**/
                 countryKeyId: undefined as number | undefined,
+                /**收件号码：用于号码段条件，选填**/
+                phone: undefined as string | undefined,
                 /**短信类型：不选时使用短信应用类型**/
                 type: undefined as string | undefined
             },
@@ -70,6 +72,7 @@ export default defineComponent({
                     const { data } = await Service.httpBaseSrmRoutePreview({
                         appKeyId: formState.value.appKeyId,
                         countryKeyId: formState.value.countryKeyId,
+                        phone: formState.value.phone?.trim() || undefined,
                         type: formState.value.type || undefined
                     })
                     result.value = data
@@ -138,6 +141,13 @@ export default defineComponent({
                                     v-model:value={formState.value.countryKeyId}
                                 ></form-base-select>
                             </form-base-column>
+                            <form-base-column label="收件号码" path="phone">
+                                <form-base-input
+                                    maxlength={24}
+                                    placeholder="选填，含国际区号，用于号码段条件"
+                                    v-model:value={formState.value.phone}
+                                ></form-base-input>
+                            </form-base-column>
                             <form-base-column label="短信类型" path="type">
                                 <form-base-select
                                     clearable
@@ -167,10 +177,15 @@ export default defineComponent({
                                     <n-text strong>
                                         {step.routeOptions.name}
                                         <n-text depth="3">
-                                            {` · ${step.routeOptions.type === 'targeted' ? '定向路由' : '通用路由'} · ${step.matched ? '命中' : '没有可用通道'}`}
+                                            {` · ${step.routeOptions.type === 'targeted' ? '定向路由' : '通用路由'} · ${!step.admitted ? '规则不匹配' : step.matched ? '命中' : '没有可用通道'}`}
                                         </n-text>
                                     </n-text>
-                                    {step.channels.length > 0 ? (
+                                    {step.ruleDescription && (
+                                        <n-text depth="3" class="text-12">
+                                            命中规则组：{step.ruleDescription}
+                                        </n-text>
+                                    )}
+                                    {!step.admitted ? null : step.channels.length > 0 ? (
                                         <common-database-table
                                             flex-height={false}
                                             limit={0}

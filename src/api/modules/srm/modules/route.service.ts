@@ -30,6 +30,26 @@ export function httpBaseSrmSelectRoute() {
     return request({ url: '/api/srm/route/select', method: 'GET' })
 }
 
+/**新增规则组**/
+export function httpBaseSrmCreateRouteRule(data: Omix) {
+    return request({ url: '/api/srm/route/rule/create', method: 'POST', data })
+}
+
+/**编辑规则组**/
+export function httpBaseSrmUpdateRouteRule(data: Omix) {
+    return request({ url: '/api/srm/route/rule/update', method: 'POST', data })
+}
+
+/**删除规则组**/
+export function httpBaseSrmDeleteRouteRule(data: Omix) {
+    return request({ url: '/api/srm/route/rule/delete', method: 'POST', data })
+}
+
+/**查询路由下的规则组**/
+export function httpBaseSrmListRouteRule(params: Omix) {
+    return request({ url: '/api/srm/route/rule/list', method: 'GET', params })
+}
+
 /**路由批量加入通道**/
 export function httpBaseSrmCreateRouteChannel(data: Omix) {
     return request({ url: '/api/srm/route/channel/create', method: 'POST', data })

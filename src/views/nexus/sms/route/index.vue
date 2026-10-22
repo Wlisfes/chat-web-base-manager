@@ -16,6 +16,7 @@ export default defineComponent({
             {
                 keyName: 'chat:nexus:sms:route',
                 actions: [
+                    { title: '规则', key: 'chat:nexus:sms:route:rule' },
                     { title: '通道', key: 'chat:nexus:sms:route:channel' },
                     { title: '应用', key: 'chat:nexus:sms:route:app' },
                     { title: '编辑', key: 'chat:nexus:sms:route:update' },
@@ -34,6 +35,7 @@ export default defineComponent({
                     { title: '路由类型', key: 'type', width: 100 },
                     { title: '排序', key: 'sort', width: 80 },
                     { title: '路由状态', key: 'status', width: 100 },
+                    { title: '规则', key: 'ruleSummary', minWidth: 280 },
                     { title: '通道（可用/全部）', key: 'channelCount', width: 140 },
                     { title: '覆盖方向', key: 'coverages', minWidth: 260 },
                     { title: '绑定应用', key: 'appCount', width: 100 },
@@ -60,6 +62,15 @@ export default defineComponent({
             return await feedback.fetchNexusSmsRoute({
                 title: '编辑路由',
                 command: 'UPDATE',
+                node,
+                onSubmit: () => fetchRefresh()
+            })
+        }
+
+        /**路由规则组管理**/
+        async function fetchRouteRule(node: Omix) {
+            return await feedback.fetchNexusSmsRouteRule({
+                title: `路由规则：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
@@ -92,7 +103,7 @@ export default defineComponent({
         async function fetchDeleteRoute(node: Omix) {
             return await fetchDialogService({
                 title: '删除路由',
-                content: `确认删除路由【${node.name}】吗？路由下的通道配置会一起删除。`,
+                content: `确认删除路由【${node.name}】吗？路由下的规则组和通道配置会一起删除。`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -182,6 +193,12 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
+                        col_ruleSummary: (data: Omix) =>
+                            data.ruleCount > 0 ? (
+                                <common-base-content value={data.ruleSummary}></common-base-content>
+                            ) : (
+                                <n-text type="warning">未配置规则，不接收短信</n-text>
+                            ),
                         col_channelCount: (data: Omix) => (
                             <n-text type={data.activeChannelCount > 0 ? 'default' : 'warning'}>
                                 {data.activeChannelCount} / {data.channelCount}
@@ -206,11 +223,17 @@ export default defineComponent({
                             <common-base-element abstract class="flex items-center gap-x-10 overflow-hidden">
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
+                                        {...{ text: true, type: 'primary', title: '规则', content: '规则' }}
+                                        onClick={() => fetchRouteRule(data)}
+                                    />
+                                </common-base-authorize>
+                                <common-base-authorize key-name={state.actions[1].key}>
+                                    <common-base-button
                                         {...{ text: true, type: 'primary', title: '通道', content: '通道' }}
                                         onClick={() => fetchRouteChannel(data)}
                                     />
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[1].key}>
+                                <common-base-authorize key-name={state.actions[2].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'primary', content: '应用' }}
                                         title={data.type === 'targeted' ? '应用' : '通用路由不绑定短信应用'}
@@ -218,13 +241,13 @@ export default defineComponent({
                                         onClick={() => fetchRouteApp(data)}
                                     />
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[2].key}>
+                                <common-base-authorize key-name={state.actions[3].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'info', title: '编辑', content: '编辑' }}
                                         onClick={() => fetchUpdateRoute(data)}
                                     />
                                 </common-base-authorize>
-                                <common-base-authorize key-name={state.actions[3].key}>
+                                <common-base-authorize key-name={state.actions[4].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'error', content: '删除' }}
                                         title={data.appCount > 0 ? '路由仍有绑定的短信应用，请先解绑' : '删除'}
