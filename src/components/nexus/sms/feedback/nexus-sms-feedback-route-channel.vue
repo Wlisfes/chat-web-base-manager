@@ -10,28 +10,28 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**路由规则**/
+        /**路由**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { state: dialog, setState: setDialog } = useState({ visible: true, loading: false, initialize: false })
         const { chunkOptions } = useChunkService(() => Service.httpBaseSrmChannelEnums(), { immediate: true })
-        /**规则下的通道**/
+        /**路由下的通道**/
         const dataSource = ref<Array<Omix>>([])
         const loading = ref(false)
         /**全部通道**/
         const channels = ref<Array<Omix>>([])
-        /**待加入的通道**/
-        const channelKeyId = ref<number>()
-        /**可加入的通道：方向和类型与规则一致，且未加入**/
+        /**待加入的通道，可多选**/
+        const channelKeyIds = ref<Array<number>>([])
+        /**可加入的通道：未加入该路由的全部通道，方向和类型不限**/
         const channelOptions = computed(() => {
             const joined = new Set(dataSource.value.map(item => item.channelKeyId))
-            return channels.value
-                .filter(item => item.countryKeyId === props.node.countryKeyId && item.type === props.node.type && !joined.has(item.keyId))
-                .map(item => ({ ...item, disabled: false }))
+            return channels.value.filter(item => !joined.has(item.keyId))
         })
         const columns = [
             { title: '通道别名', key: 'alias', minWidth: 180 },
+            { title: '方向', key: 'countryKeyId', width: 120 },
+            { title: '类型', key: 'type', width: 100 },
             { title: '通道状态', key: 'channelStatus', width: 100 },
             { title: '启用端口', key: 'enablePortCount', width: 90 },
             { title: '优先级', key: 'priority', width: 120 },
@@ -55,11 +55,11 @@ export default defineComponent({
             }
         }
 
-        /**刷新规则通道**/
+        /**刷新路由通道**/
         async function fetchRefresh() {
             loading.value = true
             try {
-                const { data } = await Service.httpBaseSrmListRouteChannel({ ruleKeyId: props.node.keyId })
+                const { data } = await Service.httpBaseSrmListRouteChannel({ routeKeyId: props.node.keyId })
                 dataSource.value = data ?? []
             } catch (err) {
                 await fetchNotifyService({ type: 'error', title: err.message })
@@ -70,10 +70,10 @@ export default defineComponent({
 
         /**加入通道：默认主通道，权重 100**/
         async function fetchCreate() {
-            if (!channelKeyId.value) return await fetchNotifyService({ type: 'warning', title: '请选择通道' })
+            if (channelKeyIds.value.length === 0) return await fetchNotifyService({ type: 'warning', title: '请选择通道' })
             try {
-                await Service.httpBaseSrmCreateRouteChannel({ ruleKeyId: props.node.keyId, channelKeyId: channelKeyId.value })
-                channelKeyId.value = undefined
+                await Service.httpBaseSrmCreateRouteChannel({ routeKeyId: props.node.keyId, channelKeyIds: channelKeyIds.value })
+                channelKeyIds.value = []
                 await fetchNotifyService({ title: '操作成功' })
                 await emit('submit', { done: setDialog })
             } catch (err) {
@@ -111,7 +111,7 @@ export default defineComponent({
         async function fetchDelete(node: Omix) {
             return await fetchDialogService({
                 title: '移除通道',
-                content: `确认把通道【${node.channelOptions?.alias ?? node.channelKeyId}】从规则移除吗？`,
+                content: `确认把通道【${node.channelOptions?.alias ?? node.channelKeyId}】从路由移除吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
@@ -134,7 +134,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={960}
+                width={1080}
                 show-footer={false}
                 v-model:visible={dialog.visible}
                 v-model:loading={dialog.loading}
@@ -143,17 +143,19 @@ export default defineComponent({
                 onClose={() => emit('close', { done: setDialog })}
             >
                 <div class="flex flex-col gap-12">
-                    <common-base-authorize key-name="chat:nexus:sms:route:rule">
+                    <common-base-authorize key-name="chat:nexus:sms:route:channel">
                         <div class="flex gap-12">
                             <form-base-select
                                 clearable
                                 filterable
                                 class="flex-1"
+                                multiple
+                                max-tag-count="responsive"
                                 label-field="alias"
                                 label-value="keyId"
-                                placeholder="选择同方向、同类型的通道加入规则"
+                                placeholder="选择通道加入路由，可多选，方向和类型不限"
                                 options={channelOptions.value}
-                                v-model:value={channelKeyId.value}
+                                v-model:value={channelKeyIds.value}
                             ></form-base-select>
                             <common-base-button type="primary" onClick={fetchCreate}>
                                 加入通道
@@ -161,7 +163,8 @@ export default defineComponent({
                         </div>
                     </common-base-authorize>
                     <n-text depth="3">
-                        优先级 1 为主通道，数字越大越靠后；同优先级按权重分流，该级没有可用通道时降级到下一优先级，全部不可用进入待分配。
+                        选路时只在同方向、同类型的通道之间比较：优先级 1
+                        为主通道，同优先级按权重分流，该级没有可用通道时降级；全部不可用时尝试下一条路由。
                     </n-text>
                     <common-database-table
                         flex-height={false}
@@ -175,6 +178,17 @@ export default defineComponent({
                     >
                         {{
                             col_alias: (data: Omix) => <common-base-content value={data.channelOptions?.alias}></common-base-content>,
+                            col_countryKeyId: (data: Omix) => (
+                                <common-base-content
+                                    value={data.channelOptions?.countryKeyIdOptions?.cnName ?? data.channelOptions?.countryKeyId}
+                                ></common-base-content>
+                            ),
+                            col_type: (data: Omix) => (
+                                <common-base-chunk
+                                    value={data.channelOptions?.type}
+                                    items={chunkOptions.value.typeOptions}
+                                ></common-base-chunk>
+                            ),
                             col_channelStatus: (data: Omix) => (
                                 <common-base-chunk
                                     bordered
@@ -216,7 +230,7 @@ export default defineComponent({
                                 ></n-switch>
                             ),
                             col_command: (data: Omix) => (
-                                <common-base-authorize key-name="chat:nexus:sms:route:rule">
+                                <common-base-authorize key-name="chat:nexus:sms:route:channel">
                                     <common-base-button text type="error" title="移除" onClick={() => fetchDelete(data)}>
                                         移除
                                     </common-base-button>

@@ -21,35 +21,28 @@ export async function fetchNexusSmsChannelPortBind(props: PropsState<Omix>) {
     })
 }
 
-/**新增、编辑路由方案**/
+/**新增、编辑路由**/
 export async function fetchNexusSmsRoute(props: PropsState<Omix>) {
     return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route.vue').then(component => {
         return createComponent(component.default, props)
     })
 }
 
-/**路由方案规则管理**/
+/**路由规则组管理**/
 export async function fetchNexusSmsRouteRule(props: PropsState<Omix>) {
     return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-rule.vue').then(component => {
         return createComponent(component.default, props)
     })
 }
 
-/**新增、编辑路由规则**/
-export async function fetchNexusSmsRouteRuleForm(props: PropsState<Omix>) {
-    return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-rule-form.vue').then(component => {
-        return createComponent(component.default, props)
-    })
-}
-
-/**路由规则通道管理**/
+/**路由通道管理**/
 export async function fetchNexusSmsRouteChannel(props: PropsState<Omix>) {
     return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-channel.vue').then(component => {
         return createComponent(component.default, props)
     })
 }
 
-/**路由方案绑定短信应用**/
+/**路由绑定短信应用**/
 export async function fetchNexusSmsRouteApp(props: PropsState<Omix>) {
     return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-app.vue').then(component => {
         return createComponent(component.default, props)

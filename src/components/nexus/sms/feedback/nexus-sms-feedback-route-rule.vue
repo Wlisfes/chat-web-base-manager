@@ -1,9 +1,19 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
-import { useColumnService, useChunkService, useSelectService, useState, pick } from '@/hooks'
+import { defineComponent, PropType, ref, onMounted } from 'vue'
+import { useChunkService, useSelectService, useState } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import * as feedback from '@/components/nexus/hooks'
 import * as Service from '@/api/instance.service'
+
+/**规则组编辑态**/
+type RuleDraft = {
+    keyId?: number
+    sort: number
+    status: string
+    remark?: string
+    conditions: Array<Omix>
+    editing: boolean
+    description?: string
+}
 
 export default defineComponent({
     name: 'NexusSmsFeedbackRouteRule',
@@ -11,92 +21,106 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**路由方案**/
+        /**路由**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { state: dialog, setState: setDialog } = useState({ visible: true, loading: false, initialize: false })
         const { chunkOptions } = useChunkService(() => Service.httpBaseSrmRouteEnums(), { immediate: true })
         /**方向下拉**/
-        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), { immediate: true })
-        /**方案下的规则**/
-        const { formState, state, fetchRefresh } = useColumnService(
-            (base, payload) =>
-                Service.httpBaseSrmColumnRouteRule({ ...payload, ...pick(base, ['page', 'size']), routeKeyId: props.node.keyId }),
-            {
-                size: 20,
-                formState: {
-                    /**方向**/
-                    countryKeyId: undefined,
-                    /**短信类型**/
-                    type: undefined
-                },
-                columns: [
-                    { title: '方向', key: 'countryKeyId', minWidth: 180 },
-                    { title: '短信类型', key: 'type', width: 100 },
-                    { title: '运营商MNC', key: 'mnc', width: 100 },
-                    { title: '号码段', key: 'prefix', width: 120 },
-                    { title: '通道（可用/全部）', key: 'channelCount', width: 140 },
-                    { title: '状态', key: 'status', width: 80 },
-                    { title: '备注', key: 'remark', minWidth: 140 },
-                    { title: '操作', key: 'command', width: 150 }
-                ]
-            }
-        )
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
+            immediate: true,
+            transform: data => data.map((item: Omix) => ({ ...item, value: String(item.keyId) }))
+        })
+        /**规则组列表**/
+        const rules = ref<Array<RuleDraft>>([])
+        const loading = ref(false)
 
-        /**规则变更后刷新列表并通知方案列表更新规则数**/
-        async function fetchChanged() {
-            await emit('submit', { done: setDialog })
-            return await fetchRefresh()
-        }
+        onMounted(fetchRefresh)
 
-        /**新增规则**/
-        async function fetchCreateRule() {
-            return await feedback.fetchNexusSmsRouteRuleForm({
-                title: '新增路由规则',
-                command: 'CREATE',
-                node: { routeKeyId: props.node.keyId },
-                onSubmit: fetchChanged
-            })
-        }
-
-        /**编辑规则**/
-        async function fetchUpdateRule(node: Omix) {
-            return await feedback.fetchNexusSmsRouteRuleForm({ title: '编辑路由规则', command: 'UPDATE', node, onSubmit: fetchChanged })
-        }
-
-        /**规则通道管理**/
-        async function fetchRuleChannel(node: Omix) {
-            return await feedback.fetchNexusSmsRouteChannel({
-                title: `规则通道：${fetchRuleName(node)}`,
-                node,
-                onSubmit: () => fetchRefresh()
-            })
-        }
-
-        /**启用、停用规则**/
-        async function fetchRuleStatus(node: Omix, status: string) {
+        /**刷新规则组**/
+        async function fetchRefresh() {
+            loading.value = true
             try {
-                await Service.httpBaseSrmUpdateRouteRule({ keyId: node.keyId, status, remark: node.remark })
-                await fetchNotifyService({ title: '操作成功' })
+                const { data } = await Service.httpBaseSrmListRouteRule({ routeKeyId: props.node.keyId })
+                rules.value = (data ?? []).map((item: Omix) => ({ ...item, editing: false }))
             } catch (err) {
                 await fetchNotifyService({ type: 'error', title: err.message })
+            } finally {
+                loading.value = false
             }
-            return await fetchRefresh()
         }
 
-        /**删除规则**/
-        async function fetchDeleteRule(node: Omix) {
+        /**字段可用的操作符：号码段用开头匹配，其余用属于**/
+        function operatorOptions(field: string) {
+            const allowed = field === 'prefix' ? ['prefix', 'not_prefix'] : ['in', 'not_in']
+            return (chunkOptions.value.ruleOperatorOptions ?? []).filter((item: Omix) => allowed.includes(item.value))
+        }
+
+        /**新增规则组**/
+        function fetchAppendRule() {
+            rules.value.push({
+                sort: (rules.value.at(-1)?.sort ?? -1) + 1,
+                status: 'enable',
+                conditions: [{ field: 'country', operator: 'in', value: [] }],
+                editing: true
+            })
+        }
+
+        /**新增条件**/
+        function fetchAppendCondition(rule: RuleDraft) {
+            rule.conditions.push({ field: 'type', operator: 'in', value: [] })
+        }
+
+        /**切换条件字段时重置操作符和取值**/
+        function fetchFieldChange(condition: Omix, field: string) {
+            condition.field = field
+            condition.operator = field === 'prefix' ? 'prefix' : 'in'
+            condition.value = []
+        }
+
+        /**保存规则组**/
+        async function fetchSave(rule: RuleDraft) {
+            if (rule.conditions.length === 0) return await fetchNotifyService({ type: 'warning', title: '请至少添加一个条件' })
+            if (rule.conditions.some(item => !item.value?.length))
+                return await fetchNotifyService({ type: 'warning', title: '条件取值不能为空' })
+            const body = {
+                sort: rule.sort ?? 0,
+                status: rule.status,
+                remark: rule.remark,
+                conditions: rule.conditions.map(item => ({ field: item.field, operator: item.operator, value: item.value.map(String) }))
+            }
+            try {
+                if (rule.keyId) await Service.httpBaseSrmUpdateRouteRule({ ...body, keyId: rule.keyId })
+                else await Service.httpBaseSrmCreateRouteRule({ ...body, routeKeyId: props.node.keyId })
+                await fetchNotifyService({ title: '操作成功' })
+                await emit('submit', { done: setDialog })
+                return await fetchRefresh()
+            } catch (err) {
+                return await fetchNotifyService({ type: 'error', title: err.message })
+            }
+        }
+
+        /**启用、停用规则组**/
+        async function fetchStatus(rule: RuleDraft, enable: boolean) {
+            rule.status = enable ? 'enable' : 'disable'
+            return await fetchSave(rule)
+        }
+
+        /**删除规则组**/
+        async function fetchDelete(rule: RuleDraft, index: number) {
+            if (!rule.keyId) return rules.value.splice(index, 1)
             return await fetchDialogService({
-                title: '删除路由规则',
-                content: `确认删除规则【${fetchRuleName(node)}】吗？规则下的通道配置会一起删除。`,
+                title: '删除规则组',
+                content: `确认删除规则组 #${index + 1} 吗？`,
                 async onSubmit(done: Function) {
                     return await done({ loading: true }).then(async () => {
                         try {
-                            await Service.httpBaseSrmDeleteRouteRule({ keyId: node.keyId })
+                            await Service.httpBaseSrmDeleteRouteRule({ keyId: rule.keyId })
                             return await done({ visible: false }).then(async () => {
                                 await fetchNotifyService({ title: '操作成功' })
-                                return await fetchChanged()
+                                await emit('submit', { done: setDialog })
+                                return await fetchRefresh()
                             })
                         } catch (err) {
                             return await done({ loading: false }).then(async () => {
@@ -108,120 +132,182 @@ export default defineComponent({
             })
         }
 
-        /**规则展示名称：方向 / 类型 / 运营商 / 号码段**/
-        function fetchRuleName(node: Omix) {
-            const country = node.countryKeyIdOptions
-            const parts = [country?.cnName ? `${country.code} ${country.cnName}` : node.countryKeyId, node.type]
-            if (node.mnc) parts.push(`MNC ${node.mnc}`)
-            if (node.prefix) parts.push(`号码段 ${node.prefix}`)
-            return parts.join(' / ')
+        /**条件取值输入**/
+        function renderValue(condition: Omix) {
+            if (condition.field === 'country') {
+                return (
+                    <form-base-select
+                        multiple
+                        filterable
+                        max-tag-count="responsive"
+                        class="flex-1"
+                        label-field="showName"
+                        label-value="value"
+                        placeholder="选择方向，可多选"
+                        options={countryOptions.dataSource.value}
+                        v-model:value={condition.value}
+                    ></form-base-select>
+                )
+            }
+            if (condition.field === 'type') {
+                return (
+                    <form-base-select
+                        multiple
+                        class="flex-1"
+                        placeholder="选择短信类型，可多选"
+                        options={chunkOptions.value.typeOptions}
+                        v-model:value={condition.value}
+                    ></form-base-select>
+                )
+            }
+            return (
+                <n-dynamic-tags class="flex-1 items-center" v-model:value={condition.value}>
+                    {{
+                        trigger: ({ activate }: Omix) => (
+                            <n-button size="small" dashed onClick={activate}>
+                                + 号码段（含区号，如 85291）
+                            </n-button>
+                        )
+                    }}
+                </n-dynamic-tags>
+            )
         }
 
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1100}
-                action={false}
+                width={960}
+                show-footer={false}
                 v-model:visible={dialog.visible}
                 v-model:loading={dialog.loading}
                 v-model:initialize={dialog.initialize}
                 onCancel={() => setDialog({ visible: false })}
                 onClose={() => emit('close', { done: setDialog })}
             >
-                <div class="flex flex-col gap-12">
-                    <div class="flex gap-12">
-                        <form-base-select
-                            clearable
-                            filterable
-                            class="w-240!"
-                            label-field="showName"
-                            label-value="keyId"
-                            placeholder="按方向筛选"
-                            loading={countryOptions.loading.value}
-                            options={countryOptions.dataSource.value}
-                            v-model:value={formState.value.countryKeyId}
-                            on-change:value={() => fetchRefresh({ page: 1 })}
-                        ></form-base-select>
-                        <form-base-select
-                            clearable
-                            class="w-160!"
-                            placeholder="短信类型"
-                            options={chunkOptions.value.typeOptions}
-                            v-model:value={formState.value.type}
-                            on-change:value={() => fetchRefresh({ page: 1 })}
-                        ></form-base-select>
-                        <div class="flex-1"></div>
-                        <common-base-authorize key-name="chat:nexus:sms:route:rule">
-                            <common-base-button type="primary" onClick={fetchCreateRule}>
-                                新增规则
-                            </common-base-button>
-                        </common-base-authorize>
+                <n-spin show={loading.value}>
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center justify-between gap-12">
+                            <n-text depth="3">
+                                短信满足任意一个启用的规则组即可进入该路由（或）；规则组内的条件需要全部满足（且）。没有启用的规则组时，路由不接收任何短信。
+                            </n-text>
+                            <common-base-authorize key-name="chat:nexus:sms:route:rule">
+                                <common-base-button type="primary" onClick={fetchAppendRule}>
+                                    新增规则组
+                                </common-base-button>
+                            </common-base-authorize>
+                        </div>
+                        {rules.value.length === 0 && <n-empty description="还没有规则组，路由不会接收任何短信"></n-empty>}
+                        {rules.value.map((rule, index) => (
+                            <n-card size="small" key={rule.keyId ?? `new-${index}`}>
+                                {{
+                                    header: () =>
+                                        rule.editing ? (
+                                            <div class="flex items-center gap-10">
+                                                <n-text strong>规则组 #{index + 1}</n-text>
+                                                <n-text depth="3" class="text-12">
+                                                    排序
+                                                </n-text>
+                                                <n-input-number
+                                                    size="small"
+                                                    class="w-120!"
+                                                    min={0}
+                                                    max={9999}
+                                                    precision={0}
+                                                    v-model:value={rule.sort}
+                                                ></n-input-number>
+                                            </div>
+                                        ) : (
+                                            <div class="flex flex-col gap-4">
+                                                <n-text strong>
+                                                    规则组 #{index + 1}
+                                                    <n-text depth="3" class="text-12">
+                                                        {' '}
+                                                        · 排序 {rule.sort}
+                                                    </n-text>
+                                                </n-text>
+                                                <n-text depth="3" class="text-12">
+                                                    {rule.description}
+                                                </n-text>
+                                            </div>
+                                        ),
+                                    'header-extra': () => (
+                                        <common-base-authorize key-name="chat:nexus:sms:route:rule">
+                                            <div class="flex items-center gap-10 ml-12">
+                                                {rule.keyId && !rule.editing && (
+                                                    <n-switch
+                                                        size="small"
+                                                        value={rule.status === 'enable'}
+                                                        onUpdate:value={(value: boolean) => fetchStatus(rule, value)}
+                                                    ></n-switch>
+                                                )}
+                                                {rule.editing ? (
+                                                    <common-base-button text type="primary" onClick={() => fetchSave(rule)}>
+                                                        保存
+                                                    </common-base-button>
+                                                ) : (
+                                                    <common-base-button text type="info" onClick={() => (rule.editing = true)}>
+                                                        编辑
+                                                    </common-base-button>
+                                                )}
+                                                {rule.editing && rule.keyId && (
+                                                    <common-base-button text onClick={fetchRefresh}>
+                                                        取消
+                                                    </common-base-button>
+                                                )}
+                                                <common-base-button text type="error" onClick={() => fetchDelete(rule, index)}>
+                                                    删除
+                                                </common-base-button>
+                                            </div>
+                                        </common-base-authorize>
+                                    ),
+                                    default: () =>
+                                        rule.editing && (
+                                            <div class="flex flex-col gap-10">
+                                                {rule.conditions.map((condition, position) => (
+                                                    <div class="flex items-center gap-10" key={position}>
+                                                        <n-text depth="3" class="w-24 shrink-0 text-right">
+                                                            {position === 0 ? '当' : '且'}
+                                                        </n-text>
+                                                        <form-base-select
+                                                            class="w-120! shrink-0"
+                                                            options={chunkOptions.value.ruleFieldOptions}
+                                                            value={condition.field}
+                                                            onUpdate:value={(value: string) => fetchFieldChange(condition, value)}
+                                                        ></form-base-select>
+                                                        <form-base-select
+                                                            class="w-120! shrink-0"
+                                                            options={operatorOptions(condition.field)}
+                                                            v-model:value={condition.operator}
+                                                        ></form-base-select>
+                                                        {renderValue(condition)}
+                                                        <common-base-button
+                                                            text
+                                                            type="error"
+                                                            disabled={rule.conditions.length <= 1}
+                                                            onClick={() => rule.conditions.splice(position, 1)}
+                                                        >
+                                                            移除
+                                                        </common-base-button>
+                                                    </div>
+                                                ))}
+                                                <div class="flex items-center gap-10">
+                                                    <span class="w-24 shrink-0"></span>
+                                                    <n-button size="small" dashed onClick={() => fetchAppendCondition(rule)}>
+                                                        + 添加条件
+                                                    </n-button>
+                                                </div>
+                                                <form-base-input
+                                                    maxlength={512}
+                                                    placeholder="备注（选填）"
+                                                    v-model:value={rule.remark}
+                                                ></form-base-input>
+                                            </div>
+                                        )
+                                }}
+                            </n-card>
+                        ))}
                     </div>
-                    <n-text depth="3">
-                        选路时在方案内按 号码段 &gt; 运营商 &gt; 方向
-                        从细到粗匹配，没有可用通道的规则会被跳过；方案内没有匹配规则时回落到默认方案。
-                    </n-text>
-                    <common-database-table
-                        flex-height={false}
-                        limit={0}
-                        bordered={false}
-                        total={state.total}
-                        columns={state.columns}
-                        v-model:page={state.page}
-                        v-model:size={state.size}
-                        v-model:select={state.select}
-                        v-model:data={state.dataSource}
-                        v-model:loading={state.loading}
-                        v-model:initialize={state.initialize}
-                        on-update:page={(page: number) => fetchRefresh({ page })}
-                        on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                    >
-                        {{
-                            col_countryKeyId: (data: Omix) => {
-                                const country = data.countryKeyIdOptions
-                                return (
-                                    <common-base-content
-                                        value={
-                                            country?.cnName ? `${country.code} ${country.cnName} - ${country.enName}` : data.countryKeyId
-                                        }
-                                    ></common-base-content>
-                                )
-                            },
-                            col_type: (data: Omix) => (
-                                <common-base-chunk value={data.type} items={chunkOptions.value.typeOptions}></common-base-chunk>
-                            ),
-                            col_mnc: (data: Omix) => (data.mnc ? <n-text>{data.mnc}</n-text> : <n-text depth="3">全部</n-text>),
-                            col_prefix: (data: Omix) => (data.prefix ? <n-text>{data.prefix}</n-text> : <n-text depth="3">全部</n-text>),
-                            col_channelCount: (data: Omix) => (
-                                <n-text type={data.activeChannelCount > 0 ? 'default' : 'warning'}>
-                                    {data.activeChannelCount} / {data.channelCount}
-                                </n-text>
-                            ),
-                            col_status: (data: Omix) => (
-                                <n-switch
-                                    size="small"
-                                    value={data.status === 'enable'}
-                                    onUpdate:value={(value: boolean) => fetchRuleStatus(data, value ? 'enable' : 'disable')}
-                                ></n-switch>
-                            ),
-                            col_command: (data: Omix) => (
-                                <common-base-authorize key-name="chat:nexus:sms:route:rule">
-                                    <div class="flex items-center gap-x-10">
-                                        <common-base-button text type="primary" title="通道" onClick={() => fetchRuleChannel(data)}>
-                                            通道
-                                        </common-base-button>
-                                        <common-base-button text type="info" title="编辑" onClick={() => fetchUpdateRule(data)}>
-                                            编辑
-                                        </common-base-button>
-                                        <common-base-button text type="error" title="删除" onClick={() => fetchDeleteRule(data)}>
-                                            删除
-                                        </common-base-button>
-                                    </div>
-                                </common-base-authorize>
-                            )
-                        }}
-                    </common-database-table>
-                </div>
+                </n-spin>
             </common-dialog-provider>
         )
     }

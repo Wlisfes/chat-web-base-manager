@@ -16,6 +16,8 @@ export default defineComponent({
         const channelEnums = useChunkService(() => Service.httpBaseSrmChannelEnums(), { immediate: true })
         /**客户下拉**/
         const userOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), { immediate: true })
+        /**方向下拉**/
+        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), { immediate: true })
         /**客户下的短信应用**/
         const appOptions = ref<Array<Omix>>([])
         /**选路结果**/
@@ -36,17 +38,16 @@ export default defineComponent({
                 userKeyId: undefined as number | undefined,
                 /**短信应用**/
                 appKeyId: undefined as number | undefined,
-                /**收件号码：含国际区号**/
+                /**方向**/
+                countryKeyId: undefined as number | undefined,
+                /**收件号码：用于号码段条件，选填**/
                 phone: undefined as string | undefined,
-                /**运营商 MNC：可为空**/
-                mnc: undefined as string | undefined,
                 /**短信类型：不选时使用短信应用类型**/
                 type: undefined as string | undefined
             },
             rules: {
                 appKeyId: { required: true, type: 'number', message: '请选择短信应用', trigger: 'blur' },
-                phone: { required: true, pattern: /^(\+|00)?\d{6,20}$/, message: '请输入含国际区号的收件号码', trigger: 'blur' },
-                mnc: { pattern: /^\d{2,3}$/, message: '运营商MNC必须是2-3位数字', trigger: 'blur' }
+                countryKeyId: { required: true, type: 'number', message: '请选择方向', trigger: 'blur' }
             }
         })
 
@@ -70,8 +71,8 @@ export default defineComponent({
                 try {
                     const { data } = await Service.httpBaseSrmRoutePreview({
                         appKeyId: formState.value.appKeyId,
-                        phone: formState.value.phone?.trim(),
-                        mnc: formState.value.mnc?.trim() || undefined,
+                        countryKeyId: formState.value.countryKeyId,
+                        phone: formState.value.phone?.trim() || undefined,
                         type: formState.value.type || undefined
                     })
                     result.value = data
@@ -129,18 +130,22 @@ export default defineComponent({
                                     v-model:value={formState.value.appKeyId}
                                 ></form-base-select>
                             </form-base-column>
+                            <form-base-column label="方向" path="countryKeyId">
+                                <form-base-select
+                                    filterable
+                                    label-field="showName"
+                                    label-value="keyId"
+                                    placeholder="请选择方向"
+                                    loading={countryOptions.loading.value}
+                                    options={countryOptions.dataSource.value}
+                                    v-model:value={formState.value.countryKeyId}
+                                ></form-base-select>
+                            </form-base-column>
                             <form-base-column label="收件号码" path="phone">
                                 <form-base-input
-                                    maxlength={22}
-                                    placeholder="含国际区号，例如 +85291234567"
+                                    maxlength={24}
+                                    placeholder="选填，含国际区号，用于号码段条件"
                                     v-model:value={formState.value.phone}
-                                ></form-base-input>
-                            </form-base-column>
-                            <form-base-column label="运营商MNC" path="mnc">
-                                <form-base-input
-                                    maxlength={3}
-                                    placeholder="可为空，为空只匹配不限运营商的规则"
-                                    v-model:value={formState.value.mnc}
                                 ></form-base-input>
                             </form-base-column>
                             <form-base-column label="短信类型" path="type">
@@ -162,55 +167,71 @@ export default defineComponent({
                                 <div class="flex flex-col gap-4">
                                     <span>{result.value.message}</span>
                                     <n-text depth="3">
-                                        号码 {result.value.phone} · 类型 {result.value.type}
-                                        {result.value.routeOptions && ` · 方案 ${result.value.routeOptions.name}`}
-                                        {result.value.fallback && ' · 已回落到默认方案'}
+                                        类型 {result.value.type}
+                                        {result.value.fallback && ' · 已回落到通用路由'}
                                     </n-text>
                                 </div>
                             </n-alert>
-                            {result.value.channels?.length > 0 && (
-                                <common-database-table
-                                    flex-height={false}
-                                    limit={0}
-                                    bordered={false}
-                                    pagination={false}
-                                    columns={columns}
-                                    data={result.value.channels}
-                                    loading={false}
-                                    initialize={false}
-                                >
-                                    {{
-                                        col_alias: (data: Omix) => (
-                                            <common-base-content value={data.channelOptions?.alias}></common-base-content>
-                                        ),
-                                        col_channelStatus: (data: Omix) => (
-                                            <common-base-chunk
-                                                bordered
-                                                value={data.channelOptions?.status}
-                                                items={channelEnums.chunkOptions.value.statusOptions}
-                                            ></common-base-chunk>
-                                        ),
-                                        col_enablePortCount: (data: Omix) => (
-                                            <n-text type={data.channelOptions?.enablePortCount > 0 ? 'default' : 'warning'}>
-                                                {data.channelOptions?.enablePortCount ?? 0}
-                                            </n-text>
-                                        ),
-                                        col_ratio: (data: Omix) => (
-                                            <n-text type={data.active ? 'default' : 'warning'}>
-                                                {data.active ? `${data.ratio}%` : '不可用'}
-                                            </n-text>
-                                        ),
-                                        col_selected: (data: Omix) =>
-                                            data.selected ? (
-                                                <n-tag size="small" type="success" bordered={false}>
-                                                    选用
-                                                </n-tag>
-                                            ) : (
-                                                <n-text depth="3">备用</n-text>
-                                            )
-                                    }}
-                                </common-database-table>
-                            )}
+                            {(result.value.steps ?? []).map((step: Omix) => (
+                                <div class="flex flex-col gap-8" key={step.routeOptions.keyId}>
+                                    <n-text strong>
+                                        {step.routeOptions.name}
+                                        <n-text depth="3">
+                                            {` · ${step.routeOptions.type === 'targeted' ? '定向路由' : '通用路由'} · ${!step.admitted ? '规则不匹配' : step.matched ? '命中' : '没有可用通道'}`}
+                                        </n-text>
+                                    </n-text>
+                                    {step.ruleDescription && (
+                                        <n-text depth="3" class="text-12">
+                                            命中规则组：{step.ruleDescription}
+                                        </n-text>
+                                    )}
+                                    {!step.admitted ? null : step.channels.length > 0 ? (
+                                        <common-database-table
+                                            flex-height={false}
+                                            limit={0}
+                                            bordered={false}
+                                            pagination={false}
+                                            columns={columns}
+                                            data={step.channels}
+                                            loading={false}
+                                            initialize={false}
+                                        >
+                                            {{
+                                                col_alias: (data: Omix) => (
+                                                    <common-base-content value={data.channelOptions?.alias}></common-base-content>
+                                                ),
+                                                col_channelStatus: (data: Omix) => (
+                                                    <common-base-chunk
+                                                        bordered
+                                                        value={data.channelOptions?.status}
+                                                        items={channelEnums.chunkOptions.value.statusOptions}
+                                                    ></common-base-chunk>
+                                                ),
+                                                col_enablePortCount: (data: Omix) => (
+                                                    <n-text type={data.channelOptions?.enablePortCount > 0 ? 'default' : 'warning'}>
+                                                        {data.channelOptions?.enablePortCount ?? 0}
+                                                    </n-text>
+                                                ),
+                                                col_ratio: (data: Omix) => (
+                                                    <n-text type={data.active ? 'default' : 'warning'}>
+                                                        {data.active ? `${data.ratio}%` : '不可用'}
+                                                    </n-text>
+                                                ),
+                                                col_selected: (data: Omix) =>
+                                                    data.selected ? (
+                                                        <n-tag size="small" type="success" bordered={false}>
+                                                            选用
+                                                        </n-tag>
+                                                    ) : (
+                                                        <n-text depth="3">备用</n-text>
+                                                    )
+                                            }}
+                                        </common-database-table>
+                                    ) : (
+                                        <n-text depth="3">该路由没有这个方向和类型的通道</n-text>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
