@@ -28,8 +28,8 @@ export default defineComponent({
                 alias: props.node.alias,
                 /**路由类型：创建后不可修改**/
                 type: props.node.type ?? 'general',
-                /**排序：通用路由按排序依次尝试**/
-                sort: props.node.sort ?? 0,
+                /**优先级：通用路由按优先级依次尝试，越小越优先**/
+                priority: props.node.priority ?? 1,
                 /**路由状态**/
                 status: props.node.status ?? 'enable',
                 /**备注**/
@@ -104,8 +104,8 @@ export default defineComponent({
                             v-model:value={formState.value.type}
                         ></form-base-select>
                     </form-base-column>
-                    <form-base-column label="排序" path="sort">
-                        <n-input-number class="w-full" min={0} max={9999} precision={0} v-model:value={formState.value.sort}>
+                    <form-base-column label="优先级" path="priority">
+                        <n-input-number class="w-full" min={1} max={100} precision={0} v-model:value={formState.value.priority}>
                             {{ suffix: () => '通用路由越小越优先' }}
                         </n-input-number>
                     </form-base-column>

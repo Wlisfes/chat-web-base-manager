@@ -31,9 +31,9 @@ export default defineComponent({
                 columns: [
                     { title: '路由ID', key: 'keyId', width: 100, disabled: true },
                     { title: '路由别名', key: 'alias', width: 180, disabled: true },
-                    { title: '路由名称', key: 'name', minWidth: 180, disabled: true },
+                    { title: '路由名称', key: 'name', width: 180, disabled: true },
                     { title: '路由类型', key: 'type', width: 100 },
-                    { title: '排序', key: 'sort', width: 80 },
+                    { title: '优先级', key: 'priority', width: 80 },
                     { title: '路由状态', key: 'status', width: 100 },
                     { title: '规则', key: 'ruleSummary', minWidth: 280 },
                     { title: '通道（可用/全部）', key: 'channelCount', width: 140 },
