@@ -55,9 +55,9 @@ export function httpBaseSrmListRouteRule(params: Omix) {
     return request({ url: '/api/srm/route/rule/list', method: 'GET', params })
 }
 
-/**路由批量加入通道**/
-export function httpBaseSrmCreateRouteChannel(data: Omix) {
-    return request({ url: '/api/srm/route/channel/create', method: 'POST', data })
+/**更新路由通道绑定**/
+export function httpBaseSrmBindRouteChannel(data: Omix) {
+    return request({ url: '/api/srm/route/channel/bind', method: 'POST', data })
 }
 
 /**编辑路由通道优先级、权重和状态**/

@@ -71,10 +71,10 @@ export default defineComponent({
             })
         }
 
-        /**路由通道管理**/
+        /**编辑路由通道**/
         async function fetchRouteChannel(node: Omix) {
             return await feedback.fetchNexusSmsRouteChannel({
-                title: `路由通道：${node.name}`,
+                title: `编辑路由通道：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })

@@ -44,15 +44,17 @@ export default defineComponent({
 
         /**加载方向、归属人选项、可绑定端口和已绑定端口。**/
         async function fetchInitialization() {
-            const taskNames = [chengOptions.fetchRequest(), countryOptions.fetchRequest(), portOptions.fetchRequest()]
             try {
-                return await Promise.all([Service.httpBaseSrmChannelResolver({ keyId: props.node.keyId }), ...taskNames]).then(
-                    async ([{ data }]) => {
-                        return await setForm({ portKeyIds: (data.list ?? []).map((e: Omix) => e.portKeyId) }).then(async () => {
-                            return await setState({ initialize: false })
-                        })
-                    }
-                )
+                return await Promise.all([
+                    Service.httpBaseSrmChannelResolver({ keyId: props.node.keyId }),
+                    chengOptions.fetchRequest(),
+                    countryOptions.fetchRequest(),
+                    portOptions.fetchRequest()
+                ]).then(async ([{ data }]) => {
+                    return await setForm({ portKeyIds: (data.list ?? []).map((e: Omix) => e.portKeyId) }).then(async () => {
+                        return await setState({ initialize: false })
+                    })
+                })
             } catch (err) {
                 return await setState({ initialize: false }).then(async () => {
                     return await fetchNotifyService({ type: 'error', title: err.message })
