@@ -14,12 +14,6 @@ export async function fetchNexusSmsChannelPort(props: PropsState<Omix>) {
     })
 }
 
-/**短信通道绑定端口**/
-export async function fetchNexusSmsChannelPortBind(props: PropsState<Omix>) {
-    return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-channel-port-bind.vue').then(component => {
-        return createComponent(component.default, props)
-    })
-}
 
 /**新增、编辑路由**/
 export async function fetchNexusSmsRoute(props: PropsState<Omix>) {

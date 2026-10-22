@@ -88,14 +88,6 @@ export function httpBaseSrmUpdateChannelPort(data: Omix) {
     })
 }
 
-/**通道批量解绑端口**/
-export function httpBaseSrmUnbindChannelPort(data: Omix) {
-    return request({
-        url: '/api/srm/channel/port/unbind',
-        method: 'POST',
-        data
-    })
-}
 
 /**通道端口分页列表**/
 export function httpBaseSrmColumnChannelPort(data: Omix) {
@@ -106,14 +98,6 @@ export function httpBaseSrmColumnChannelPort(data: Omix) {
     })
 }
 
-/**可绑定端口分页列表**/
-export function httpBaseSrmAvailableChannelPort(data: Omix) {
-    return request({
-        url: '/api/srm/channel/port/available',
-        method: 'POST',
-        data
-    })
-}
 
 /**按方向和归属人查询可绑定端口**/
 export function httpBaseSrmSelectChannelPort(data: Omix) {
