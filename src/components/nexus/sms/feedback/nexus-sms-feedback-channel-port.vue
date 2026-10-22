@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { useSelectService, useFormService, pick } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -27,9 +27,6 @@ export default defineComponent({
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: false
         })
-        /**已绑定端口**/
-        const boundPorts = ref<Array<Omix>>([])
-        const boundLoading = ref(false)
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
@@ -41,37 +38,21 @@ export default defineComponent({
                 portKeyIds: []
             },
             rules: {
-                portKeyIds: { type: 'array', required: true, min: 1, message: '请选择要绑定的端口', trigger: 'change' },
-                ownerUserUid: { required: true, message: '归属人不能为空', trigger: 'change' },
-                countryKeyId: { required: true, type: 'number', message: '方向不能为空', trigger: 'change' }
+                portKeyIds: { type: 'array', required: true, min: 1, message: '请选择要绑定的端口', trigger: 'blur' }
             }
         })
 
-        /**查询通道已绑定的端口；列表项带端口和设备当前状态**/
-        async function fetchBoundPorts() {
-            boundLoading.value = true
-            try {
-                const { data } = await Service.httpBaseSrmColumnChannelPort({ channelKeyId: props.node.keyId, page: 1, size: 300 })
-                boundPorts.value = data?.list ?? []
-            } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
-            } finally {
-                boundLoading.value = false
-            }
-        }
-
         /**加载方向、归属人选项、可绑定端口和已绑定端口。**/
         async function fetchInitialization() {
-            const taskNames = [
-                chengOptions.fetchRequest(),
-                countryOptions.fetchRequest(),
-                portOptions.fetchRequest(),
-                fetchBoundPorts()
-            ]
+            const taskNames = [chengOptions.fetchRequest(), countryOptions.fetchRequest(), portOptions.fetchRequest()]
             try {
-                return await Promise.all(taskNames).then(async () => {
-                    return await setState({ initialize: false })
-                })
+                return await Promise.all([Service.httpBaseSrmChannelResolver({ keyId: props.node.keyId }), ...taskNames]).then(
+                    async ([{ data }]) => {
+                        return await setForm({ portKeyIds: (data.list ?? []).map((e: Omix) => e.portKeyId) }).then(async () => {
+                            return await setState({ initialize: false })
+                        })
+                    }
+                )
             } catch (err) {
                 return await setState({ initialize: false }).then(async () => {
                     return await fetchNotifyService({ type: 'error', title: err.message })
@@ -123,7 +104,7 @@ export default defineComponent({
                     base-columns-template
                     base-columns-template-props={{ class: 'gap-x-20', type: 'auto-fit', number: 320 }}
                 >
-                    <form-base-column label="归属人" path="ownerUserUid">
+                    <form-base-column label="归属人" required>
                         <form-base-select
                             disabled
                             label-value="uid"
@@ -134,7 +115,7 @@ export default defineComponent({
                             v-model:value={formState.value.ownerUserUid}
                         ></form-base-select>
                     </form-base-column>
-                    <form-base-column label="方向" path="countryKeyId">
+                    <form-base-column label="方向" required>
                         <form-base-select
                             disabled
                             label-field="showName"
@@ -145,41 +126,6 @@ export default defineComponent({
                             v-model:value={formState.value.countryKeyId}
                         ></form-base-select>
                     </form-base-column>
-                    {boundPorts.value.length > 0 && (
-                        <form-base-column full label={`已绑定端口（${boundPorts.value.length}）`}>
-                            <common-database-table
-                                flex-height={false}
-                                limit={0}
-                                bordered={false}
-                                pagination={false}
-                                initialize={false}
-                                loading={boundLoading.value}
-                                data={boundPorts.value}
-                                columns={[
-                                    { title: '设备', key: 'simbankKeyId', minWidth: 180 },
-                                    { title: '端口', key: 'portKeyId', width: 90 },
-                                    { title: 'SIM卡号', key: 'sim', width: 150 },
-                                    { title: 'ICCID', key: 'iccid', width: 200 },
-                                    { title: '权重', key: 'weight', width: 90 },
-                                    { title: '状态', key: 'status', width: 100 }
-                                ]}
-                            >
-                                {{
-                                    col_simbankKeyId: (data: Omix) => (
-                                        <common-base-content
-                                            value={[data.simbankOptions?.alias, data.simbankOptions?.name].filter(Boolean).join(' / ')}
-                                        ></common-base-content>
-                                    ),
-                                    col_portKeyId: (data: Omix) => <n-text>{data.portOptions?.port ?? data.portKeyId}</n-text>,
-                                    col_sim: (data: Omix) => (data.portOptions?.sim ? <n-text>{data.portOptions.sim}</n-text> : <n-text depth="3">-</n-text>),
-                                    col_iccid: (data: Omix) =>
-                                        data.portOptions?.iccid ? <n-text>{data.portOptions.iccid}</n-text> : <n-text depth="3">-</n-text>,
-                                    col_weight: (data: Omix) => <n-text>{data.weight}</n-text>,
-                                    col_status: (data: Omix) => <n-text>{data.status === 'enable' ? '启用' : '停用'}</n-text>
-                                }}
-                            </common-database-table>
-                        </form-base-column>
-                    )}
                     <form-base-column full label="新增端口" path="portKeyIds">
                         <form-base-select
                             multiple
