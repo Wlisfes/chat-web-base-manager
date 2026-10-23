@@ -49,3 +49,12 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.form-base-input-number {
+    position: relative;
+    :deep(.n-input-wrapper):has(.form-base-switch) {
+        --n-padding-right: 3px;
+    }
+}
+</style>

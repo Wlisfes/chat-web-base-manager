@@ -15,9 +15,7 @@ export default defineComponent({
         /**绑定端口列表**/
         list: { type: Array as PropType<Array<Omix>>, default: () => [] },
         /**绑定端口item对象数据**/
-        node: { type: Object as PropType<Omix>, default: () => ({}) },
-        /**枚举对象**/
-        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
+        node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
         const { node, list } = useVModels(props, emit)
@@ -29,7 +27,9 @@ export default defineComponent({
             return (props.simbankPortOptions ?? []).map(item => ({ ...item, disabled: selected.has(item.keyId) }))
         })
         function fetchPortRule(_rule: unknown, value: number) {
-            if (!value) return new Error('请选择要绑定的端口')
+            if (!value) {
+                return new Error('请选择要绑定的端口')
+            }
             const duplicated = (list.value ?? []).some((item, index) => index !== props.index && item?.portKeyId === value)
             return duplicated ? new Error('不能重复选择相同端口') : true
         }
@@ -102,9 +102,3 @@ export default defineComponent({
     }
 })
 </script>
-
-<style lang="scss" scoped>
-.nexus-sms-channel-port-column :deep(.n-input-number .n-input-wrapper) {
-    --n-padding-right: 3px;
-}
-</style>

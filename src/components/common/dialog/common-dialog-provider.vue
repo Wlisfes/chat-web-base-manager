@@ -52,7 +52,7 @@ export default defineComponent({
                 show-icon={false}
                 show={visible.value}
                 style={styleNodes.value}
-                class={`flex flex-col overflow-hidden ${props.className}`}
+                class={`flex flex-col ${props.className}`}
                 content-class="flex flex-col flex-1 overflow-hidden"
                 title-class="text-20! line-height-28 gap-8 select-none p-inline-20! p-block-20!"
                 on-update:show={(show: boolean) => (visible.value = show)}

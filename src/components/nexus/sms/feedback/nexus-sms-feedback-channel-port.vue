@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, useChunkService, pick, omit, v4 } from '@/hooks'
+import { useSelectService, useFormService, pick, omit, v4 } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -14,10 +14,6 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        /**通道静态枚举**/
-        const { chunkOptions, fetchChunkService } = useChunkService(() => Service.httpBaseSrmChannelEnums(), {
-            immediate: false
-        })
         /**端口列表下拉**/
         const simbankPortOptions = useSelectService(e => Service.httpBaseSrmSelectSimbankPort(pick(e, ['ownerUserUid', 'countryKeyId'])), {
             immediate: false,
@@ -51,8 +47,7 @@ export default defineComponent({
             try {
                 return await Promise.all([
                     Service.httpBaseSrmChannelResolver({ keyId: props.node.keyId }),
-                    simbankPortOptions.fetchRequest(),
-                    fetchChunkService()
+                    simbankPortOptions.fetchRequest()
                 ]).then(async ([{ data }]) => {
                     return await setForm({ list: (data.list ?? [{}]).map(fetchAdapter) }).then(async () => {
                         return await setState({ initialize: false })
@@ -91,7 +86,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={750}
+                width={850}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -113,7 +108,6 @@ export default defineComponent({
                             key={item.uuid}
                             v-model:node={item}
                             fetch-adapter={fetchAdapter}
-                            chunk-options={chunkOptions}
                             v-model:list={formState.value.list}
                             simbank-port-options={simbankPortOptions.dataSource.value}
                         ></nexus-sms-channel-port-column>
