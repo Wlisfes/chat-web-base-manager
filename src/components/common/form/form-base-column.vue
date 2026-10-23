@@ -53,7 +53,9 @@ export default defineComponent({
             const baseStyle: CSSProperties = !['top'].includes(formRef.value.labelPlacement) ? {} : {
                 '--n-label-height': '22px',
                 '--n-label-padding': '0 0 2px 2px',
-                '--n-arrow-offset': '5px'
+                '--n-feedback-padding': '2px 0 0 2px',
+                '--n-feedback-height': '22px',
+                '--n-arrow-offset': '5px',
             }
             if (props.full) {
                 return { ...baseStyle, gridColumn: '1 / -1' }
