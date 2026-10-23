@@ -89,11 +89,6 @@ export default defineComponent({
             })
         }
 
-        /**选路预览**/
-        async function fetchRoutePreview() {
-            return await feedback.fetchNexusSmsRoutePreview({ title: '选路预览' })
-        }
-
         /**删除路由**/
         async function fetchDeleteRoute(node: Omix) {
             return await fetchDialogService({
@@ -137,11 +132,6 @@ export default defineComponent({
                         <common-base-authorize key-name="chat:nexus:sms:route:create">
                             <common-base-button class="min-w-80" type="primary" onClick={fetchCreateRoute}>
                                 新增
-                            </common-base-button>
-                        </common-base-authorize>
-                        <common-base-authorize key-name="chat:nexus:sms:route:preview">
-                            <common-base-button class="min-w-80" onClick={fetchRoutePreview}>
-                                选路预览
                             </common-base-button>
                         </common-base-authorize>
                     </common-database-search-function>

@@ -80,17 +80,7 @@ export function httpBaseSrmBindRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/bind', method: 'POST', data })
 }
 
-/**短信应用解绑路由**/
-export function httpBaseSrmUnbindRouteApp(data: Omix) {
-    return request({ url: '/api/srm/route/app/unbind', method: 'POST', data })
-}
-
 /**分页查询短信应用路由绑定**/
 export function httpBaseSrmColumnRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/column', method: 'POST', data })
-}
-
-/**选路预览**/
-export function httpBaseSrmRoutePreview(data: Omix) {
-    return request({ url: '/api/srm/route/preview', method: 'POST', data })
 }
