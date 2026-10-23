@@ -31,7 +31,7 @@ export default defineComponent({
                 /**归属人：来自通道，不可改**/
                 ownerUserUid: props.node.ownerUserUid,
                 /**绑定端口列表**/
-                list: props.node.list ?? [fetchAdapter()]
+                list: props.node.list ?? Array.from({ length: 1 }, () => fetchAdapter())
             }
         })
 

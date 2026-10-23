@@ -35,7 +35,7 @@ export default defineComponent({
         }
 
         return () => (
-            <div class="w-full flex gap-x-20">
+            <div class="nexus-sms-channel-port-column w-full flex gap-x-14">
                 <form-base-column
                     class="flex-1"
                     label="绑定端口"
@@ -52,7 +52,7 @@ export default defineComponent({
                     ></form-base-select>
                 </form-base-column>
                 <form-base-column
-                    class="w-170"
+                    class="w-240"
                     label="端口权重"
                     show-label={props.index === 0}
                     path={`list[${props.index}].weight`}
@@ -61,26 +61,23 @@ export default defineComponent({
                     <form-base-number-input
                         min={1}
                         max={100}
+                        show-button={false}
                         placeholder="请输入端口权重"
                         v-model:value={node.value.weight}
+                        disabled={node.value.status === 'disable'}
+                        suffix={
+                            <form-base-switch
+                                round={false}
+                                size="large"
+                                checked-value="enable"
+                                unchecked-value="disable"
+                                v-model:value={node.value.status}
+                            />
+                        }
                     ></form-base-number-input>
-                </form-base-column>
-                <form-base-column
-                    label="绑定状态"
-                    show-label={props.index === 0}
-                    path={`list[${props.index}].status`}
-                    rule={{ required: true, message: '请选择绑定状态', trigger: 'blur' }}
-                >
-                    <form-base-switch
-                        round={false}
-                        size="large"
-                        checked-value="enable"
-                        unchecked-value="disable"
-                        v-model:value={node.value.status}
-                    ></form-base-switch>
                     {props.index === 0 ? (
                         <common-base-button
-                            class="p-inline-6 m-is-20"
+                            class="p-inline-6 m-is-14"
                             title="新增"
                             secondary
                             type="primary"
@@ -90,7 +87,7 @@ export default defineComponent({
                         ></common-base-button>
                     ) : (
                         <common-base-button
-                            class="p-inline-6 m-is-20"
+                            class="p-inline-6 m-is-14"
                             title="删除"
                             secondary
                             type="error"
@@ -105,3 +102,9 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.nexus-sms-channel-port-column :deep(.n-input-number .n-input-wrapper) {
+    --n-padding-right: 3px;
+}
+</style>
