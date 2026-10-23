@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, useChunkService, pick, v4 } from '@/hooks'
+import { useSelectService, useFormService, useChunkService, pick, omit, v4 } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -72,7 +72,10 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    await Service.httpBaseSrmBindChannelPort({ channelKeyId: props.node.keyId, list: formState.value.list })
+                    await Service.httpBaseSrmBindChannelPort({
+                        channelKeyId: props.node.keyId,
+                        list: formState.value.list.map((item: Omix) => omit(item, ['uuid']))
+                    })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
                         return await fetchNotifyService({ title: `操作成功` })
