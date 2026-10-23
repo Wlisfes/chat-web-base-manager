@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, PropType, ref } from 'vue'
-import { useColumnService, useSelectService, useState, pick } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
+import { defineComponent, PropType } from 'vue'
+import { useSelectService, useFormService, omit, v4 } from '@/hooks'
+import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -14,82 +14,67 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const { state: dialog, setState: setDialog } = useState({ visible: true, loading: false, initialize: false })
-        /**客户下拉**/
-        const userOptions = useSelectService(() => Service.httpBaseCrmSelectUser({}), { immediate: true })
-        /**待绑定：客户和该客户下的短信应用**/
-        const userKeyId = ref<number>()
-        const appKeyIds = ref<Array<number>>([])
-        const appOptions = ref<Array<Omix>>([])
-        const appLoading = ref(false)
-        /**路由已绑定的短信应用**/
-        const { state, fetchRefresh } = useColumnService(
-            (base, payload) =>
-                Service.httpBaseSrmColumnRouteApp({ ...payload, ...pick(base, ['page', 'size']), routeKeyId: props.node.keyId }),
-            {
-                size: 20,
-                formState: {},
-                columns: [
-                    { title: '短信应用', key: 'appKeyId', minWidth: 200 },
-                    { title: '应用ID', key: 'appId', width: 170 },
-                    { title: '应用类型', key: 'type', width: 90 },
-                    { title: '所属客户', key: 'userKeyId', minWidth: 180 },
-                    { title: '绑定人', key: 'modifyBy', width: 110 },
-                    { title: '绑定时间', key: 'modifyTime', width: 160 },
-                    { title: '操作', key: 'command', width: 80 }
-                ]
+        /**同类型短信应用下拉**/
+        const appOptions = useSelectService(() => Service.httpBaseCrmSelectSmsApp({ type: props.node.type }), {
+            immediate: false,
+            transform: async data => data.map(item => ({ ...item, label: [item.appAlias, item.appName].filter(Boolean).join(' - ') }))
+        })
+        const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
+            callback: fetchInitialization,
+            formState: {
+                /**路由别名**/
+                alias: props.node.alias,
+                /**路由类型：创建后不可修改**/
+                type: props.node.type,
+                /**已绑定的短信应用**/
+                list: Array.from({ length: 1 }, () => fetchAdapter())
             }
-        )
+        })
 
-        /**切换客户后加载该客户的短信应用**/
-        async function fetchUserChange(value?: number) {
-            appKeyIds.value = []
-            appOptions.value = []
-            if (!value) return
-            appLoading.value = true
-            try {
-                const { data } = await Service.httpBaseCrmSelectSmsApp({ userKeyId: value })
-                appOptions.value = (data ?? []).map((item: Omix) => ({ ...item, label: `${item.appAlias} - ${item.appName}` }))
-            } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
-            } finally {
-                appLoading.value = false
+        /**绑定应用数据转换**/
+        function fetchAdapter(item: Omix = {}) {
+            return {
+                uuid: v4(),
+                keyId: item.keyId,
+                appKeyId: item.appKeyId,
+                status: item.status ?? 'enable'
             }
         }
 
-        /**绑定短信应用：已绑定其他路由的应用会改绑到当前路由**/
-        async function fetchBind() {
-            if (appKeyIds.value.length === 0) return await fetchNotifyService({ type: 'warning', title: '请选择短信应用' })
+        /**加载同类型应用下拉，并用路由详情回显已绑定的短信应用。**/
+        async function fetchInitialization() {
             try {
-                const { data } = await Service.httpBaseSrmBindRouteApp({ routeKeyId: props.node.keyId, appKeyIds: appKeyIds.value })
-                appKeyIds.value = []
-                await fetchNotifyService({ title: `已绑定 ${data?.count ?? 0} 个短信应用` })
-                await emit('submit', { done: setDialog })
+                return await Promise.all([Service.httpBaseSrmRouteResolver({ keyId: props.node.keyId }), appOptions.fetchRequest()]).then(
+                    async ([{ data }]) => {
+                        const rows = data?.apps ?? []
+                        return await setForm({ list: (rows.length ? rows : [{}]).map(fetchAdapter) }).then(async () => {
+                            return await setState({ initialize: false })
+                        })
+                    }
+                )
             } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
+                return await setState({ initialize: false }).then(async () => {
+                    return await fetchNotifyService({ type: 'error', title: err.message })
+                })
             }
-            return await fetchRefresh()
         }
 
-        /**解绑短信应用：解绑后应用按优先级走同类型路由**/
-        async function fetchUnbind(node: Omix) {
-            return await fetchDialogService({
-                title: '解绑短信应用',
-                content: `确认解绑短信应用【${node.appKeyIdOptions?.appName ?? node.appKeyId}】吗？解绑后该应用按优先级走同类型路由。`,
-                async onSubmit(done: Function) {
-                    return await done({ loading: true }).then(async () => {
-                        try {
-                            await Service.httpBaseSrmUnbindRouteApp({ keyIds: [node.keyId] })
-                            return await done({ visible: false }).then(async () => {
-                                await fetchNotifyService({ title: '操作成功' })
-                                await emit('submit', { done: setDialog })
-                                return await fetchRefresh()
-                            })
-                        } catch (err) {
-                            return await done({ loading: false }).then(async () => {
-                                return await fetchNotifyService({ type: 'error', title: err.message })
-                            })
-                        }
+        /**更新短信应用绑定：以本次列表为准。**/
+        async function fetchSubmit() {
+            return await fetchValidater().then(async error => {
+                if (error) return await setState({ loading: false, disabled: false })
+                try {
+                    await Service.httpBaseSrmBindRouteApp({
+                        routeKeyId: props.node.keyId,
+                        apps: formState.value.list.map((item: Omix) => omit(item, ['uuid', 'keyId']))
+                    })
+                    return await setState({ visible: false }).then(async () => {
+                        await emit('submit', { done: setState })
+                        return await fetchNotifyService({ title: '操作成功' })
+                    })
+                } catch (err) {
+                    return await setState({ loading: false, disabled: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
                     })
                 }
             })
@@ -98,94 +83,33 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1000}
-                action={false}
-                v-model:visible={dialog.visible}
-                v-model:loading={dialog.loading}
-                v-model:initialize={dialog.initialize}
-                onCancel={() => setDialog({ visible: false })}
-                onClose={() => emit('close', { done: setDialog })}
+                width={750}
+                v-model:visible={state.visible}
+                v-model:loading={state.loading}
+                v-model:initialize={state.initialize}
+                onSubmit={fetchSubmit}
+                onCancel={() => setState({ visible: false })}
+                onClose={() => emit('close', { done: setState })}
             >
-                <div class="flex flex-col gap-12">
-                    <common-base-authorize key-name="chat:nexus:sms:route:app">
-                        <div class="flex gap-12">
-                            <form-base-select
-                                clearable
-                                filterable
-                                class="w-260!"
-                                label-field="showName"
-                                label-value="keyId"
-                                placeholder="选择客户"
-                                loading={userOptions.loading.value}
-                                options={userOptions.dataSource.value}
-                                v-model:value={userKeyId.value}
-                                on-change:value={fetchUserChange}
-                            ></form-base-select>
-                            <form-base-select
-                                multiple
-                                clearable
-                                filterable
-                                class="flex-1"
-                                label-field="label"
-                                label-value="keyId"
-                                placeholder="选择该客户下的短信应用"
-                                loading={appLoading.value}
-                                options={appOptions.value}
-                                v-model:value={appKeyIds.value}
-                            ></form-base-select>
-                            <common-base-button type="primary" onClick={fetchBind}>
-                                绑定
-                            </common-base-button>
-                        </div>
-                    </common-base-authorize>
-                    <n-text depth="3">
-                        一个短信应用只能绑定一个同类型路由；已绑定其他路由的应用会改绑到当前路由；未绑定或绑定路由不可用时，按优先级走同类型路由。
-                    </n-text>
-                    <common-database-table
-                        flex-height={false}
-                        limit={0}
-                        bordered={false}
-                        total={state.total}
-                        columns={state.columns}
-                        v-model:page={state.page}
-                        v-model:size={state.size}
-                        v-model:select={state.select}
-                        v-model:data={state.dataSource}
-                        v-model:loading={state.loading}
-                        v-model:initialize={state.initialize}
-                        on-update:page={(page: number) => fetchRefresh({ page })}
-                        on-update:size={(size: number) => fetchRefresh({ page: 1, size })}
-                    >
-                        {{
-                            col_appKeyId: (data: Omix) => (
-                                <common-base-content
-                                    value={
-                                        [data.appKeyIdOptions?.appAlias, data.appKeyIdOptions?.appName].filter(Boolean).join(' - ') ||
-                                        data.appKeyId
-                                    }
-                                ></common-base-content>
-                            ),
-                            col_appId: (data: Omix) => <common-base-content value={data.appKeyIdOptions?.appId}></common-base-content>,
-                            col_type: (data: Omix) => <common-base-content value={data.appKeyIdOptions?.type}></common-base-content>,
-                            col_userKeyId: (data: Omix) => (
-                                <common-base-content
-                                    value={
-                                        [data.userKeyIdOptions?.alias, data.userKeyIdOptions?.name].filter(Boolean).join(' - ') ||
-                                        data.userKeyId
-                                    }
-                                ></common-base-content>
-                            ),
-                            col_modifyBy: (data: Omix) => <common-base-user element="text" data={data.modifyByOptions}></common-base-user>,
-                            col_command: (data: Omix) => (
-                                <common-base-authorize key-name="chat:nexus:sms:route:app">
-                                    <common-base-button text type="error" title="解绑" onClick={() => fetchUnbind(data)}>
-                                        解绑
-                                    </common-base-button>
-                                </common-base-authorize>
-                            )
-                        }}
-                    </common-database-table>
-                </div>
+                <form-base-container
+                    size="medium"
+                    ref={formRef}
+                    rules={state.rules}
+                    model={formState.value}
+                    disabled={state.loading}
+                    require-mark-placement="left"
+                >
+                    {formState.value.list.map((item: Omix, index: number) => (
+                        <nexus-sms-route-app-column
+                            index={index}
+                            key={item.uuid}
+                            app-options={appOptions.dataSource.value}
+                            v-model:node={item}
+                            fetch-adapter={fetchAdapter}
+                            v-model:list={formState.value.list}
+                        ></nexus-sms-route-app-column>
+                    ))}
+                </form-base-container>
             </common-dialog-provider>
         )
     }
