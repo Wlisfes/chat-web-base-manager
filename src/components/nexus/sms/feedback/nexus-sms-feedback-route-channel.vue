@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useChunkService, useFormService } from '@/hooks'
+import { useSelectService, useFormService, useChunkService, pick, omit, v4 } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -29,12 +29,25 @@ export default defineComponent({
                 /**路由类型：创建后不可修改**/
                 type: props.node.type,
                 /**已绑定的通道**/
+                list: Array.from({ length: 1 }, () => fetchAdapter()),
                 channelKeyIds: []
             },
             rules: {
                 channelKeyIds: { type: 'array', required: true, min: 1, message: '请选择要绑定的通道', trigger: 'blur' }
             }
         })
+
+        /**绑定通道数据转换**/
+        function fetchAdapter(item: Omix = {}) {
+            return {
+                uuid: v4(),
+                keyId: item.keyId,
+                channelKeyId: item.channelKeyId,
+                status: item.status ?? 'enable',
+                priority: item.priority,
+                weight: item.weight
+            }
+        }
 
         /**加载通道下拉和路由已绑定的通道**/
         async function fetchInitialization() {
