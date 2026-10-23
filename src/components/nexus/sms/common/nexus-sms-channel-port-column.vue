@@ -20,7 +20,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { node, list } = useVModels(props, emit)
         /**其他行已选端口不可再选，当前行自己的选项保持可选。**/
-        const portOptions = computed(() => {
+        const options = computed(() => {
             const selected = new Set(
                 (list.value ?? []).filter((item, index) => index !== props.index && item?.portKeyId).map(item => item.portKeyId)
             )
@@ -47,8 +47,9 @@ export default defineComponent({
                         label-field="showName"
                         label-value="keyId"
                         placeholder="请选择要绑定的端口，可输入 SIM、IMEI、ICCID 搜索"
-                        options={portOptions.value}
+                        options={options.value}
                         v-model:value={node.value.portKeyId}
+                        disabled={node.value.status === 'disable'}
                     ></form-base-select>
                 </form-base-column>
                 <form-base-column

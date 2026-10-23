@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, useChunkService, pick, omit, v4 } from '@/hooks'
+import { useSelectService, useFormService, omit, v4 } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -14,9 +14,6 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const { chunkOptions, fetchChunkService } = useChunkService(() => Service.httpBaseSrmRouteEnums(), {
-            immediate: false
-        })
         /**通道下拉**/
         const channelOptions = useSelectService(() => Service.httpBaseSrmSelectChannel(), {
             immediate: false
@@ -29,11 +26,7 @@ export default defineComponent({
                 /**路由类型：创建后不可修改**/
                 type: props.node.type,
                 /**已绑定的通道**/
-                list: Array.from({ length: 1 }, () => fetchAdapter()),
-                channelKeyIds: []
-            },
-            rules: {
-                channelKeyIds: { type: 'array', required: true, min: 1, message: '请选择要绑定的通道', trigger: 'blur' }
+                list: Array.from({ length: 1 }, () => fetchAdapter())
             }
         })
 
@@ -54,10 +47,9 @@ export default defineComponent({
             try {
                 return await Promise.all([
                     Service.httpBaseSrmListRouteChannel({ routeKeyId: props.node.keyId }),
-                    channelOptions.fetchRequest(),
-                    fetchChunkService()
+                    channelOptions.fetchRequest()
                 ]).then(async ([{ data }]) => {
-                    return await setForm({ channelKeyIds: (data ?? []).map((e: Omix) => e.channelKeyId) }).then(async () => {
+                    return await setForm({ list: (data ?? [{}]).map(fetchAdapter) }).then(async () => {
                         return await setState({ initialize: false })
                     })
                 })
@@ -77,7 +69,7 @@ export default defineComponent({
                 try {
                     await Service.httpBaseSrmBindRouteChannel({
                         routeKeyId: props.node.keyId,
-                        channelKeyIds: formState.value.channelKeyIds
+                        channels: formState.value.list.map((item: Omix) => omit(item, ['uuid']))
                     })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -94,7 +86,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={800}
+                width={850}
                 v-model:visible={state.visible}
                 v-model:loading={state.loading}
                 v-model:initialize={state.initialize}
@@ -109,34 +101,17 @@ export default defineComponent({
                     model={formState.value}
                     disabled={state.loading}
                     require-mark-placement="left"
-                    base-columns-template
-                    base-columns-template-props={{ class: 'gap-x-20', type: 'auto-fit', number: 320 }}
                 >
-                    <form-base-column label="路由别名" required>
-                        <form-base-input disabled v-model:value={formState.value.alias} />
-                    </form-base-column>
-                    <form-base-column label="路由类型" required>
-                        <form-base-select
-                            disabled
-                            label-field="label"
-                            label-value="value"
-                            placeholder="请选择路由类型，创建后不可修改"
-                            options={chunkOptions.value.routeTypeOptions}
-                            v-model:value={formState.value.type}
-                        ></form-base-select>
-                    </form-base-column>
-                    <form-base-column full label="通道" path="channelKeyIds">
-                        <form-base-select
-                            multiple
-                            max-tag-count={999}
-                            label-field="alias"
-                            label-value="keyId"
-                            placeholder="请选择路由要使用的通道"
-                            loading={channelOptions.loading.value}
-                            options={channelOptions.dataSource.value}
-                            v-model:value={formState.value.channelKeyIds}
-                        ></form-base-select>
-                    </form-base-column>
+                    {formState.value.list.map((item: Omix, index: number) => (
+                        <nexus-sms-route-channel-column
+                            index={index}
+                            key={item.uuid}
+                            v-model:node={item}
+                            fetch-adapter={fetchAdapter}
+                            v-model:list={formState.value.list}
+                            channel-options={channelOptions.dataSource.value}
+                        ></nexus-sms-route-channel-column>
+                    ))}
                 </form-base-container>
             </common-dialog-provider>
         )
