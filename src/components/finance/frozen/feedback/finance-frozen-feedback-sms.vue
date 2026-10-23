@@ -133,22 +133,22 @@ export default defineComponent({
                         ></form-base-input>
                     </form-base-column>
                     <form-base-column label="上行短信价格" path="upUsd">
-                        <form-base-number-input
+                        <form-base-input-number
                             v-model:value={formState.value.upUsd}
                             placeholder="请输入上行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="下行短信价格" path="downUsd">
-                        <form-base-number-input
+                        <form-base-input-number
                             v-model:value={formState.value.downUsd}
                             placeholder="请输入下行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="备注" path="remark">
                         <form-base-input

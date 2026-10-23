@@ -135,7 +135,7 @@ export default defineComponent({
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="上行调整" path="upValue">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             show-button={false}
                             max={inputOptions.value.max}
@@ -144,10 +144,10 @@ export default defineComponent({
                             suffix={<span>{inputOptions.value.unit}</span>}
                             v-model:value={formState.value.upValue}
                             placeholder="请输入上行调整值，不调整填 0"
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="下行调整" path="downValue">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             show-button={false}
                             max={inputOptions.value.max}
@@ -156,7 +156,7 @@ export default defineComponent({
                             suffix={<span>{inputOptions.value.unit}</span>}
                             v-model:value={formState.value.downValue}
                             placeholder="请输入下行调整值，不调整填 0"
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>

@@ -58,7 +58,7 @@ export default defineComponent({
                     path={`list[${props.index}].weight`}
                     rule={{ required: true, type: 'number', message: '请输入端口权重', trigger: 'blur' }}
                 >
-                    <form-base-number-input
+                    <form-base-input-number
                         min={1}
                         max={100}
                         show-button={false}
@@ -74,7 +74,7 @@ export default defineComponent({
                                 v-model:value={node.value.status}
                             />
                         }
-                    ></form-base-number-input>
+                    ></form-base-input-number>
                     {props.index === 0 ? (
                         <common-base-button
                             class="p-inline-6 m-is-14"

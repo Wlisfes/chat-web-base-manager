@@ -143,13 +143,13 @@ export default defineComponent({
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="优先级" path="priority" tooltip="同类型路由按优先级从小到大依次尝试，1 最优先，最大 100">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={1}
                             max={100}
                             precision={0}
                             placeholder="请输入优先级"
                             v-model:value={formState.value.priority}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="路由状态" path="status">
                         <form-base-select

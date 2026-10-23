@@ -167,23 +167,23 @@ export default defineComponent({
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="发送间隔" path="sendInterval">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             max={600000}
                             step={500}
                             suffix={<span>毫秒</span>}
                             placeholder="请输入发送间隔时间"
                             v-model:value={formState.value.sendInterval}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="最大重试" path="maxRetry">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             max={20}
                             suffix={<span>次</span>}
                             placeholder="请输入最大重试次数"
                             v-model:value={formState.value.maxRetry}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column full label="备注" path="remark">
                         <form-base-input
