@@ -30,11 +30,6 @@ export function httpBaseSrmColumnRoute(data: Omix) {
     return request({ url: '/api/srm/route/column', method: 'POST', data })
 }
 
-/**路由下拉选项**/
-export function httpBaseSrmSelectRoute() {
-    return request({ url: '/api/srm/route/select', method: 'GET' })
-}
-
 /**新增规则组**/
 export function httpBaseSrmCreateRouteRule(data: Omix) {
     return request({ url: '/api/srm/route/rule/create', method: 'POST', data })
@@ -60,16 +55,6 @@ export function httpBaseSrmBindRouteChannel(data: Omix) {
     return request({ url: '/api/srm/route/channel/bind', method: 'POST', data })
 }
 
-/**编辑路由通道优先级、权重和状态**/
-export function httpBaseSrmUpdateRouteChannel(data: Omix) {
-    return request({ url: '/api/srm/route/channel/update', method: 'POST', data })
-}
-
-/**从路由移除通道**/
-export function httpBaseSrmDeleteRouteChannel(data: Omix) {
-    return request({ url: '/api/srm/route/channel/delete', method: 'POST', data })
-}
-
 /**查询路由下的通道**/
 export function httpBaseSrmListRouteChannel(params: Omix) {
     return request({ url: '/api/srm/route/channel/list', method: 'GET', params })
@@ -78,9 +63,4 @@ export function httpBaseSrmListRouteChannel(params: Omix) {
 /**短信应用绑定路由**/
 export function httpBaseSrmBindRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/bind', method: 'POST', data })
-}
-
-/**分页查询短信应用路由绑定**/
-export function httpBaseSrmColumnRouteApp(data: Omix) {
-    return request({ url: '/api/srm/route/app/column', method: 'POST', data })
 }

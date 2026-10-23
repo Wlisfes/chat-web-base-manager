@@ -78,25 +78,3 @@ export function httpBaseSrmBindChannelPort(data: Omix) {
         data
     })
 }
-
-/**编辑通道端口权重和状态**/
-export function httpBaseSrmUpdateChannelPort(data: Omix) {
-    return request({
-        url: '/api/srm/channel/port/update',
-        method: 'POST',
-        data
-    })
-}
-
-
-/**通道端口分页列表**/
-export function httpBaseSrmColumnChannelPort(data: Omix) {
-    return request({
-        url: '/api/srm/channel/port/column',
-        method: 'POST',
-        data
-    })
-}
-
-
-
