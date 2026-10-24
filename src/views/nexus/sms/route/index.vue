@@ -23,8 +23,8 @@ export default defineComponent({
                     { title: '删除', key: 'chat:nexus:sms:route:delete' }
                 ],
                 formState: {
-                    /**路由名称或别名**/
-                    name: undefined,
+                    /**模糊搜索：路由名称或别名**/
+                    vague: undefined,
                     /**路由状态**/
                     status: undefined
                 },
@@ -135,11 +135,11 @@ export default defineComponent({
                             </common-base-button>
                         </common-base-authorize>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="路由">
+                    <common-database-search-column disabled prop="vague" label="路由">
                         <form-base-input
                             clearable
                             placeholder="路由名称或别名"
-                            v-model:value={formState.value.name}
+                            v-model:value={formState.value.vague}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
