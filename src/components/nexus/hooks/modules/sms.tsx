@@ -22,8 +22,8 @@ export async function fetchNexusSmsRoute(props: PropsState<Omix>) {
 }
 
 /**路由规则组管理**/
-export async function fetchNexusSmsRouteRule(props: PropsState<Omix>) {
-    return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-rule.vue').then(component => {
+export async function fetchNexusSmsRouteRules(props: PropsState<Omix>) {
+    return await import('@/components/nexus/sms/feedback/nexus-sms-feedback-route-rules.vue').then(component => {
         return createComponent(component.default, props)
     })
 }

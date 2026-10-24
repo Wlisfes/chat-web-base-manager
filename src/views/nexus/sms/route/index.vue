@@ -62,19 +62,19 @@ export default defineComponent({
             })
         }
 
-        /**路由规则组管理**/
-        async function fetchRouteRule(node: Omix) {
-            return await feedback.fetchNexusSmsRouteRule({
-                title: `路由规则：${node.name}`,
+        /**编辑路由规则**/
+        async function fetchRouteRules(node: Omix) {
+            return await feedback.fetchNexusSmsRouteRules({
+                title: `编辑路由规则：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
         }
 
-        /**编辑路由通道**/
+        /**绑定路由通道**/
         async function fetchRouteChannel(node: Omix) {
             return await feedback.fetchNexusSmsRouteChannel({
-                title: `编辑路由通道：${node.name}`,
+                title: `绑定路由通道：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
@@ -211,7 +211,7 @@ export default defineComponent({
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'primary', title: '规则', content: '规则' }}
-                                        onClick={() => fetchRouteRule(data)}
+                                        onClick={() => fetchRouteRules(data)}
                                     />
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[1].key}>
