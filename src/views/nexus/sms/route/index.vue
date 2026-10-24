@@ -32,8 +32,8 @@ export default defineComponent({
                     { title: '路由ID', key: 'keyId', width: 120, disabled: true },
                     { title: '路由别名', key: 'alias', width: 180, disabled: true },
                     { title: '路由名称', key: 'name', width: 180, disabled: true },
-                    { title: '绑定通道', key: 'channelCount', minWidth: 180 },
-                    { title: '绑定应用', key: 'appCount', minWidth: 180 },
+                    { title: '绑定通道', key: 'channels', minWidth: 180 },
+                    { title: '绑定应用', key: 'apps', minWidth: 180 },
                     { title: '优先级', key: 'priority', width: 120 },
                     { title: '路由类型', key: 'type', width: 120 },
                     { title: '路由状态', key: 'status', width: 120 },
@@ -178,25 +178,12 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
-                        col_ruleSummary: (data: Omix) =>
-                            data.ruleCount > 0 ? (
-                                <common-base-content value={data.ruleSummary}></common-base-content>
-                            ) : (
-                                <n-text type="warning">未配置规则，不接收短信</n-text>
-                            ),
-                        col_channelCount: (data: Omix) => (
-                            <n-text type={data.activeChannelCount > 0 ? 'default' : 'warning'}>
-                                {data.activeChannelCount} / {data.channelCount}
-                            </n-text>
+                        col_channels: (data: Omix) => (
+                            <common-base-content value={(data.channels ?? []).map((e: Omix) => e.channelOptions?.alias)} />
                         ),
-                        col_coverages: (data: Omix) => (
-                            <common-base-content
-                                value={(data.coverages ?? [])
-                                    .map((item: Omix) => `${item.countryKeyIdOptions?.cnName ?? item.countryKeyId} ${item.type}`)
-                                    .join('、')}
-                            ></common-base-content>
+                        col_apps: (data: Omix) => (
+                            <common-base-content value={(data.apps ?? []).map((e: Omix) => e.appOptions?.appAlias)} />
                         ),
-                        col_appCount: (data: Omix) => <span>{data.appCount}</span>,
                         col_ownerUserUid: (data: Omix) => (
                             <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
                         ),
