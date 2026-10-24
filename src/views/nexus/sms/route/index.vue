@@ -183,9 +183,6 @@ export default defineComponent({
                         col_apps: (data: Omix) => (
                             <common-base-content value={(data.apps ?? []).map((e: Omix) => e.appOptions?.appAlias)} />
                         ),
-                        col_ownerUserUid: (data: Omix) => (
-                            <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
-                        ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
                         },

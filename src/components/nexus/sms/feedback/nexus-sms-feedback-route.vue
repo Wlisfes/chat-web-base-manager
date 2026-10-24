@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useChunkService, useSelectService } from '@/hooks'
+import { useFormService, useChunkService } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -19,9 +19,6 @@ export default defineComponent({
         const { chunkOptions, fetchChunkService } = useChunkService(() => Service.httpBaseSrmRouteEnums(), {
             immediate: false
         })
-        const chengOptions = useSelectService(() => Service.httpBaseSkylineSelectUser(), {
-            immediate: false
-        })
         const { formState, formRef, state, setState, setForm, fetchReste, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
@@ -33,22 +30,19 @@ export default defineComponent({
                 priority: props.node.priority ?? 10,
                 /**路由状态**/
                 status: props.node.status ?? 'enable',
-                /**归属人：不选时新增默认当前登录人**/
-                ownerUserUid: props.node.ownerUserUid,
                 /**备注**/
                 remark: props.node.remark
             },
             rules: {
                 name: { required: true, message: '请输入路由名称', trigger: 'blur' },
                 type: { required: true, message: '请选择路由类型，创建后不可修改', trigger: 'blur' },
-                status: { required: true, message: '请选择路由状态', trigger: 'blur' },
-                ownerUserUid: { required: ['CREATE'].includes(props.command), message: '请选择归属人', trigger: 'blur' }
+                status: { required: true, message: '请选择路由状态', trigger: 'blur' }
             }
         })
 
         /**详情初始化**/
         async function fetchInitialization() {
-            const taskNames = [chengOptions.fetchRequest(), fetchChunkService()]
+            const taskNames = [fetchChunkService()]
             try {
                 if (['CREATE'].includes(props.command)) {
                     return await Promise.all(taskNames).finally(async () => {
@@ -118,19 +112,7 @@ export default defineComponent({
                         <form-base-input maxlength={64} placeholder="请输入路由名称" v-model:value={formState.value.name}></form-base-input>
                     </form-base-column>
                     <form-base-column label="路由别名">
-                        <form-base-input disabled placeholder="自动生成，如 LSK1233-MRKT-A001" value={props.node.alias}></form-base-input>
-                    </form-base-column>
-                    <form-base-column label="归属人" path="ownerUserUid">
-                        <form-base-select
-                            filterable
-                            label-value="uid"
-                            label-field="showName"
-                            placeholder="请选择归属人"
-                            disabled={['UPDATE'].includes(props.command)}
-                            loading={chengOptions.loading.value}
-                            options={chengOptions.dataSource.value}
-                            v-model:value={formState.value.ownerUserUid}
-                        ></form-base-select>
+                        <form-base-input disabled placeholder="自动生成，如 LSK1002001-MRKT" value={props.node.alias}></form-base-input>
                     </form-base-column>
                     <form-base-column label="路由类型" path="type">
                         <form-base-select
