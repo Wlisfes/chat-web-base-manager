@@ -26,16 +26,20 @@ export default defineComponent({
         const indeterminate = computed(() => {
             return state.columns.every(item => item.check) ? false : state.columns.some(item => item.check)
         })
-        /**初始化**/
-        onBeforeMount(fetchInitialize)
-        async function fetchInitialize() {
-            const allColumns = (props.columns ?? []).map(item => ({
+        /**按最初传入的列配置生成排序和显隐，check: false 默认隐藏。**/
+        function fetchDefaultColumns() {
+            return (props.columns ?? []).map(item => ({
                 key: item.key,
                 prop: item.key,
                 title: typeof item.title === 'function' ? item.key : item.title,
                 disabled: item.disabled ?? false,
                 check: item.disabled ? true : (item.check ?? true)
             }))
+        }
+        /**初始化**/
+        onBeforeMount(fetchInitialize)
+        async function fetchInitialize() {
+            const allColumns = fetchDefaultColumns()
             let columns: Array<Omix> = []
             if (customize.value.length > 0) {
                 /**保留已有排序顺序并合并新字段**/
@@ -71,16 +75,10 @@ export default defineComponent({
         async function fetchSyncCustomize() {
             return await nextTick(() => (customize.value = cloneDeep(state.columns)))
         }
-        /**重置排版规则**/
+        /**重置为最初传入的列排序和显隐规则。**/
         async function fetchReset() {
-            const columns = (props.columns ?? []).map(item => ({
-                key: item.key,
-                prop: item.key,
-                title: typeof item.title === 'function' ? item.key : item.title,
-                disabled: item.disabled ?? false,
-                check: true
-            }))
-            return await setState({ columns: cloneDeep(columns), checked: true }).then(fetchSyncCustomize)
+            const columns = fetchDefaultColumns()
+            return await setState({ columns: cloneDeep(columns), checked: columns.every(item => item.check) }).then(fetchSyncCustomize)
         }
         /**拖动排序变更后实时生效**/
         async function fetchDragUpdate() {
