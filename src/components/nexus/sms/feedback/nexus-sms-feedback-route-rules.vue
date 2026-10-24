@@ -57,12 +57,12 @@ export default defineComponent({
 
         /**提交参数转换**/
         function fetchStateAdapter(list: Array<Omix>) {
-            return list.map(item => {
+            return list.map((item, sort) => {
                 const conditions = item.conditions.map((e: Omix) => ({
                     ...omit(e),
                     value: (e.value ?? []).map((value: Omix) => String(value))
                 }))
-                return { ...omit(item), conditions }
+                return { ...omit(item), sort: sort + 1, conditions }
             })
         }
 
@@ -70,13 +70,13 @@ export default defineComponent({
         async function fetchInitialization() {
             try {
                 return await Promise.all([
-                    Service.httpBaseSrmListRouteRule({ routeKeyId: props.node.keyId }),
+                    Service.httpBaseSrmRouteResolver({ keyId: props.node.keyId }),
                     countryOptions.fetchRequest(),
                     fetchChunkService()
                 ]).then(async ([{ data }]) => {
-                    const rules = Array.isArray(data) && data.length > 0 ? data : [{}]
-                    await setForm({ list: rules.map(fetchAdapter) })
-                    return await setState({ initialize: false })
+                    return await setForm({ list: (data.rules ?? [{}]).map(fetchAdapter) }).then(async () => {
+                        return await setState({ initialize: false })
+                    })
                 })
             } catch (err) {
                 return await setState({ initialize: false }).then(async () => {
