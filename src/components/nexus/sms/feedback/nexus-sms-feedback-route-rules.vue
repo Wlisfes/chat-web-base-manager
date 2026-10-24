@@ -1,6 +1,6 @@
 <script lang="tsx">
-import { defineComponent, PropType, Fragment } from 'vue'
-import { useChunkService, useFormService, useSelectService, pick, omit, v4 } from '@/hooks'
+import { defineComponent, PropType } from 'vue'
+import { useChunkService, useFormService, useSelectService, omit, v4 } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -14,20 +14,22 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        /**路由枚举**/
-        const { chunkOptions } = useChunkService(() => Service.httpBaseSrmRouteEnums(), {
-            immediate: true
+        /**路由枚举、号段下拉**/
+        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseSrmRouteEnums(), {
+            request: e => Service.httpBaseSkylineChunkOptionColumn({ types: e.types }),
+            types: ['CHUNK_SRM_NUMBER_RANGE'],
+            immediate: false
         })
         /**方向下拉**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
-            immediate: true,
+            immediate: false,
             transform: data => data.map((item: Omix) => ({ ...item, value: String(item.keyId) }))
         })
         const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
                 /**规则列表**/
-                list: Array.from({ length: 5 }, () => fetchAdapter())
+                list: Array.from({ length: 1 }, () => fetchAdapter())
             }
         })
 
@@ -53,10 +55,29 @@ export default defineComponent({
             }
         }
 
-        /**加载方向、归属人选项、可绑定端口和已绑定端口。**/
+        /**提交参数转换**/
+        function fetchStateAdapter(list: Array<Omix>) {
+            return list.map(item => {
+                const conditions = item.conditions.map((e: Omix) => ({
+                    ...omit(e),
+                    value: (e.value ?? []).map((value: Omix) => String(value))
+                }))
+                return { ...omit(item), conditions }
+            })
+        }
+
+        /**加载方向、号段和当前路由已配置的规则组。**/
         async function fetchInitialization() {
             try {
-                return await setState({ initialize: false })
+                return await Promise.all([
+                    Service.httpBaseSrmListRouteRule({ routeKeyId: props.node.keyId }),
+                    countryOptions.fetchRequest(),
+                    fetchChunkService()
+                ]).then(async ([{ data }]) => {
+                    const rules = Array.isArray(data) && data.length > 0 ? data : [{}]
+                    await setForm({ list: rules.map(fetchAdapter) })
+                    return await setState({ initialize: false })
+                })
             } catch (err) {
                 return await setState({ initialize: false }).then(async () => {
                     return await fetchNotifyService({ type: 'error', title: err.message })
@@ -64,21 +85,21 @@ export default defineComponent({
             }
         }
 
-        /**绑定选中的端口。**/
+        /**按当前列表配置路由规则组。**/
         async function fetchSubmit() {
             return await fetchValidater().then(async error => {
                 if (error) {
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    // await Service.httpBaseSrmBindChannelPort({
-                    //     channelKeyId: props.node.keyId,
-                    //     list: formState.value.list.map((item: Omix) => omit(item, ['uuid']))
-                    // })
-                    // return await setState({ visible: false }).then(async () => {
-                    //     await emit('submit', { done: setState })
-                    //     return await fetchNotifyService({ title: `操作成功` })
-                    // })
+                    await Service.httpBaseSrmBindRouteRule({
+                        routeKeyId: props.node.keyId,
+                        list: fetchStateAdapter(formState.value.list)
+                    })
+                    return await setState({ visible: false }).then(async () => {
+                        await emit('submit', { done: setState })
+                        return await fetchNotifyService({ title: `操作成功` })
+                    })
                 } catch (err) {
                     return await setState({ loading: false, disabled: false }).then(async () => {
                         return await fetchNotifyService({ type: 'error', title: err.message })
@@ -110,7 +131,7 @@ export default defineComponent({
                         <n-empty class="p-block-32" description="还没有规则组，路由不会接收任何短信">
                             {{
                                 extra: () => (
-                                    <common-base-button secondary type="primary">
+                                    <common-base-button secondary type="primary" onClick={() => formState.value.list.push(fetchAdapter())}>
                                         新增规则组
                                     </common-base-button>
                                 )
@@ -122,13 +143,13 @@ export default defineComponent({
                             handle=".nexus-handle"
                             animation={200}
                             v-model={formState.value.list}
-                            //onUpdate={fetchDragUpdate}
                         >
                             {formState.value.list.map((item: Omix, index: number) => (
                                 <nexus-sms-route-rule-column
                                     index={index}
                                     key={item.uuid}
                                     v-model:node={item}
+                                    chunk-state={chunkState}
                                     chunk-options={chunkOptions.value}
                                     country-options={countryOptions.dataSource.value}
                                     fetch-adapter={fetchAdapter}

@@ -14,6 +14,8 @@ export default defineComponent({
         fetchAdapter: { type: Function, required: true },
         /**新增规则条件函数**/
         fetchConditionsAdapter: { type: Function, required: true },
+        /**字典枚举**/
+        chunkState: { type: Object as PropType<Omix>, default: () => ({}) },
         /**规则枚举**/
         chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
         /**方向下拉**/
@@ -113,8 +115,8 @@ export default defineComponent({
                         <form-base-column
                             class="flex-1"
                             show-label={false}
-                            path={`list[${props.index}].conditions[${position}].operator`}
-                            rule={{ required: true, trigger: 'blur', message: '请选择条件' }}
+                            path={`list[${props.index}].conditions[${position}].value`}
+                            rule={{ required: true, type: 'array', trigger: ['blur', 'change'], message: '请选择取值' }}
                         >
                             {item.field === 'country' ? (
                                 <form-base-select
@@ -130,7 +132,7 @@ export default defineComponent({
                                 <form-base-select
                                     multiple
                                     label-field="label"
-                                    label-value="label"
+                                    label-value="value"
                                     placeholder="选择短信类型，可多选"
                                     options={props.chunkOptions.typeOptions}
                                     v-model:value={item.value}
