@@ -55,11 +55,6 @@ export function httpBaseSrmBindRouteChannel(data: Omix) {
     return request({ url: '/api/srm/route/channel/bind', method: 'POST', data })
 }
 
-/**查询路由下的通道**/
-export function httpBaseSrmListRouteChannel(params: Omix) {
-    return request({ url: '/api/srm/route/channel/list', method: 'GET', params })
-}
-
 /**短信应用绑定路由**/
 export function httpBaseSrmBindRouteApp(data: Omix) {
     return request({ url: '/api/srm/route/app/bind', method: 'POST', data })
