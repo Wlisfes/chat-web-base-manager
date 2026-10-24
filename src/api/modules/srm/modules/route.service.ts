@@ -62,15 +62,6 @@ export function httpBaseSrmBindRouteRule(data: Omix) {
     })
 }
 
-/**查询路由下的规则组**/
-export function httpBaseSrmListRouteRule(params: Omix) {
-    return request({
-        url: '/api/srm/route/rule/list',
-        method: 'GET',
-        params
-    })
-}
-
 /**更新路由通道绑定**/
 export function httpBaseSrmBindRouteChannel(data: Omix) {
     return request({
