@@ -25,8 +25,6 @@ export default defineComponent({
                     userKeyId: undefined,
                     /**供应商别名**/
                     userAlias: undefined,
-                    /**simbank ID**/
-                    simbankKeyId: undefined,
                     /**simbank 别名**/
                     simbankAlias: undefined,
                     /**国家/地区主键列表**/
@@ -111,15 +109,7 @@ export default defineComponent({
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="simbankKeyId" label="simbank ID">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入simbank ID"
-                            v-model:value={formState.value.simbankKeyId}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
-                    <common-database-search-column prop="simbankAlias" label="simbank 别名">
+                    <common-database-search-column prop="simbankAlias" label="别名">
                         <form-base-input
                             clearable
                             placeholder="请输入simbank 别名"
