@@ -10,16 +10,23 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**需要调价的短信基础价格列表**/
-        items: { type: Array as PropType<Array<Omix>>, default: () => [] }
+        /**需要调价的基础价格列表**/
+        items: { type: Array as PropType<Array<Omix>>, default: () => [] },
+        /**价格类型：sms=短信基础价格（C 端），simbank=simbank 基础成本价格（R 端）**/
+        kind: { type: String as PropType<'sms' | 'simbank'>, default: 'sms' }
     },
     setup(props, { emit }) {
+        /**按价格类型选择接口**/
+        const api = {
+            enums: props.kind === 'simbank' ? Service.httpBaseFinanceFrozenSimbankEnums : Service.httpBaseFinanceFrozenSmsEnums,
+            fluctuate: props.kind === 'simbank' ? Service.httpBaseFinanceFluctuateFrozenSimbank : Service.httpBaseFinanceFluctuateFrozenSms
+        }
         /**国家/地区下拉数据**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: false
         })
         /**调价方式静态枚举**/
-        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseFinanceFrozenSmsEnums(), {
+        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => api.enums(), {
             immediate: false
         })
         /**表单实例**/
@@ -72,7 +79,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const { data } = await Service.httpBaseFinanceFluctuateFrozenSms({
+                    const { data } = await api.fluctuate({
                         countryKeyIds: formState.value.countryKeyIds,
                         mode: formState.value.mode,
                         upValue: formState.value.upValue,
