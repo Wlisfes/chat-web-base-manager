@@ -166,13 +166,13 @@ export default defineComponent({
                             ></form-base-select>
                         </form-base-column>
                         <form-base-column label="排序号" path="sort">
-                            <form-base-number-input
+                            <form-base-input-number
                                 min={0}
                                 step={10}
                                 precision={0}
                                 placeholder="请输入排序号"
                                 v-model:value={formState.value.sort}
-                            ></form-base-number-input>
+                            ></form-base-input-number>
                         </form-base-column>
                         <form-base-column label="是否允许更新" path="allowUpdate">
                             <n-switch

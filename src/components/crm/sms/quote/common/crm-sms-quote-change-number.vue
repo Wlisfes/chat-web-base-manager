@@ -61,7 +61,7 @@ export default defineComponent({
         }
         return () => (
             <div class="flex items-center gap-x-10 overflow-hidden">
-                <form-base-number-input
+                <form-base-input-number
                     class="flex-1 overflow-hidden"
                     min={0}
                     step={0.01}
@@ -71,7 +71,7 @@ export default defineComponent({
                     disabled={state.loading || node.value.status === 'deleted'}
                     v-model:value={state.value}
                     on-blur={fetchChnageNumber}
-                ></form-base-number-input>
+                ></form-base-input-number>
                 <div class="whitespace-nowrap min-w-150 overflow-hidden" v-html={change.value}></div>
             </div>
         )

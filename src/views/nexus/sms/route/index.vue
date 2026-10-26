@@ -23,27 +23,21 @@ export default defineComponent({
                     { title: '删除', key: 'chat:nexus:sms:route:delete' }
                 ],
                 formState: {
-                    /**路由名称或别名**/
-                    name: undefined,
+                    /**模糊搜索：路由名称或别名**/
+                    vague: undefined,
                     /**路由状态**/
                     status: undefined
                 },
                 columns: [
-                    { title: '路由ID', key: 'keyId', width: 100, disabled: true },
+                    { title: '路由ID', key: 'keyId', width: 120, disabled: true },
                     { title: '路由别名', key: 'alias', width: 180, disabled: true },
-                    { title: '路由名称', key: 'name', minWidth: 180, disabled: true },
-                    { title: '路由类型', key: 'type', width: 100 },
-                    { title: '排序', key: 'sort', width: 80 },
-                    { title: '路由状态', key: 'status', width: 100 },
-                    { title: '规则', key: 'ruleSummary', minWidth: 280 },
-                    { title: '通道（可用/全部）', key: 'channelCount', width: 140 },
-                    { title: '覆盖方向', key: 'coverages', minWidth: 260 },
-                    { title: '绑定应用', key: 'appCount', width: 100 },
-                    { title: '创建人', key: 'createBy', width: 120, check: false },
-                    { title: '创建时间', key: 'createTime', width: 160, check: false },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
-                    { title: '更新时间', key: 'modifyTime', width: 160 },
-                    { title: '备注', key: 'remark', minWidth: 200 }
+                    { title: '路由名称', key: 'name', minWidth: 240, disabled: true },
+                    { title: '绑定通道', key: 'channels', minWidth: 240 },
+                    { title: '绑定应用', key: 'apps', minWidth: 200 },
+                    { title: '优先级', key: 'priority', minWidth: 120 },
+                    { title: '路由类型', key: 'type', minWidth: 120 },
+                    { title: '路由状态', key: 'status', minWidth: 120 },
+                    { title: '备注', key: 'remark', width: 200, check: false }
                 ]
             }
         )
@@ -67,19 +61,19 @@ export default defineComponent({
             })
         }
 
-        /**路由规则组管理**/
-        async function fetchRouteRule(node: Omix) {
-            return await feedback.fetchNexusSmsRouteRule({
-                title: `路由规则：${node.name}`,
+        /**编辑路由规则**/
+        async function fetchRouteRules(node: Omix) {
+            return await feedback.fetchNexusSmsRouteRules({
+                title: `编辑路由规则：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
         }
 
-        /**路由通道管理**/
+        /**绑定路由通道**/
         async function fetchRouteChannel(node: Omix) {
             return await feedback.fetchNexusSmsRouteChannel({
-                title: `路由通道：${node.name}`,
+                title: `绑定路由通道：${node.name}`,
                 node,
                 onSubmit: () => fetchRefresh()
             })
@@ -92,11 +86,6 @@ export default defineComponent({
                 node,
                 onSubmit: () => fetchRefresh()
             })
-        }
-
-        /**选路预览**/
-        async function fetchRoutePreview() {
-            return await feedback.fetchNexusSmsRoutePreview({ title: '选路预览' })
         }
 
         /**删除路由**/
@@ -144,17 +133,12 @@ export default defineComponent({
                                 新增
                             </common-base-button>
                         </common-base-authorize>
-                        <common-base-authorize key-name="chat:nexus:sms:route:preview">
-                            <common-base-button class="min-w-80" onClick={fetchRoutePreview}>
-                                选路预览
-                            </common-base-button>
-                        </common-base-authorize>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="路由">
+                    <common-database-search-column disabled prop="vague" label="路由">
                         <form-base-input
                             clearable
                             placeholder="路由名称或别名"
-                            v-model:value={formState.value.name}
+                            v-model:value={formState.value.vague}
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
@@ -193,26 +177,12 @@ export default defineComponent({
                         col_status: (data: Omix) => (
                             <common-base-chunk value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                         ),
-                        col_ruleSummary: (data: Omix) =>
-                            data.ruleCount > 0 ? (
-                                <common-base-content value={data.ruleSummary}></common-base-content>
-                            ) : (
-                                <n-text type="warning">未配置规则，不接收短信</n-text>
-                            ),
-                        col_channelCount: (data: Omix) => (
-                            <n-text type={data.activeChannelCount > 0 ? 'default' : 'warning'}>
-                                {data.activeChannelCount} / {data.channelCount}
-                            </n-text>
+                        col_channels: (data: Omix) => (
+                            <common-base-content value={(data.channels ?? []).map((e: Omix) => e.channelOptions?.alias)} />
                         ),
-                        col_coverages: (data: Omix) => (
-                            <common-base-content
-                                value={(data.coverages ?? [])
-                                    .map((item: Omix) => `${item.countryKeyIdOptions?.cnName ?? item.countryKeyId} ${item.type}`)
-                                    .join('、')}
-                            ></common-base-content>
+                        col_apps: (data: Omix) => (
+                            <common-base-content value={(data.apps ?? []).map((e: Omix) => e.appOptions?.appAlias)} />
                         ),
-                        col_appCount: (data: Omix) =>
-                            data.type === 'targeted' ? <span>{data.appCount}</span> : <n-text depth="3">-</n-text>,
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
                         },
@@ -224,7 +194,7 @@ export default defineComponent({
                                 <common-base-authorize key-name={state.actions[0].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'primary', title: '规则', content: '规则' }}
-                                        onClick={() => fetchRouteRule(data)}
+                                        onClick={() => fetchRouteRules(data)}
                                     />
                                 </common-base-authorize>
                                 <common-base-authorize key-name={state.actions[1].key}>
@@ -236,8 +206,7 @@ export default defineComponent({
                                 <common-base-authorize key-name={state.actions[2].key}>
                                     <common-base-button
                                         {...{ text: true, type: 'primary', content: '应用' }}
-                                        title={data.type === 'targeted' ? '应用' : '通用路由不绑定短信应用'}
-                                        disabled={data.type !== 'targeted'}
+                                        title="应用"
                                         onClick={() => fetchRouteApp(data)}
                                     />
                                 </common-base-authorize>

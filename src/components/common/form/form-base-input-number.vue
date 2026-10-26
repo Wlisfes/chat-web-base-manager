@@ -4,7 +4,7 @@ import { enter, fetchWherer, isNotEmpty } from '@/utils'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
-    name: 'FormBaseNumberInput',
+    name: 'FormBaseInputNumber',
     emits: ['update:value', '-submit', '-change:value'],
     props: {
         /**绑定数据**/
@@ -31,7 +31,7 @@ export default defineComponent({
 
         return () => (
             <n-input-number
-                class="form-base-number-input w-full"
+                class="form-base-input-number w-full"
                 v-model:value={value.value}
                 onUpdate:value={fetchUpdate}
                 onKeydown={fetchSubmit}
@@ -49,3 +49,12 @@ export default defineComponent({
     }
 })
 </script>
+
+<style lang="scss" scoped>
+.form-base-input-number {
+    position: relative;
+    :deep(.n-input-wrapper):has(.form-base-switch) {
+        --n-padding-right: 3px;
+    }
+}
+</style>

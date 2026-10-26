@@ -14,9 +14,17 @@ export default defineComponent({
         /**操作指令**/
         command: { type: String as PropType<'CREATE' | 'UPDATE'>, default: 'CREATE' },
         /**编辑操作详情数据**/
-        node: { type: Object as PropType<Omix>, default: () => ({}) }
+        node: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**价格类型：sms=短信基础价格（C 端），simbank=simbank 基础成本价格（R 端）**/
+        kind: { type: String as PropType<'sms' | 'simbank'>, default: 'sms' }
     },
     setup(props, { emit }) {
+        /**按价格类型选择接口**/
+        const api = {
+            resolver: props.kind === 'simbank' ? Service.httpBaseFinanceFrozenSimbankResolver : Service.httpBaseFinanceFrozenSmsResolver,
+            create: props.kind === 'simbank' ? Service.httpBaseFinanceCreateFrozenSimbank : Service.httpBaseFinanceCreateFrozenSms,
+            update: props.kind === 'simbank' ? Service.httpBaseFinanceUpdateFrozenSimbank : Service.httpBaseFinanceUpdateFrozenSms
+        }
         /**国家/地区下拉数据**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: false
@@ -53,7 +61,7 @@ export default defineComponent({
                     return await setState({ initialize: false })
                 })
             } else {
-                taskNames.unshift(Service.httpBaseFinanceFrozenSmsResolver({ keyId: props.node.keyId }))
+                taskNames.unshift(api.resolver({ keyId: props.node.keyId }))
             }
             return await Promise.all(taskNames).then(async ([{ data }]) => {
                 try {
@@ -78,9 +86,9 @@ export default defineComponent({
                 try {
                     const formOptions: Omix = cloneDeep(formState.value)
                     if (['CREATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceCreateFrozenSms(formOptions)
+                        await api.create(formOptions)
                     } else if (['UPDATE'].includes(props.command)) {
-                        await Service.httpBaseFinanceUpdateFrozenSms({ ...formOptions, keyId: props.node.keyId })
+                        await api.update({ ...formOptions, keyId: props.node.keyId })
                     }
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -133,22 +141,22 @@ export default defineComponent({
                         ></form-base-input>
                     </form-base-column>
                     <form-base-column label="上行短信价格" path="upUsd">
-                        <form-base-number-input
+                        <form-base-input-number
                             v-model:value={formState.value.upUsd}
                             placeholder="请输入上行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="下行短信价格" path="downUsd">
-                        <form-base-number-input
+                        <form-base-input-number
                             v-model:value={formState.value.downUsd}
                             placeholder="请输入下行短信价格 (USD)"
                             min={0}
                             step={0.000001}
                             precision={6}
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="备注" path="remark">
                         <form-base-input

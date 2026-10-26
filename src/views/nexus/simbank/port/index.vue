@@ -48,6 +48,8 @@ export default defineComponent({
                     insertStatus: undefined,
                     /**端口状态**/
                     status: undefined,
+                    /**在线状态**/
+                    online: undefined,
                     /**激活方向**/
                     countryKeyId: undefined
                 },
@@ -62,6 +64,7 @@ export default defineComponent({
                     { title: '激活状态', key: 'activateStatus', width: 100 },
                     { title: '插卡状态', key: 'insertStatus', width: 100 },
                     { title: '端口状态', key: 'status', width: 100 },
+                    { title: '在线状态', key: 'online', width: 100 },
                     { title: '归属供应商', key: 'userKeyId', minWidth: 240 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', width: 160 },
@@ -251,6 +254,15 @@ export default defineComponent({
                             v-model:value={formState.value.status}
                         ></form-base-select>
                     </common-database-search-column>
+                    <common-database-search-column prop="online" label="在线状态">
+                        <form-base-select
+                            clearable
+                            placeholder="请选择在线状态"
+                            loading={chunkState.loading}
+                            options={chunkOptions.value.onlineOptions}
+                            v-model:value={formState.value.online}
+                        ></form-base-select>
+                    </common-database-search-column>
                     <common-database-search-column prop="countryKeyId" label="激活方向">
                         <form-base-select
                             clearable
@@ -302,6 +314,9 @@ export default defineComponent({
                         ),
                         col_status: (data: Omix) => (
                             <common-base-chunk bordered value={data.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
+                        ),
+                        col_online: (data: Omix) => (
+                            <common-base-chunk value={data.online} items={chunkOptions.value.onlineOptions}></common-base-chunk>
                         ),
                         col_userKeyId: (data: Omix) => (
                             <common-base-content ellipsis value={data.simbankOptions?.userKeyIdOptions?.name}>

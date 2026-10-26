@@ -55,14 +55,13 @@ export default defineComponent({
                 class={`flex flex-col ${props.className}`}
                 content-class="flex flex-col flex-1 overflow-hidden"
                 title-class="text-20! line-height-28 gap-8 select-none p-inline-20! p-block-20!"
-                action-class="flex flex-col overflow-hidden"
                 on-update:show={(show: boolean) => (visible.value = show)}
                 on-after-leave={() => emit('close')}
             >
                 {{
                     action: () => {
                         return !props.action ? null : (
-                            <common-base-element class="flex justify-center gap-12 p-inline-20 p-block-20">
+                            <common-base-element class="w-full flex justify-center gap-12 p-inline-20 p-block-20">
                                 {props.cancel && (
                                     <n-button class="min-w-80" size="medium" secondary focusable={false} onClick={() => emit('cancel')}>
                                         {props.cancel}

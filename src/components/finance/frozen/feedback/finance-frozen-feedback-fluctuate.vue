@@ -10,16 +10,23 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
-        /**需要调价的短信基础价格列表**/
-        items: { type: Array as PropType<Array<Omix>>, default: () => [] }
+        /**需要调价的基础价格列表**/
+        items: { type: Array as PropType<Array<Omix>>, default: () => [] },
+        /**价格类型：sms=短信基础价格（C 端），simbank=simbank 基础成本价格（R 端）**/
+        kind: { type: String as PropType<'sms' | 'simbank'>, default: 'sms' }
     },
     setup(props, { emit }) {
+        /**按价格类型选择接口**/
+        const api = {
+            enums: props.kind === 'simbank' ? Service.httpBaseFinanceFrozenSimbankEnums : Service.httpBaseFinanceFrozenSmsEnums,
+            fluctuate: props.kind === 'simbank' ? Service.httpBaseFinanceFluctuateFrozenSimbank : Service.httpBaseFinanceFluctuateFrozenSms
+        }
         /**国家/地区下拉数据**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: false
         })
         /**调价方式静态枚举**/
-        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => Service.httpBaseFinanceFrozenSmsEnums(), {
+        const { chunkOptions, chunkState, fetchChunkService } = useChunkService(e => api.enums(), {
             immediate: false
         })
         /**表单实例**/
@@ -72,7 +79,7 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const { data } = await Service.httpBaseFinanceFluctuateFrozenSms({
+                    const { data } = await api.fluctuate({
                         countryKeyIds: formState.value.countryKeyIds,
                         mode: formState.value.mode,
                         upValue: formState.value.upValue,
@@ -135,7 +142,7 @@ export default defineComponent({
                         ></form-base-select>
                     </form-base-column>
                     <form-base-column label="上行调整" path="upValue">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             show-button={false}
                             max={inputOptions.value.max}
@@ -144,10 +151,10 @@ export default defineComponent({
                             suffix={<span>{inputOptions.value.unit}</span>}
                             v-model:value={formState.value.upValue}
                             placeholder="请输入上行调整值，不调整填 0"
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                     <form-base-column label="下行调整" path="downValue">
-                        <form-base-number-input
+                        <form-base-input-number
                             min={0}
                             show-button={false}
                             max={inputOptions.value.max}
@@ -156,7 +163,7 @@ export default defineComponent({
                             suffix={<span>{inputOptions.value.unit}</span>}
                             v-model:value={formState.value.downValue}
                             placeholder="请输入下行调整值，不调整填 0"
-                        ></form-base-number-input>
+                        ></form-base-input-number>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>

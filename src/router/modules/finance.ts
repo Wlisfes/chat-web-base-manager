@@ -19,12 +19,17 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '汇率管理', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/finance/base/exchange/index.vue')
     },
-
     {
         path: '/finance/frozen/sms',
         name: 'FinanceFrozenSmsManager',
         meta: { title: '短信基础价格', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/finance/frozen/sms/index.vue')
+    },
+    {
+        path: '/finance/frozen/simbank',
+        name: 'FinanceFrozenSimbankManager',
+        meta: { title: 'simbank成本价格', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/finance/frozen/simbank/index.vue')
     },
     {
         path: '/finance/account/consumer',

@@ -1,7 +1,7 @@
 <script lang="tsx">
-import { defineComponent, PropType, ref, computed, onMounted } from 'vue'
-import { useChunkService, useState } from '@/hooks'
-import { fetchDialogService, fetchNotifyService } from '@/plugins'
+import { defineComponent, PropType } from 'vue'
+import { useSelectService, useFormService, omit, v4 } from '@/hooks'
+import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -14,118 +14,70 @@ export default defineComponent({
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
     setup(props, { emit }) {
-        const { state: dialog, setState: setDialog } = useState({ visible: true, loading: false, initialize: false })
-        const { chunkOptions } = useChunkService(() => Service.httpBaseSrmChannelEnums(), { immediate: true })
-        /**路由下的通道**/
-        const dataSource = ref<Array<Omix>>([])
-        const loading = ref(false)
-        /**全部通道**/
-        const channels = ref<Array<Omix>>([])
-        /**待加入的通道，可多选**/
-        const channelKeyIds = ref<Array<number>>([])
-        /**可加入的通道：未加入该路由的全部通道，方向和类型不限**/
-        const channelOptions = computed(() => {
-            const joined = new Set(dataSource.value.map(item => item.channelKeyId))
-            return channels.value.filter(item => !joined.has(item.keyId))
+        /**通道下拉**/
+        const channelOptions = useSelectService(() => Service.httpBaseSrmSelectChannel(), {
+            immediate: false
         })
-        const columns = [
-            { title: '通道别名', key: 'alias', minWidth: 180 },
-            { title: '方向', key: 'countryKeyId', width: 120 },
-            { title: '类型', key: 'type', width: 100 },
-            { title: '通道状态', key: 'channelStatus', width: 100 },
-            { title: '启用端口', key: 'enablePortCount', width: 90 },
-            { title: '优先级', key: 'priority', width: 120 },
-            { title: '权重', key: 'weight', width: 120 },
-            { title: '同级占比', key: 'ratio', width: 90 },
-            { title: '状态', key: 'status', width: 80 },
-            { title: '操作', key: 'command', width: 80 }
-        ]
-
-        onMounted(async () => {
-            await Promise.all([fetchRefresh(), fetchChannels()])
+        const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
+            callback: fetchInitialization,
+            formState: {
+                /**路由别名**/
+                alias: props.node.alias,
+                /**路由类型：创建后不可修改**/
+                type: props.node.type,
+                /**已绑定的通道**/
+                list: Array.from({ length: 1 }, () => fetchAdapter())
+            }
         })
 
-        /**查询全部通道**/
-        async function fetchChannels() {
-            try {
-                const { data } = await Service.httpBaseSrmSelectChannel()
-                channels.value = data ?? []
-            } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
+        /**绑定通道数据转换**/
+        function fetchAdapter(item: Omix = {}) {
+            return {
+                uuid: v4(),
+                keyId: item.keyId,
+                channelKeyId: item.channelKeyId,
+                status: item.status ?? 'enable',
+                priority: item.priority,
+                weight: item.weight
             }
         }
 
-        /**刷新路由通道**/
-        async function fetchRefresh() {
-            loading.value = true
+        /**加载通道下拉和路由已绑定的通道**/
+        async function fetchInitialization() {
             try {
-                const { data } = await Service.httpBaseSrmListRouteChannel({ routeKeyId: props.node.keyId })
-                dataSource.value = data ?? []
-            } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
-            } finally {
-                loading.value = false
-            }
-        }
-
-        /**加入通道：默认主通道，权重 100**/
-        async function fetchCreate() {
-            if (channelKeyIds.value.length === 0) return await fetchNotifyService({ type: 'warning', title: '请选择通道' })
-            try {
-                await Service.httpBaseSrmCreateRouteChannel({ routeKeyId: props.node.keyId, channelKeyIds: channelKeyIds.value })
-                channelKeyIds.value = []
-                await fetchNotifyService({ title: '操作成功' })
-                await emit('submit', { done: setDialog })
-            } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
-            }
-            return await fetchRefresh()
-        }
-
-        /**修改优先级、权重或状态**/
-        async function fetchUpdate(node: Omix, value: Omix) {
-            try {
-                await Service.httpBaseSrmUpdateRouteChannel({
-                    keyId: node.keyId,
-                    priority: node.priority,
-                    weight: node.weight,
-                    status: node.status,
-                    ...value
+                return await Promise.all([
+                    Service.httpBaseSrmRouteResolver({ keyId: props.node.keyId }),
+                    channelOptions.fetchRequest()
+                ]).then(async ([{ data }]) => {
+                    return await setForm({ list: (data.channels ?? [{}]).map(fetchAdapter) }).then(async () => {
+                        return await setState({ initialize: false })
+                    })
                 })
-                await emit('submit', { done: setDialog })
             } catch (err) {
-                await fetchNotifyService({ type: 'error', title: err.message })
-            }
-            return await fetchRefresh()
-        }
-
-        /**数字输入失焦后保存**/
-        async function fetchNumberBlur(node: Omix, key: 'priority' | 'weight', max: number, event: FocusEvent) {
-            const value = Number((event.target as HTMLInputElement).value)
-            if (Number.isInteger(value) && value >= 1 && value <= max && value !== node[key]) {
-                return await fetchUpdate(node, { [key]: value })
+                return await setState({ initialize: false }).then(async () => {
+                    return await fetchNotifyService({ type: 'error', title: err.message })
+                })
             }
         }
 
-        /**移除通道**/
-        async function fetchDelete(node: Omix) {
-            return await fetchDialogService({
-                title: '移除通道',
-                content: `确认把通道【${node.channelOptions?.alias ?? node.channelKeyId}】从路由移除吗？`,
-                async onSubmit(done: Function) {
-                    return await done({ loading: true }).then(async () => {
-                        try {
-                            await Service.httpBaseSrmDeleteRouteChannel({ keyId: node.keyId })
-                            return await done({ visible: false }).then(async () => {
-                                await fetchNotifyService({ title: '操作成功' })
-                                await emit('submit', { done: setDialog })
-                                return await fetchRefresh()
-                            })
-                        } catch (err) {
-                            return await done({ loading: false }).then(async () => {
-                                return await fetchNotifyService({ type: 'error', title: err.message })
-                            })
-                        }
+        /**更新路由通道绑定**/
+        async function fetchSubmit() {
+            return await fetchValidater().then(async error => {
+                if (error) {
+                    return await setState({ loading: false, disabled: false })
+                }
+                try {
+                    await Service.httpBaseSrmBindRouteChannel({
+                        routeKeyId: props.node.keyId,
+                        channels: formState.value.list.map((item: Omix) => omit(item, ['uuid']))
+                    })
+                    return await setState({ visible: false }).then(async () => {
+                        await emit('submit', { done: setState })
+                        return await fetchNotifyService({ title: `操作成功` })
+                    })
+                } catch (err) {
+                    return await setState({ loading: false, disabled: false }).then(async () => {
+                        return await fetchNotifyService({ type: 'error', title: err.message })
                     })
                 }
             })
@@ -134,111 +86,33 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1080}
-                show-footer={false}
-                v-model:visible={dialog.visible}
-                v-model:loading={dialog.loading}
-                v-model:initialize={dialog.initialize}
-                onCancel={() => setDialog({ visible: false })}
-                onClose={() => emit('close', { done: setDialog })}
+                width={850}
+                v-model:visible={state.visible}
+                v-model:loading={state.loading}
+                v-model:initialize={state.initialize}
+                onSubmit={fetchSubmit}
+                onCancel={() => setState({ visible: false })}
+                onClose={() => emit('close', { done: setState })}
             >
-                <div class="flex flex-col gap-12">
-                    <common-base-authorize key-name="chat:nexus:sms:route:channel">
-                        <div class="flex gap-12">
-                            <form-base-select
-                                clearable
-                                filterable
-                                class="flex-1"
-                                multiple
-                                max-tag-count="responsive"
-                                label-field="alias"
-                                label-value="keyId"
-                                placeholder="选择通道加入路由，可多选，方向和类型不限"
-                                options={channelOptions.value}
-                                v-model:value={channelKeyIds.value}
-                            ></form-base-select>
-                            <common-base-button type="primary" onClick={fetchCreate}>
-                                加入通道
-                            </common-base-button>
-                        </div>
-                    </common-base-authorize>
-                    <n-text depth="3">
-                        选路时只在同方向、同类型的通道之间比较：优先级 1
-                        为主通道，同优先级按权重分流，该级没有可用通道时降级；全部不可用时尝试下一条路由。
-                    </n-text>
-                    <common-database-table
-                        flex-height={false}
-                        limit={0}
-                        bordered={false}
-                        pagination={false}
-                        columns={columns}
-                        data={dataSource.value}
-                        loading={loading.value}
-                        initialize={false}
-                    >
-                        {{
-                            col_alias: (data: Omix) => <common-base-content value={data.channelOptions?.alias}></common-base-content>,
-                            col_countryKeyId: (data: Omix) => (
-                                <common-base-content
-                                    value={data.channelOptions?.countryKeyIdOptions?.cnName ?? data.channelOptions?.countryKeyId}
-                                ></common-base-content>
-                            ),
-                            col_type: (data: Omix) => (
-                                <common-base-chunk
-                                    value={data.channelOptions?.type}
-                                    items={chunkOptions.value.typeOptions}
-                                ></common-base-chunk>
-                            ),
-                            col_channelStatus: (data: Omix) => (
-                                <common-base-chunk
-                                    bordered
-                                    value={data.channelOptions?.status}
-                                    items={chunkOptions.value.statusOptions}
-                                ></common-base-chunk>
-                            ),
-                            col_enablePortCount: (data: Omix) => (
-                                <n-text type={data.channelOptions?.enablePortCount > 0 ? 'default' : 'warning'}>
-                                    {data.channelOptions?.enablePortCount ?? 0}
-                                </n-text>
-                            ),
-                            col_priority: (data: Omix) => (
-                                <n-input-number
-                                    size="small"
-                                    min={1}
-                                    max={9}
-                                    value={data.priority}
-                                    onBlur={(event: FocusEvent) => fetchNumberBlur(data, 'priority', 9, event)}
-                                ></n-input-number>
-                            ),
-                            col_weight: (data: Omix) => (
-                                <n-input-number
-                                    size="small"
-                                    min={1}
-                                    max={10000}
-                                    value={data.weight}
-                                    onBlur={(event: FocusEvent) => fetchNumberBlur(data, 'weight', 10000, event)}
-                                ></n-input-number>
-                            ),
-                            col_ratio: (data: Omix) => (
-                                <n-text type={data.active ? 'default' : 'warning'}>{data.active ? `${data.ratio}%` : '不可用'}</n-text>
-                            ),
-                            col_status: (data: Omix) => (
-                                <n-switch
-                                    size="small"
-                                    value={data.status === 'enable'}
-                                    onUpdate:value={(value: boolean) => fetchUpdate(data, { status: value ? 'enable' : 'disable' })}
-                                ></n-switch>
-                            ),
-                            col_command: (data: Omix) => (
-                                <common-base-authorize key-name="chat:nexus:sms:route:channel">
-                                    <common-base-button text type="error" title="移除" onClick={() => fetchDelete(data)}>
-                                        移除
-                                    </common-base-button>
-                                </common-base-authorize>
-                            )
-                        }}
-                    </common-database-table>
-                </div>
+                <form-base-container
+                    size="medium"
+                    ref={formRef}
+                    rules={state.rules}
+                    model={formState.value}
+                    disabled={state.loading}
+                    require-mark-placement="left"
+                >
+                    {formState.value.list.map((item: Omix, index: number) => (
+                        <nexus-sms-route-channel-column
+                            index={index}
+                            key={item.uuid}
+                            v-model:node={item}
+                            fetch-adapter={fetchAdapter}
+                            v-model:list={formState.value.list}
+                            channel-options={channelOptions.dataSource.value}
+                        ></nexus-sms-route-channel-column>
+                    ))}
+                </form-base-container>
             </common-dialog-provider>
         )
     }
