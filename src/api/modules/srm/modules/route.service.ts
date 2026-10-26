@@ -79,3 +79,12 @@ export function httpBaseSrmBindRouteApp(data: Omix) {
         data
     })
 }
+
+/**分页查询规则组**/
+export function httpBaseSrmColumnRouteRule(data: Omix) {
+    return request({
+        url: '/api/srm/route/rule/column',
+        method: 'POST',
+        data
+    })
+}
