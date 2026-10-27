@@ -15,8 +15,8 @@ export default defineComponent({
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseFinanceColumnFrozenSms({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chat:finance:frozen:sms',
-                actions: [{ title: '编辑', key: 'chat:finance:frozen:sms:update' }],
+                keyName: 'chat:finance:frozen:crm:sms',
+                actions: [{ title: '编辑', key: 'chat:finance:frozen:crm:sms:update' }],
                 formState: {
                     /**国家/地区**/
                     countryKeyId: undefined,
