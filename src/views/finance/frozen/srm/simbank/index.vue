@@ -15,8 +15,8 @@ export default defineComponent({
         const { formRef, formState, state, instState, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseFinanceColumnFrozenSimbank({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chat:finance:frozen:simbank',
-                actions: [{ title: '编辑', key: 'chat:finance:frozen:simbank:update' }],
+                keyName: 'chat:finance:frozen:srm:simbank',
+                actions: [{ title: '编辑', key: 'chat:finance:frozen:srm:simbank:update' }],
                 formState: {
                     /**国家/地区**/
                     countryKeyId: undefined,

@@ -44,8 +44,9 @@ export default defineComponent({
                     { title: '归属部门', key: 'ownerOrganizations', minWidth: 140 },
                     { title: '等级', key: 'level', width: 100 },
                     { title: '币种', key: 'currency', width: 100 },
-                    { title: '余额', key: 'balance', width: 120 },
-                    { title: '信用额度', key: 'credit', width: 120 },
+                    { title: '余额(USD)', key: 'balanceUsd', width: 130 },
+                    { title: '累计成本(USD)', key: 'billedUsd', width: 140 },
+                    { title: '计费条数', key: 'billCount', width: 110 },
                     { title: '备注', key: 'remark', minWidth: 200, check: false },
                     { title: '创建时间', key: 'createTime', width: 160 }
                 ]
@@ -171,11 +172,11 @@ export default defineComponent({
                                 items={props.chunkState.CHUNK_SRM_USER_SOURCE.options}
                             ></common-base-chunk>
                         ),
-                        col_balance: (data: Omix) => {
-                            return <common-base-number shrink value={data.balance}></common-base-number>
+                        col_balanceUsd: (data: Omix) => {
+                            return <common-base-number shrink value={data.balanceUsd}></common-base-number>
                         },
-                        col_credit: (data: Omix) => {
-                            return <common-base-number shrink value={data.credit}></common-base-number>
+                        col_billedUsd: (data: Omix) => {
+                            return <common-base-number shrink value={data.billedUsd}></common-base-number>
                         },
                         col_ownerUserUid: (data: Omix) => {
                             return <common-base-user element="text" data={data.ownerUserUidOptions}></common-base-user>
