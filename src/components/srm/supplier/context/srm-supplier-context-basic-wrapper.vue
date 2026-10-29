@@ -71,9 +71,7 @@ export default defineComponent({
                         <common-base-columns-wrapper label-class={props.labelClass} label="余额：">
                             <common-base-number shrink value={faseNode.value.balance}></common-base-number>
                         </common-base-columns-wrapper>
-                        <common-base-columns-wrapper label-class={props.labelClass} label="余额(USD)：">
-                            <common-base-number shrink value={faseNode.value.balanceUsd}></common-base-number>
-                        </common-base-columns-wrapper>
+
                         <common-base-columns-wrapper label-class={props.labelClass} label="信用额度：">
                             <common-base-number shrink value={faseNode.value.credit}></common-base-number>
                         </common-base-columns-wrapper>
