@@ -36,8 +36,6 @@ export default defineComponent({
                     { title: '激活/释放', key: 'chat:nexus:simbank:port:activate' }
                 ],
                 formState: {
-                    /**SIM/ICCID/IMEI/端口编号/设备名称/别名/MAC/设备ID**/
-                    name: undefined,
                     /**所属设备**/
                     simbankKeyId: undefined,
                     /**归属供应商**/
@@ -55,12 +53,12 @@ export default defineComponent({
                 },
                 columns: [
                     { title: '端口ID', key: 'keyId', width: 100, disabled: true },
-                    { title: '端口编号', key: 'port', width: 100, disabled: true },
                     { title: '设备名称', key: 'simbankKeyId', width: 160, disabled: true },
                     { title: 'SIM卡号', key: 'sim', width: 160 },
                     { title: 'ICCID', key: 'iccid', width: 200 },
                     { title: 'IMEI', key: 'imei', width: 160 },
                     { title: '激活方向', key: 'countryKeyId', width: 180 },
+                    { title: '端口编号', key: 'port', width: 100 },
                     { title: '激活状态', key: 'activateStatus', width: 100 },
                     { title: '插卡状态', key: 'insertStatus', width: 100 },
                     { title: '端口状态', key: 'status', width: 100 },
@@ -68,9 +66,9 @@ export default defineComponent({
                     { title: '归属供应商', key: 'userKeyId', minWidth: 240 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', width: 160 },
-                    { title: '创建人', key: 'createBy', width: 120 },
-                    { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '创建人', key: 'createBy', width: 120, check: false },
+                    { title: '创建时间', key: 'createTime', width: 160, check: false },
+                    { title: '更新人', key: 'modifyBy', width: 120, check: false },
                     { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
@@ -195,14 +193,6 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-column disabled prop="name" label="关键词">
-                        <form-base-input
-                            clearable
-                            placeholder="SIM/ICCID/IMEI/端口/设备"
-                            v-model:value={formState.value.name}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
                     <common-database-search-column prop="simbankKeyId" label="所属设备">
                         <form-base-select
                             clearable
