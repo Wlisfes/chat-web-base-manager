@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, pick, omit, v4 } from '@/hooks'
+import { useSelectService, useFormService, pick, omit, v4, fetchNotArrayr } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -47,7 +47,7 @@ export default defineComponent({
                     Service.httpBaseSrmChannelResolver({ keyId: props.node.keyId }),
                     simbankPortOptions.fetchRequest()
                 ]).then(async ([{ data }]) => {
-                    return await setForm({ list: (data.list ?? [{}]).map(fetchAdapter) }).then(async () => {
+                    return await setForm({ list: fetchNotArrayr((data.list, [{}])).map(fetchAdapter) }).then(async () => {
                         return await setState({ initialize: false })
                     })
                 })

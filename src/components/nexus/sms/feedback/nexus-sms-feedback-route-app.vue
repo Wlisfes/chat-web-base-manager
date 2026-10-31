@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, omit, v4 } from '@/hooks'
+import { useSelectService, useFormService, omit, v4, fetchNotArrayr } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -46,8 +46,7 @@ export default defineComponent({
             try {
                 return await Promise.all([Service.httpBaseSrmRouteResolver({ keyId: props.node.keyId }), appOptions.fetchRequest()]).then(
                     async ([{ data }]) => {
-                        const rows = data?.apps ?? []
-                        return await setForm({ list: (rows.length ? rows : [{}]).map(fetchAdapter) }).then(async () => {
+                        return await setForm({ list: fetchNotArrayr(data?.apps, [{}]).map(fetchAdapter) }).then(async () => {
                             return await setState({ initialize: false })
                         })
                     }

@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useSelectService, useFormService, omit, v4 } from '@/hooks'
+import { useSelectService, useFormService, omit, v4, fetchNotArrayr } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -49,7 +49,7 @@ export default defineComponent({
                     Service.httpBaseSrmRouteResolver({ keyId: props.node.keyId }),
                     channelOptions.fetchRequest()
                 ]).then(async ([{ data }]) => {
-                    return await setForm({ list: (data.channels ?? [{}]).map(fetchAdapter) }).then(async () => {
+                    return await setForm({ list: fetchNotArrayr(data.channels, [{}]).map(fetchAdapter) }).then(async () => {
                         return await setState({ initialize: false })
                     })
                 })

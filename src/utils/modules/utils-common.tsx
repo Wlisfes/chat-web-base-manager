@@ -125,6 +125,14 @@ export function fetchByte(byte: number, dec: number = 2) {
     return parseFloat((byte / Math.pow(k, i)).toFixed(dm)) + sizes[i]
 }
 
+/**数组判断空默认值**/
+export function fetchNotArrayr<T extends Omix>(list: Array<T>, defaultValue?: Array<T>) {
+    if (!isArray(list) || (isArray(list) && list.length === 0)) {
+        return defaultValue ?? []
+    }
+    return list ?? defaultValue ?? []
+}
+
 /**视口判断**/
 export function fetchScreenResize(
     data: Partial<{ width: number; height: number }> = {}
