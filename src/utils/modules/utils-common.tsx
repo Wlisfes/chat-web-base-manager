@@ -200,3 +200,24 @@ export function fetchOrganizationChartNodes<T extends Omix>(nodes: Array<T> = []
     walk(nodes)
     return result as Array<T>
 }
+
+/**快捷方式**/
+export function fetchShortcuts<T extends '近1小时' | '近3小时' | '近24小时' | '近3天' | '近7天' | '近30天'>(type: T | Array<T>) {
+    const shortcutRanges = {
+        近1小时: () => [moment().subtract(1, 'hour').valueOf(), moment().endOf('day').valueOf()] as [number, number],
+        近3小时: () => [moment().subtract(3, 'hour').valueOf(), moment().endOf('day').valueOf()] as [number, number],
+        近24小时: () => [moment().subtract(24, 'hour').valueOf(), moment().endOf('day').valueOf()] as [number, number],
+        近3天: () => [moment().subtract(2, 'day').startOf('day').valueOf(), moment().endOf('day').valueOf()] as [number, number],
+        近7天: () => [moment().subtract(6, 'day').startOf('day').valueOf(), moment().endOf('day').valueOf()] as [number, number],
+        近30天: () => [moment().subtract(29, 'day').startOf('day').valueOf(), moment().endOf('day').valueOf()] as [number, number]
+    }
+    if (isString(type)) {
+        return {
+            startTime: moment().subtract(1, 'hour').valueOf(),
+            endTime: moment().endOf('day').valueOf()
+        }
+    } else if (isArray(type) && type.length > 0) {
+        return Object.fromEntries(type.map(name => [name, shortcutRanges[name]]))
+    }
+    return {}
+}
