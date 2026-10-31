@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useChunkService, useSelectService, pick } from '@/hooks'
+import { useColumnService, useChunkService, useSelectService } from '@/hooks'
+import { pick, fetchShortcuts } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -19,7 +20,7 @@ export default defineComponent({
             immediate: true
         })
         /**设备下拉**/
-        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords || undefined }), {
+        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords }), {
             immediate: true
         })
         /**表格实例**/
@@ -46,10 +47,10 @@ export default defineComponent({
                     sendStatus: undefined,
                     /**MCC**/
                     mcc: undefined,
-                    /**发送时间起始**/
-                    startTime: undefined,
-                    /**发送时间结束**/
-                    endTime: undefined
+                    /**发送时间起始：默认近1小时**/
+                    startTime: fetchShortcuts('近24小时').startTime,
+                    /**发送时间结束：默认当天 23:59:59**/
+                    endTime: fetchShortcuts('近24小时').endTime
                 },
                 columns: [
                     { title: '消息ID', key: 'msgId', width: 200, disabled: true },
@@ -87,20 +88,20 @@ export default defineComponent({
                     v-model:database={state.database}
                     v-model:formState={formState.value}
                     on-update:database={instOptions.fetchUpdateDatabase}
-                    on-restore={instOptions.fetchRestore}
+                    on-restore={() => instOptions.fetchRestore(fetchShortcuts('近24小时'))}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-column prop="startTime" label="发送时间" span={2}>
+                    <common-database-search-column disabled prop="startTime" label="发送时间" span={2}>
                         <form-base-date-picker
-                            clearable
                             type="datetimerange"
                             start-placeholder="起始时间"
                             end-placeholder="结束时间"
+                            functions={['近1小时', '近3小时', '近24小时', '近3天', '近7天', '近30天']}
                             v-model:startTime={formState.value.startTime}
                             v-model:endTime={formState.value.endTime}
                         ></form-base-date-picker>
                     </common-database-search-column>
-                    <common-database-search-column prop="msgId" label="消息ID">
+                    <common-database-search-column disabled prop="msgId" label="消息ID">
                         <form-base-input
                             clearable
                             placeholder="请输入消息ID"
@@ -108,7 +109,7 @@ export default defineComponent({
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="mcc" label="MCC">
+                    <common-database-search-column disabled prop="mcc" label="MCC">
                         <form-base-input
                             clearable
                             placeholder="请输入MCC"

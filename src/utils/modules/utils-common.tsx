@@ -213,8 +213,8 @@ export function fetchShortcuts<T extends '近1小时' | '近3小时' | '近24小
     }
     if (isString(type)) {
         return {
-            startTime: moment().subtract(1, 'hour').valueOf(),
-            endTime: moment().endOf('day').valueOf()
+            startTime: moment().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+            endTime: moment().endOf('day').format('YYYY-MM-DD HH:mm:ss')
         }
     } else if (isArray(type) && type.length > 0) {
         return Object.fromEntries(type.map(name => [name, shortcutRanges[name]]))
