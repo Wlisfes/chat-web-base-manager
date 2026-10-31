@@ -17,13 +17,13 @@ export default defineComponent({
             immediate: true
         })
         /**设备下拉**/
-        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords || undefined }), {
-            immediate: true,
-            transform: list => list.map(item => ({ ...item, label: `[${item.alias}] ${item.name}` }))
+        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords }), {
+            immediate: true
         })
         /**激活方向下拉**/
         const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
-            immediate: true
+            immediate: true,
+            transform: s => s.map(e => ({ ...e, value: e.keyId, label: e.showName }))
         })
         /**表格实例**/
         const { formRef, formState, state, router, instState, instOptions, fetchRefresh } = useColumnService(
@@ -193,13 +193,13 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
-                    <common-database-search-column prop="simbankKeyId" label="所属设备">
+                    <common-database-search-column prop="simbankKeyId" label="设备别名">
                         <form-base-select
                             clearable
                             filterable
-                            label-field="label"
+                            label-field="alias"
                             label-value="keyId"
-                            placeholder="请选择所属设备"
+                            placeholder="请选择设备别名"
                             loading={simbankOptions.loading.value}
                             options={simbankOptions.dataSource.value}
                             v-model:value={formState.value.simbankKeyId}
@@ -295,10 +295,15 @@ export default defineComponent({
                                 items={chunkOptions.value.activateStatusOptions}
                             ></common-base-chunk>
                         ),
-                        col_countryKeyId: (data: Omix) => {
-                            const country = countryOptions.dataSource.value.find((item: Omix) => item.keyId === data.countryKeyId)
-                            return <common-base-content value={country?.showName}></common-base-content>
-                        },
+
+                        col_countryKeyId: (data: Omix) => (
+                            <common-base-chunk
+                                mode="text"
+                                ellipsis
+                                value={data.countryKeyId}
+                                items={countryOptions.dataSource.value}
+                            ></common-base-chunk>
+                        ),
                         col_insertStatus: (data: Omix) => (
                             <common-base-chunk value={data.insertStatus} items={chunkOptions.value.insertStatusOptions}></common-base-chunk>
                         ),
@@ -313,23 +318,18 @@ export default defineComponent({
                                 <n-text
                                     class="cursor-pointer"
                                     type="info"
-                                    onClick={(e: MouseEvent) =>
-                                        data.simbankOptions?.userKeyIdOptions?.keyId &&
-                                        fetchJumpContextSupplier(e, data.simbankOptions.userKeyIdOptions)
-                                    }
+                                    onClick={(e: MouseEvent) => fetchJumpContextSupplier(e, data.simbankOptions.userKeyIdOptions)}
                                 >
                                     {data.simbankOptions?.userKeyIdOptions?.name}
                                 </n-text>
                             </common-base-content>
                         ),
-                        col_ownerUserUid: (data: Omix) => {
-                            return <common-base-user element="text" data={data.simbankOptions?.ownerUserUidOptions}></common-base-user>
-                        },
-                        col_ownerOrganizations: (data: Omix) => {
-                            return (
-                                <common-base-content value={data.simbankOptions?.ownerUserUidOptions?.organizations}></common-base-content>
-                            )
-                        },
+                        col_ownerUserUid: (data: Omix) => (
+                            <common-base-user element="text" data={data.simbankOptions?.ownerUserUidOptions}></common-base-user>
+                        ),
+                        col_ownerOrganizations: (data: Omix) => (
+                            <common-base-content value={data.simbankOptions?.ownerUserUidOptions?.organizations}></common-base-content>
+                        ),
                         col_createBy: (data: Omix) => {
                             return <common-base-user element="text" data={data.createByOptions}></common-base-user>
                         },
