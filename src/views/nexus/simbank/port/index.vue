@@ -17,7 +17,7 @@ export default defineComponent({
             immediate: true
         })
         /**设备下拉**/
-        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ name: e.keywords || undefined }), {
+        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords || undefined }), {
             immediate: true,
             transform: list => list.map(item => ({ ...item, label: `[${item.alias}] ${item.name}` }))
         })

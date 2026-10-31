@@ -14,10 +14,13 @@ export default defineComponent({
         const userOptions = useSelectService(e => Service.httpBaseSrmSelectUser(), {
             immediate: true
         })
+        /**通道下拉**/
+        const channelOptions = useSelectService(() => Service.httpBaseSrmSelectChannel(), {
+            immediate: true
+        })
         /**设备下拉**/
-        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ name: e.keywords || undefined }), {
-            immediate: true,
-            transform: list => list.map(item => ({ ...item, label: `[${item.alias}] ${item.name}` }))
+        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords || undefined }), {
+            immediate: true
         })
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
@@ -25,6 +28,10 @@ export default defineComponent({
             {
                 keyName: 'chat:nexus:simbank:message',
                 formState: {
+                    /**消息ID**/
+                    msgId: undefined,
+                    /**通道**/
+                    channelKeyId: undefined,
                     /**所属设备**/
                     simbankKeyId: undefined,
                     /**归属供应商**/
@@ -79,11 +86,40 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
+                    <common-database-search-column prop="msgId" label="消息ID">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入消息ID"
+                            v-model:value={formState.value.msgId}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column prop="mcc" label="MCC">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入MCC"
+                            maxlength={4}
+                            v-model:value={formState.value.mcc}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column prop="channelKeyId" label="通道">
+                        <form-base-select
+                            clearable
+                            filterable
+                            label-field="alias"
+                            label-value="keyId"
+                            placeholder="请选择通道"
+                            loading={channelOptions.loading.value}
+                            options={channelOptions.dataSource.value}
+                            v-model:value={formState.value.channelKeyId}
+                        ></form-base-select>
+                    </common-database-search-column>
                     <common-database-search-column prop="simbankKeyId" label="设备别名">
                         <form-base-select
                             clearable
                             filterable
-                            label-field="label"
+                            label-field="alias"
                             label-value="keyId"
                             placeholder="请选择设备别名"
                             loading={simbankOptions.loading.value}
@@ -139,15 +175,6 @@ export default defineComponent({
                             v-model:value={formState.value.encoding}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="mcc" label="MCC">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入MCC"
-                            maxlength={4}
-                            v-model:value={formState.value.mcc}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
                 </common-database-search>
                 <common-database-table
                     show-settings
@@ -176,7 +203,12 @@ export default defineComponent({
                             <common-base-chunk value={data.encoding} items={chunkOptions.value.encodingOptions}></common-base-chunk>
                         ),
                         col_sendStatus: (data: Omix) => (
-                            <common-base-chunk value={data.sendStatus} items={chunkOptions.value.sendStatusOptions}></common-base-chunk>
+                            <div class="flex items-center gap-x-5 overflow-hidden">
+                                <common-base-chunk value={data.sendStatus} items={chunkOptions.value.sendStatusOptions}></common-base-chunk>
+                                {['rejected', 'failed'].includes(data.sendStatus) && (
+                                    <common-base-hint-tooltip>{data.statusMessage}</common-base-hint-tooltip>
+                                )}
+                            </div>
                         ),
                         col_cost: (data: Omix) => {
                             return <common-base-number shrink value={data.cost}></common-base-number>
