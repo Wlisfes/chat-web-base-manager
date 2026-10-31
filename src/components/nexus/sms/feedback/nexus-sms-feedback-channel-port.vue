@@ -15,15 +15,13 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         /**端口列表下拉**/
-        const simbankPortOptions = useSelectService(e => Service.httpBaseSrmSelectSimbankPort(pick(e, ['ownerUserUid', 'countryKeyId'])), {
+        const simbankPortOptions = useSelectService(e => Service.httpBaseSrmSelectSimbankPort(pick(e, ['ownerUserUid'])), {
             immediate: false,
-            options: { countryKeyId: props.node.countryKeyId, ownerUserUid: props.node.ownerUserUid }
+            options: { ownerUserUid: props.node.ownerUserUid }
         })
         const { formState, formRef, state, setState, setForm, fetchValidater } = useFormService({
             callback: fetchInitialization,
             formState: {
-                /**方向：来自通道，不可改**/
-                countryKeyId: props.node.countryKeyId,
                 /**归属人：来自通道，不可改**/
                 ownerUserUid: props.node.ownerUserUid,
                 /**绑定端口列表**/
@@ -42,7 +40,7 @@ export default defineComponent({
             }
         }
 
-        /**加载方向、归属人选项、可绑定端口和已绑定端口。**/
+        /**加载可绑定端口和已绑定端口。**/
         async function fetchInitialization() {
             try {
                 return await Promise.all([

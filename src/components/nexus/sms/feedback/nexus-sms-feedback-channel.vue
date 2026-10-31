@@ -19,10 +19,6 @@ export default defineComponent({
         const { chunkOptions, fetchChunkService } = useChunkService(() => Service.httpBaseSrmChannelEnums(), {
             immediate: false
         })
-        /**方向下拉**/
-        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
-            immediate: false
-        })
         /**归属人下拉**/
         const chengOptions = useSelectService(() => Service.httpBaseSkylineSelectUser(), {
             immediate: false
@@ -32,8 +28,6 @@ export default defineComponent({
             formState: {
                 /**通道名称**/
                 name: props.node.name,
-                /**方向：仅新增可选**/
-                countryKeyId: props.node.countryKeyId,
                 /**通道类型：仅新增可选**/
                 type: props.node.type,
                 /**归属人：不选默认当前登录人**/
@@ -49,7 +43,6 @@ export default defineComponent({
             },
             rules: {
                 name: { required: true, message: '请输入通道名称', trigger: 'blur' },
-                countryKeyId: { required: true, type: 'number', message: '请选择方向', trigger: 'blur' },
                 type: { required: true, message: '请选择通道类型，创建后不可修改', trigger: 'blur' },
                 ownerUserUid: { required: true, message: '请选择归属人', trigger: 'blur' },
                 sendInterval: { required: true, type: 'number', message: '请输入端口发送间隔', trigger: 'blur' },
@@ -59,7 +52,7 @@ export default defineComponent({
 
         /**详情初始化：编辑时拉取通道详情回填表单。**/
         async function fetchInitialization() {
-            const taskNames = [chengOptions.fetchRequest(), countryOptions.fetchRequest(), fetchChunkService()]
+            const taskNames = [chengOptions.fetchRequest(), fetchChunkService()]
             try {
                 if (['CREATE'].includes(props.command)) {
                     return await Promise.all(taskNames).finally(async () => {
@@ -154,18 +147,7 @@ export default defineComponent({
                             v-model:value={formState.value.type}
                         ></form-base-select>
                     </form-base-column>
-                    <form-base-column label="方向" path="countryKeyId">
-                        <form-base-select
-                            filterable
-                            label-field="showName"
-                            label-value="keyId"
-                            placeholder="请选择方向，创建后不可修改"
-                            disabled={['UPDATE'].includes(props.command)}
-                            loading={countryOptions.loading.value}
-                            options={countryOptions.dataSource.value}
-                            v-model:value={formState.value.countryKeyId}
-                        ></form-base-select>
-                    </form-base-column>
+
                     <form-base-column label="发送间隔" path="sendInterval">
                         <form-base-input-number
                             min={0}
