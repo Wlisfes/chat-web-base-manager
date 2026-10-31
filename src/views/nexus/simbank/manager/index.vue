@@ -28,8 +28,6 @@ export default defineComponent({
                     { title: '启用/禁用', key: 'chat:nexus:simbank:manager:status' }
                 ],
                 formState: {
-                    /**设备名称/别名/MAC地址/设备ID**/
-                    name: undefined,
                     /**设备型号**/
                     model: undefined,
                     /**归属供应商**/
@@ -51,9 +49,9 @@ export default defineComponent({
                     { title: '归属供应商', key: 'userKeyId', width: 200 },
                     { title: '归属人', key: 'ownerUserUid', width: 120 },
                     { title: '归属部门', key: 'ownerOrganizations', width: 160 },
-                    { title: '创建人', key: 'createBy', width: 120 },
-                    { title: '创建时间', key: 'createTime', width: 160 },
-                    { title: '更新人', key: 'modifyBy', width: 120 },
+                    { title: '创建人', key: 'createBy', width: 120, check: false },
+                    { title: '创建时间', key: 'createTime', width: 160, check: false },
+                    { title: '更新人', key: 'modifyBy', width: 120, check: false },
                     { title: '更新时间', key: 'modifyTime', width: 160 }
                 ]
             }
@@ -135,14 +133,6 @@ export default defineComponent({
                             </common-base-button>
                         </common-base-authorize>
                     </common-database-search-function>
-                    <common-database-search-column disabled prop="name" label="关键词">
-                        <form-base-input
-                            clearable
-                            placeholder="设备名称/别名/MAC地址/ID"
-                            v-model:value={formState.value.name}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
                     <common-database-search-column prop="userKeyId" label="归属供应商">
                         <form-base-select
                             clearable

@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useChunkService, useSelectService, pick } from '@/hooks'
+import { useColumnService, useChunkService, pick } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
 import * as feedback from '@/components/nexus/hooks'
 import * as Service from '@/api/instance.service'
@@ -10,10 +10,6 @@ export default defineComponent({
     setup(props) {
         /**通道静态枚举**/
         const { chunkOptions, chunkState } = useChunkService(() => Service.httpBaseSrmChannelEnums(), {
-            immediate: true
-        })
-        /**方向下拉**/
-        const countryOptions = useSelectService(() => Service.httpBaseSkylineSelectCountry(), {
             immediate: true
         })
         /**表格实例**/
@@ -30,8 +26,6 @@ export default defineComponent({
                 formState: {
                     /**通道别名**/
                     alias: undefined,
-                    /**方向**/
-                    countryKeyId: undefined,
                     /**通道类型**/
                     type: undefined,
                     /**通道状态**/
@@ -41,7 +35,6 @@ export default defineComponent({
                     { title: '通道ID', key: 'keyId', width: 120, disabled: true },
                     { title: '通道别名', key: 'alias', width: 180, disabled: true },
                     { title: '通道名称', key: 'name', minWidth: 180, disabled: true },
-                    { title: '方向', key: 'countryKeyId', minWidth: 180 },
                     { title: '通道类型', key: 'type', minWidth: 120 },
                     { title: '归属人', key: 'ownerUserUid', minWidth: 120 },
                     { title: '通道状态', key: 'status', minWidth: 120 },
@@ -158,19 +151,7 @@ export default defineComponent({
                             on-submit={fetchRefresh}
                         ></form-base-input>
                     </common-database-search-column>
-                    <common-database-search-column prop="countryKeyId" label="方向">
-                        <form-base-select
-                            clearable
-                            filterable
-                            label-field="showName"
-                            label-value="keyId"
-                            placeholder="请选择方向"
-                            loading={countryOptions.loading.value}
-                            options={countryOptions.dataSource.value}
-                            v-model:value={formState.value.countryKeyId}
-                            on-change:value={fetchRefresh}
-                        ></form-base-select>
-                    </common-database-search-column>
+
                     <common-database-search-column prop="type" label="通道类型">
                         <form-base-select
                             clearable
@@ -213,13 +194,7 @@ export default defineComponent({
                         col_portCount: (data: Omix) => {
                             return <common-base-content value={data.portCount}>{data.portCount}</common-base-content>
                         },
-                        col_countryKeyId: (data: Omix) => (
-                            <common-base-chunk
-                                mode="text"
-                                value={data.countryKeyId}
-                                items={countryOptions.dataSource.value}
-                            ></common-base-chunk>
-                        ),
+
                         col_type: (data: Omix) => (
                             <common-base-chunk value={data.type} items={chunkOptions.value.typeOptions}></common-base-chunk>
                         ),
