@@ -50,6 +50,7 @@ export default defineComponent({
                         class="form-base-date-picker w-full"
                         type={props.type}
                         value={rangeTime.value}
+                        default-time={props.type.includes('time') ? ['00:00:00', '23:59:59'] : undefined}
                         on-update:value={fetchRangeUpdate}
                     ></n-date-picker>
                 )

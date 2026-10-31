@@ -45,13 +45,17 @@ export default defineComponent({
                     /**发送状态**/
                     sendStatus: undefined,
                     /**MCC**/
-                    mcc: undefined
+                    mcc: undefined,
+                    /**发送时间起始**/
+                    startTime: undefined,
+                    /**发送时间结束**/
+                    endTime: undefined
                 },
                 columns: [
                     { title: '消息ID', key: 'msgId', width: 200, disabled: true },
                     { title: '发送号码', key: 'fromNumber', width: 150, check: false },
                     { title: '接收号码', key: 'toNumber', width: 150 },
-                    { title: '发送状态', key: 'sendStatus', width: 120 },
+                    { title: '发送状态', key: 'sendStatus', width: 110 },
                     { title: '上下行', key: 'source', width: 90, check: false },
                     { title: '类型', key: 'type', width: 100 },
                     { title: 'MCC', key: 'mcc', width: 80 },
@@ -86,6 +90,16 @@ export default defineComponent({
                     on-restore={instOptions.fetchRestore}
                     on-submit={instOptions.fetchRequest}
                 >
+                    <common-database-search-column prop="startTime" label="发送时间" span={2}>
+                        <form-base-date-picker
+                            clearable
+                            type="datetimerange"
+                            start-placeholder="起始时间"
+                            end-placeholder="结束时间"
+                            v-model:startTime={formState.value.startTime}
+                            v-model:endTime={formState.value.endTime}
+                        ></form-base-date-picker>
+                    </common-database-search-column>
                     <common-database-search-column prop="msgId" label="消息ID">
                         <form-base-input
                             clearable
