@@ -36,6 +36,12 @@ const routes: RouteRecordRaw[] = [
         name: 'FinanceAccountConsumer',
         meta: { title: '消费用户', AUTH: 'AUTH', keepAlive: true },
         component: () => import('@/views/finance/account/consumer/index.vue')
+    },
+    {
+        path: '/finance/account/supplier',
+        name: 'FinanceAccountSupplier',
+        meta: { title: '供应商用户', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/finance/account/supplier/index.vue')
     }
 ]
 
