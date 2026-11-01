@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, computed, nextTick, PropType, VNode } from 'vue'
-import { moment, isNotEmpty, isEmpty } from '@/utils'
+import { moment, isNotEmpty, isEmpty, fetchShortcuts } from '@/utils'
 import { useVModels } from '@vueuse/core'
 
 export default defineComponent({
@@ -16,10 +16,17 @@ export default defineComponent({
         /**自定义图标**/
         dateIcon: { type: Object as PropType<VNode> },
         /**加载状态**/
-        loading: { type: Boolean, default: false }
+        loading: { type: Boolean, default: false },
+        /**快捷方式**/
+        functions: { type: Array as PropType<Array<'近1小时' | '近3小时' | '近24小时' | '近3天' | '近7天' | '近30天'>>, default: () => [] }
     },
     setup(props, { emit, slots }) {
         const { startTime, endTime } = useVModels(props, emit)
+
+        /**按 functions 生成面板快捷项；未传入时不展示。开始时间按当前时刻或自然日回推，结束时间统一为当天 23:59:59。**/
+        const shortcuts = computed(() => {
+            return props.functions.length === 0 ? undefined : fetchShortcuts(props.functions)
+        })
 
         /**时间组合模式**/
         const rangeTime = computed(() => {
@@ -50,6 +57,8 @@ export default defineComponent({
                         class="form-base-date-picker w-full"
                         type={props.type}
                         value={rangeTime.value}
+                        default-time={props.type.includes('time') ? ['00:00:00', '23:59:59'] : undefined}
+                        shortcuts={shortcuts.value}
                         on-update:value={fetchRangeUpdate}
                     ></n-date-picker>
                 )

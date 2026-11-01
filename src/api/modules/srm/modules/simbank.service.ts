@@ -156,3 +156,12 @@ export function httpBaseSrmSelectSimbankPort(data: Omix) {
         data
     })
 }
+
+/**分页查询可绑定到通道的端口，过滤规则同 httpBaseSrmSelectSimbankPort**/
+export function httpBaseSrmColumnSelectSimbankPort(data: Omix) {
+    return request({
+        url: '/api/srm/simbank/port/select/column',
+        method: 'POST',
+        data
+    })
+}

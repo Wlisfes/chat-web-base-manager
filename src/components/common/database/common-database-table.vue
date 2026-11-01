@@ -278,10 +278,14 @@ export default defineComponent({
             return columns
         }
         /**选择列事件**/
-        async function fetchUpdateSelecter(keys: Array<string>, data: Array<Omix>) {
-            return await nextTick(() => (select.value = data)).then(async () => {
-                await emit('update:select', select.value)
-                return await emit('-update:select', select.value)
+        async function fetchUpdateSelecter(keys: Array<string | number>, data: Array<Omix | undefined>) {
+            /**优先沿用原选中对象（保留其上的附加字段）；不在当前页的已选行 naive-ui 返回 undefined，也从原选中数据补回**/
+            const current = new Map(select.value.map(item => [item.keyId, item]))
+            const rows = keys.map((key, index) => current.get(key) ?? data[index]).filter(isNotEmpty) as Array<Omix>
+            /**select 是非 passive 的 useVModels，赋值后读取仍是旧 props，事件必须直接传 rows**/
+            return await nextTick(() => (select.value = rows)).then(async () => {
+                await emit('update:select', rows)
+                return await emit('-update:select', rows)
             })
         }
         /**分页page变更**/

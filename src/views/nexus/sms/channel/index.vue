@@ -194,7 +194,6 @@ export default defineComponent({
                         col_portCount: (data: Omix) => {
                             return <common-base-content value={data.portCount}>{data.portCount}</common-base-content>
                         },
-
                         col_type: (data: Omix) => (
                             <common-base-chunk value={data.type} items={chunkOptions.value.typeOptions}></common-base-chunk>
                         ),

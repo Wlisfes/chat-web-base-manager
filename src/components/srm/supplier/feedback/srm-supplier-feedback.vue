@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, Fragment, PropType } from 'vue'
 import { useFormService, useChunkService, fetchCloneByte, v4, pick, omit } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -10,6 +10,8 @@ export default defineComponent({
     props: {
         /**标题**/
         title: { type: String, required: true },
+        /**操作指令：CREATE 新增（含联系人）；UPDATE 编辑基础信息**/
+        command: { type: String as PropType<'CREATE' | 'UPDATE'>, default: 'CREATE' },
         /**编辑操作详情数据**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
@@ -59,9 +61,17 @@ export default defineComponent({
             }
         })
 
-        /**详情初始化**/
+        /**详情初始化：新增时填充模拟数据，编辑时回显供应商基础信息**/
         async function fetchInitialization() {
             try {
+                if (['UPDATE'].includes(props.command)) {
+                    return await fetchChunkService().then(async () => {
+                        const node = pick(props.node, ['name', 'currency', 'email', 'phone', 'source', 'payMode', 'remark'])
+                        return await setForm(node).then(async () => {
+                            return await setState({ initialize: false })
+                        })
+                    })
+                }
                 return await Promise.all([Service.httpBaseSrmUserFaker(), fetchChunkService()]).then(async ([{ data }]) => {
                     const contact = pick(data.contact, ['name', 'address', 'remark'])
                     const items = (data.contact.items ?? [{}]).map((item: Omix) => ({ ...item, disabled: true, keyId: v4() }))
@@ -83,13 +93,16 @@ export default defineComponent({
                     return await setState({ loading: false, disabled: false })
                 }
                 try {
-                    const formOptions = fetchCloneByte(omit(formState.value, ['items']), {
-                        contact: fetchCloneByte(formState.value.contact, {
-                            items: formState.value.items.map(e => pick(e, ['type', 'value']))
+                    if (['UPDATE'].includes(props.command)) {
+                        await Service.httpBaseSrmUpdateUser({ ...omit(formState.value, ['items', 'contact']), keyId: props.node.keyId })
+                    } else {
+                        const formOptions = fetchCloneByte(omit(formState.value, ['items']), {
+                            contact: fetchCloneByte(formState.value.contact, {
+                                items: formState.value.items.map(e => pick(e, ['type', 'value']))
+                            })
                         })
-                    })
-
-                    await Service.httpBaseSrmCreateUser(formOptions)
+                        await Service.httpBaseSrmCreateUser(formOptions)
+                    }
 
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -163,7 +176,7 @@ export default defineComponent({
                             check-strategy="child"
                             expand-trigger="click"
                             label-field="label"
-                            label-value="value"
+                            label-value="keyId"
                             children-field="children"
                             placeholder="请选择供应商来源"
                             options={chunkState.CHUNK_SRM_USER_SOURCE.options}
@@ -179,42 +192,46 @@ export default defineComponent({
                             autosize={{ minRows: 2, maxRows: 6 }}
                         />
                     </form-base-column>
-                    <form-base-column label="联系人名称" path="contact.name">
-                        <form-base-input
-                            maxlength={64}
-                            placeholder="请输入联系人名称"
-                            v-model:value={formState.value.contact.name}
-                        ></form-base-input>
-                    </form-base-column>
-                    <form-base-column span={2} label="联系人地址" path="contact.address">
-                        <form-base-input
-                            maxlength={512}
-                            placeholder="请输入联系人地址"
-                            v-model:value={formState.value.contact.address}
-                        ></form-base-input>
-                    </form-base-column>
-                    <form-base-column full required show-feedback={false} label="联系方式">
-                        <div class="flex flex-col flex-1">
-                            {formState.value.items.map((item, index) => (
-                                <common-business-contact-block
-                                    key={item.keyId}
-                                    index={index}
-                                    options={chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
-                                    v-model:list={formState.value.items}
-                                    v-model:node={item}
-                                ></common-business-contact-block>
-                            ))}
-                        </div>
-                    </form-base-column>
-                    <form-base-column full label="联系人备注">
-                        <n-input
-                            type="textarea"
-                            maxlength={1024}
-                            placeholder="请输入联系人备注"
-                            v-model:value={formState.value.contact.remark}
-                            autosize={{ minRows: 2, maxRows: 4 }}
-                        />
-                    </form-base-column>
+                    {['CREATE'].includes(props.command) && (
+                        <Fragment>
+                            <form-base-column label="联系人名称" path="contact.name">
+                                <form-base-input
+                                    maxlength={64}
+                                    placeholder="请输入联系人名称"
+                                    v-model:value={formState.value.contact.name}
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column span={2} label="联系人地址" path="contact.address">
+                                <form-base-input
+                                    maxlength={512}
+                                    placeholder="请输入联系人地址"
+                                    v-model:value={formState.value.contact.address}
+                                ></form-base-input>
+                            </form-base-column>
+                            <form-base-column full required show-feedback={false} label="联系方式">
+                                <div class="flex flex-col flex-1">
+                                    {formState.value.items.map((item, index) => (
+                                        <common-business-contact-block
+                                            key={item.keyId}
+                                            index={index}
+                                            options={chunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
+                                            v-model:list={formState.value.items}
+                                            v-model:node={item}
+                                        ></common-business-contact-block>
+                                    ))}
+                                </div>
+                            </form-base-column>
+                            <form-base-column full label="联系人备注">
+                                <n-input
+                                    type="textarea"
+                                    maxlength={1024}
+                                    placeholder="请输入联系人备注"
+                                    v-model:value={formState.value.contact.remark}
+                                    autosize={{ minRows: 2, maxRows: 4 }}
+                                />
+                            </form-base-column>
+                        </Fragment>
+                    )}
                 </form-base-container>
             </common-dialog-provider>
         )

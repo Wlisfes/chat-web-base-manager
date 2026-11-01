@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useChunkService, useFormService, useSelectService, omit, v4 } from '@/hooks'
+import { useChunkService, useFormService, useSelectService, omit, v4, fetchNotArrayr } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -74,7 +74,7 @@ export default defineComponent({
                     countryOptions.fetchRequest(),
                     fetchChunkService()
                 ]).then(async ([{ data }]) => {
-                    return await setForm({ list: (data.rules ?? [{}]).map(fetchAdapter) }).then(async () => {
+                    return await setForm({ list: fetchNotArrayr(data.rules, [{}]).map(fetchAdapter) }).then(async () => {
                         return await setState({ initialize: false })
                     })
                 })

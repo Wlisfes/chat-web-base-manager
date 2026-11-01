@@ -1,6 +1,7 @@
 <script lang="tsx">
 import { defineComponent } from 'vue'
-import { useColumnService, useChunkService, useSelectService, pick } from '@/hooks'
+import { useColumnService, useChunkService, useSelectService } from '@/hooks'
+import { pick, fetchShortcuts } from '@/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -14,10 +15,13 @@ export default defineComponent({
         const userOptions = useSelectService(e => Service.httpBaseSrmSelectUser(), {
             immediate: true
         })
+        /**通道下拉**/
+        const channelOptions = useSelectService(() => Service.httpBaseSrmSelectChannel(), {
+            immediate: true
+        })
         /**设备下拉**/
-        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ name: e.keywords || undefined }), {
-            immediate: true,
-            transform: list => list.map(item => ({ ...item, label: `[${item.alias}] ${item.name}` }))
+        const simbankOptions = useSelectService(e => Service.httpBaseSrmSelectSimbank({ vague: e.keywords }), {
+            immediate: true
         })
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
@@ -25,6 +29,10 @@ export default defineComponent({
             {
                 keyName: 'chat:nexus:simbank:message',
                 formState: {
+                    /**消息ID**/
+                    msgId: undefined,
+                    /**通道**/
+                    channelKeyId: undefined,
                     /**所属设备**/
                     simbankKeyId: undefined,
                     /**归属供应商**/
@@ -38,13 +46,17 @@ export default defineComponent({
                     /**发送状态**/
                     sendStatus: undefined,
                     /**MCC**/
-                    mcc: undefined
+                    mcc: undefined,
+                    /**发送时间起始：默认近1小时**/
+                    startTime: fetchShortcuts('近24小时').startTime,
+                    /**发送时间结束：默认当天 23:59:59**/
+                    endTime: fetchShortcuts('近24小时').endTime
                 },
                 columns: [
                     { title: '消息ID', key: 'msgId', width: 200, disabled: true },
                     { title: '发送号码', key: 'fromNumber', width: 150, check: false },
                     { title: '接收号码', key: 'toNumber', width: 150 },
-                    { title: '发送状态', key: 'sendStatus', width: 120 },
+                    { title: '发送状态', key: 'sendStatus', width: 110 },
                     { title: '上下行', key: 'source', width: 90, check: false },
                     { title: '类型', key: 'type', width: 100 },
                     { title: 'MCC', key: 'mcc', width: 80 },
@@ -76,14 +88,53 @@ export default defineComponent({
                     v-model:database={state.database}
                     v-model:formState={formState.value}
                     on-update:database={instOptions.fetchUpdateDatabase}
-                    on-restore={instOptions.fetchRestore}
+                    on-restore={() => instOptions.fetchRestore(fetchShortcuts('近24小时'))}
                     on-submit={instOptions.fetchRequest}
                 >
+                    <common-database-search-column disabled prop="startTime" label="发送时间" span={2}>
+                        <form-base-date-picker
+                            type="datetimerange"
+                            start-placeholder="起始时间"
+                            end-placeholder="结束时间"
+                            functions={['近1小时', '近3小时', '近24小时', '近3天', '近7天', '近30天']}
+                            v-model:startTime={formState.value.startTime}
+                            v-model:endTime={formState.value.endTime}
+                        ></form-base-date-picker>
+                    </common-database-search-column>
+                    <common-database-search-column disabled prop="msgId" label="消息ID">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入消息ID"
+                            v-model:value={formState.value.msgId}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column disabled prop="mcc" label="MCC">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入MCC"
+                            maxlength={4}
+                            v-model:value={formState.value.mcc}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column prop="channelKeyId" label="通道">
+                        <form-base-select
+                            clearable
+                            filterable
+                            label-field="alias"
+                            label-value="keyId"
+                            placeholder="请选择通道"
+                            loading={channelOptions.loading.value}
+                            options={channelOptions.dataSource.value}
+                            v-model:value={formState.value.channelKeyId}
+                        ></form-base-select>
+                    </common-database-search-column>
                     <common-database-search-column prop="simbankKeyId" label="设备别名">
                         <form-base-select
                             clearable
                             filterable
-                            label-field="label"
+                            label-field="alias"
                             label-value="keyId"
                             placeholder="请选择设备别名"
                             loading={simbankOptions.loading.value}
@@ -139,15 +190,6 @@ export default defineComponent({
                             v-model:value={formState.value.encoding}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="mcc" label="MCC">
-                        <form-base-input
-                            clearable
-                            placeholder="请输入MCC"
-                            maxlength={4}
-                            v-model:value={formState.value.mcc}
-                            on-submit={fetchRefresh}
-                        ></form-base-input>
-                    </common-database-search-column>
                 </common-database-search>
                 <common-database-table
                     show-settings
@@ -176,7 +218,12 @@ export default defineComponent({
                             <common-base-chunk value={data.encoding} items={chunkOptions.value.encodingOptions}></common-base-chunk>
                         ),
                         col_sendStatus: (data: Omix) => (
-                            <common-base-chunk value={data.sendStatus} items={chunkOptions.value.sendStatusOptions}></common-base-chunk>
+                            <div class="flex items-center gap-x-5 overflow-hidden">
+                                <common-base-chunk value={data.sendStatus} items={chunkOptions.value.sendStatusOptions}></common-base-chunk>
+                                {['rejected', 'failed'].includes(data.sendStatus) && (
+                                    <common-base-hint-tooltip>{data.statusMessage}</common-base-hint-tooltip>
+                                )}
+                            </div>
                         ),
                         col_cost: (data: Omix) => {
                             return <common-base-number shrink value={data.cost}></common-base-number>
