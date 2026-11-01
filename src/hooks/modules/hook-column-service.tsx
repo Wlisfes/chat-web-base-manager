@@ -44,6 +44,8 @@ interface BaseServiceState<T, C> extends Omix {
 interface BaseServiceConfig<T, U, R, C> extends Partial<BaseServiceState<T, C>> {
     /**立即执行**/
     immediate?: boolean
+    /**刷新列表后保留已选中的数据，用于跨页、搜索后继续勾选；默认 false 刷新即清空**/
+    keepSelect?: boolean
     /**额外字段**/
     options?: Omix<R>
     /**筛选条件表单**/
@@ -165,7 +167,8 @@ export function useColumnService<T extends Omix, U extends Omix, R extends Omix,
 
     /**列表接口请求回调执行**/
     async function fetchCallbackRequest(opts: Omix = {}) {
-        return await setState({ initialize: false, loading: false, select: [], ...opts } as never).then(async () => {
+        const select = options.keepSelect ? state.select : []
+        return await setState({ initialize: false, loading: false, select, ...opts } as never).then(async () => {
             return await fetchHandler(isNotEmpty(options.callback), async () => {
                 return await options.callback!(formState.value, state as never)
             }).then(() => state as BaseServiceState<T, C> & Omix<R>)
