@@ -27,7 +27,7 @@ export function httpBaseSkylineDatetaskStatusUpdate(data: Datetask.DatetaskStatu
     })
 }
 
-/**修改系统任务 Cron 表达式**/
+/**修改系统任务 Cron 表达式和运行日志保留时长**/
 export function httpBaseSkylineUpdateDatetaskCron(data: Datetask.DatetaskCronRequest) {
     return request<Datetask.DatetaskItem>({
         url: '/api/skyline/deploy/datetask/cron/update',

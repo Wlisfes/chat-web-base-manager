@@ -10,6 +10,9 @@ export type DatetaskLogStatus = 'pending' | 'running' | 'retrying' | 'success' |
 /**执行触发方式：system=系统执行；manual=手动执行。*/
 export type DatetaskLogTrigger = 'system' | 'manual'
 
+/**运行日志最大保留时长。*/
+export type DatetaskLogRetention = '24h' | '3d' | '7d' | '15d' | '30d' | '60d' | '90d'
+
 /**操作人展示选项；系统账号 uid 为 0。*/
 export interface DatetaskOperatorOption {
     uid: string
@@ -32,6 +35,8 @@ export interface DatetaskItem {
     body: Record<string, unknown> | null
     /**单次执行最大尝试次数（含首次）。*/
     maxAttempts: number
+    /**运行日志最大保留时长。*/
+    logRetention: DatetaskLogRetention
     lastTime: string | null
     nextTime: string | null
     createBy: string
@@ -67,6 +72,7 @@ export interface DatetaskEnumsResponse {
     statusOptions: DatetaskEnumOption<DatetaskStatus>[]
     logStatusOptions: DatetaskEnumOption<DatetaskLogStatus>[]
     triggerTypeOptions: DatetaskEnumOption<DatetaskLogTrigger>[]
+    logRetentionOptions: DatetaskEnumOption<DatetaskLogRetention>[]
 }
 
 /**周期任务分页响应数据。*/
@@ -90,6 +96,7 @@ export interface DatetaskStatusRequest extends DatetaskKeyRequest {
 /**周期任务 Cron 更新请求体。*/
 export interface DatetaskCronRequest extends DatetaskKeyRequest {
     cron: string
+    logRetention: DatetaskLogRetention
 }
 
 /**执行记录（执行日志）项；一次触发一条，重试只累加尝试次数。*/
