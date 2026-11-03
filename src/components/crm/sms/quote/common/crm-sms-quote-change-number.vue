@@ -11,7 +11,7 @@ export default defineComponent({
     emits: ['update:node'],
     props: {
         /**类型**/
-        mode: { type: String as PropType<'downUsd' | 'upUsd'>, required: true },
+        mode: { type: String as PropType<'downUsd' | 'upUsd' | 'downLocal' | 'upLocal'>, required: true },
         /**对接节点数据**/
         node: { type: Object as PropType<Omix>, default: () => ({}) }
     },
@@ -22,7 +22,13 @@ export default defineComponent({
         const { state, setState } = useState({ loading: false, value: shrink.value })
         /**现行报价原价（实际金额）；当前应用无该方向报价时为空**/
         const amount = computed(() => {
-            const existing = node.value[props.mode === 'upUsd' ? 'existingUpUsd' : 'existingDownUsd']
+            const existingKey = {
+                upUsd: 'existingUpUsd',
+                downUsd: 'existingDownUsd',
+                upLocal: 'existingUpLocal',
+                downLocal: 'existingDownLocal'
+            }[props.mode]
+            const existing = node.value[existingKey]
             return isEmpty(existing) ? existing : fetchShrinkNumber(existing)
         })
         /**内容渲染**/

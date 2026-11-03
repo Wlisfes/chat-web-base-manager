@@ -36,13 +36,15 @@ export default defineComponent({
             columns: [
                 { title: '序号', key: 'index', width: 100 },
                 { title: '客户ID', key: 'userKeyId', width: 100 },
-                { title: '客户别名', key: 'userAlias', width: 130 },
-                { title: '客户名称', key: 'userName', width: 240, ellipsis: false },
+                // { title: '客户别名', key: 'userAlias', width: 130 },
+                // { title: '客户名称', key: 'userName', width: 240, ellipsis: false },
                 { title: '应用别名', key: 'appAlias', width: 160 },
                 { title: 'MCC', key: 'mcc', width: 100 },
                 { title: '国家/地区', key: 'countryKeyId', minWidth: 180 },
-                { title: '下行费率(USD)', key: 'downUsd', width: 160 },
-                { title: '上行费率(USD)', key: 'upUsd', width: 160 },
+                { title: '下行费率(报价币种)', key: 'downLocal', width: 150 },
+                { title: '上行费率(报价币种)', key: 'upLocal', width: 150 },
+                { title: '下行费率USD', key: 'downUsd', width: 130 },
+                { title: '上行费率USD', key: 'upUsd', width: 130 },
                 { title: '下行变更状态', key: 'downStatus', width: 120 },
                 { title: '上行变更状态', key: 'upStatus', width: 120 },
                 { title: '生效时间', key: 'effectiveTime', width: 160 }
@@ -91,7 +93,9 @@ export default defineComponent({
                             <common-skeleton-block initialize={state.initialize}>{formState.value.appAlias ?? '-'}</common-skeleton-block>
                         </common-base-columns-wrapper>
                         <common-base-columns-wrapper label="报价币种：">
-                            <common-skeleton-block initialize={state.initialize}>{props.faseNode.currency ?? '-'}</common-skeleton-block>
+                            <common-skeleton-block initialize={state.initialize}>
+                                <span title="报价和扣费按此账户币种金额，USD 只用于报表统计">{props.faseNode.currency ?? '-'}</span>
+                            </common-skeleton-block>
                         </common-base-columns-wrapper>
                     </common-base-columns-template>
                 </common-base-element>
@@ -126,8 +130,14 @@ export default defineComponent({
                                 items={props.mccOptions.dataSource.value}
                             ></common-base-chunk>
                         ),
+                        col_downLocal: (data: Omix) => {
+                            return <common-base-number shrink value={data.downLocal}></common-base-number>
+                        },
                         col_downUsd: (data: Omix) => {
                             return <common-base-number shrink value={data.downUsd}></common-base-number>
+                        },
+                        col_upLocal: (data: Omix) => {
+                            return <common-base-number shrink value={data.upLocal}></common-base-number>
                         },
                         col_upUsd: (data: Omix) => {
                             return <common-base-number shrink value={data.upUsd}></common-base-number>

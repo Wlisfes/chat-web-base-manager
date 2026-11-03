@@ -11,16 +11,20 @@ export default defineComponent({
         /**标题**/
         title: { type: String, required: true },
         /**编辑操作详情数据**/
-        node: { type: Object as PropType<Omix>, default: () => ({}) }
+        node: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**运行日志保留时长选项**/
+        logRetentionOptions: { type: Array as PropType<Omix[]>, default: () => [] }
     },
     setup(props, { emit }) {
         /**表单实例**/
         const { formState, formRef, state, setState, fetchValidater } = useFormService({
             formState: {
-                cron: props.node.cron
+                cron: props.node.cron,
+                logRetention: props.node.logRetention
             },
             rules: {
-                cron: { required: true, message: '请输入Cron表达式', trigger: 'blur' }
+                cron: { required: true, message: '请输入Cron表达式', trigger: 'blur' },
+                logRetention: { required: true, message: '请选择日志保留时长', trigger: 'change' }
             }
         })
 
@@ -33,7 +37,8 @@ export default defineComponent({
                 try {
                     await Service.httpBaseSkylineUpdateDatetaskCron({
                         taskId: props.node.taskId,
-                        cron: formState.value.cron
+                        cron: formState.value.cron,
+                        logRetention: formState.value.logRetention
                     })
                     return await setState({ visible: false }).then(async () => {
                         await emit('submit', { done: setState })
@@ -77,6 +82,13 @@ export default defineComponent({
                             placeholder="请输入Cron表达式，例如：0 0 8 * * *"
                             v-model:value={formState.value.cron}
                         ></form-base-input>
+                    </form-base-column>
+                    <form-base-column label="日志保留" path="logRetention">
+                        <form-base-select
+                            placeholder="请选择运行日志保留时长"
+                            options={props.logRetentionOptions}
+                            v-model:value={formState.value.logRetention}
+                        ></form-base-select>
                     </form-base-column>
                 </form-base-container>
             </common-dialog-provider>

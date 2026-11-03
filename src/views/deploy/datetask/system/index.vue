@@ -71,6 +71,7 @@ export default defineComponent({
             return await fetchDeployDatetaskCron({
                 title: '修改Cron表达式',
                 node,
+                logRetentionOptions: chunkOptions.value.logRetentionOptions,
                 onSubmit: () => fetchRefresh()
             })
         }
@@ -197,6 +198,9 @@ export default defineComponent({
                                 </common-base-columns-wrapper>
                                 <common-base-columns-wrapper vertical label="定时规则" label-class="text-12">
                                     {item.cron}
+                                </common-base-columns-wrapper>
+                                <common-base-columns-wrapper vertical label="日志保留" label-class="text-12">
+                                    {chunkOptions.value.logRetentionOptions?.find((option: Omix) => option.value === item.logRetention)?.label ?? '-'}
                                 </common-base-columns-wrapper>
                                 <div class="grid-cols-2 gap-x-10 overflow-hidden">
                                     <common-base-columns-wrapper vertical label="更新人" label-class="text-12">

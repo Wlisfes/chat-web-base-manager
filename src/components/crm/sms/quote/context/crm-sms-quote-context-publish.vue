@@ -77,7 +77,7 @@ export default defineComponent({
                             </common-base-columns-wrapper>
                             <common-base-columns-wrapper label="报价币种：">
                                 <common-skeleton-block initialize={props.state.initialize}>
-                                    {props.faseNode.currency ?? '-'}
+                                    <span title="报价和扣费按此账户币种金额，USD 只用于报表统计">{props.faseNode.currency ?? '-'}</span>
                                 </common-skeleton-block>
                             </common-base-columns-wrapper>
                         </common-base-columns-template>
