@@ -81,7 +81,7 @@ export default defineComponent({
                     function-class="justify-end"
                     function={['search', 'restore', 'collapse', 'deploy']}
                     ref={formRef}
-                    label-width={85}
+                    //label-width={85}
                     limit={state.limit}
                     v-model:loading={state.loading}
                     v-model:when={state.when}
@@ -142,7 +142,7 @@ export default defineComponent({
                             v-model:value={formState.value.simbankKeyId}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="userKeyId" label="归属供应商">
+                    <common-database-search-column prop="userKeyId" label="供应商">
                         <form-base-select
                             clearable
                             filterable
