@@ -14,8 +14,8 @@ export default defineComponent({
         value: { type: [Number, String, Array] },
         /**选项label的字段名**/
         labelField: { type: String, default: 'label' },
-        /**选项value的字段名**/
-        labelValue: { type: String, default: 'value' },
+        /**选项 value 的字段名**/
+        valueField: { type: String, default: 'value' },
         /**选项children的字段名**/
         childrenField: { type: String, default: 'children' },
         /**加载状态：n-cascader 不支持 loading，通过 arrow 插槽渲染与 n-select 一致的加载动画**/
@@ -36,7 +36,7 @@ export default defineComponent({
                 multiple={props.multiple}
                 max-tag-count={props.maxTagCount}
                 label-field={props.labelField}
-                value-field={props.labelValue}
+                value-field={props.valueField}
                 children-field={props.childrenField}
                 v-model:value={value.value}
                 on-update:value={fetchUpdate}

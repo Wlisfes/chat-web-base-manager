@@ -99,7 +99,7 @@ export default defineComponent({
                             clearable
                             filterable
                             placeholder="请选择国家/地区"
-                            label-value="keyId"
+                            value-field="keyId"
                             label-field="showName"
                             loading={countryOptions.loading.value}
                             options={countryOptions.dataSource.value}

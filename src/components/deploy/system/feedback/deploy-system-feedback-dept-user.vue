@@ -118,7 +118,7 @@ export default defineComponent({
                         <form-base-cascader
                             v-model:value={formState.value.organizationKeyId}
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             children-field="children"
                             placeholder="请选择所属部门"
                             expand-trigger="click"
@@ -131,7 +131,7 @@ export default defineComponent({
                             multiple
                             filterable
                             max-tag-count={999}
-                            label-value="uid"
+                            value-field="uid"
                             label-field="showName"
                             placeholder="请选择关联账号"
                             loading={accountOptions.loading.value}

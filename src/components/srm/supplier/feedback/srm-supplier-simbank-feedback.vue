@@ -94,7 +94,7 @@ export default defineComponent({
                         <form-base-select
                             placeholder="请选择设备型号"
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             options={chunkState.CHUNK_SRM_SIMBANK_MODEL.options}
                             v-model:value={formState.value.model}
                         ></form-base-select>

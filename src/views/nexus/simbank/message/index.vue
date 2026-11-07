@@ -123,7 +123,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="alias"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择通道"
                             loading={channelOptions.loading.value}
                             options={channelOptions.dataSource.value}
@@ -135,7 +135,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="alias"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择设备别名"
                             loading={simbankOptions.loading.value}
                             options={simbankOptions.dataSource.value}
@@ -147,7 +147,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择归属供应商"
                             loading={userOptions.loading.value}
                             options={userOptions.dataSource.value}

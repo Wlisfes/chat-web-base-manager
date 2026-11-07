@@ -48,7 +48,7 @@ export default defineComponent({
                         class="w-160"
                         placeholder="请选择联系方式"
                         label-field="label"
-                        label-value="value"
+                        value-field="value"
                         options={props.options}
                         disabled={node.value.disabled}
                         v-model:value={node.value.type}

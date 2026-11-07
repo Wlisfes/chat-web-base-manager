@@ -172,7 +172,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="showName"
-                            label-value="uid"
+                            value-field="uid"
                             placeholder="请选择归属人"
                             loading={ownerOptions.loading.value}
                             options={ownerOptions.dataSource.value}
@@ -216,7 +216,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             label-field="label"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择供应商来源"
                             loading={chunkState.loading}
                             options={chunkState.CHUNK_SRM_USER_SOURCE.options}

@@ -75,7 +75,7 @@ export default defineComponent({
                             <form-base-select
                                 filterable
                                 label-field="showName"
-                                label-value="keyId"
+                                value-field="keyId"
                                 v-model:value={formState.value.userKeyId}
                                 loading={props.userOptions.loading.value}
                                 options={props.userOptions.dataSource.value}
@@ -90,7 +90,7 @@ export default defineComponent({
                             <form-base-select
                                 filterable
                                 label-field="appAlias"
-                                label-value="appId"
+                                value-field="appId"
                                 v-model:value={formState.value.appId}
                                 loading={props.appOptions.loading.value}
                                 options={props.appOptions.dataSource.value}

@@ -130,7 +130,7 @@ export default defineComponent({
                             filterable
                             placeholder="请选择品牌"
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             loading={props.brandOptions.loading.value}
                             options={props.brandOptions.dataSource.value}
                             v-model:value={formState.value.brandKeyId}
@@ -141,7 +141,7 @@ export default defineComponent({
                             clearable
                             filterable
                             placeholder="请选择币种"
-                            label-value="currency"
+                            value-field="currency"
                             label-field="currency"
                             loading={props.currencyOptions.loading.value}
                             options={props.currencyOptions.dataSource.value}
@@ -174,7 +174,7 @@ export default defineComponent({
                             check-strategy="child"
                             expand-trigger="click"
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             children-field="children"
                             placeholder="请选择客户来源"
                             loading={props.chunkState.loading}

@@ -79,7 +79,7 @@ export default defineComponent({
                             filterable
                             clearable
                             max-tag-count={999}
-                            label-value="uid"
+                            value-field="uid"
                             label-field="showName"
                             placeholder="请选择关联用户"
                             loading={accountOptions.loading.value}

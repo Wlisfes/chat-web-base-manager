@@ -145,7 +145,7 @@ export default defineComponent({
                             filterable
                             placeholder="请选择归属品牌"
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             options={brandOptions.dataSource.value}
                             v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
@@ -154,7 +154,7 @@ export default defineComponent({
                         <form-base-select
                             filterable
                             placeholder="请选择币种"
-                            label-value="currency"
+                            value-field="currency"
                             label-field="currency"
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
@@ -184,7 +184,7 @@ export default defineComponent({
                             check-strategy="child"
                             expand-trigger="click"
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             children-field="children"
                             placeholder="请选择客户来源"
                             options={chunkState.CHUNK_CRM_USER_SOURCE.options}
