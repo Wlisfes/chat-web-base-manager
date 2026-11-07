@@ -78,3 +78,12 @@ export function httpBaseCrmColumnUserContact(data: Omix) {
         data
     })
 }
+
+/**校验消费客户邮箱是否可用**/
+export function httpBaseCrmUserEmailValidate(data: Omix) {
+    return request({
+        url: '/api/crm/user/email/validate',
+        method: 'POST',
+        data
+    })
+}

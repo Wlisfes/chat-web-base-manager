@@ -114,3 +114,12 @@ export function httpBaseSrmColumnUserContact(data: Omix) {
         data
     })
 }
+
+/**校验供应商邮箱是否可用**/
+export function httpBaseSrmUserEmailValidate(data: Omix) {
+    return request({
+        url: '/api/srm/user/email/validate',
+        method: 'POST',
+        data
+    })
+}

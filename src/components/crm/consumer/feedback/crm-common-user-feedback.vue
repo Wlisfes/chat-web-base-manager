@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
-import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { useFormService, useSelectService, useChunkService, fetchAccountEmailRule } from '@/hooks'
 import { v4, pick, omit, fetchCloneByte } from '@/utils'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
@@ -65,7 +65,7 @@ export default defineComponent({
                 name: { required: true, message: '请输入客户名称', trigger: 'blur' },
                 brandKeyId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'blur' },
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
-                email: { required: true, message: '请输入邮箱', trigger: 'blur' },
+                email: fetchAccountEmailRule(params => Service.httpBaseCrmUserEmailValidate(params)),
                 source: { required: true, message: '请选择客户来源', trigger: 'blur' },
                 payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
             }
