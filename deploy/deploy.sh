@@ -17,6 +17,11 @@ if [ ! -f "$COMPOSE_FILE" ]; then
     exit 1
 fi
 
+if grep -E '8848:8848|9848:9848' "$COMPOSE_FILE" >/dev/null; then
+    echo "Manager Compose 不得发布 Nacos 8848/9848。这两个端口由 chat-web-cloud-nacos-public 持有，避免重建 Nginx 时客户端心跳被拒绝。" >&2
+    exit 1
+fi
+
 command -v docker >/dev/null || { echo '未找到 Docker。' >&2; exit 1; }
 command -v curl >/dev/null || { echo '未找到 curl。' >&2; exit 1; }
 command -v openssl >/dev/null || { echo '未找到 openssl。' >&2; exit 1; }

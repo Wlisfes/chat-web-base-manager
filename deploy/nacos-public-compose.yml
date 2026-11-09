@@ -1,0 +1,28 @@
+name: chat-web-cloud-nacos-public
+
+services:
+    nacos-public:
+        image: ${IMAGE:?IMAGE is required}
+        container_name: chat-web-cloud-nacos-public
+        restart: unless-stopped
+        init: true
+        ports:
+            - '172.18.100.12:8848:8848'
+            - '172.18.100.12:9848:9848'
+        volumes:
+            - /opt/chat-web-cloud/nacos-public.conf:/etc/nginx/nginx.conf:ro
+        healthcheck:
+            test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:8848/nacos/v1/console/health/readiness | grep -q OK']
+            interval: 15s
+            timeout: 5s
+            retries: 6
+            start_period: 10s
+        mem_limit: 64m
+        mem_reservation: 16m
+        cpus: 0.2
+        pids_limit: 64
+        logging:
+            driver: json-file
+            options:
+                max-size: 10m
+                max-file: '5'

@@ -16,7 +16,7 @@
 | 网关上游             | WireGuard 本机 Gateway `10.66.0.2:80`     |
 | 基础设施网络         | `chat-web-cloud`                          |
 
-开发机上的 `chat-web-base-manager` 容器、`chat-web-base-manager-tls` Volume、`chat.lisfes.com` 本地域名和旧的本机 HTTPS 入口均已废弃。云端 Nginx 仅承载 Manager 静态资源和 MySQL、Redis、RabbitMQ、Kafka、Nacos 的 TCP 入口；浏览器 API 请求直接访问 `chat-web.lisfes.cn` 对应的 Gateway 入口。发布 Manager 时必须保留这些端口映射。
+开发机上的 `chat-web-base-manager` 容器、`chat-web-base-manager-tls` Volume、`chat.lisfes.com` 本地域名和旧的本机 HTTPS 入口均已废弃。云端 Nginx 仅承载 Manager 静态资源和 MySQL、Redis、RabbitMQ、Kafka 的 TCP 入口；浏览器 API 请求直接访问 `chat-web.lisfes.cn` 对应的 Gateway 入口。Nacos 公网 `8848/9848` 由独立容器 `chat-web-cloud-nacos-public` 发布，不要放回 Manager Compose。发布 Manager 时必须保留其余端口映射。
 
 ## 云端初始化
 
@@ -84,8 +84,24 @@ curl --silent --show-error --fail --insecure --resolve chat-web.lisfes.cn:443:12
 | 页面正常、API 502         | 检查 `chat-web.lisfes.cn` 解析、Gateway 证书、CORS 白名单和服务连通性                |
 | 登录提示验证码不存在      | 确认验证码请求使用 `chat-web.lisfes.cn` 且浏览器允许凭据；再检查登录请求是否携带 `chat-web-auth-captcha` Cookie |
 | Nginx 启动失败            | 执行 `docker exec chat-web-cloud-nginx nginx -t`，确认云端配置中的证书与上游地址有效 |
-| 基础设施域名异常          | 确认 Manager Compose 仍保留 3306、6379、5672、9092、15672、8848、9848 端口映射       |
+| 基础设施域名异常          | 确认 Manager Compose 仍保留 3306、6379、5672、9092、15672 端口映射，且 `chat-web-cloud-nacos-public` 仍持有 `172.18.100.12:8848/9848`       |
 | 部署一直等待              | 检查 `production-cloud` 的 SSH Secret、主机指纹和 Docker 权限                        |
+
+
+## Nacos 公网入口
+
+`chat-web-nacos.lisfes.cn:8848` 和 `:9848` 由 `/opt/chat-web-cloud/nacos-public-compose.yml` 的 `chat-web-cloud-nacos-public` 转发到 `10.66.0.1` 上的 `chat-web-cloud-nacos`。控制台 HTTPS 仍走云端 Nginx `443`。
+
+不要把 `8848/9848` 加回 `manager-compose.yml`。Manager 发布会重建 `chat-web-cloud-nginx`；如果这两个端口挂在 Nginx 上，重建期间公网没有监听，本机 Docker 服务的 Nacos 心跳会收到 `ECONNREFUSED 47.119.21.228:8848`。
+
+恢复入口：
+
+```bash
+cd /opt/chat-web-cloud
+IMAGE=$(docker inspect chat-web-cloud-nginx --format '{{.Config.Image}}')
+IMAGE="$IMAGE" docker compose -p chat-web-cloud-nacos-public -f nacos-public-compose.yml up -d
+curl --fail --silent --show-error http://172.18.100.12:8848/nacos/v1/console/health/readiness
+```
 
 ## 回滚
 
@@ -97,4 +113,4 @@ IMAGE='ghcr.io/wlisfes/chat-web-base-manager:<previous-sha>' docker compose -p c
 docker inspect chat-web-cloud-nginx --format '{{.State.Health.Status}}'
 ```
 
-只回滚 Manager 镜像，不停止 `chat-web-cloud-nacos`，也不删除云端证书、WireGuard、Nacos 数据卷或基础设施配置。
+只回滚 Manager 镜像，不停止 `chat-web-cloud-nacos` 和 `chat-web-cloud-nacos-public`，也不删除云端证书、WireGuard、Nacos 数据卷或基础设施配置。
