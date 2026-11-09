@@ -81,7 +81,7 @@ export default defineComponent({
                     function-class="justify-end"
                     function={['search', 'restore', 'collapse', 'deploy']}
                     ref={formRef}
-                    label-width={85}
+                    //label-width={85}
                     limit={state.limit}
                     v-model:loading={state.loading}
                     v-model:when={state.when}
@@ -123,7 +123,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="alias"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择通道"
                             loading={channelOptions.loading.value}
                             options={channelOptions.dataSource.value}
@@ -135,19 +135,19 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="alias"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择设备别名"
                             loading={simbankOptions.loading.value}
                             options={simbankOptions.dataSource.value}
                             v-model:value={formState.value.simbankKeyId}
                         ></form-base-select>
                     </common-database-search-column>
-                    <common-database-search-column prop="userKeyId" label="归属供应商">
+                    <common-database-search-column prop="userKeyId" label="供应商">
                         <form-base-select
                             clearable
                             filterable
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择归属供应商"
                             loading={userOptions.loading.value}
                             options={userOptions.dataSource.value}

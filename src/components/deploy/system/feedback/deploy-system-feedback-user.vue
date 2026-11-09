@@ -174,7 +174,7 @@ export default defineComponent({
                                 multiple
                                 filterable
                                 label-field="name"
-                                label-value="keyId"
+                                value-field="keyId"
                                 placeholder="请选择岗位"
                                 loading={chunkState.loading}
                                 options={chunkState.CHUNK_SKYLINE_USER_POST.options}
@@ -186,7 +186,7 @@ export default defineComponent({
                                 clearable
                                 filterable
                                 label-field="name"
-                                label-value="keyId"
+                                value-field="keyId"
                                 placeholder="请选择职级"
                                 loading={chunkState.loading}
                                 options={chunkState.CHUNK_SKYLINE_USER_LEVEL.options}

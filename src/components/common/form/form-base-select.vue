@@ -14,8 +14,8 @@ export default defineComponent({
         value: { type: [Number, String, Array] },
         /**选项label的字段名**/
         labelField: { type: String, default: 'label' },
-        /**选项value的字段名**/
-        labelValue: { type: String, default: 'value' },
+        /**选项 value 的字段名**/
+        valueField: { type: String, default: 'value' },
         /**选项children的字段名**/
         childrenField: { type: String, default: 'children' }
     },
@@ -34,7 +34,7 @@ export default defineComponent({
                 multiple={props.multiple}
                 max-tag-count={props.maxTagCount}
                 label-field={props.labelField}
-                value-field={props.labelValue}
+                value-field={props.valueField}
                 children-field={props.childrenField}
                 v-model:value={value.value}
                 on-update:value={fetchUpdate}

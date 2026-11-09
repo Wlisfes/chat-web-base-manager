@@ -43,6 +43,7 @@
 - 禁止无意义的导出别名，例如 `export { TbSkylineUser as tbSkylineUser }`。
 - 从同一 interface、dto、schema 或类型定义模块具名导入的标识符超过 3 个时，一律改为 `import * as XxxDto from ...` 命名空间导入（仅类型用途时使用 `import type * as XxxTypes from ...`）；`vue`、`naive-ui`、`vue-router` 等框架和组件库无论数量多少一律保持具名导入，禁止写成 `Vue.defineComponent()`、`NaiveUI.NButton` 这类命名空间调用。
 - 日志、校验消息、Swagger 描述和面向维护者的错误信息使用中文；代码标识符使用英文。
+- `if`、`else`、`for`、`while` 的执行体必须使用花括号，禁止省略花括号写成单行。例如禁止 `if (!key) throw new BadRequestException('对象键不能为空')`，必须写成花括号块。
 
 ## 模块边界
 

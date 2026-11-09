@@ -138,7 +138,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择归属供应商"
                             loading={userOptions.loading.value}
                             options={userOptions.dataSource.value}
@@ -150,7 +150,7 @@ export default defineComponent({
                         <form-base-select
                             clearable
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             placeholder="请选择设备型号"
                             loading={chunkState.loading}
                             options={chunkState.CHUNK_SRM_SIMBANK_MODEL.options}

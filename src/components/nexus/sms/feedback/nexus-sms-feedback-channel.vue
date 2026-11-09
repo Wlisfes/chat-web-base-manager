@@ -130,7 +130,7 @@ export default defineComponent({
                     <form-base-column label="归属人" path="ownerUserUid">
                         <form-base-select
                             filterable
-                            label-value="uid"
+                            value-field="uid"
                             label-field="showName"
                             placeholder="请选择归属人"
                             disabled={['UPDATE'].includes(props.command)}

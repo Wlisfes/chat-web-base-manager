@@ -117,7 +117,7 @@ export default defineComponent({
                     <form-base-column label="路由类型" path="type">
                         <form-base-select
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             placeholder="请选择路由类型，创建后不可修改"
                             disabled={['UPDATE'].includes(props.command)}
                             options={chunkOptions.value.routeTypeOptions}
@@ -136,7 +136,7 @@ export default defineComponent({
                     <form-base-column label="路由状态" path="status">
                         <form-base-select
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             options={chunkOptions.value.statusOptions}
                             v-model:value={formState.value.status}
                         ></form-base-select>

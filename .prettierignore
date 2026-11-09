@@ -11,7 +11,7 @@ vite.config.js
 *.tsbuildinfo
 # 依赖锁文件由包管理器维护
 yarn.lock
-# 静态资源与部署配置不参与格式化
-public
-nginx
-deploy
+# 只忽略项目根目录。不写前导斜杠时，deploy 会匹配任意层级，src/views/deploy 也会被跳过。
+/public
+/nginx
+/deploy

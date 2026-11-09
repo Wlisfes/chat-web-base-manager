@@ -66,7 +66,7 @@ export default defineComponent({
                         <form-base-select
                             filterable
                             label-field="showName"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择激活方向"
                             loading={countryOptions.loading.value}
                             options={countryOptions.dataSource.value}

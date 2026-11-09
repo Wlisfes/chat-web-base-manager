@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType, ref } from 'vue'
-import { useFormService, useSelectService, useChunkService } from '@/hooks'
+import { useFormService, useSelectService, useChunkService, fetchAccountEmailRule } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -50,7 +50,7 @@ export default defineComponent({
                 name: { required: true, message: '请输入客户名称', trigger: 'blur' },
                 brandKeyId: { required: true, type: 'number', message: '请选择归属品牌', trigger: 'change' },
                 currency: { required: true, message: '请选择币种', trigger: 'change' },
-                email: { required: true, message: '请输入邮箱', trigger: 'blur' },
+                email: fetchAccountEmailRule(params => Service.httpBaseCrmUserEmailValidate(params), props.node.keyId),
                 payMode: { required: true, message: '请选择付款模式', trigger: 'change' },
                 contact: {
                     name: { required: true, message: '请输入联系人名称', trigger: 'blur' },
@@ -139,7 +139,7 @@ export default defineComponent({
                             filterable
                             placeholder="请选择归属品牌"
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             options={brandOptions.dataSource.value}
                             v-model:value={formState.value.brandKeyId}
                         ></form-base-select>
@@ -148,7 +148,7 @@ export default defineComponent({
                         <form-base-select
                             filterable
                             placeholder="请选择币种"
-                            label-value="currency"
+                            value-field="currency"
                             label-field="currency"
                             options={currencyOptions.dataSource.value}
                             v-model:value={formState.value.currency}
@@ -213,7 +213,7 @@ export default defineComponent({
                                                     class="w-160"
                                                     placeholder="类型"
                                                     label-field="label"
-                                                    label-value="keyId"
+                                                    value-field="keyId"
                                                     loading={contactChunkState.loading}
                                                     options={contactChunkState.CHUNK_SKYLINE_CONTACT_TYPE.options}
                                                     v-model:value={value.type}

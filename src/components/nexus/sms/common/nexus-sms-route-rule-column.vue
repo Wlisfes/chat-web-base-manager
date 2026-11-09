@@ -90,7 +90,7 @@ export default defineComponent({
                             <form-base-select
                                 class="w-120"
                                 label-field="label"
-                                label-value="value"
+                                value-field="value"
                                 placeholder="请选择字段"
                                 options={props.chunkOptions.ruleFieldOptions}
                                 v-model:value={item.field}
@@ -105,7 +105,7 @@ export default defineComponent({
                             <form-base-select
                                 class="w-120"
                                 label-field="label"
-                                label-value="value"
+                                value-field="value"
                                 placeholder="请选择条件"
                                 options={fetchOptionsOperator(item.field)}
                                 v-model:value={item.operator}
@@ -123,7 +123,7 @@ export default defineComponent({
                                     multiple
                                     filterable
                                     label-field="showName"
-                                    label-value="value"
+                                    value-field="value"
                                     placeholder="选择方向，可多选"
                                     options={props.countryOptions}
                                     v-model:value={item.value}
@@ -132,7 +132,7 @@ export default defineComponent({
                                 <form-base-select
                                     multiple
                                     label-field="label"
-                                    label-value="value"
+                                    value-field="value"
                                     placeholder="选择短信类型，可多选"
                                     options={props.chunkOptions.typeOptions}
                                     v-model:value={item.value}
@@ -143,7 +143,7 @@ export default defineComponent({
                                     multiple
                                     filterable
                                     label-field="label"
-                                    label-value="label"
+                                    value-field="label"
                                     placeholder="选择或输入号段"
                                     options={state.options}
                                     v-model:value={item.value}

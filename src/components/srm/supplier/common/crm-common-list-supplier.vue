@@ -129,7 +129,7 @@ export default defineComponent({
                             check-strategy="child"
                             expand-trigger="click"
                             label-field="label"
-                            label-value="value"
+                            value-field="value"
                             children-field="children"
                             placeholder="请选择供应商来源"
                             loading={props.chunkState.loading}

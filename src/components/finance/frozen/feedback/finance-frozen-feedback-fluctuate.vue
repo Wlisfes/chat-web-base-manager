@@ -123,7 +123,7 @@ export default defineComponent({
                         <form-base-select
                             multiple
                             filterable
-                            label-value="keyId"
+                            value-field="keyId"
                             label-field="showName"
                             placeholder="请选择国家/地区"
                             loading={countryOptions.loading.value}
@@ -134,7 +134,7 @@ export default defineComponent({
                     <form-base-column label="调价方式" path="mode">
                         <form-base-select
                             placeholder="请选择调价方式"
-                            label-value="value"
+                            value-field="value"
                             label-field="label"
                             loading={chunkState.loading}
                             options={chunkOptions.value.modeOptions}

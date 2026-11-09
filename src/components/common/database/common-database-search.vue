@@ -61,7 +61,7 @@ export default defineComponent({
         const formClass = computed(() => ({
             'common-database-formstate': true,
             'p-be-12': when.value || (database.value.length > 0 && database.value.some(item => item.check)),
-            'formstate-collapse': width.value < 674
+            'formstate-collapse': width.value < 634
         }))
         /**圆角、边框样式**/
         const cardStyle = computed<CSSProperties>(() => {
@@ -215,7 +215,7 @@ export default defineComponent({
     gap: 10px;
     display: grid;
     grid-auto-flow: row dense;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     &.formstate-collapse :deep(.common-database-search-column.grid-col-span-2) {
         grid-column: span 1 / span 1 !important;
     }

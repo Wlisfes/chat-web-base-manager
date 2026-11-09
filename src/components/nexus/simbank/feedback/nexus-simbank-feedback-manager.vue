@@ -111,7 +111,7 @@ export default defineComponent({
                             <form-base-select
                                 filterable
                                 label-field="name"
-                                label-value="keyId"
+                                value-field="keyId"
                                 placeholder="请选择归属供应商"
                                 loading={userOptions.loading.value}
                                 options={userOptions.dataSource.value}
@@ -127,7 +127,7 @@ export default defineComponent({
                             <form-base-select
                                 placeholder="请选择设备型号"
                                 label-field="label"
-                                label-value="value"
+                                value-field="value"
                                 options={chunkState.CHUNK_SRM_SIMBANK_MODEL.options}
                                 v-model:value={formState.value.model}
                             ></form-base-select>

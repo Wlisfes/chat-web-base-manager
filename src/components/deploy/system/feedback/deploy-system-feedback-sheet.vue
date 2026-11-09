@@ -169,7 +169,7 @@ export default defineComponent({
                         <form-base-cascader
                             clearable
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             children-field="children"
                             placeholder="请选择父级菜单/按钮"
                             expand-trigger="click"

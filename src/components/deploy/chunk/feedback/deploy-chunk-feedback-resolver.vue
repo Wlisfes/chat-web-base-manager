@@ -149,7 +149,7 @@ export default defineComponent({
                                     filterable
                                     expand-trigger="click"
                                     label-field="name"
-                                    label-value="keyId"
+                                    value-field="keyId"
                                     children-field="children"
                                     placeholder="请选择父级主键，为空表示顶级"
                                     disabled={chunkTreeOptions.loading.value}

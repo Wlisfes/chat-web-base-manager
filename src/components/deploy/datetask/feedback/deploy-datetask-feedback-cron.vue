@@ -24,7 +24,7 @@ export default defineComponent({
             },
             rules: {
                 cron: { required: true, message: '请输入Cron表达式', trigger: 'blur' },
-                logRetention: { required: true, message: '请选择日志保留时长', trigger: 'change' }
+                logRetention: { required: true, message: '请选择日志保留时长', trigger: 'blur' }
             }
         })
 

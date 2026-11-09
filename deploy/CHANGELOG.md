@@ -1,5 +1,14 @@
 # 部署变更记录
 
+## 2026-11-09：Nacos 公网端口与 Manager Nginx 解耦
+
+- 影响机器：云服务器 `47.119.21.228`。
+- 变更内容：`172.18.100.12:8848/9848` 不再由 `chat-web-cloud-nginx` 发布。Manager 重建 Nginx 时这两个端口会消失，本机服务向 `chat-web-nacos.lisfes.cn:8848` 发心跳会收到 `ECONNREFUSED`。公网入口改由 `chat-web-cloud-nacos-public` 转发到 `10.66.0.1` 上的 `chat-web-cloud-nacos`。控制台 HTTPS `443` 仍走云端 Nginx。
+- 机器侧操作：更新 `/opt/chat-web-cloud/manager-compose.yml`、`nginx.conf`，启动 `/opt/chat-web-cloud/nacos-public-compose.yml`。下次 Manager 发布必须带上本次 Compose，不能再把 `8848/9848` 加回 Nginx。
+- 验证命令：`curl --fail http://172.18.100.12:8848/nacos/v1/console/health/readiness`；从开发机容器连接 `chat-web-nacos.lisfes.cn` 的 `8848` 和 `9848`。
+- 回滚方法：停止 `chat-web-cloud-nacos-public`，恢复 Nginx 的 `8848/9848` 端口映射和对应 `proxy_pass`，再重建 `chat-web-cloud-nginx`。不要同时让两个容器发布同一主机端口。
+
+
 ## 2026-10-12：系统管理接口切换到 Skyline 服务
 
 - 影响机器：`chat-home-server`。

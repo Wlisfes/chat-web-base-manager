@@ -1,6 +1,6 @@
 <script lang="tsx">
 import { defineComponent, Fragment, PropType } from 'vue'
-import { useFormService, useChunkService, fetchCloneByte, v4, pick, omit } from '@/hooks'
+import { useFormService, useChunkService, fetchCloneByte, fetchAccountEmailRule, v4, pick, omit } from '@/hooks'
 import { fetchNotifyService } from '@/plugins'
 import * as Service from '@/api/instance.service'
 
@@ -55,7 +55,7 @@ export default defineComponent({
             rules: {
                 name: { required: true, message: '请输入供应商名称', trigger: 'blur' },
                 currency: { required: true, message: '请选择币种', trigger: 'blur' },
-                email: { required: true, message: '请输入邮箱', trigger: 'blur' },
+                email: fetchAccountEmailRule(params => Service.httpBaseSrmUserEmailValidate(params), props.node.keyId),
                 source: { required: true, message: '请选择供应商来源', trigger: 'blur' },
                 payMode: { required: true, message: '请选择付款模式', trigger: 'blur' }
             }
@@ -176,7 +176,7 @@ export default defineComponent({
                             check-strategy="child"
                             expand-trigger="click"
                             label-field="label"
-                            label-value="keyId"
+                            value-field="value"
                             children-field="children"
                             placeholder="请选择供应商来源"
                             options={chunkState.CHUNK_SRM_USER_SOURCE.options}

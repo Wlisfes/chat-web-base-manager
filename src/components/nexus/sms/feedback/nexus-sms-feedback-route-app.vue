@@ -157,7 +157,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="showName"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择客户"
                             loading={userOptions.loading.value}
                             options={userOptions.dataSource.value}

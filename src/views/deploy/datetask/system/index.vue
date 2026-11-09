@@ -191,26 +191,32 @@ export default defineComponent({
                             <n-card key={item.taskId} embedded content-class="p-12! flex flex-col gap-y-10">
                                 <div class="flex items-center justify-between gap-x-10 overflow-hidden">
                                     <n-h4 class="m-be-0">{item.taskName}</n-h4>
-                                    <common-base-chunk bordered value={item.module} items={chunkOptions.value.moduleOptions}></common-base-chunk>
+                                    <common-base-chunk
+                                        bordered
+                                        value={item.module}
+                                        items={chunkOptions.value.moduleOptions}
+                                    ></common-base-chunk>
                                 </div>
                                 <common-base-columns-wrapper vertical label="处理器标识" label-class="text-12">
                                     {item.handler}
                                 </common-base-columns-wrapper>
-                                <common-base-columns-wrapper vertical label="定时规则" label-class="text-12">
-                                    {item.cron}
-                                </common-base-columns-wrapper>
-                                <common-base-columns-wrapper vertical label="日志保留" label-class="text-12">
-                                    {chunkOptions.value.logRetentionOptions?.find((option: Omix) => option.value === item.logRetention)?.label ?? '-'}
-                                </common-base-columns-wrapper>
-                                <div class="grid-cols-2 gap-x-10 overflow-hidden">
+                                <div class="grid-cols-2 gap-10 overflow-hidden">
+                                    <common-base-columns-wrapper vertical label="定时规则" label-class="text-12">
+                                        {item.cron}
+                                    </common-base-columns-wrapper>
+                                    <common-base-columns-wrapper vertical label="日志保留" label-class="text-12">
+                                        <common-base-chunk
+                                            mode="text"
+                                            value={item.logRetention}
+                                            items={chunkOptions.value.logRetentionOptions}
+                                        ></common-base-chunk>
+                                    </common-base-columns-wrapper>
                                     <common-base-columns-wrapper vertical label="更新人" label-class="text-12">
                                         <common-base-user element="text" data={item.modifyByOptions}></common-base-user>
                                     </common-base-columns-wrapper>
                                     <common-base-columns-wrapper vertical label="更新时间" label-class="text-12">
                                         {item.modifyTime ?? '-'}
                                     </common-base-columns-wrapper>
-                                </div>
-                                <div class="grid-cols-2 gap-x-10 overflow-hidden">
                                     <common-base-columns-wrapper vertical label="上次执行" label-class="text-12">
                                         {item.lastTime ?? '-'}
                                     </common-base-columns-wrapper>
@@ -219,11 +225,7 @@ export default defineComponent({
                                     </common-base-columns-wrapper>
                                 </div>
                                 <div class="flex items-end justify-between gap-x-12 p-bs-10 overflow-hidden">
-                                    <common-base-chunk
-                                        bordered
-                                        value={item.status}
-                                        items={chunkOptions.value.statusOptions}
-                                    ></common-base-chunk>
+                                    <common-base-chunk value={item.status} items={chunkOptions.value.statusOptions}></common-base-chunk>
                                     <common-base-element abstract class="flex items-center gap-x-12 overflow-hidden">
                                         <common-base-authorize key-name={state.actions[0].key}>
                                             {item.status === 'enable' ? (

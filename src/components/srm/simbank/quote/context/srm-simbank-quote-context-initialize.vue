@@ -75,7 +75,7 @@ export default defineComponent({
                             <form-base-select
                                 filterable
                                 label-field="showName"
-                                label-value="keyId"
+                                value-field="keyId"
                                 v-model:value={formState.value.userKeyId}
                                 loading={props.userOptions.loading.value}
                                 options={props.userOptions.dataSource.value}
@@ -90,7 +90,7 @@ export default defineComponent({
                             <form-base-select
                                 filterable
                                 label-field="showName"
-                                label-value="keyId"
+                                value-field="keyId"
                                 v-model:value={formState.value.simbankKeyId}
                                 loading={props.simbankOptions.loading.value}
                                 options={props.simbankOptions.dataSource.value}

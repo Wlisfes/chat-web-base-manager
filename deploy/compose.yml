@@ -17,13 +17,13 @@ services:
             - '80:80'
             - '443:443'
             # 基础设施 TCP 端口继续由云端 Nginx stream 转发到开发机。
+            # Nacos 8848/9848 不在这里发布。Manager 重建会摘掉端口，客户端心跳会收到 ECONNREFUSED。
+            # 公网入口由 /opt/chat-web-cloud/nacos-public-compose.yml 的 chat-web-cloud-nacos-public 持有。
             - '3306:3306'
             - '6379:6379'
             - '5672:5672'
             - '9092:9092'
             - '15672:15672'
-            - '172.18.100.12:8848:8848'
-            - '172.18.100.12:9848:9848'
         volumes:
             # 云端 Nginx 配置由基础设施部署维护，避免 Manager 发布覆盖其他域名入口。
             - ${NGINX_CONFIG_PATH:-./nginx.conf}:/etc/nginx/nginx.conf:ro

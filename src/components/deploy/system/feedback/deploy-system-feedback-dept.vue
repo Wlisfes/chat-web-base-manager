@@ -132,7 +132,7 @@ export default defineComponent({
                             <form-base-cascader
                                 v-model:value={formState.value.parentKeyId}
                                 label-field="name"
-                                label-value="keyId"
+                                value-field="keyId"
                                 children-field="children"
                                 placeholder="请选择上级部门"
                                 expand-trigger="click"
@@ -163,7 +163,7 @@ export default defineComponent({
                         <form-base-column label="负责人" path="leaderUserUid">
                             <form-base-select
                                 filterable
-                                label-value="uid"
+                                value-field="uid"
                                 label-field="showName"
                                 placeholder="请选择负责人"
                                 options={leaderOptions.dataSource.value}

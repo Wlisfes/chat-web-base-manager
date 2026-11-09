@@ -183,7 +183,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="name"
-                            label-value="keyId"
+                            value-field="keyId"
                             placeholder="请选择品牌"
                             loading={brandOptions.loading.value}
                             options={brandOptions.dataSource.value}
@@ -195,7 +195,7 @@ export default defineComponent({
                             clearable
                             filterable
                             label-field="showName"
-                            label-value="uid"
+                            value-field="uid"
                             placeholder="请选择归属人"
                             loading={ownerOptions.loading.value}
                             options={ownerOptions.dataSource.value}
