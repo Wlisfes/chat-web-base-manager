@@ -70,7 +70,7 @@ export default defineComponent({
         return () => (
             <common-dialog-provider
                 title={props.title}
-                width={1440}
+                width={1480}
                 action={false}
                 scrollbar={false}
                 class-element="p-inline-20 p-be-20"
