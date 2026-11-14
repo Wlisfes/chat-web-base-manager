@@ -37,6 +37,8 @@ export default defineComponent({
         contentClass: { type: String, default: '' },
         /**容器样式**/
         className: { type: String, default: '' },
+        /**容器样式**/
+        insetClass: { type: String, default: '' },
         /**开启边框**/
         bordered: { type: Boolean, default: true },
         /**分页跳转**/
@@ -68,7 +70,7 @@ export default defineComponent({
                 class="common-database-wrapper flex flex-col flex-1 overflow-hidden"
                 style={{ [`--common-limit-width`]: `${props.limit}px` }}
             >
-                <div class="common-database-absolute flex flex-col absolute inset-0 overflow-hidden">
+                <div class={`common-database-absolute flex flex-col absolute inset-0 overflow-hidden ${props.insetClass}`}>
                     <n-card
                         class="flex flex-col flex-1 overflow-hidden"
                         content-class="flex flex-col flex-1 overflow-hidden p-0!"

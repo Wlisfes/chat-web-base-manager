@@ -7,7 +7,7 @@ export default defineComponent({
     name: 'DeployBasicDatetask',
     setup(props, ctx) {
         /**系统任务静态枚举**/
-        const { chunkOptions, chunkState, observer } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
+        const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
             tabName: 'TASK_SYSTEM',
             immediate: true
         })
@@ -18,7 +18,6 @@ export default defineComponent({
                     animated
                     type="line"
                     tabs-padding={14}
-                    tab-class="p-block-12!"
                     default-value="TASK_SYSTEM"
                     class="common-base-tabser inset-absolute inset-border flex-1 overflow-hidden"
                     v-model:value={chunkState.tabName}
@@ -29,7 +28,11 @@ export default defineComponent({
                             display-directive="show:lazy"
                             tab={<common-base-tab-title initialize={chunkState.initialize} title={item.label} />}
                         >
-                            <deploy-datetask-list-container node={item} chunk-options={chunkOptions.value}></deploy-datetask-list-container>
+                            <deploy-datetask-list-container
+                                node={item}
+                                chunk-state={chunkState}
+                                chunk-options={chunkOptions.value}
+                            ></deploy-datetask-list-container>
                         </n-tab-pane>
                     ))}
                 </n-tabs>

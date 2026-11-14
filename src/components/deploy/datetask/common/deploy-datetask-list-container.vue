@@ -1,9 +1,9 @@
 <script lang="tsx">
 import { defineComponent, PropType } from 'vue'
 import { Document, Edit, Flash, Pause, Play } from '@vicons/carbon'
-import { useColumnService } from '@/hooks'
 import { fetchDialogService, fetchNotifyService } from '@/plugins'
-import { fetchDeployDatetaskCron, fetchDeployDatetaskLog } from '@/components/deploy/hooks'
+import { useColumnService } from '@/hooks'
+import * as feedback from '@/components/deploy/hooks'
 import * as Service from '@/api/instance.service'
 
 export default defineComponent({
@@ -12,23 +12,25 @@ export default defineComponent({
         /**tab数据配置**/
         node: { type: Object as PropType<Omix>, default: () => ({}) },
         /**枚举对象**/
-        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) }
+        chunkOptions: { type: Object as PropType<Omix>, default: () => ({}) },
+        /**枚举对象**/
+        chunkState: { type: Object as PropType<Omix>, default: () => ({}) }
     },
-    setup(props, { slots }) {
+    setup(props) {
         /**表格实例**/
         const { formRef, formState, state, instOptions, fetchRefresh } = useColumnService(
             (base, payload) => Service.httpBaseSkylineColumnDatetask({ ...payload, page: base.page, size: base.size }),
             {
-                keyName: 'chat:deploy:datetask:system',
+                keyName: 'chat:deploy:basic:datetask',
                 actions: [
-                    { title: '启用/停用', key: 'chat:deploy:datetask:system:status:update' },
-                    { title: '编辑', key: 'chat:deploy:datetask:system:update' },
-                    { title: '手动触发', key: 'chat:deploy:datetask:system:trigger' },
-                    { title: '任务日志', key: 'chat:deploy:datetask:system:logs' }
+                    { title: '启用/停用', key: 'chat:deploy:basic:datetask:status:update' },
+                    { title: '编辑', key: 'chat:deploy:basic:datetask:update' },
+                    { title: '手动触发', key: 'chat:deploy:basic:datetask:trigger' },
+                    { title: '任务日志', key: 'chat:deploy:basic:datetask:logs' }
                 ],
                 formState: {
                     /**任务所属模块**/
-                    module: undefined,
+                    module: props.node.value,
                     /**任务名称**/
                     taskName: undefined,
                     /**任务状态**/
@@ -62,7 +64,7 @@ export default defineComponent({
 
         /**查看执行日志**/
         async function fetchDatetaskLog(node: Omix) {
-            return await fetchDeployDatetaskLog({
+            return await feedback.fetchDeployDatetaskLog({
                 title: `执行日志 - ${node.taskName}`,
                 node
             })
@@ -70,7 +72,7 @@ export default defineComponent({
 
         /**修改Cron表达式**/
         async function fetchDatetaskCronUpdate(node: Omix) {
-            return await fetchDeployDatetaskCron({
+            return await feedback.fetchDeployDatetaskCron({
                 title: '修改Cron表达式',
                 node,
                 logRetentionOptions: props.chunkOptions.logRetentionOptions,
@@ -134,13 +136,44 @@ export default defineComponent({
         }
 
         return () => (
-            <common-base-element is-white is-border class-name="h-full border-t-0! rd-t-none! overflow-hidden">
+            <common-base-element class="deploy-datetask-list-container h-full flex flex-col gap-14 overflow-hidden">
+                <common-database-search
+                    class="p-0!"
+                    function-class="justify-end"
+                    function={['search', 'restore', 'collapse', 'deploy', 'abstract']}
+                    square={['l-t', 'r-t']}
+                    ref={formRef}
+                    limit={state.limit}
+                    v-model:when={state.when}
+                    v-model:loading={state.loading}
+                    v-model:database={state.database}
+                    v-model:formState={formState.value}
+                    v-model:initialize={state.initialize}
+                    on-update:database={instOptions.fetchUpdateDatabase}
+                    on-restore={instOptions.fetchRestore}
+                    on-submit={instOptions.fetchRequest}
+                >
+                    <common-database-search-column disabled prop="taskName" label="任务名称">
+                        <form-base-input
+                            clearable
+                            placeholder="请输入任务名称"
+                            v-model:value={formState.value.taskName}
+                            on-submit={fetchRefresh}
+                        ></form-base-input>
+                    </common-database-search-column>
+                    <common-database-search-column prop="status" label="任务状态">
+                        <form-base-select
+                            clearable
+                            placeholder="请选择任务状态"
+                            loading={props.chunkState.loading}
+                            options={props.chunkOptions.statusOptions}
+                            v-model:value={formState.value.status}
+                            on-change:value={fetchRefresh}
+                        ></form-base-select>
+                    </common-database-search-column>
+                </common-database-search>
                 <common-database-wrapper
-                    class="h-full"
-                    class-name="p-bs-0"
-                    content-class="p-inline-0"
-                    pagination-class="p-inline-0! p-be-0!"
-                    bordered={false}
+                    inset-class="p-0!"
                     limit={state.limit}
                     total={state.total}
                     v-model:page={state.page}
