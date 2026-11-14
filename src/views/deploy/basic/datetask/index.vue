@@ -8,8 +8,8 @@ export default defineComponent({
     setup(props, ctx) {
         /**系统任务静态枚举**/
         const { chunkOptions, chunkState } = useChunkService(e => Service.httpBaseSkylineDatetaskEnums(), {
-            tabName: 'TASK_SYSTEM',
-            immediate: true
+            immediate: true,
+            tabName: 'TASK_SYSTEM'
         })
 
         return () => (
@@ -19,10 +19,17 @@ export default defineComponent({
                     type="line"
                     tabs-padding={14}
                     default-value="TASK_SYSTEM"
+                    style={{ '--n-tab-gap': '20px' }}
                     class="common-base-tabser inset-absolute inset-border flex-1 overflow-hidden"
                     v-model:value={chunkState.tabName}
                 >
-                    {(chunkOptions.value.moduleOptions ?? []).map((item: Omix) => (
+                    {(
+                        chunkOptions.value.moduleOptions ?? [
+                            { value: 'TASK_SYSTEM', label: '系统' },
+                            { value: 'TASK_FINANCE', label: '财务' },
+                            { value: 'TASK_CRM', label: 'CRM' }
+                        ]
+                    ).map((item: Omix) => (
                         <n-tab-pane
                             name={item.value}
                             display-directive="show:lazy"
