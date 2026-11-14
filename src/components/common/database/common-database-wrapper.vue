@@ -33,6 +33,10 @@ export default defineComponent({
         pagination: { type: Boolean, default: true },
         /**分页框样式**/
         paginationClass: { type: String, default: '' },
+        /**滚动容器样式**/
+        contentClass: { type: String, default: '' },
+        /**容器样式**/
+        className: { type: String, default: '' },
         /**开启边框**/
         bordered: { type: Boolean, default: true },
         /**分页跳转**/
@@ -70,10 +74,10 @@ export default defineComponent({
                         content-class="flex flex-col flex-1 overflow-hidden p-0!"
                         bordered={props.bordered}
                     >
-                        <div class="flex flex-col flex-1 overflow-hidden p-block-[var(--common-limit-width)]">
+                        <div class={`flex flex-col flex-1 overflow-hidden p-block-[var(--common-limit-width)] ${props.className}`}>
                             <common-base-wrapper
                                 scrollbar
-                                scrollbar-props={{ contentClass: 'p-inline-[var(--common-limit-width)]' }}
+                                scrollbar-props={{ contentClass: `p-inline-[var(--common-limit-width)] ${props.contentClass}` }}
                                 v-model:loading={loading.value}
                                 v-model:initialize={initialize.value}
                             >

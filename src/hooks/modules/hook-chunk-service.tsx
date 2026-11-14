@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { useState } from '@/hooks'
-import { isEmpty, isNotEmpty } from '@/utils'
+import { isEmpty, isNotEmpty, Observer } from '@/utils'
 import { ResultResolver, ChunkOptionGroup } from '@/interface/instance.resolver'
 
 /**字典枚举基础状态**/
@@ -11,6 +11,8 @@ export interface ChunkBaseState<K extends string> {
     loading: boolean
     /**枚举类型**/
     types: Array<K>
+    /**tab默认值**/
+    tabName: string
 }
 
 /**字典枚举对象：types 中的每个枚举类型都会扩展为 state 上的同名字段**/
@@ -26,6 +28,8 @@ export interface ChunkServiceOptions<K extends string> {
     loading?: boolean
     /**枚举类型**/
     types?: Array<K>
+    /**tab默认值**/
+    tabName?: string
     /**字典请求函数**/
     request?: (data: ChunkState<NoInfer<K>>) => Promise<ResultResolver<Omix>>
 }
@@ -36,8 +40,10 @@ export function useChunkService<const K extends string = never>(
     options: ChunkServiceOptions<K> = {}
 ) {
     const chunkOptions = ref<Omix>({})
+    const observer = Observer<Record<string, Omix>>()
     const { state, setState } = useState<ChunkBaseState<K>>({
         types: options.types ?? [],
+        tabName: options.tabName ?? 'default',
         loading: options.loading ?? options.immediate ?? true,
         initialize: options.initialize ?? options.immediate ?? true,
         ...(options.types ?? []).reduce((s, key) => ({ ...s, [key]: [] }), {})
@@ -77,6 +83,7 @@ export function useChunkService<const K extends string = never>(
     }
 
     return {
+        observer,
         chunkState: state as ChunkState<K>,
         chunkOptions,
         setState,

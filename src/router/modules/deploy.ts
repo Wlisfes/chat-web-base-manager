@@ -26,11 +26,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/deploy/basic/country/index.vue')
     },
     {
-        path: '/deploy/datetask/system',
-        name: 'DeployDatetaskSystem',
-        meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },
-        component: () => import('@/views/deploy/datetask/system/index.vue')
+        path: '/deploy/basic/datetask',
+        name: 'DeployBasicDatetask',
+        meta: { title: '任务管理', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/basic/datetask/index.vue')
     },
+    // {
+    //     path: '/deploy/datetask/system',
+    //     name: 'DeployDatetaskSystem',
+    //     meta: { title: '系统任务管理', AUTH: 'AUTH', keepAlive: true },
+    //     component: () => import('@/views/deploy/datetask/system/index.vue')
+    // },
     {
         path: '/deploy/system/sheet',
         name: 'DeploySystemSheet',
