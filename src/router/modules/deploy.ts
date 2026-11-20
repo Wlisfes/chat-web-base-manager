@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/deploy/basic/datetask/index.vue')
     },
     {
+        path: '/deploy/daily/logger',
+        name: 'DeployDailyLogger',
+        meta: { title: '操作日志', AUTH: 'AUTH', keepAlive: true },
+        component: () => import('@/views/deploy/daily/logger/index.vue')
+    },
+    {
         path: '/deploy/system/sheet',
         name: 'DeploySystemSheet',
         meta: { title: '菜单管理', AUTH: 'AUTH', keepAlive: true },
